@@ -213,6 +213,12 @@ def log_operacao(
     payload: Any = None,
     ip: str | None = None,
 ) -> None:
+    sanitized_payload = payload
+    if isinstance(payload, dict):
+        sanitized_payload = {
+            k: v for k, v in payload.items()
+            if k not in ("senha", "senha_hash", "mfa_secret", "password", "secret")
+        }
     db.add(
         LogOperacao(
             usuario_id=usuario_id,
@@ -220,7 +226,7 @@ def log_operacao(
             entidade=entidade,
             entidade_id=entidade_id,
             detalhes=detalhes,
-            payload=payload,
+            payload=sanitized_payload,
             ip=ip,
         )
     )
