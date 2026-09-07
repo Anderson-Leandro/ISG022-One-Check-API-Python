@@ -1,8 +1,12 @@
+import uuid
 from datetime import date, datetime, timezone
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
+from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
 from app.deps import get_current_user, require_roles
 from app.models import (
@@ -10,9 +14,11 @@ from app.models import (
     Checklist,
     Contrato,
     Imovel,
+    ImovelComodo,
     Problema,
     Usuario,
 )
+from app.notification_service import notificar_admins
 from app.schemas import (
     AgendamentoCreate,
     ChecklistCreate,
@@ -27,6 +33,7 @@ from app.serializers import (
     serialize_agendamento,
     serialize_checklist,
     serialize_contrato,
+    serialize_problema,
 )
 
 router = APIRouter(prefix="/contratos", tags=["contratos"])
@@ -316,50 +323,138 @@ def create_checklist(
 
 
 def _assert_pode_problema(contrato: Contrato, user: Usuario) -> None:
-    if user.role in ("admin", "gestor", "vistoriador"):
+    if user.role in ("admin", "gestor"):
         return
     if user.role == "locatario" and contrato.locatario_id == user.id:
         return
-    raise HTTPException(status_code=403, detail="Sem permissão para registrar problemas neste contrato")
+    raise HTTPException(status_code=403, detail="Você não tem permissão para registrar problemas neste contrato")
 
 
 @router.post("/{contrato_id}/problemas")
-def create_problema(
+async def create_problema(
     contrato_id: str,
-    body: ProblemaCreate,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
-    _assert_pode_problema(ct, user)
+        return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Contrato não encontrado"})
+    
+    if ct.status != "ativo":
+        return JSONResponse(
+            status_code=422,
+            content={"sucesso": False, "erro": "Problemas só podem ser registrados em contratos ativos"},
+        )
 
-    if body.prioridade not in ("normal", "alta", "urgente"):
-        return fail("Prioridade inválida")
-    if body.status not in ("aberto", "em_analise", "resolvido", "fechado"):
-        return fail("Status inválido")
+    try:
+        _assert_pode_problema(ct, user)
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"sucesso": False, "erro": e.detail})
+
+    content_type = request.headers.get("content-type", "")
+    foto_chave = None
+    titulo = ""
+    descricao = None
+    comodo_id = None
+    prioridade = "normal"
+    status_val = "aberto"
+
+    if "multipart/form-data" in content_type:
+        form = await request.form()
+        titulo = str(form.get("titulo") or "").strip()
+        descricao = form.get("descricao")
+        if descricao is not None:
+            descricao = str(descricao).strip()
+        comodo_id = form.get("comodo_id")
+        if comodo_id:
+            comodo_id = str(comodo_id).strip()
+        if form.get("prioridade"):
+            prioridade = str(form.get("prioridade")).strip()
+        if form.get("status"):
+            status_val = str(form.get("status")).strip()
+        
+        foto = form.get("foto")
+        if foto and hasattr(foto, "read"):
+            content = await foto.read()
+            if len(content) > MAX_UPLOAD_MB * 1024 * 1024:
+                return JSONResponse(
+                    status_code=422,
+                    content={"sucesso": False, "erro": f"A foto não pode exceder {MAX_UPLOAD_MB} MB", "erros": {"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"}},
+                )
+            ext = Path(getattr(foto, "filename", "foto.jpg") or "foto.jpg").suffix or ".jpg"
+            filename = f"{uuid.uuid4().hex}{ext}"
+            UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+            filepath = UPLOAD_DIR / filename
+            filepath.write_bytes(content)
+            foto_chave = filename
+    else:
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        titulo = str(body.get("titulo") or "").strip()
+        descricao = body.get("descricao")
+        if descricao is not None:
+            descricao = str(descricao).strip()
+        comodo_id = body.get("comodo_id")
+        if comodo_id:
+            comodo_id = str(comodo_id).strip()
+        prioridade = str(body.get("prioridade") or "normal").strip()
+        status_val = str(body.get("status") or "aberto").strip()
+        foto_chave = body.get("foto_url")
+
+    erros = {}
+    if not titulo:
+        erros["titulo"] = "O campo título é obrigatório"
+
+    if comodo_id:
+        comodo = (
+            db.query(ImovelComodo)
+            .filter(ImovelComodo.id == comodo_id, ImovelComodo.imovel_id == ct.imovel_id)
+            .first()
+        )
+        if not comodo:
+            return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Cômodo não encontrado"})
+
+    if prioridade not in ("normal", "alta", "urgente"):
+        return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Prioridade inválida", "erros": {"prioridade": "Prioridade inválida"}})
+
+    if status_val not in ("aberto", "em_andamento", "em_analise", "resolvido", "fechado"):
+        return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Status inválido", "erros": {"status": "Status inválido"}})
+
+    if erros:
+        return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Dados inválidos", "erros": erros})
 
     pb = Problema(
         contrato_id=contrato_id,
-        titulo=body.titulo.strip(),
-        descricao=body.descricao,
-        prioridade=body.prioridade,
-        status=body.status,
+        comodo_id=comodo_id,
+        titulo=titulo,
+        descricao=descricao,
+        foto_url=foto_chave,
+        prioridade=prioridade,
+        status=status_val,
     )
     db.add(pb)
     db.commit()
     db.refresh(pb)
-    log_operacao(db, user.id, "create", "problema", pb.id)
-    return ok({
-        "id": pb.id,
-        "contrato_id": pb.contrato_id,
-        "titulo": pb.titulo,
-        "descricao": pb.descricao,
-        "prioridade": pb.prioridade,
-        "status": pb.status,
-        "created_at": pb.created_at.isoformat() if pb.created_at else None,
-    })
+
+    log_operacao(
+        db,
+        user.id,
+        "create",
+        "registro_problema",
+        pb.id,
+        payload={"contrato_id": contrato_id, "comodo_id": pb.comodo_id, "titulo": pb.titulo},
+    )
+
+    notificar_admins(
+        db,
+        f"Novo problema registrado — {pb.titulo}",
+        f"Um novo problema foi registrado no contrato {contrato_id}.\n\nTítulo: {pb.titulo}\nDescrição: {pb.descricao}\n\nAcesse o painel para visualizar os detalhes.",
+    )
+
+    return JSONResponse(status_code=201, content={"sucesso": True, "dados": serialize_problema(pb)})
 
 
 @router.get("/{contrato_id}/problemas")
@@ -370,26 +465,16 @@ def list_problemas(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Contrato não encontrado"})
     try:
         _assert_pode_problema(ct, user)
-    except HTTPException:
-        return fail("Sem permissão para ver problemas deste contrato")
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"sucesso": False, "erro": e.detail})
+
     rows = (
         db.query(Problema)
         .filter(Problema.contrato_id == contrato_id)
         .order_by(Problema.created_at.desc())
         .all()
     )
-    return ok([
-        {
-            "id": p.id,
-            "contrato_id": p.contrato_id,
-            "titulo": p.titulo,
-            "descricao": p.descricao,
-            "prioridade": p.prioridade,
-            "status": p.status,
-            "created_at": p.created_at.isoformat() if p.created_at else None,
-        }
-        for p in rows
-    ])
+    return ok([serialize_problema(p) for p in rows])
