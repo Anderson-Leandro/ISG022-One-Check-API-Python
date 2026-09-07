@@ -344,3 +344,124 @@ class TestListProblemas:
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/problemas")
         assert r.status_code == 401
+
+
+# ── GET /contratos/{id} ───────────────────────────────────────────────────────────
+
+class TestGetContrato:
+    def test_admin_busca_contrato_por_id(self, client, contrato, token_admin):
+        r = client.get(f"{BASE}/{contrato.id}", headers=auth(token_admin))
+        data = r.json()
+        assert data["sucesso"] is True
+        assert data["dados"]["id"] == contrato.id
+        assert data["dados"]["status"] == "ativo"
+
+    def test_locatario_acessa_proprio_contrato(self, client, contrato, token_locatario):
+        r = client.get(f"{BASE}/{contrato.id}", headers=auth(token_locatario))
+        data = r.json()
+        assert data["sucesso"] is True
+        assert data["dados"]["id"] == contrato.id
+
+    def test_locatario_nao_acessa_contrato_alheio(self, client, db, contrato):
+        from app.auth import create_access_token
+        from app.models import Usuario
+        from tests.conftest import _SENHA_HASH
+        u2 = Usuario(nome="Locatario 2", email="loc2@test.com", senha_hash=_SENHA_HASH, role="locatario", ativo=True)
+        db.add(u2)
+        db.flush()
+        token2 = create_access_token(u2.id, u2.role)
+
+        r = client.get(f"{BASE}/{contrato.id}", headers=auth(token2))
+        assert r.status_code == 403
+
+    def test_contrato_inexistente_retorna_falha(self, client, token_admin):
+        r = client.get(f"{BASE}/00000000-0000-0000-0000-000000000000", headers=auth(token_admin))
+        assert r.json()["sucesso"] is False
+
+
+# ── PATCH /contratos/{id}/encerrar e /cancelar ────────────────────────────────────
+
+class TestCicloVidaContrato:
+    def test_admin_encerra_contrato_e_libera_imovel(self, client, db, imovel, user_locatario, token_admin):
+        # Criar contrato
+        r_create = client.post(BASE, json={
+            "imovel_id": imovel.id,
+            "locatario_id": user_locatario.id,
+            "data_inicio": "2025-01-01",
+            "data_fim": "2025-12-31",
+        }, headers=auth(token_admin))
+        ct_id = r_create.json()["dados"]["id"]
+
+        # Encerrar
+        r = client.patch(f"{BASE}/{ct_id}/encerrar", headers=auth(token_admin))
+        data = r.json()
+        assert data["sucesso"] is True
+        assert data["dados"]["status"] == "encerrado"
+
+        # Verificar que imóvel foi liberado
+        db.refresh(imovel)
+        assert imovel.status == "disponivel"
+
+    def test_admin_cancela_contrato_e_libera_imovel(self, client, db, imovel, user_locatario, token_admin):
+        # Criar contrato
+        r_create = client.post(BASE, json={
+            "imovel_id": imovel.id,
+            "locatario_id": user_locatario.id,
+            "data_inicio": "2025-01-01",
+            "data_fim": "2025-12-31",
+        }, headers=auth(token_admin))
+        ct_id = r_create.json()["dados"]["id"]
+
+        # Cancelar
+        r = client.patch(f"{BASE}/{ct_id}/cancelar", headers=auth(token_admin))
+        data = r.json()
+        assert data["sucesso"] is True
+        assert data["dados"]["status"] == "cancelado"
+
+        # Verificar que imóvel foi liberado
+        db.refresh(imovel)
+        assert imovel.status == "disponivel"
+
+    def test_encerrar_contrato_ja_encerrado_retorna_falha(self, client, contrato, token_admin):
+        client.patch(f"{BASE}/{contrato.id}/encerrar", headers=auth(token_admin))
+        r = client.patch(f"{BASE}/{contrato.id}/encerrar", headers=auth(token_admin))
+        data = r.json()
+        assert data["sucesso"] is False
+        assert "encerrado" in data["erro"].lower()
+
+    def test_locatario_nao_pode_encerrar_contrato(self, client, contrato, token_locatario):
+        r = client.patch(f"{BASE}/{contrato.id}/encerrar", headers=auth(token_locatario))
+        assert r.status_code == 403
+
+
+# ── Validações de Regra de Negócio na Criação ────────────────────────────────────
+
+class TestValidacoesCriacaoContrato:
+    def test_data_fim_anterior_a_inicio_retorna_falha(self, client, imovel, user_locatario, token_admin):
+        r = client.post(BASE, json={
+            "imovel_id": imovel.id,
+            "locatario_id": user_locatario.id,
+            "data_inicio": "2025-12-31",
+            "data_fim": "2025-01-01",
+        }, headers=auth(token_admin))
+        data = r.json()
+        assert data["sucesso"] is False
+        assert "posterior" in data["erro"].lower()
+
+    def test_usuario_com_role_admin_como_locatario_retorna_falha(self, client, imovel, user_admin, token_admin):
+        r = client.post(BASE, json={
+            "imovel_id": imovel.id,
+            "locatario_id": user_admin.id,
+            "data_inicio": "2025-01-01",
+            "data_fim": "2025-12-31",
+        }, headers=auth(token_admin))
+        data = r.json()
+        assert data["sucesso"] is False
+        assert "locatário" in data["erro"].lower()
+
+    def test_filtra_contratos_por_imovel_id(self, client, contrato, token_admin):
+        r = client.get(f"{BASE}?imovel_id={contrato.imovel_id}", headers=auth(token_admin))
+        data = r.json()
+        assert data["sucesso"] is True
+        for c in data["dados"]:
+            assert c["imovel_id"] == contrato.imovel_id

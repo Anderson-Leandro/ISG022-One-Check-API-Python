@@ -6,7 +6,18 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import CORS_ORIGINS, UPLOAD_DIR
 from app.database import Base, ensure_schema_updates, engine
-from app.routers import admin, auth_router, checklists, contratos, dashboard, health, imoveis, usuarios
+from app.routers import (
+    admin,
+    agendamentos,
+    auth_router,
+    checklists,
+    contratos,
+    dashboard,
+    health,
+    imoveis,
+    problemas,
+    usuarios,
+)
 
 
 @asynccontextmanager
@@ -38,7 +49,9 @@ app.include_router(auth_router.router, prefix=prefix)
 app.include_router(usuarios.router, prefix=prefix)
 app.include_router(imoveis.router, prefix=prefix)
 app.include_router(contratos.router, prefix=prefix)
+app.include_router(agendamentos.router, prefix=prefix)
 app.include_router(checklists.router, prefix=prefix)
+app.include_router(problemas.router, prefix=prefix)
 app.include_router(dashboard.router, prefix=prefix)
 app.include_router(admin.router, prefix=prefix)
 

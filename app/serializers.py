@@ -21,9 +21,12 @@ from app.models import (
 )
 
 
-def foto_url(arquivo: str) -> str:
-    path = f"/api/v1/uploads/{arquivo}"
-    return path
+def foto_url(arquivo: str | None) -> str | None:
+    if not arquivo:
+        return None
+    if arquivo.startswith("http://") or arquivo.startswith("https://") or arquivo.startswith("/"):
+        return arquivo
+    return f"/api/v1/uploads/{arquivo}"
 
 
 def serialize_foto(f: ChecklistItemFoto) -> dict:
@@ -165,6 +168,17 @@ def serialize_contrato(ct: Contrato) -> dict:
     }
 
 
+def serialize_agendamento(ag) -> dict:
+    return {
+        "id": ag.id,
+        "contrato_id": ag.contrato_id,
+        "tipo": ag.tipo,
+        "data_agendada": ag.data_agendada.isoformat() if ag.data_agendada else None,
+        "observacao": ag.observacao,
+        "created_at": ag.created_at.isoformat() if ag.created_at else None,
+    }
+
+
 def serialize_usuario(u: Usuario) -> dict:
     return {
         "id": u.id,
@@ -199,6 +213,12 @@ def log_operacao(
     payload: Any = None,
     ip: str | None = None,
 ) -> None:
+    sanitized_payload = payload
+    if isinstance(payload, dict):
+        sanitized_payload = {
+            k: v for k, v in payload.items()
+            if k not in ("senha", "senha_hash", "mfa_secret", "password", "secret")
+        }
     db.add(
         LogOperacao(
             usuario_id=usuario_id,
@@ -206,7 +226,7 @@ def log_operacao(
             entidade=entidade,
             entidade_id=entidade_id,
             detalhes=detalhes,
-            payload=payload,
+            payload=sanitized_payload,
             ip=ip,
         )
     )

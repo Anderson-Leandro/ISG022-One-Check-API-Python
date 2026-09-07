@@ -10,6 +10,7 @@ Rotas cobertas:
   POST /api/v1/admin/refresh-data
   POST /api/v1/admin/seed
 """
+from datetime import datetime
 from app.config import SEED_SECRET, UPLOAD_DIR
 from tests.conftest import auth, small_image_bytes
 
@@ -93,6 +94,34 @@ class TestLogs:
         r = client.get("/api/v1/logs?pagina=1&por_pagina=5", headers=auth(token_admin))
         data = r.json()
         assert data["paginacao"]["itensPorPagina"] == 5
+
+    def test_filtro_por_entidade_e_datas(self, client, token_admin):
+        hoje = datetime.now().strftime("%Y-%m-%d")
+        r = client.get(f"/api/v1/logs?entidade=usuario&de={hoje}&ate={hoje}", headers=auth(token_admin))
+        assert r.status_code == 200
+        data = r.json()
+        assert data["sucesso"] is True
+        for item in data["dados"]:
+            assert item["entidade"] == "usuario"
+
+    def test_filtro_data_futura_retorna_vazio(self, client, token_admin):
+        r = client.get("/api/v1/logs?de=2099-01-01&ate=2099-12-31", headers=auth(token_admin))
+        assert r.status_code == 200
+        assert len(r.json()["dados"]) == 0
+
+    def test_payload_nao_contem_senhas(self, client, token_admin):
+        r = client.get("/api/v1/logs", headers=auth(token_admin))
+        assert r.status_code == 200
+        for item in r.json()["dados"]:
+            p = item.get("payload")
+            if isinstance(p, dict):
+                assert "senha" not in p
+                assert "senha_hash" not in p
+                assert "mfa_secret" not in p
+
+    def test_locatario_nao_pode_acessar_logs_retorna_403(self, client, token_locatario):
+        r = client.get("/api/v1/logs", headers=auth(token_locatario))
+        assert r.status_code == 403
 
     def test_sem_autenticacao_retorna_401(self, client):
         r = client.get("/api/v1/logs")

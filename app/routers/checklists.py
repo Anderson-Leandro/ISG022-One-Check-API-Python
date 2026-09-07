@@ -1,21 +1,44 @@
+from datetime import date
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile
 from sqlalchemy.orm import Session, joinedload
 
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
-from app.deps import get_current_user
-from app.models import Checklist, ChecklistItem, ChecklistItemFoto, Contrato, ItemVistoria, Usuario
-from app.schemas import AddChecklistItemRequest, ItemUpdateRequest, fail, ok
+from app.deps import get_current_user, require_roles
+from app.models import (
+    AceiteChecklist,
+    Checklist,
+    ChecklistItem,
+    ChecklistItemFoto,
+    Contrato,
+    Imovel,
+    ImovelComodo,
+    ItemVistoria,
+    Usuario,
+)
+from app.pdf_generator import gerar_pdf_checklist
+from app.schemas import (
+    AddChecklistItemRequest,
+    ItemUpdateRequest,
+    RejeitarChecklistRequest,
+    fail,
+    ok,
+)
 from app.serializers import (
     foto_url,
     get_comodos_for_checklist,
     log_operacao,
+    serialize_aceite,
     serialize_checklist,
+    serialize_contrato,
+    serialize_endereco,
     serialize_foto,
+    serialize_imovel,
     serialize_item,
+    serialize_usuario,
 )
 
 router = APIRouter(tags=["checklists"])
@@ -24,7 +47,10 @@ router = APIRouter(tags=["checklists"])
 def _get_checklist(db: Session, checklist_id: str) -> Checklist | None:
     return (
         db.query(Checklist)
-        .options(joinedload(Checklist.itens).joinedload(ChecklistItem.fotos))
+        .options(
+            joinedload(Checklist.itens).joinedload(ChecklistItem.fotos),
+            joinedload(Checklist.aceite),
+        )
         .filter(Checklist.id == checklist_id)
         .first()
     )
@@ -37,9 +63,12 @@ def _assert_vistoriador(checklist: Checklist, user: Usuario) -> None:
         raise HTTPException(status_code=403, detail="Vistoriador não autorizado neste checklist")
 
 
-def _assert_pode_aceitar(checklist: Checklist, user: Usuario, db: Session) -> None:
+def _assert_pode_aceitar(checklist: Checklist, user: Usuario, db: Session) -> Contrato | None:
+    contrato = db.query(Contrato).filter(Contrato.id == checklist.contrato_id).first()
     if user.role in ("admin", "gestor"):
-        return
+        return contrato
+    if user.role == "locatario" and contrato and contrato.locatario_id == user.id:
+        return contrato
     raise HTTPException(status_code=403, detail="Sem permissão para aceitar ou rejeitar esta vistoria")
 
 
@@ -87,8 +116,26 @@ def add_item(
         return fail("Checklist não encontrado")
     _assert_vistoriador(ck, user)
 
+    if ck.status != "em_preenchimento":
+        return fail(f"Não é possível adicionar itens a um checklist com status '{ck.status}'")
+
     if body.estado not in ("otimo", "bom", "regular", "ruim"):
         return fail("Estado inválido")
+
+    # Validar que comodo existe
+    contrato = db.query(Contrato).filter(Contrato.id == ck.contrato_id).first()
+    if contrato:
+        comodo = db.query(ImovelComodo).filter(
+            ImovelComodo.id == body.comodo_id,
+            ImovelComodo.imovel_id == contrato.imovel_id,
+        ).first()
+        if not comodo:
+            return fail("Cômodo não encontrado")
+
+    # Validar que item_vistoria existe
+    it_vist = db.query(ItemVistoria).filter(ItemVistoria.id == body.item_vistoria_id).first()
+    if not it_vist:
+        return fail("Item de vistoria não encontrado")
 
     existing = (
         db.query(ChecklistItem)
@@ -114,8 +161,6 @@ def add_item(
         observacao=body.observacao,
     )
     db.add(item)
-    if ck.status == "em_preenchimento":
-        ck.status = "em_preenchimento"
     db.commit()
     db.refresh(item)
     log_operacao(db, user.id, "create", "checklist_item", item.id)
@@ -135,14 +180,20 @@ def update_item(
         return fail("Checklist não encontrado")
     _assert_vistoriador(ck, user)
 
+    if ck.status != "em_preenchimento":
+        return fail(f"Não é possível editar itens de um checklist com status '{ck.status}'")
+
     item = (
         db.query(ChecklistItem)
         .options(joinedload(ChecklistItem.fotos))
-        .filter(ChecklistItem.id == item_id, ChecklistItem.checklist_id == checklist_id)
+        .filter(ChecklistItem.id == item_id)
         .first()
     )
     if not item:
         return fail("Item não encontrado")
+
+    if item.checklist_id != checklist_id:
+        return fail("Este item não pertence ao checklist informado")
 
     if body.estado is not None:
         if body.estado not in ("otimo", "bom", "regular", "ruim"):
@@ -153,6 +204,7 @@ def update_item(
 
     db.commit()
     db.refresh(item)
+    log_operacao(db, user.id, "update", "checklist_item", item.id)
     return ok(serialize_item(item))
 
 
@@ -169,14 +221,20 @@ async def upload_foto(
         return fail("Checklist não encontrado")
     _assert_vistoriador(ck, user)
 
+    if ck.status != "em_preenchimento":
+        return fail(f"Não é possível adicionar fotos a um checklist com status '{ck.status}'")
+
     item = (
         db.query(ChecklistItem)
         .options(joinedload(ChecklistItem.fotos))
-        .filter(ChecklistItem.id == item_id, ChecklistItem.checklist_id == checklist_id)
+        .filter(ChecklistItem.id == item_id)
         .first()
     )
     if not item:
         return fail("Item não encontrado")
+
+    if item.checklist_id != checklist_id:
+        return fail("Este item não pertence ao checklist informado")
 
     if not item.estado:
         return fail("Selecione o estado do item antes de enviar a foto")
@@ -204,7 +262,7 @@ async def upload_foto(
     db.refresh(foto_row)
     log_operacao(db, user.id, "upload", "checklist_foto", foto_row.id)
 
-    return ok({"id": foto_row.id, "url": foto_url(filename)})
+    return ok({"id": foto_row.id, "checklist_item_id": item.id, "url": foto_url(filename)})
 
 
 @router.delete("/checklists/{checklist_id}/itens/{item_id}/fotos/{foto_id}")
@@ -219,6 +277,9 @@ def delete_foto(
     if not ck:
         return fail("Checklist não encontrado")
     _assert_vistoriador(ck, user)
+
+    if ck.status != "em_preenchimento":
+        return fail(f"Não é possível excluir fotos de um checklist com status '{ck.status}'")
 
     foto_row = (
         db.query(ChecklistItemFoto)
@@ -238,6 +299,7 @@ def delete_foto(
         old_path.unlink(missing_ok=True)
     db.delete(foto_row)
     db.commit()
+    log_operacao(db, user.id, "delete", "checklist_foto", foto_id)
     return ok(None)
 
 
@@ -252,6 +314,9 @@ def submit_checklist(
         return fail("Checklist não encontrado")
     _assert_vistoriador(ck, user)
 
+    if ck.status in ("pendente_aceite", "aceito") or ck.status != "em_preenchimento":
+        return fail("Checklist já foi submetido")
+
     filled = (
         db.query(ChecklistItem)
         .filter(ChecklistItem.checklist_id == checklist_id, ChecklistItem.estado.isnot(None))
@@ -260,13 +325,40 @@ def submit_checklist(
     if filled == 0:
         return fail("Preencha ao menos um item antes de submeter")
 
-    if ck.status in ("pendente_aceite", "aceito"):
-        return fail("Checklist já foi submetido")
+    ck.status = "pendente_aceite"
+    ck.data_vistoria = date.today()
+    db.commit()
+    db.refresh(ck)
+    log_operacao(db, user.id, "update", "checklist", checklist_id, "submeter")
+    return ok(serialize_checklist(ck, include_itens=True))
+
+
+@router.patch("/checklists/{checklist_id}/enviar-para-aceite")
+def enviar_para_aceite(
+    checklist_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    ck = _get_checklist(db, checklist_id)
+    if not ck:
+        return fail("Checklist não encontrado")
+
+    if ck.status != "em_preenchimento":
+        return fail(f"Não é possível enviar para aceite um checklist com status '{ck.status}'")
+
+    filled = (
+        db.query(ChecklistItem)
+        .filter(ChecklistItem.checklist_id == checklist_id, ChecklistItem.estado.isnot(None))
+        .count()
+    )
+    if filled == 0:
+        return fail("O checklist deve ter ao menos um item preenchido antes de ser enviado para aceite")
 
     ck.status = "pendente_aceite"
     db.commit()
-    log_operacao(db, user.id, "submit", "checklist", checklist_id)
-    return ok({"id": checklist_id, "status": ck.status})
+    db.refresh(ck)
+    log_operacao(db, user.id, "update", "checklist", checklist_id, "enviar_para_aceite")
+    return ok(serialize_checklist(ck, include_itens=True))
 
 
 @router.patch("/checklists/{checklist_id}/aceitar")
@@ -278,17 +370,62 @@ def aceitar_checklist(
     ck = _get_checklist(db, checklist_id)
     if not ck:
         return fail("Checklist não encontrado")
-    _assert_pode_aceitar(ck, user, db)
+    contrato = _assert_pode_aceitar(ck, user, db)
     if ck.status != "pendente_aceite":
         return fail("Checklist não está pendente de aceite")
+
+    loc_id = contrato.locatario_id if contrato else user.id
+    aceite = db.query(AceiteChecklist).filter(AceiteChecklist.checklist_id == checklist_id).first()
+    if not aceite:
+        aceite = AceiteChecklist(checklist_id=checklist_id, locatario_id=loc_id, status="aceito")
+        db.add(aceite)
+    else:
+        aceite.status = "aceito"
+        aceite.motivo_rejeicao = None
+
     ck.status = "aceito"
     db.commit()
+    db.refresh(ck)
     log_operacao(db, user.id, "accept", "checklist", checklist_id)
-    return ok({"id": checklist_id, "status": ck.status})
+    return ok(serialize_checklist(ck, include_itens=True))
 
 
 @router.patch("/checklists/{checklist_id}/rejeitar")
 def rejeitar_checklist(
+    checklist_id: str,
+    body: RejeitarChecklistRequest = RejeitarChecklistRequest(),
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user),
+):
+    ck = _get_checklist(db, checklist_id)
+    if not ck:
+        return fail("Checklist não encontrado")
+    contrato = _assert_pode_aceitar(ck, user, db)
+    if ck.status != "pendente_aceite":
+        return fail("Checklist não está pendente de aceite")
+
+    motivo = (body.motivo or body.motivo_rejeicao or "").strip()
+
+    loc_id = contrato.locatario_id if contrato else user.id
+    aceite = db.query(AceiteChecklist).filter(AceiteChecklist.checklist_id == checklist_id).first()
+    if not aceite:
+        aceite = AceiteChecklist(checklist_id=checklist_id, locatario_id=loc_id, status="rejeitado", motivo_rejeicao=motivo or None)
+        db.add(aceite)
+    else:
+        aceite.status = "rejeitado"
+        aceite.motivo_rejeicao = motivo or None
+
+    ck.status = "rejeitado"
+    db.commit()
+    db.refresh(ck)
+    log_operacao(db, user.id, "reject", "checklist", checklist_id)
+    return ok(serialize_checklist(ck, include_itens=True))
+
+
+@router.get("/checklists/{checklist_id}/download")
+@router.get("/checklists/{checklist_id}/download-pdf")
+@router.get("/checklists/{checklist_id}/pdf")
+def download_pdf(
     checklist_id: str,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
@@ -296,10 +433,41 @@ def rejeitar_checklist(
     ck = _get_checklist(db, checklist_id)
     if not ck:
         return fail("Checklist não encontrado")
-    _assert_pode_aceitar(ck, user, db)
-    if ck.status != "pendente_aceite":
-        return fail("Checklist não está pendente de aceite")
-    ck.status = "rejeitado"
-    db.commit()
-    log_operacao(db, user.id, "reject", "checklist", checklist_id)
-    return ok({"id": checklist_id, "status": ck.status})
+
+    if user.role == "vistoriador":
+        raise HTTPException(status_code=403, detail="Vistoriadores não têm acesso ao PDF do checklist")
+
+    contrato = db.query(Contrato).filter(Contrato.id == ck.contrato_id).first()
+    if user.role == "locatario":
+        if not contrato or contrato.locatario_id != user.id:
+            raise HTTPException(status_code=403, detail="Você não tem permissão para baixar o PDF deste checklist")
+
+    imovel = db.query(Imovel).filter(Imovel.id == contrato.imovel_id).first() if contrato else None
+    endereco = imovel.endereco if imovel else None
+    locatario = db.query(Usuario).filter(Usuario.id == contrato.locatario_id).first() if contrato else None
+    vistoriador = db.query(Usuario).filter(Usuario.id == ck.vistoriador_id).first()
+    aceite = db.query(AceiteChecklist).filter(AceiteChecklist.checklist_id == checklist_id).first()
+
+    ck_dict = serialize_checklist(ck, include_itens=True)
+    ct_dict = serialize_contrato(contrato) if contrato else {}
+    im_dict = serialize_imovel(imovel, include_endereco=True) if imovel else {}
+    end_dict = serialize_endereco(endereco) if endereco else None
+    loc_dict = serialize_usuario(locatario) if locatario else {}
+    vist_dict = serialize_usuario(vistoriador) if vistoriador else {}
+    aceite_dict = serialize_aceite(aceite) if aceite else None
+
+    pdf_bytes = gerar_pdf_checklist(
+        checklist=ck_dict,
+        contrato=ct_dict,
+        imovel=im_dict,
+        endereco=end_dict,
+        locatario=loc_dict,
+        vistoriador=vist_dict,
+        aceite=aceite_dict,
+    )
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="checklist-{checklist_id}.pdf"'},
+    )
