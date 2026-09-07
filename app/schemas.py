@@ -236,6 +236,18 @@ class ContratoOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class AgendamentoCreate(BaseModel):
+    tipo: str
+    data_agendada: datetime | date | str
+    observacao: str | None = None
+
+
+class AgendamentoUpdate(BaseModel):
+    tipo: str | None = None
+    data_agendada: datetime | date | str | None = None
+    observacao: str | None = None
+
+
 class AgendamentoOut(BaseModel):
     id: str
     contrato_id: str

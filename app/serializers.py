@@ -165,6 +165,17 @@ def serialize_contrato(ct: Contrato) -> dict:
     }
 
 
+def serialize_agendamento(ag) -> dict:
+    return {
+        "id": ag.id,
+        "contrato_id": ag.contrato_id,
+        "tipo": ag.tipo,
+        "data_agendada": ag.data_agendada.isoformat() if ag.data_agendada else None,
+        "observacao": ag.observacao,
+        "created_at": ag.created_at.isoformat() if ag.created_at else None,
+    }
+
+
 def serialize_usuario(u: Usuario) -> dict:
     return {
         "id": u.id,

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -13,10 +13,18 @@ from app.models import (
     Problema,
     Usuario,
 )
-from app.schemas import ChecklistCreate, ContratoCreate, ProblemaCreate, fail, ok
+from app.schemas import (
+    AgendamentoCreate,
+    ChecklistCreate,
+    ContratoCreate,
+    ProblemaCreate,
+    fail,
+    ok,
+)
 from app.serializers import (
     log_operacao,
     paginate,
+    serialize_agendamento,
     serialize_checklist,
     serialize_contrato,
 )
@@ -168,25 +176,79 @@ def cancelar_contrato(
     return ok(serialize_contrato(ct))
 
 
+def _parse_datetime(dt_val) -> datetime:
+    if isinstance(dt_val, datetime):
+        return dt_val
+    if isinstance(dt_val, date):
+        return datetime.combine(dt_val, datetime.min.time())
+    if isinstance(dt_val, str):
+        dt_val = dt_val.replace("Z", "+00:00")
+        try:
+            return datetime.fromisoformat(dt_val)
+        except Exception:
+            raise ValueError("Formato de data inválido")
+    raise ValueError("Formato de data inválido")
+
+
 @router.get("/{contrato_id}/agendamentos")
-def list_agendamentos(contrato_id: str, db: Session = Depends(get_db), _: Usuario = Depends(get_current_user)):
+def list_agendamentos(
+    contrato_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user),
+):
+    ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+    if not ct:
+        return fail("Contrato não encontrado")
+
+    if user.role == "locatario":
+        raise HTTPException(status_code=403, detail="Você não tem acesso aos agendamentos deste contrato")
+
     rows = (
         db.query(AgendamentoVistoria)
         .filter(AgendamentoVistoria.contrato_id == contrato_id)
         .order_by(AgendamentoVistoria.created_at)
         .all()
     )
-    return ok([
-        {
-            "id": r.id,
-            "contrato_id": r.contrato_id,
-            "tipo": r.tipo,
-            "data_agendada": r.data_agendada.isoformat() if r.data_agendada else None,
-            "observacao": r.observacao,
-            "created_at": r.created_at.isoformat() if r.created_at else None,
-        }
-        for r in rows
-    ])
+    return ok([serialize_agendamento(r) for r in rows])
+
+
+@router.post("/{contrato_id}/agendamentos")
+def create_agendamento(
+    contrato_id: str,
+    body: AgendamentoCreate,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+    if not ct:
+        return fail("Contrato não encontrado")
+
+    if ct.status != "ativo":
+        return fail("Agendamentos só podem ser criados em contratos ativos")
+
+    if body.tipo not in ("inicial", "encerramento"):
+        return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'")
+
+    try:
+        parsed_dt = _parse_datetime(body.data_agendada)
+    except Exception:
+        return fail("Formato de data_agendada inválido")
+
+    now = datetime.now() if parsed_dt.tzinfo is None else datetime.now(timezone.utc)
+    if parsed_dt <= now:
+        return fail("A data agendada deve ser uma data futura")
+
+    ag = AgendamentoVistoria(
+        contrato_id=contrato_id,
+        tipo=body.tipo,
+        data_agendada=parsed_dt.replace(tzinfo=None) if parsed_dt.tzinfo else parsed_dt,
+        observacao=body.observacao,
+    )
+    db.add(ag)
+    db.commit()
+    db.refresh(ag)
+    log_operacao(db, user.id, "create", "agendamento_vistoria", ag.id)
+    return ok(serialize_agendamento(ag))
 
 
 @router.get("/{contrato_id}/checklists")
