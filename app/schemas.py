@@ -285,6 +285,12 @@ class AceiteChecklistOut(BaseModel):
 
 class AceiteChecklistRequest(BaseModel):
     motivo_rejeicao: str | None = None
+    motivo: str | None = None
+
+
+class RejeitarChecklistRequest(BaseModel):
+    motivo: str | None = None
+    motivo_rejeicao: str | None = None
 
 
 class ChecklistItemOut(BaseModel):

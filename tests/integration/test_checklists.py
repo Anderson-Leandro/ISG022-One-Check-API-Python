@@ -404,6 +404,13 @@ class TestAceitarChecklist:
         data = r.json()
         assert data["sucesso"] is True
 
+    def test_locatario_aceita_checklist_proprio(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_locatario):
+        self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
+        r = client.patch(f"{BASE}/{checklist.id}/aceitar", headers=auth(token_locatario))
+        data = r.json()
+        assert data["sucesso"] is True
+        assert data["dados"]["status"] == "aceito"
+
     def test_vistoriador_nao_pode_aceitar(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
         r = client.patch(f"{BASE}/{checklist.id}/aceitar", headers=auth(token_vistoriador))
@@ -431,14 +438,21 @@ class TestRejeitarChecklist:
 
     def test_admin_rejeita_checklist(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_admin):
         self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
-        r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_admin))
+        r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_admin), json={"motivo": "Fotos borradas"})
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["status"] == "rejeitado"
 
-    def test_locatario_nao_pode_rejeitar(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_locatario):
+    def test_locatario_rejeita_proprio_checklist(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_locatario):
         self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
-        r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_locatario))
+        r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_locatario), json={"motivo": "Pintura danificada"})
+        data = r.json()
+        assert data["sucesso"] is True
+        assert data["dados"]["status"] == "rejeitado"
+
+    def test_vistoriador_nao_pode_rejeitar(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
+        self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
+        r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_vistoriador))
         assert r.status_code == 403
 
     def test_nao_pendente_retorna_falha(self, client, checklist, token_admin):
@@ -495,3 +509,42 @@ class TestEnviarParaAceite:
         data = r.json()
         assert data["sucesso"] is False
         assert "não é possível editar" in data["erro"].lower()
+
+
+# ── GET /checklists/{id}/download (PDF) ───────────────────────────────────────────
+
+class TestDownloadPdf:
+    def test_admin_baixa_pdf_checklist(self, client, db, checklist, item_vistoria, imovel, token_admin):
+        comodo = _primeiro_comodo(db, imovel.id)
+        _cria_item(db, checklist.id, comodo.id, item_vistoria.id, "bom")
+
+        r = client.get(f"{BASE}/{checklist.id}/download", headers=auth(token_admin))
+        assert r.status_code == 200
+        assert r.headers["content-type"] == "application/pdf"
+        assert r.content.startswith(b"%PDF-1.4")
+        assert len(r.content) > 100
+
+    def test_locatario_baixa_pdf_proprio_checklist(self, client, db, checklist, item_vistoria, imovel, token_locatario):
+        comodo = _primeiro_comodo(db, imovel.id)
+        _cria_item(db, checklist.id, comodo.id, item_vistoria.id, "bom")
+
+        r = client.get(f"{BASE}/{checklist.id}/download", headers=auth(token_locatario))
+        assert r.status_code == 200
+        assert r.headers["content-type"] == "application/pdf"
+        assert r.content.startswith(b"%PDF-1.4")
+
+    def test_locatario_alheio_recebe_403(self, client, db, checklist, item_vistoria, imovel):
+        from app.auth import create_access_token
+        from app.models import Usuario
+        from tests.conftest import _SENHA_HASH
+        u_outro = Usuario(nome="Outro Loc", email="outro_loc@teste.com", senha_hash=_SENHA_HASH, role="locatario", ativo=True)
+        db.add(u_outro)
+        db.commit()
+        token_outro = create_access_token(u_outro.id, u_outro.role)
+
+        r = client.get(f"{BASE}/{checklist.id}/download", headers=auth(token_outro))
+        assert r.status_code == 403
+
+    def test_vistoriador_nao_tem_acesso_ao_pdf_e_recebe_403(self, client, checklist, token_vistoriador):
+        r = client.get(f"{BASE}/{checklist.id}/download", headers=auth(token_vistoriador))
+        assert r.status_code == 403

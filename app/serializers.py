@@ -21,9 +21,12 @@ from app.models import (
 )
 
 
-def foto_url(arquivo: str) -> str:
-    path = f"/api/v1/uploads/{arquivo}"
-    return path
+def foto_url(arquivo: str | None) -> str | None:
+    if not arquivo:
+        return None
+    if arquivo.startswith("http://") or arquivo.startswith("https://") or arquivo.startswith("/"):
+        return arquivo
+    return f"/api/v1/uploads/{arquivo}"
 
 
 def serialize_foto(f: ChecklistItemFoto) -> dict:
