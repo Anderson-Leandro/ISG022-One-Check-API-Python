@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.deps import get_current_user
+from app.deps import get_current_user, require_roles
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -29,6 +29,7 @@ def list_contratos(
     pagina: int = Query(1, ge=1),
     por_pagina: int = Query(20, ge=1, le=100),
     status: str | None = None,
+    imovel_id: str | None = None,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
@@ -43,6 +44,8 @@ def list_contratos(
         )
     if status:
         q = q.filter(Contrato.status == status)
+    if imovel_id:
+        q = q.filter(Contrato.imovel_id == imovel_id)
     q = q.order_by(Contrato.created_at.desc())
     items, pag = paginate(q, pagina, por_pagina)
     return ok([serialize_contrato(c) for c in items], pag)
@@ -52,13 +55,24 @@ def list_contratos(
 def create_contrato(
     body: ContratoCreate,
     db: Session = Depends(get_db),
-    user: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
 ):
-    imovel = db.query(Imovel).filter(Imovel.id == body.imovel_id).first()
+    if body.data_fim <= body.data_inicio:
+        return fail("A data de fim deve ser posterior à data de início.")
+
+    imovel = db.query(Imovel).filter(Imovel.id == body.imovel_id, Imovel.ativo == True).first()
     if not imovel:
         return fail("Imóvel não encontrado")
     if imovel.status == "locado":
         return fail("Imóvel já está locado")
+    if db.query(Contrato).filter(Contrato.imovel_id == body.imovel_id, Contrato.status == "ativo").first():
+        return fail("Este imóvel já possui um contrato ativo")
+
+    locatario = db.query(Usuario).filter(Usuario.id == body.locatario_id, Usuario.ativo == True).first()
+    if not locatario:
+        return fail("Locatário não encontrado")
+    if locatario.role != "locatario":
+        return fail("O usuário informado não possui a role de locatário")
 
     ct = Contrato(
         imovel_id=body.imovel_id,
@@ -85,6 +99,72 @@ def create_contrato(
     db.commit()
     db.refresh(ct)
     log_operacao(db, user.id, "create", "contrato", ct.id)
+    return ok(serialize_contrato(ct))
+
+
+@router.get("/{contrato_id}")
+def get_contrato(
+    contrato_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user),
+):
+    ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+    if not ct:
+        return fail("Contrato não encontrado")
+
+    if user.role == "locatario" and ct.locatario_id != user.id:
+        raise HTTPException(status_code=403, detail="Você não tem acesso a este contrato")
+
+    return ok(serialize_contrato(ct))
+
+
+@router.patch("/{contrato_id}/encerrar")
+@router.post("/{contrato_id}/encerrar")
+def encerrar_contrato(
+    contrato_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+    if not ct:
+        return fail("Contrato não encontrado")
+
+    if ct.status != "ativo":
+        return fail(f"Não é possível encerrar um contrato com status '{ct.status}'")
+
+    ct.status = "encerrado"
+    imovel = db.query(Imovel).filter(Imovel.id == ct.imovel_id).first()
+    if imovel:
+        imovel.status = "disponivel"
+
+    db.commit()
+    db.refresh(ct)
+    log_operacao(db, user.id, "update", "contrato", ct.id, "encerrar")
+    return ok(serialize_contrato(ct))
+
+
+@router.patch("/{contrato_id}/cancelar")
+@router.post("/{contrato_id}/cancelar")
+def cancelar_contrato(
+    contrato_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+    if not ct:
+        return fail("Contrato não encontrado")
+
+    if ct.status != "ativo":
+        return fail(f"Não é possível cancelar um contrato com status '{ct.status}'")
+
+    ct.status = "cancelado"
+    imovel = db.query(Imovel).filter(Imovel.id == ct.imovel_id).first()
+    if imovel:
+        imovel.status = "disponivel"
+
+    db.commit()
+    db.refresh(ct)
+    log_operacao(db, user.id, "update", "contrato", ct.id, "cancelar")
     return ok(serialize_contrato(ct))
 
 
