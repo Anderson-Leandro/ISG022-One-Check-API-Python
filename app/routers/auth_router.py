@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.auth import (
+    MFA_REQUIRED_ROLES,
     create_access_token,
     create_mfa_setup_token,
     create_refresh_token,
@@ -10,8 +11,10 @@ from app.auth import (
     generate_mfa_secret,
     hash_password,
     mfa_provisioning_data,
+    mfa_self_disable_error,
     mfa_setup_required,
     needs_mfa,
+    reset_mfa,
     revoke_refresh_token,
     usuario_to_dict,
     verify_password,
@@ -27,6 +30,7 @@ from app.schemas import (
     MfaActivateLoginRequest,
     MfaActivateRequest,
     MfaDisableRequest,
+    MfaDisableSelfRequest,
     MfaVerifyRequest,
     RefreshRequest,
     fail,
@@ -182,12 +186,15 @@ def mfa_disable(
     current_admin: Usuario = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ):
+    # O próprio MFA não se reseta por aqui: exige outro admin (separação de deveres)
+    if body.usuario_id == current_admin.id:
+        raise HTTPException(status_code=403, detail="Não é possível resetar o próprio MFA")
+
     target = db.query(Usuario).filter(Usuario.id == body.usuario_id, Usuario.ativo == True).first()
     if not target:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    target.mfa_enabled = False
-    target.mfa_secret = None
+    reset_mfa(target)
     db.commit()
     db.refresh(target)
     log_operacao(db, current_admin.id, "mfa_disable", "usuario", target.id)
@@ -208,11 +215,19 @@ def mfa_habilitar(
 
 @router.post("/mfa/desabilitar")
 def mfa_desabilitar(
+    body: MfaDisableSelfRequest,
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    if user.role in MFA_REQUIRED_ROLES:
+        raise HTTPException(status_code=403, detail="MFA é obrigatório para este perfil")
+    erro = mfa_self_disable_error(user, body.senha, body.codigo)
+    if erro:
+        return fail(erro)
+
     user.mfa_enabled = False
     user.mfa_secret = None
+    user.mfa_secret_pendente = None
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "mfa_disable", "usuario", user.id)

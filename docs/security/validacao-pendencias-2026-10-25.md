@@ -11,7 +11,7 @@
 |---|---|---|---|
 | 1 | `GET /auth/mfa/setup` sobrescreve o segredo TOTP ativo | ✅ Confirmado (e há variante crítica, ver N1) | Alta |
 | 2 | Locatário lista todos os usuários | ✅ Confirmado (vaza também CPF) | Alta |
-| 3 | Checklist com `vistoriador_id` inexistente → 500 | ✅ Confirmado (e a rota não tem autorização, ver N3) | Média |
+| 3 | Checklist com `vistoriador_id` inexistente → 500 | ✅ Confirmado (e a rota não tem autorização, ver N3) · corrigido com N3 | Média |
 | 4 | `/dashboard` ignora o perfil | ✅ Confirmado | Média |
 | 5 | Locatário recebe 403 nos agendamentos do próprio contrato | ✅ Confirmado: bloqueio explícito no código (decisão de negócio) | Baixa |
 | 6 | Vistoriador: 403 na lista de problemas, 200 no problema por ID | ✅ Confirmado: o furo está no acesso por ID (BOLA) | Média |
@@ -115,9 +115,9 @@ Encontrei também **8 falhas novas** durante a validação (seção 3). Duas sã
 |---|---|---|
 | N1 | Bypass do MFA usando só a senha | **Crítica** · ✅ corrigida ([relatório](correcao-n1-n2-2026-10-25.md)) |
 | N2 | Reset do banco e tomada da conta admin com o `SEED_SECRET` padrão | **Crítica** · ✅ corrigida ([relatório](correcao-n1-n2-2026-10-25.md)) |
-| N3 | Criação de checklist sem autorização, e locatário vistoriando e aceitando o próprio imóvel | Alta |
-| N4 | Gestor consegue se promover a admin e assumir contas de admin | Alta |
-| N5 | Desativar o próprio MFA sem reautenticação | Alta |
+| N3 | Criação de checklist sem autorização, e locatário vistoriando e aceitando o próprio imóvel | Alta · ✅ corrigida ([relatório](correcao-n3-n4-n5-2026-10-25.md)) |
+| N4 | Gestor consegue se promover a admin e assumir contas de admin | Alta · ✅ corrigida ([relatório](correcao-n3-n4-n5-2026-10-25.md)) |
+| N5 | Desativar o próprio MFA sem reautenticação | Alta · ✅ corrigida ([relatório](correcao-n3-n4-n5-2026-10-25.md)) |
 | N6 | Sem rate limit em login e verificação de MFA | Média |
 | N7 | Uploads sem validação de tipo, servidos publicamente | Média |
 | N8 | Segredos com valor padrão no código e no compose | Média |

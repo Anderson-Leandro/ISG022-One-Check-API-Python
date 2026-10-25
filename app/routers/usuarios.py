@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.auth import (
+    MFA_REQUIRED_ROLES,
+    PRIVILEGED_ROLES,
+    ROLES,
     generate_mfa_secret,
     hash_password,
     mfa_provisioning_data,
+    mfa_self_disable_error,
+    reset_mfa,
     verify_password,
     verify_totp_code,
 )
@@ -13,6 +18,7 @@ from app.deps import get_current_user, require_roles
 from app.models import Usuario
 from app.schemas import (
     AlterarSenhaRequest,
+    MfaDisableSelfRequest,
     MfaEnableRequest,
     UsuarioCreate,
     UsuarioUpdate,
@@ -23,6 +29,19 @@ from app.schemas import (
 from app.serializers import log_operacao, paginate, serialize_usuario
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
+
+
+def _assert_pode_gerenciar(current: Usuario, target: Usuario) -> None:
+    """Rotas /usuarios/{id}: a própria conta só muda por /usuarios/me, e só admin gerencia admin/gestor."""
+    if target.id == current.id:
+        raise HTTPException(status_code=403, detail="Use /usuarios/me para alterar a própria conta")
+    if target.role in PRIVILEGED_ROLES and current.role != "admin":
+        raise HTTPException(status_code=403, detail="Permissão negada")
+
+
+def _assert_pode_atribuir(current: Usuario, role: str) -> None:
+    if role in PRIVILEGED_ROLES and current.role != "admin":
+        raise HTTPException(status_code=403, detail="Só administradores atribuem este perfil")
 
 
 @router.get("/me")
@@ -95,10 +114,18 @@ def mfa_enable_me(
 
 @router.delete("/me/mfa")
 def mfa_disable_me(
+    body: MfaDisableSelfRequest,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    if user.role in MFA_REQUIRED_ROLES:
+        raise HTTPException(status_code=403, detail="MFA é obrigatório para este perfil")
+    erro = mfa_self_disable_error(user, body.senha, body.codigo)
+    if erro:
+        return fail(erro)
+
     user.mfa_secret = None
+    user.mfa_secret_pendente = None
     user.mfa_enabled = False
     db.commit()
     db.refresh(user)
@@ -144,6 +171,16 @@ def update_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
+
+    novo_role = user.role
+    if body.role is not None:
+        if body.role not in ROLES:
+            return fail("Perfil inválido")
+        _assert_pode_atribuir(current, body.role)
+        novo_role = body.role
+    if body.mfa_enabled is False and novo_role in MFA_REQUIRED_ROLES:
+        return fail("MFA é obrigatório para este perfil")
 
     if body.email is not None and body.email != user.email:
         existente = db.query(Usuario).filter(Usuario.email == body.email, Usuario.id != usuario_id).first()
@@ -153,8 +190,10 @@ def update_usuario(
 
     if body.nome is not None:
         user.nome = body.nome.strip()
-    if body.role is not None:
-        user.role = body.role
+    if novo_role != user.role:
+        user.role = novo_role
+        if novo_role in MFA_REQUIRED_ROLES:
+            user.mfa_enabled = True
     if body.mfa_enabled is not None:
         user.mfa_enabled = body.mfa_enabled
         if not body.mfa_enabled:
@@ -180,6 +219,7 @@ def delete_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
 
     user.ativo = False
     db.commit()
@@ -196,6 +236,7 @@ def mfa_setup_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
     secret = generate_mfa_secret()
     return ok(mfa_provisioning_data(user.email, secret))
 
@@ -211,6 +252,7 @@ def mfa_enable_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
 
     if body and body.codigo:
         if not verify_totp_code(body.secret, body.codigo):
@@ -234,8 +276,8 @@ def mfa_reset_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
-    user.mfa_secret = None
-    user.mfa_enabled = False
+    _assert_pode_gerenciar(current, user)
+    reset_mfa(user)
     db.commit()
     db.refresh(user)
     log_operacao(db, current.id, "update", "usuario", user.id, "mfa_reset")
@@ -248,6 +290,9 @@ def create_usuario(
     db: Session = Depends(get_db),
     current: Usuario = Depends(require_roles("admin", "gestor")),
 ):
+    if body.role not in ROLES:
+        return fail("Perfil inválido")
+    _assert_pode_atribuir(current, body.role)
     if db.query(Usuario).filter(Usuario.email == body.email).first():
         return fail("E-mail já cadastrado")
 
@@ -257,7 +302,7 @@ def create_usuario(
         senha_hash=hash_password(body.senha),
         role=body.role,
         cpf=body.cpf,
-        mfa_enabled=body.role in {"admin", "vistoriador", "gestor"},
+        mfa_enabled=body.role in MFA_REQUIRED_ROLES,
     )
     db.add(user)
     db.commit()

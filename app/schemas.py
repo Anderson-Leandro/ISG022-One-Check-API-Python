@@ -64,6 +64,11 @@ class MfaDisableRequest(BaseModel):
     usuario_id: str
 
 
+class MfaDisableSelfRequest(BaseModel):
+    senha: str
+    codigo: str | None = None
+
+
 class RefreshRequest(BaseModel):
     refresh_token: str
 

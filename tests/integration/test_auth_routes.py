@@ -330,7 +330,11 @@ class TestMfaExtended:
         r_hab = client.post("/api/v1/auth/mfa/habilitar", headers=auth(token_locatario))
         assert r_hab.json()["sucesso"] is True
 
-        r_des = client.post("/api/v1/auth/mfa/desabilitar", headers=auth(token_locatario))
+        r_des = client.post(
+            "/api/v1/auth/mfa/desabilitar",
+            json={"senha": TEST_SENHA},
+            headers=auth(token_locatario),
+        )
         assert r_des.json()["sucesso"] is True
 
     def test_mfa_disable_admin(self, client, token_admin, user_locatario):

@@ -282,14 +282,25 @@ def create_checklist(
     contrato_id: str,
     body: ChecklistCreate,
     db: Session = Depends(get_db),
-    user: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
         return fail("Contrato não encontrado")
 
+    if ct.status != "ativo":
+        return fail("Vistorias só podem ser criadas em contratos ativos")
+
     if body.tipo not in ("inicial", "encerramento"):
         return fail("Tipo deve ser 'inicial' ou 'encerramento'")
+
+    vistoriador = (
+        db.query(Usuario)
+        .filter(Usuario.id == body.vistoriador_id, Usuario.ativo == True, Usuario.role == "vistoriador")
+        .first()
+    )
+    if not vistoriador:
+        return fail("Vistoriador não encontrado")
 
     existing = (
         db.query(Checklist)

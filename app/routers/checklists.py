@@ -64,6 +64,9 @@ def _assert_vistoriador(checklist: Checklist, user: Usuario) -> None:
 
 
 def _assert_pode_aceitar(checklist: Checklist, user: Usuario, db: Session) -> Contrato | None:
+    # Separação de deveres: quem vistoriou não aprova a própria vistoria
+    if checklist.vistoriador_id == user.id:
+        raise HTTPException(status_code=403, detail="O vistoriador não pode aceitar ou rejeitar a própria vistoria")
     contrato = db.query(Contrato).filter(Contrato.id == checklist.contrato_id).first()
     if user.role in ("admin", "gestor"):
         return contrato

@@ -15,6 +15,9 @@ from app.config import (
 )
 from app.models import RefreshToken, Usuario
 
+ROLES = {"admin", "gestor", "vistoriador", "locatario", "visualizador"}
+# Só admin atribui estes perfis ou gerencia contas que os possuem
+PRIVILEGED_ROLES = {"admin", "gestor"}
 MFA_REQUIRED_ROLES = {"admin", "vistoriador", "gestor"}
 
 
@@ -98,6 +101,13 @@ def mfa_setup_required(user: Usuario) -> bool:
     return user.role in MFA_REQUIRED_ROLES and user.mfa_enabled and not user.mfa_secret
 
 
+def reset_mfa(user: Usuario) -> None:
+    """Remove o autenticador. Em perfis obrigatórios o MFA continua exigido e o próximo login pede nova configuração."""
+    user.mfa_secret = None
+    user.mfa_secret_pendente = None
+    user.mfa_enabled = user.role in MFA_REQUIRED_ROLES
+
+
 def verify_totp_code(secret: str, codigo: str) -> bool:
     totp = pyotp.TOTP(secret)
     return totp.verify(codigo.strip(), valid_window=1)
@@ -107,6 +117,15 @@ def verify_totp(user: Usuario, codigo: str) -> bool:
     if not user.mfa_secret:
         return False
     return verify_totp_code(user.mfa_secret, codigo)
+
+
+def mfa_self_disable_error(user: Usuario, senha: str, codigo: str | None) -> str | None:
+    """Reautenticação para o usuário desligar o próprio MFA: senha e, se houver autenticador, código atual."""
+    if not verify_password(senha, user.senha_hash):
+        return "Senha incorreta"
+    if user.mfa_secret and not (codigo and verify_totp(user, codigo)):
+        return "Código MFA inválido"
+    return None
 
 
 def generate_mfa_secret() -> str:
