@@ -198,15 +198,27 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configurar Variáveis de Ambiente (`.env`)
-Crie um arquivo `.env` na raiz do projeto (opcional em desenvolvimento):
+Crie um arquivo `.env` na raiz do projeto:
 ```env
-JWT_SECRET=sua_chave_secreta_jwt_super_segura
+# Sem APP_ENV, vale a regra de produção: a API não sobe sem JWT_SECRET forte.
+# Em desenvolvimento, APP_ENV=development dispensa o JWT_SECRET (gera um aleatório por execução).
+APP_ENV=development
+# Obrigatório em produção, 32+ caracteres. Gere com:
+#   python -c "import secrets; print(secrets.token_urlsafe(48))"
+JWT_SECRET=
+# Docker Compose: obrigatório (sem valor padrão)
+POSTGRES_PASSWORD=
 # Opcional. Vazio = rotas /admin/* desabilitadas. Com banco já populado,
 # as rotas também exigem token de admin (Authorization: Bearer ...)
-SEED_SECRET=sua_chave_secreta_para_admin_seed
+# Com valor, precisa ter 32+ caracteres fora de desenvolvimento
+SEED_SECRET=
 # Necessário para /admin/seed com force=true e para /admin/refresh-data (apagam dados)
 # SEED_ALLOW_DESTRUCTIVE=true
 # DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck
+# Limite de tentativas falhas de login/MFA/reautenticação (padrões abaixo)
+# RATE_LIMIT_FALHAS_CONTA=5
+# RATE_LIMIT_FALHAS_IP=20
+# RATE_LIMIT_JANELA_MIN=15
 ```
 
 ### 5. Iniciar a API

@@ -3,7 +3,7 @@ import io
 import pytest
 
 from app.models import Contrato, Imovel, ImovelComodo, Problema, Usuario
-from tests.conftest import auth
+from tests.conftest import auth, small_image_bytes
 
 BASE_CONTRATOS = "/api/v1/contratos"
 BASE_PROBLEMAS = "/api/v1/problemas"
@@ -202,7 +202,7 @@ class TestCriarProblema:
     def test_upload_foto_problema_multipart(
         self, client, contrato, comodo_contrato, token_locatario
     ):
-        fake_file = io.BytesIO(b"fake image data jpg")
+        fake_file = io.BytesIO(small_image_bytes())
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
             data={
@@ -328,7 +328,7 @@ class TestAtualizacoesProblema:
         assert data1["dados"]["problema_id"] == problema_criado["id"]
 
         # 2. Cria segunda atualização com foto multipart
-        fake_file = io.BytesIO(b"foto reparo")
+        fake_file = io.BytesIO(small_image_bytes())
         r2 = client.post(
             f"{BASE_PROBLEMAS}/{problema_criado['id']}/atualizacoes",
             data={"descricao": "O técnico trocou a vedação da torneira."},

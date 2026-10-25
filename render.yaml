@@ -10,8 +10,12 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.5"
+      # Obrigatório fora de APP_ENV=development/test: a API não sobe sem um valor de 32+ caracteres
       - key: JWT_SECRET
         generateValue: true
+      # O IP do cliente vem do X-Forwarded-For do proxy do Render (usado no limite de tentativas)
+      - key: FORWARDED_ALLOW_IPS
+        value: "*"
       - key: PUBLIC_BASE_URL
         sync: false
       # Deixe vazio para desabilitar /admin/*; com valor, as rotas também exigem token de admin

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.auth import (
@@ -26,6 +26,7 @@ from app.auth import (
 from app.database import get_db
 from app.deps import get_current_user, require_roles
 from app.models import Usuario
+from app.rate_limit import Tentativas
 from app.schemas import (
     LoginRequest,
     MfaActivateLoginRequest,
@@ -43,11 +44,17 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login")
-def login(body: LoginRequest, db: Session = Depends(get_db)):
+def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
+    # Verificado antes da senha: durante o bloqueio nem a senha correta é aceita
+    tentativas = Tentativas(request, "login", body.email.strip().lower())
+    tentativas.verificar()
+
     user = db.query(Usuario).filter(Usuario.email == body.email, Usuario.ativo == True).first()
     if not user or not verify_password(body.senha, user.senha_hash):
+        tentativas.falhou()
         log_operacao(db, None, "login_falho", "usuario", None, f"email: {body.email}")
         return fail("Credenciais inválidas")
+    tentativas.sucesso()
 
     if needs_mfa(user):
         temp = create_temp_token(user.id)
@@ -76,7 +83,7 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/mfa/verify")
-def mfa_verify(body: MfaVerifyRequest, db: Session = Depends(get_db)):
+def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
     if not payload or payload.get("type") != "mfa":
         return fail("Token MFA inválido ou expirado")
@@ -85,8 +92,14 @@ def mfa_verify(body: MfaVerifyRequest, db: Session = Depends(get_db)):
     if not user:
         return fail("Usuário não encontrado")
 
+    # A conta (e não o temp_token) é a chave: um novo login não zera as tentativas
+    tentativas = Tentativas(request, "mfa", user.id)
+    tentativas.verificar()
     if not verify_totp(user, body.codigo.strip()):
+        tentativas.falhou()
+        log_operacao(db, user.id, "mfa_falho", "usuario", user.id, "via: mfa")
         return fail("Código MFA inválido")
+    tentativas.sucesso()
 
     access = create_access_token(user.id, user.role)
     refresh = create_refresh_token(db, user.id)
@@ -122,7 +135,7 @@ def setup_login(temp_token: str = Query(...), db: Session = Depends(get_db)):
 
 
 @router.post("/mfa/activate-login")
-def activate_login(body: MfaActivateLoginRequest, db: Session = Depends(get_db)):
+def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
     if not payload or payload.get("type") != "mfa_setup":
         return fail("Token MFA inválido ou expirado")
@@ -134,8 +147,13 @@ def activate_login(body: MfaActivateLoginRequest, db: Session = Depends(get_db))
     if not mfa_setup_required(user):
         return fail("MFA já configurado para este usuário")
 
+    tentativas = Tentativas(request, "mfa", user.id)
+    tentativas.verificar()
     if not user.mfa_secret_pendente or not verify_totp_code(user.mfa_secret_pendente, body.codigo):
+        tentativas.falhou()
+        log_operacao(db, user.id, "mfa_falho", "usuario", user.id, "via: mfa_setup")
         return fail("Código MFA inválido")
+    tentativas.sucesso()
 
     user.mfa_secret = user.mfa_secret_pendente
     user.mfa_secret_pendente = None
@@ -168,14 +186,18 @@ def mfa_setup(user: Usuario = Depends(get_current_user), db: Session = Depends(g
 @router.post("/mfa/activate")
 def mfa_activate(
     body: MfaActivateRequest,
+    request: Request,
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     if not user.mfa_secret_pendente:
         return fail("Configuração MFA não encontrada")
 
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
     erro = mfa_troca_error(user, body.codigo_atual)
     if erro:
+        tentativas.falhou()
         return fail(erro)
 
     if not verify_totp_code(user.mfa_secret_pendente, body.codigo.strip()):
@@ -226,14 +248,19 @@ def mfa_habilitar(
 @router.post("/mfa/desabilitar")
 def mfa_desabilitar(
     body: MfaDisableSelfRequest,
+    request: Request,
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     if user.role in MFA_REQUIRED_ROLES:
         raise HTTPException(status_code=403, detail="MFA é obrigatório para este perfil")
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
     erro = mfa_self_disable_error(user, body.senha, body.codigo)
     if erro:
+        tentativas.falhou()
         return fail(erro)
+    tentativas.sucesso()
 
     user.mfa_enabled = False
     user.mfa_secret = None

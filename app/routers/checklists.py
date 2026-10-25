@@ -1,6 +1,4 @@
 from datetime import date
-import uuid
-from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile
 from sqlalchemy.orm import Session, joinedload
@@ -27,6 +25,7 @@ from app.schemas import (
     fail,
     ok,
 )
+from app.uploads import UploadInvalido, salvar_imagem
 from app.serializers import (
     foto_url,
     get_comodos_for_checklist,
@@ -247,11 +246,10 @@ async def upload_foto(
     if len(content) > max_bytes:
         return fail(f"Arquivo excede {MAX_UPLOAD_MB}MB")
 
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    ext = Path(foto.filename or "foto.jpg").suffix or ".jpg"
-    filename = f"{uuid.uuid4().hex}{ext}"
-    filepath = UPLOAD_DIR / filename
-    filepath.write_bytes(content)
+    try:
+        filename = salvar_imagem(content)
+    except UploadInvalido as e:
+        return fail(str(e))
 
     for old in list(item.fotos):
         old_path = UPLOAD_DIR / old.arquivo

@@ -1,12 +1,10 @@
-import uuid
 from datetime import date, datetime, timezone
-from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
+from app.config import MAX_UPLOAD_MB
 from app.database import get_db
 from app.deps import assert_acesso_problemas, get_current_user, require_roles
 from app.models import (
@@ -19,6 +17,7 @@ from app.models import (
     Usuario,
 )
 from app.notification_service import notificar_admins
+from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 from app.schemas import (
     AgendamentoCreate,
     ChecklistCreate,
@@ -385,12 +384,10 @@ async def create_problema(
                     status_code=422,
                     content={"sucesso": False, "erro": f"A foto não pode exceder {MAX_UPLOAD_MB} MB", "erros": {"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"}},
                 )
-            ext = Path(getattr(foto, "filename", "foto.jpg") or "foto.jpg").suffix or ".jpg"
-            filename = f"{uuid.uuid4().hex}{ext}"
-            UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-            filepath = UPLOAD_DIR / filename
-            filepath.write_bytes(content)
-            foto_chave = filename
+            try:
+                foto_chave = salvar_imagem(content)
+            except UploadInvalido as e:
+                return JSONResponse(status_code=422, content={"sucesso": False, "erro": str(e), "erros": {"foto": str(e)}})
     else:
         try:
             body = await request.json()
@@ -405,7 +402,13 @@ async def create_problema(
             comodo_id = str(comodo_id).strip()
         prioridade = str(body.get("prioridade") or "normal").strip()
         status_val = str(body.get("status") or "aberto").strip()
-        foto_chave = body.get("foto_url")
+        if body.get("foto_url"):
+            foto_chave = nome_de_upload_existente(body.get("foto_url"))
+            if not foto_chave:
+                return JSONResponse(
+                    status_code=422,
+                    content={"sucesso": False, "erro": "Foto inválida", "erros": {"foto_url": "Envie a foto pelo upload da API"}},
+                )
 
     erros = {}
     if not titulo:

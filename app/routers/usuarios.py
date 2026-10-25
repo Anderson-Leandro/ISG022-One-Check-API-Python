@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.auth import (
@@ -17,6 +17,7 @@ from app.auth import (
 from app.database import get_db
 from app.deps import get_current_user, require_roles
 from app.models import Usuario
+from app.rate_limit import Tentativas
 from app.schemas import (
     AlterarSenhaRequest,
     MfaDisableSelfRequest,
@@ -53,6 +54,7 @@ def me(user: Usuario = Depends(get_current_user)):
 @router.patch("/me")
 def update_me(
     body: UsuarioUpdateMe,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
@@ -65,8 +67,12 @@ def update_me(
     if body.senha_nova:
         if not body.senha_atual:
             return fail("Informe a senha atual")
+        tentativas = Tentativas(request, "reauth", user.id)
+        tentativas.verificar()
         if not verify_password(body.senha_atual, user.senha_hash):
+            tentativas.falhou()
             return fail("Senha atual incorreta")
+        tentativas.sucesso()
         user.senha_hash = hash_password(body.senha_nova)
 
     db.commit()
@@ -78,11 +84,16 @@ def update_me(
 @router.put("/me/senha")
 def alterar_senha_me(
     body: AlterarSenhaRequest,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
     if not verify_password(body.senha_atual, user.senha_hash):
+        tentativas.falhou()
         return fail("Senha atual incorreta")
+    tentativas.sucesso()
 
     user.senha_hash = hash_password(body.nova_senha)
     db.commit()
@@ -100,11 +111,15 @@ def mfa_setup_me(user: Usuario = Depends(get_current_user)):
 @router.post("/me/mfa/enable")
 def mfa_enable_me(
     body: MfaEnableRequest,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
     erro = mfa_troca_error(user, body.codigo_atual)
     if erro:
+        tentativas.falhou()
         return fail(erro)
     if not verify_totp_code(body.secret, body.codigo):
         return fail("Código MFA inválido")
@@ -119,14 +134,19 @@ def mfa_enable_me(
 @router.delete("/me/mfa")
 def mfa_disable_me(
     body: MfaDisableSelfRequest,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
     if user.role in MFA_REQUIRED_ROLES:
         raise HTTPException(status_code=403, detail="MFA é obrigatório para este perfil")
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
     erro = mfa_self_disable_error(user, body.senha, body.codigo)
     if erro:
+        tentativas.falhou()
         return fail(erro)
+    tentativas.sucesso()
 
     user.mfa_secret = None
     user.mfa_secret_pendente = None

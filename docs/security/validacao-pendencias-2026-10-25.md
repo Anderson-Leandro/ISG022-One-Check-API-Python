@@ -118,9 +118,9 @@ Encontrei também **8 falhas novas** durante a validação (seção 3). Duas sã
 | N3 | Criação de checklist sem autorização, e locatário vistoriando e aceitando o próprio imóvel | Alta · ✅ corrigida ([relatório](correcao-n3-n4-n5-2026-10-25.md)) |
 | N4 | Gestor consegue se promover a admin e assumir contas de admin | Alta · ✅ corrigida ([relatório](correcao-n3-n4-n5-2026-10-25.md)) |
 | N5 | Desativar o próprio MFA sem reautenticação | Alta · ✅ corrigida ([relatório](correcao-n3-n4-n5-2026-10-25.md)) |
-| N6 | Sem rate limit em login e verificação de MFA | Média |
-| N7 | Uploads sem validação de tipo, servidos publicamente | Média |
-| N8 | Segredos com valor padrão no código e no compose | Média |
+| N6 | Sem rate limit em login e verificação de MFA | Média · ✅ corrigida ([relatório](correcao-n6-n7-n8-2026-10-25.md)) |
+| N7 | Uploads sem validação de tipo, servidos publicamente | Média · ✅ corrigida ([relatório](correcao-n6-n7-n8-2026-10-25.md)) |
+| N8 | Segredos com valor padrão no código e no compose | Média · ✅ corrigida ([relatório](correcao-n6-n7-n8-2026-10-25.md)) |
 
 ### N1 — Bypass do MFA usando só a senha · Crítica
 - **Fluxo:**
@@ -172,17 +172,17 @@ Encontrei também **8 falhas novas** durante a validação (seção 3). Duas sã
 - **Impacto:** um token roubado (XSS, máquina compartilhada) vira acesso permanente só com a senha.
 - **Correção:** exigir código TOTP atual + senha e bloquear para perfis obrigatórios. Se essa função for necessária, deixar só o admin resetar o MFA de outros, com log.
 
-### N6 — Sem rate limit em login e verificação de MFA · Média
+### N6 — Sem rate limit em login e verificação de MFA · Média · corrigida ([relatório](correcao-n6-n7-n8-2026-10-25.md))
 - `POST /auth/login` e `/auth/mfa/verify` não têm limite de tentativas. O `temp_token` vale 10 minutos com `valid_window=1` (`auth.py:96`), o que permite força bruta de senha e de código TOTP.
 - **Correção:** limitar tentativas por IP e por conta (ex.: `slowapi`), bloquear temporariamente após N falhas e registrar as falhas de MFA no log.
 
-### N7 — Uploads sem validação de tipo, servidos publicamente · Média
+### N7 — Uploads sem validação de tipo, servidos publicamente · Média · corrigida ([relatório](correcao-n6-n7-n8-2026-10-25.md))
 - `ALLOWED_MIME_TYPES` está definido em `problemas.py:17`, mas **nunca é usado**.
 - A extensão salva vem do nome enviado pelo cliente (`checklists.py:248`, `contratos.py:385`, `problemas.py:121`). Um `.html` ou `.svg` enviado como "foto" é servido por `GET /uploads/{filename}` (`health.py:15-21`) **sem autenticação**, com `Content-Type` deduzido da extensão: XSS armazenado na origem da API.
 - As fotos das vistorias também ficam públicas para quem tiver a URL (LGPD).
 - **Correção:** validar o conteúdo (magic bytes ou Pillow), fixar a extensão pelo tipo detectado, servir com `Content-Disposition: attachment` e `X-Content-Type-Options: nosniff`, e avaliar autenticação no download.
 
-### N8 — Segredos com valor padrão · Média
+### N8 — Segredos com valor padrão · Média · corrigida ([relatório](correcao-n6-n7-n8-2026-10-25.md))
 - `JWT_SECRET` tem fallback `"onecheck-dev-secret-change-me"` (`config.py:16`, `docker-compose.yml:12`).
 - O Render gera um valor, mas qualquer outro deploy sem a variável aceita tokens forjados por quem lê o repositório. O mesmo vale para a senha padrão do Postgres no compose.
 - **Correção:** falhar na inicialização se `JWT_SECRET` (e `SEED_SECRET`, se as rotas admin estiverem ativas) não estiverem definidos fora do ambiente de desenvolvimento.
