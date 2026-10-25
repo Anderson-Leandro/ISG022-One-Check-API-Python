@@ -49,10 +49,12 @@ class MfaVerifyRequest(BaseModel):
 class MfaEnableRequest(BaseModel):
     secret: str = Field(min_length=16, max_length=64)
     codigo: str = Field(min_length=6, max_length=6)
+    codigo_atual: str | None = None
 
 
 class MfaActivateRequest(BaseModel):
     codigo: str = Field(min_length=6, max_length=6)
+    codigo_atual: str | None = None
 
 
 class MfaActivateLoginRequest(BaseModel):

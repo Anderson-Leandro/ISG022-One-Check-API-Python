@@ -13,6 +13,7 @@ from app.auth import (
     mfa_provisioning_data,
     mfa_self_disable_error,
     mfa_setup_required,
+    mfa_troca_error,
     needs_mfa,
     reset_mfa,
     revoke_refresh_token,
@@ -152,10 +153,13 @@ def activate_login(body: MfaActivateLoginRequest, db: Session = Depends(get_db))
     })
 
 
-@router.get("/mfa/setup")
+@router.post("/mfa/setup")
+@router.get("/mfa/setup", deprecated=True)
 def mfa_setup(user: Usuario = Depends(get_current_user), db: Session = Depends(get_db)):
+    # O segredo fica pendente até o /mfa/activate confirmar o código: abandonar o setup
+    # não invalida o autenticador em uso
     secret = generate_mfa_secret()
-    user.mfa_secret = secret
+    user.mfa_secret_pendente = secret
     db.commit()
     db.refresh(user)
     return ok(mfa_provisioning_data(user.email, secret))
@@ -167,12 +171,18 @@ def mfa_activate(
     user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    if not user.mfa_secret:
+    if not user.mfa_secret_pendente:
         return fail("Configuração MFA não encontrada")
 
-    if not verify_totp(user, body.codigo.strip()):
+    erro = mfa_troca_error(user, body.codigo_atual)
+    if erro:
+        return fail(erro)
+
+    if not verify_totp_code(user.mfa_secret_pendente, body.codigo.strip()):
         return fail("Código MFA inválido")
 
+    user.mfa_secret = user.mfa_secret_pendente
+    user.mfa_secret_pendente = None
     user.mfa_enabled = True
     db.commit()
     db.refresh(user)

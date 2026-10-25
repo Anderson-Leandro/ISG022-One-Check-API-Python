@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import assert_acesso_problemas, get_current_user, require_roles
 from app.models import AtualizacaoProblema, Contrato, Problema, Usuario
 from app.notification_service import notificar_usuario
 from app.serializers import log_operacao, serialize_atualizacao_problema, serialize_problema
@@ -35,8 +35,7 @@ def _assert_pode_acessar_problema(pb: Problema, user: Usuario, db: Session) -> C
     contrato = db.query(Contrato).filter(Contrato.id == pb.contrato_id).first()
     if not contrato:
         raise HTTPException(status_code=404, detail="Contrato não encontrado")
-    if user.role == "locatario" and contrato.locatario_id != user.id:
-        raise HTTPException(status_code=403, detail="Você não tem acesso a este problema")
+    assert_acesso_problemas(contrato, user)
     return contrato
 
 

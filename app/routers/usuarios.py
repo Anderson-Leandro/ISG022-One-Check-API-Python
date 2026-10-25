@@ -9,6 +9,7 @@ from app.auth import (
     hash_password,
     mfa_provisioning_data,
     mfa_self_disable_error,
+    mfa_troca_error,
     reset_mfa,
     verify_password,
     verify_totp_code,
@@ -102,6 +103,9 @@ def mfa_enable_me(
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    erro = mfa_troca_error(user, body.codigo_atual)
+    if erro:
+        return fail(erro)
     if not verify_totp_code(body.secret, body.codigo):
         return fail("Código MFA inválido")
     user.mfa_secret = body.secret
@@ -139,7 +143,7 @@ def list_usuarios(
     por_pagina: int = Query(20, ge=1, le=100),
     role: str | None = None,
     db: Session = Depends(get_db),
-    _: Usuario = Depends(get_current_user),
+    _: Usuario = Depends(require_roles("admin", "gestor")),
 ):
     q = db.query(Usuario).filter(Usuario.ativo == True)
     if role:

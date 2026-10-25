@@ -173,8 +173,8 @@ class TestMfaDisableMe:
 # ── GET /usuarios (listagem) ──────────────────────────────────────────────────────
 
 class TestListUsuarios:
-    def test_lista_usuarios_autenticado(self, client, user_locatario, token_locatario):
-        r = client.get(BASE, headers=auth(token_locatario))
+    def test_lista_usuarios_gestor(self, client, user_locatario, token_gestor):
+        r = client.get(BASE, headers=auth(token_gestor))
         data = r.json()
         assert data["sucesso"] is True
         assert isinstance(data["dados"], list)

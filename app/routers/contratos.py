@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import assert_acesso_problemas, get_current_user, require_roles
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -333,14 +333,6 @@ def create_checklist(
     return ok(serialize_checklist(ck))
 
 
-def _assert_pode_problema(contrato: Contrato, user: Usuario) -> None:
-    if user.role in ("admin", "gestor"):
-        return
-    if user.role == "locatario" and contrato.locatario_id == user.id:
-        return
-    raise HTTPException(status_code=403, detail="Você não tem permissão para registrar problemas neste contrato")
-
-
 @router.post("/{contrato_id}/problemas")
 async def create_problema(
     contrato_id: str,
@@ -359,7 +351,7 @@ async def create_problema(
         )
 
     try:
-        _assert_pode_problema(ct, user)
+        assert_acesso_problemas(ct, user)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"sucesso": False, "erro": e.detail})
 
@@ -478,7 +470,7 @@ def list_problemas(
     if not ct:
         return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Contrato não encontrado"})
     try:
-        _assert_pode_problema(ct, user)
+        assert_acesso_problemas(ct, user)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"sucesso": False, "erro": e.detail})
 

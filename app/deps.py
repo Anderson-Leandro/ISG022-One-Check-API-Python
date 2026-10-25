@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import decode_token
 from app.database import get_db
-from app.models import Usuario
+from app.models import Contrato, Usuario
 
 security = HTTPBearer(auto_error=False)
 
@@ -31,3 +31,12 @@ def require_roles(*roles: str):
         return user
 
     return _dep
+
+
+def assert_acesso_problemas(contrato: Contrato, user: Usuario) -> None:
+    """Regra única para listar, registrar e ler problemas de um contrato: admin, gestor ou o locatário dono."""
+    if user.role in ("admin", "gestor"):
+        return
+    if user.role == "locatario" and contrato.locatario_id == user.id:
+        return
+    raise HTTPException(status_code=403, detail="Você não tem acesso aos problemas deste contrato")

@@ -128,6 +128,13 @@ def mfa_self_disable_error(user: Usuario, senha: str, codigo: str | None) -> str
     return None
 
 
+def mfa_troca_error(user: Usuario, codigo_atual: str | None) -> str | None:
+    """Trocar um autenticador em uso exige provar posse dele com o código TOTP atual."""
+    if user.mfa_enabled and user.mfa_secret and not (codigo_atual and verify_totp(user, codigo_atual)):
+        return "Código do autenticador atual inválido"
+    return None
+
+
 def generate_mfa_secret() -> str:
     return pyotp.random_base32()
 

@@ -9,12 +9,12 @@
 
 | # | Item | Veredito | Severidade |
 |---|---|---|---|
-| 1 | `GET /auth/mfa/setup` sobrescreve o segredo TOTP ativo | ✅ Confirmado (e há variante crítica, ver N1) | Alta |
-| 2 | Locatário lista todos os usuários | ✅ Confirmado (vaza também CPF) | Alta |
+| 1 | `GET /auth/mfa/setup` sobrescreve o segredo TOTP ativo | ✅ Confirmado (e há variante crítica, ver N1) · corrigido ([relatório](correcao-itens-1-2-6-2026-10-25.md)) | Alta |
+| 2 | Locatário lista todos os usuários | ✅ Confirmado (vaza também CPF) · corrigido ([relatório](correcao-itens-1-2-6-2026-10-25.md)) | Alta |
 | 3 | Checklist com `vistoriador_id` inexistente → 500 | ✅ Confirmado (e a rota não tem autorização, ver N3) · corrigido com N3 | Média |
 | 4 | `/dashboard` ignora o perfil | ✅ Confirmado | Média |
 | 5 | Locatário recebe 403 nos agendamentos do próprio contrato | ✅ Confirmado: bloqueio explícito no código (decisão de negócio) | Baixa |
-| 6 | Vistoriador: 403 na lista de problemas, 200 no problema por ID | ✅ Confirmado: o furo está no acesso por ID (BOLA) | Média |
+| 6 | Vistoriador: 403 na lista de problemas, 200 no problema por ID | ✅ Confirmado: o furo está no acesso por ID (BOLA) · corrigido ([relatório](correcao-itens-1-2-6-2026-10-25.md)) | Média |
 | 7 | Atualizar problema só para admin/gestor | ✅ Confirmado: restrição intencional, não é falha | Info |
 | 8 | `enviar-para-aceite` não exige item / `pendente_revisao` | ⚠️ Parcial: **falso positivo** na exigência de item; `pendente_revisao` sem uso confirmado | Baixa |
 | 9 | Bodies não documentados no OpenAPI | ✅ Confirmado | Baixa |
@@ -29,7 +29,7 @@ Encontrei também **8 falhas novas** durante a validação (seção 3). Duas sã
 
 ## 1. Itens de segurança do documento
 
-### Item 1 — `GET /auth/mfa/setup` troca o segredo de quem já tem MFA · ✅ Confirmado · Alta
+### Item 1 — `GET /auth/mfa/setup` troca o segredo de quem já tem MFA · ✅ Confirmado · Alta · corrigido ([relatório](correcao-itens-1-2-6-2026-10-25.md))
 - **Evidência:** `app/routers/auth_router.py:139-145`. Gera o segredo e grava direto em `user.mfa_secret`, com `db.commit()`, sem segredo pendente e sem exigir código atual. Basta chamar a rota para invalidar o autenticador configurado.
 - **Pilares/princípios:** Disponibilidade (o usuário fica sem acesso) e Autenticidade. Viola fail secure e a semântica de GET (que não deveria alterar estado).
 - **Rotas paralelas:**
@@ -37,7 +37,7 @@ Encontrei também **8 falhas novas** durante a validação (seção 3). Duas sã
   - `GET /auth/mfa/setup-login` (`auth_router.py:95-109`) **também grava direto**, e é pior: ver **N1**.
 - **Correção:** guardar o segredo em `mfa_secret_pendente` e só promovê-lo a `mfa_secret` em `/mfa/activate` após validar o código. Trocar o método para POST e exigir o código TOTP atual (ou a senha) quando já houver MFA ativo.
 
-### Item 2 — Locatário lista todos os usuários · ✅ Confirmado · Alta
+### Item 2 — Locatário lista todos os usuários · ✅ Confirmado · Alta · corrigido ([relatório](correcao-itens-1-2-6-2026-10-25.md))
 - **Evidência:** `app/routers/usuarios.py:109-122` usa só `get_current_user`. As demais rotas do recurso usam `require_roles("admin", "gestor")` (`:129`, `:142`, `:249`).
 - **Agravante:** `serialize_usuario` (`app/serializers.py:182-193`) devolve **CPF**, e-mail e estado do MFA de todos. O filtro `?role=admin` lista exatamente as contas mais valiosas para um atacante.
 - **Pilares:** Confidencialidade, LGPD (minimização, art. 6º III). OWASP API1/API3, CWE-862 / CWE-200.
@@ -62,7 +62,7 @@ Encontrei também **8 falhas novas** durante a validação (seção 3). Duas sã
 - **Problema real na mesma rota:** para os outros perfis não há checagem de vínculo. Qualquer vistoriador ou visualizador lê os agendamentos de **qualquer** contrato (o mesmo vale para `GET /contratos/{id}`, `:120-133`).
 - **Sugestão:** permitir ao locatário dono (`ct.locatario_id == user.id`) e restringir o vistoriador aos contratos em que atua.
 
-### Item 6 — Vistoriador: 403 na lista, 200 por ID · ✅ Confirmado · Média
+### Item 6 — Vistoriador: 403 na lista, 200 por ID · ✅ Confirmado · Média · corrigido ([relatório](correcao-itens-1-2-6-2026-10-25.md))
 - **Evidência:**
   - Na lista, `contratos.py:325-330` (`_assert_pode_problema`) libera só admin, gestor e locatário dono.
   - Por ID, `problemas.py:34-40` (`_assert_pode_acessar_problema`) só restringe **locatário**. Vistoriador e visualizador abrem **qualquer** problema e suas atualizações (`problemas.py:43-56` e `:173-198`), inclusive de contratos onde não atuam.
