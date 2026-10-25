@@ -35,10 +35,20 @@ def create_access_token(usuario_id: str, role: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def create_temp_token(usuario_id: str) -> str:
+def _create_short_token(usuario_id: str, token_type: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=10)
-    payload = {"sub": usuario_id, "type": "mfa", "exp": expire}
+    payload = {"sub": usuario_id, "type": token_type, "exp": expire}
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def create_temp_token(usuario_id: str) -> str:
+    """Token do passo de verificação MFA (usuário já tem autenticador)."""
+    return _create_short_token(usuario_id, "mfa")
+
+
+def create_mfa_setup_token(usuario_id: str) -> str:
+    """Token do primeiro acesso, para configurar o autenticador. Não serve para /mfa/verify."""
+    return _create_short_token(usuario_id, "mfa_setup")
 
 
 def decode_token(token: str) -> dict | None:

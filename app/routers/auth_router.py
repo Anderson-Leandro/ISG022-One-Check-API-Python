@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import (
     create_access_token,
+    create_mfa_setup_token,
     create_refresh_token,
     create_temp_token,
     decode_token,
@@ -52,7 +53,7 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
         })
 
     if mfa_setup_required(user):
-        temp = create_temp_token(user.id)
+        temp = create_mfa_setup_token(user.id)
         return ok({
             "mfa_setup_required": True,
             "temp_token": temp,
@@ -72,7 +73,7 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/mfa/verify")
 def mfa_verify(body: MfaVerifyRequest, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
-    if not payload or payload.get("type") not in ("mfa", "temp_mfa"):
+    if not payload or payload.get("type") != "mfa":
         return fail("Token MFA inválido ou expirado")
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
@@ -94,16 +95,22 @@ def mfa_verify(body: MfaVerifyRequest, db: Session = Depends(get_db)):
 
 @router.get("/mfa/setup-login")
 def setup_login(temp_token: str = Query(...), db: Session = Depends(get_db)):
+    # Só o token de primeiro acesso serve aqui; o de verificação (type "mfa") é emitido
+    # para quem já tem autenticador, e aceitá-lo permitiria trocar o segredo só com a senha
     payload = decode_token(temp_token)
-    if not payload or payload.get("type") not in ("mfa", "temp_mfa"):
+    if not payload or payload.get("type") != "mfa_setup":
         raise HTTPException(status_code=401, detail="Token MFA inválido ou expirado")
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
+    # Revalida no momento da chamada: o token vale 10 min e pode ser reutilizado após a ativação
+    if not mfa_setup_required(user):
+        raise HTTPException(status_code=409, detail="MFA já configurado para este usuário")
+
     secret = generate_mfa_secret()
-    user.mfa_secret = secret
+    user.mfa_secret_pendente = secret
     db.commit()
     db.refresh(user)
     return ok(mfa_provisioning_data(user.email, secret))
@@ -112,16 +119,21 @@ def setup_login(temp_token: str = Query(...), db: Session = Depends(get_db)):
 @router.post("/mfa/activate-login")
 def activate_login(body: MfaActivateLoginRequest, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
-    if not payload or payload.get("type") not in ("mfa", "temp_mfa"):
+    if not payload or payload.get("type") != "mfa_setup":
         return fail("Token MFA inválido ou expirado")
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
 
-    if not user.mfa_secret or not verify_totp(user, body.codigo.strip()):
+    if not mfa_setup_required(user):
+        return fail("MFA já configurado para este usuário")
+
+    if not user.mfa_secret_pendente or not verify_totp_code(user.mfa_secret_pendente, body.codigo):
         return fail("Código MFA inválido")
 
+    user.mfa_secret = user.mfa_secret_pendente
+    user.mfa_secret_pendente = None
     user.mfa_enabled = True
     db.commit()
     db.refresh(user)

@@ -14,6 +14,11 @@ services:
         generateValue: true
       - key: PUBLIC_BASE_URL
         sync: false
+      # Deixe vazio para desabilitar /admin/*; com valor, as rotas também exigem token de admin
+      - key: SEED_SECRET
+        sync: false
+      - key: SEED_ALLOW_DESTRUCTIVE
+        value: "false"
       - key: DATABASE_URL
         fromDatabase:
           name: onecheck-db

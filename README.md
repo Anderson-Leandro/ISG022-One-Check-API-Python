@@ -201,7 +201,11 @@ pip install -r requirements.txt
 Crie um arquivo `.env` na raiz do projeto (opcional em desenvolvimento):
 ```env
 JWT_SECRET=sua_chave_secreta_jwt_super_segura
+# Opcional. Vazio = rotas /admin/* desabilitadas. Com banco já populado,
+# as rotas também exigem token de admin (Authorization: Bearer ...)
 SEED_SECRET=sua_chave_secreta_para_admin_seed
+# Necessário para /admin/seed com force=true e para /admin/refresh-data (apagam dados)
+# SEED_ALLOW_DESTRUCTIVE=true
 # DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck
 ```
 

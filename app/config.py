@@ -23,7 +23,13 @@ MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "10"))
 
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "http://localhost:8000").rstrip("/")
 
-SEED_SECRET = os.getenv("SEED_SECRET", "onecheck-seed-dev")
+# Sem SEED_SECRET (ou com o antigo valor padrão, que é público) as rotas /admin/* ficam desabilitadas
+_PUBLIC_SEED_SECRETS = {"onecheck-seed-dev"}
+_seed_secret = os.getenv("SEED_SECRET", "").strip()
+SEED_SECRET = "" if _seed_secret in _PUBLIC_SEED_SECRETS else _seed_secret
+
+# force=true e refresh_data apagam dados: só com opt-in explícito
+SEED_ALLOW_DESTRUCTIVE = os.getenv("SEED_ALLOW_DESTRUCTIVE", "false").strip().lower() in ("1", "true", "yes")
 
 _cors = os.getenv("CORS_ORIGINS", "*")
 CORS_ORIGINS = ["*"] if _cors.strip() == "*" else [o.strip() for o in _cors.split(",") if o.strip()]

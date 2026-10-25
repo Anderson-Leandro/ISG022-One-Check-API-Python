@@ -9,7 +9,7 @@ Rotas cobertas:
 """
 import pytest
 
-from app.auth import create_refresh_token, create_temp_token
+from app.auth import create_mfa_setup_token, create_refresh_token, create_temp_token
 from app.models import Usuario
 from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now
 
@@ -283,7 +283,7 @@ class TestMfaExtended:
         db.add(u)
         db.flush()
 
-        temp_token = create_temp_token(u.id)
+        temp_token = create_mfa_setup_token(u.id)
 
         # 1. GET /auth/mfa/setup-login
         r_setup = client.get(f"/api/v1/auth/mfa/setup-login?temp_token={temp_token}")

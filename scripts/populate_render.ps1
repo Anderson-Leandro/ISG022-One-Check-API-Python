@@ -4,7 +4,10 @@
 
 $ApiUrl = "https://onecheck-api.onrender.com/api/v1/admin/seed"
 $Secret = $env:SEED_SECRET
-if (-not $Secret) { $Secret = "onecheck-seed-dev" }
+if (-not $Secret) {
+    Write-Host "Defina a variavel de ambiente SEED_SECRET com o mesmo valor configurado no Render."
+    exit 1
+}
 
 Write-Host "POST $ApiUrl"
 
