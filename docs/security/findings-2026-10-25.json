@@ -1,0 +1,319 @@
+{
+  "project": "onecheck-api",
+  "mode": "full",
+  "base": null,
+  "date": "2026-10-25",
+  "commit": "f081c60",
+  "findings": [
+    {
+      "id": "SEC-001",
+      "title": "Seed automático cria admin com senha e segredo MFA públicos",
+      "severity": "critical",
+      "pillars": ["Autenticidade", "Confidencialidade", "Integridade"],
+      "principles": ["Secure by default", "Design aberto"],
+      "stride": ["S", "E"],
+      "cwe": "CWE-798",
+      "owasp": "A07:2021",
+      "locations": [
+        {"file": "start.sh", "line": 8},
+        {"file": "scripts/seed.py", "line": 25},
+        {"file": "scripts/seed.py", "line": 36},
+        {"file": "app/seed_service.py", "line": 25},
+        {"file": "app/seed_service.py", "line": 290},
+        {"file": "app/seed_service.py", "line": 364}
+      ],
+      "evidence": "start.sh:8 python scripts/seed.py; seed.py:25 MFA_SECRET = \"JBSW****\"; seed.py:36 hash_password(\"admi****\")",
+      "scenario": "O repositório é público. Todo start do container (Render e Docker) roda scripts/seed.py; em banco vazio ele cria admin@onecheck.local com senha conhecida e mfa_secret fixo. O atacante faz POST /auth/login com a senha do código, gera o TOTP com o segredo público e recebe um access_token de admin.",
+      "impact": "Tomada completa da API (todos os dados pessoais, contratos e vistorias) por anônimo pela internet. Probabilidade alta (técnica trivial, credenciais no repositório público) × impacto alto. A confirmar em produção: se as contas de seed ainda existem com a senha original (não testado contra o ambiente real).",
+      "recommendation": "Remover a chamada do seed do start.sh (o bootstrap já é coberto por /admin/seed com SEED_SECRET). Em produção, gerar senha aleatória e não definir mfa_secret (o usuário configura no primeiro login, fluxo mfa_setup). Verificar agora em produção se admin@onecheck.local, gestor, vistoriadores e locatários de seed existem; se sim, trocar senha e resetar MFA (ou desativar as contas) e revogar refresh tokens.",
+      "source": ["claude", "bandit"]
+    },
+    {
+      "id": "SEC-002",
+      "title": "Pillow 11.1.0 com CVEs críticas e Image.open aceita qualquer formato do upload",
+      "severity": "high",
+      "pillars": ["Integridade", "Disponibilidade", "Confidencialidade"],
+      "principles": ["Superfície de ataque mínima", "Defesa em profundidade"],
+      "stride": ["E", "D"],
+      "cwe": "CWE-1395",
+      "owasp": "A06:2021",
+      "locations": [
+        {"file": "app/uploads.py", "line": 25},
+        {"file": "requirements.txt", "line": 11}
+      ],
+      "evidence": "with Image.open(io.BytesIO(content)) as im:  # pillow==11.1.0",
+      "scenario": "Um locatário autenticado envia como 'foto' de problema um arquivo PSD, TIFF, FITS ou JPEG2000 malicioso. Image.open testa todos os plugins de formato antes de o código checar se é JPEG/PNG/WebP, e o decoder vulnerável processa o arquivo (ex.: CVE-2026-42311, execução de código via PSD; CVE-2026-25990, escrita fora dos limites; dezenas de DoS).",
+      "impact": "Execução de código ou queda do processo da API por qualquer usuário que possa enviar foto (locatário, vistoriador, admin). Probabilidade média (exige conta) × impacto alto.",
+      "recommendation": "Atualizar para pillow>=13.0.0 e restringir o parser: Image.open(buf, formats=[\"JPEG\", \"PNG\", \"WEBP\"]). Conferir a assinatura (magic bytes) antes de abrir e definir Image.MAX_IMAGE_PIXELS explicitamente.",
+      "source": ["claude", "trivy", "osv-scanner"]
+    },
+    {
+      "id": "SEC-003",
+      "title": "DoS anônimo: multipart processado antes da autenticação, sem limite de corpo e com dependências vulneráveis",
+      "severity": "high",
+      "pillars": ["Disponibilidade"],
+      "principles": ["Fail secure", "Defesa em profundidade"],
+      "stride": ["D"],
+      "cwe": "CWE-770",
+      "owasp": "API4:2023",
+      "locations": [
+        {"file": "app/routers/checklists.py", "line": 217},
+        {"file": "app/routers/checklists.py", "line": 244},
+        {"file": "requirements.txt", "line": 8},
+        {"file": "requirements.txt", "line": 1}
+      ],
+      "evidence": "foto: UploadFile = File(...)  # o corpo é lido antes de Depends(get_current_user); python-multipart==0.0.20; fastapi==0.115.6 (starlette 0.41.3)",
+      "scenario": "Sem token, o atacante envia POST /checklists/x/itens/y/fotos com multipart de vários GB (ou com milhares de partes/cabeçalhos). O FastAPI interpreta e grava o corpo em arquivo temporário antes de responder 401 (verificado: um upload anônimo de 5 MB foi processado e só então recebeu 401). Repetido em paralelo, enche o disco e consome CPU. CVEs de DoS no python-multipart (CVE-2026-42561, CVE-2026-53539) e no Starlette (FileResponse com Range, CVE-2025-62727, alcançável pelo GET /uploads público) somam-se ao vetor.",
+      "impact": "Indisponibilidade da API por anônimo. Probabilidade alta × impacto médio (degradação/queda, sem perda de dados).",
+      "recommendation": "Limitar o tamanho do corpo antes do roteamento (middleware que recusa Content-Length acima de MAX_UPLOAD_MB e corta corpos em streaming, além do limite no proxy). Atualizar python-multipart>=0.0.31 e FastAPI para uma versão com Starlette >= 0.49.1. Nas rotas de upload, fazer a autenticação como dependência de router e ler o arquivo em blocos, interrompendo ao passar do limite.",
+      "source": ["claude", "trivy", "osv-scanner"]
+    },
+    {
+      "id": "SEC-004",
+      "title": "Leitura por ID ignora o vínculo do vistoriador (contratos, agendamentos, imóveis)",
+      "severity": "medium",
+      "pillars": ["Confidencialidade"],
+      "principles": ["Mediação completa", "Menor privilégio"],
+      "stride": ["I"],
+      "cwe": "CWE-639",
+      "owasp": "API1:2023",
+      "locations": [
+        {"file": "app/routers/contratos.py", "line": 129},
+        {"file": "app/routers/contratos.py", "line": 209},
+        {"file": "app/routers/imoveis.py", "line": 134},
+        {"file": "app/routers/imoveis.py", "line": 210},
+        {"file": "app/routers/imoveis.py", "line": 257}
+      ],
+      "evidence": "if user.role == \"locatario\" and ct.locatario_id != user.id: raise 403  # nenhuma regra para vistoriador",
+      "scenario": "As listagens (contratos.py:51, imoveis.py:68-78) restringem o vistoriador aos contratos/imóveis em que tem checklist, mas GET /contratos/{id}, /contratos/{id}/agendamentos, /imoveis/{id}, /imoveis/{id}/endereco e /imoveis/{id}/comodos só restringem o locatário. Um vistoriador lê valor do aluguel, locatário, datas e endereço de qualquer contrato pelo ID.",
+      "impact": "Vazamento limitado de dados de negócio e de endereço a um usuário autenticado (mesmo padrão do item 6, corrigido em problemas). Probabilidade média × impacto médio.",
+      "recommendation": "Um helper por recurso (como assert_acesso_problemas) aplicado igualmente à lista e ao acesso por ID; para o vistoriador, exigir Checklist.vistoriador_id == user.id no contrato. Definir com o negócio o alcance do perfil visualizador, que hoje lê tudo.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-005",
+      "title": "Troca de senha e reset de MFA não revogam as sessões existentes",
+      "severity": "medium",
+      "pillars": ["Autenticidade"],
+      "principles": ["Fail secure"],
+      "stride": ["S"],
+      "cwe": "CWE-613",
+      "owasp": "A07:2021",
+      "locations": [
+        {"file": "app/routers/usuarios.py", "line": 76},
+        {"file": "app/routers/usuarios.py", "line": 98},
+        {"file": "app/routers/usuarios.py", "line": 226},
+        {"file": "app/auth.py", "line": 80}
+      ],
+      "evidence": "user.senha_hash = hash_password(body.nova_senha)  # refresh tokens do usuário continuam válidos por JWT_REFRESH_DAYS (30)",
+      "scenario": "Um atacante obtém a sessão da vítima (token roubado). A vítima, ou o admin, troca a senha e reseta o MFA. O refresh token do atacante continua gerando access tokens por até 30 dias, porque verify_refresh_token só confere hash, validade e usuário ativo.",
+      "impact": "A resposta a incidente não corta o acesso do atacante. Probabilidade média (exige token roubado) × impacto médio.",
+      "recommendation": "Ao trocar a senha (pelo próprio usuário ou pelo admin), resetar o MFA ou mudar o perfil: apagar todos os RefreshToken do usuário e incluir no JWT uma versão de credencial (ex.: token_version) conferida em get_current_user. Considerar reduzir JWT_REFRESH_DAYS e detectar reuso de refresh token rotacionado.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-006",
+      "title": "Outras dependências com CVEs e sem lockfile (dependências transitivas não verificadas)",
+      "severity": "medium",
+      "pillars": ["Integridade"],
+      "principles": ["Defesa em profundidade"],
+      "stride": ["T"],
+      "cwe": "CWE-1104",
+      "owasp": "A06:2021",
+      "locations": [
+        {"file": "requirements.txt", "line": 6},
+        {"file": "requirements.txt", "line": 10},
+        {"file": "requirements.txt", "line": 12}
+      ],
+      "evidence": "python-jose[cryptography]==3.3.0; python-dotenv==1.0.1; cryptography==44.0.0",
+      "scenario": "python-jose 3.3.0 tem CVEs críticas de confusão de algoritmo (CVE-2024-33663, CVE-2026-85394), mas a API usa só HS256 com algorithms fixo, então não são alcançáveis hoje. As CVEs do cryptography (PKCS#7, curvas SECT, X.509) também não estão no caminho de uso. Sem lockfile, Starlette, uvicorn, h11 e outras dependências transitivas não foram analisadas pelos scanners.",
+      "impact": "Hoje sem exploração conhecida no uso atual; risco de regressão silenciosa e de CVEs transitivas não detectadas. Média pela regra 'CVE alta sem exploit no uso atual'.",
+      "recommendation": "Migrar de python-jose (sem manutenção ativa) para PyJWT; atualizar cryptography>=50, python-dotenv>=1.2.2 e pytest. Gerar lockfile com hashes (pip-tools/uv: requirements.lock) e rodar osv-scanner/trivy no CI.",
+      "source": ["trivy", "osv-scanner", "claude"]
+    },
+    {
+      "id": "SEC-007",
+      "title": "Hardening HTTP: CORS * com credenciais, /docs público e sem cabeçalhos de segurança",
+      "severity": "low",
+      "pillars": ["Confidencialidade"],
+      "principles": ["Secure by default", "Superfície de ataque mínima"],
+      "stride": ["I"],
+      "cwe": "CWE-942",
+      "owasp": "API8:2023",
+      "locations": [
+        {"file": "app/main.py", "line": 40},
+        {"file": "app/config.py", "line": 65},
+        {"file": "render.yaml", "line": 30}
+      ],
+      "evidence": "allow_origins=CORS_ORIGINS (padrão \"*\"), allow_credentials=True; FastAPI sem docs_url=None",
+      "scenario": "Qualquer site pode chamar a API pelo navegador do usuário e ler as respostas. O impacto é baixo porque a autenticação é por header Bearer (não há credencial automática), mas qualquer adoção futura de cookies vira CSRF/roubo de dados imediato. /docs e /openapi.json mapeiam toda a superfície para o atacante.",
+      "impact": "Baixo hoje; vira alto se a autenticação passar a usar cookies.",
+      "recommendation": "CORS_ORIGINS com a lista explícita de origens do front e allow_credentials=False; desabilitar /docs e /openapi.json em produção (ou protegê-los); adicionar HSTS, X-Content-Type-Options e Cache-Control: no-store nas respostas autenticadas.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-008",
+      "title": "Container roda como root e CI usa actions por tag mutável sem permissions",
+      "severity": "low",
+      "pillars": ["Integridade"],
+      "principles": ["Menor privilégio"],
+      "stride": ["E", "T"],
+      "cwe": "CWE-250",
+      "owasp": "A05:2021",
+      "locations": [
+        {"file": "Dockerfile", "line": 22},
+        {"file": ".github/workflows/tests.yml", "line": 34},
+        {"file": ".github/workflows/tests.yml", "line": 37}
+      ],
+      "evidence": "Dockerfile sem USER; imagem final com gcc e libs de build; uses: actions/checkout@v4, actions/setup-python@v5",
+      "scenario": "Uma execução de código no processo (ver SEC-002) roda como root no container, com compilador disponível. No CI, uma tag de action repontada executa código com o GITHUB_TOKEN de permissões padrão.",
+      "impact": "Amplifica outras falhas; sozinho tem impacto baixo.",
+      "recommendation": "Build multi-stage sem gcc na imagem final, usuário sem privilégio (USER app) e uploads com dono restrito. No workflow, declarar permissions: contents: read e fixar as actions por SHA.",
+      "source": ["semgrep", "trivy"]
+    },
+    {
+      "id": "SEC-009",
+      "title": "Banco SQLite versionado em repositório público",
+      "severity": "low",
+      "pillars": ["Confidencialidade"],
+      "principles": ["Superfície de ataque mínima"],
+      "stride": ["I"],
+      "cwe": "CWE-538",
+      "owasp": "A05:2021",
+      "locations": [{"file": "onecheck.db", "line": 1}],
+      "evidence": "onecheck.db versionado (7 usuários @onecheck.local, hashes bcrypt, mfa_secret de seed, logs); há uma versão local modificada ainda não commitada",
+      "scenario": "Hoje o conteúdo é só de seed (verificado: só e-mails @onecheck.local). Mas o arquivo está versionado e modificado localmente: um commit descuidado publica dados reais de teste/uso, que ficam no histórico mesmo depois de removidos.",
+      "impact": "Baixo com os dados atuais; alto se dados reais forem commitados.",
+      "recommendation": "git rm --cached onecheck.db e adicioná-lo ao .gitignore (os testes já usam onecheck_test.db). Avaliar limpar o histórico se algum dado real já tiver sido commitado.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-010",
+      "title": "Trilha de auditoria incompleta (sem IP, sem o que mudou nas alterações de usuário)",
+      "severity": "low",
+      "pillars": ["Não-repúdio"],
+      "principles": ["Responsabilização"],
+      "stride": ["R"],
+      "cwe": "CWE-778",
+      "owasp": "A09:2021",
+      "locations": [
+        {"file": "app/serializers.py", "line": 230},
+        {"file": "app/routers/usuarios.py", "line": 230},
+        {"file": "app/notification_service.py", "line": 17}
+      ],
+      "evidence": "log_operacao(db, current.id, \"update\", \"usuario\", user.id)  # sem campos alterados; o parâmetro ip nunca é passado",
+      "scenario": "Um admin troca a senha ou o perfil de outro usuário e o log só registra 'update usuario'. Nenhum evento registra o IP de origem, nem o login falho. As notificações gravam e-mail e conteúdo da mensagem no log da aplicação.",
+      "impact": "Investigação de incidente sem base (quem mudou o quê, de onde); PII em log de aplicação (LGPD).",
+      "recommendation": "Passar o IP (request.client.host) em log_operacao; registrar os campos alterados (sem valores sensíveis: 'senha alterada', 'role: locatario→gestor'); remover e-mail e corpo da mensagem do logger de notificações.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-011",
+      "title": "Política de senha fraca",
+      "severity": "low",
+      "pillars": ["Autenticidade"],
+      "principles": ["Secure by default"],
+      "stride": ["S"],
+      "cwe": "CWE-521",
+      "owasp": "A07:2021",
+      "locations": [{"file": "app/schemas.py", "line": 106}],
+      "evidence": "senha: str = Field(min_length=6)",
+      "scenario": "Senhas de 6 caracteres e comuns (ex.: 123456) são aceitas. Mesmo com o limite de tentativas de N6, credential stuffing distribuído acerta contas com senhas vazadas. bcrypt ignora o que passa de 72 bytes.",
+      "impact": "Baixo com o rate limit e o MFA nos perfis privilegiados; maior para locatários sem MFA.",
+      "recommendation": "Mínimo de 10–12 caracteres, recusar senhas comuns/vazadas (lista local ou k-anonymity do HIBP) e max_length=72 bytes.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-012",
+      "title": "Regras de negócio sem validação no servidor e dashboard global",
+      "severity": "low",
+      "pillars": ["Integridade", "Confidencialidade"],
+      "principles": ["Mediação completa"],
+      "stride": ["T", "I"],
+      "cwe": "CWE-915",
+      "owasp": "API3:2023",
+      "locations": [
+        {"file": "app/routers/contratos.py", "line": 429},
+        {"file": "app/routers/dashboard.py", "line": 23}
+      ],
+      "evidence": "status_val vem do cliente (aceita \"resolvido\"/\"fechado\"); dashboard conta todos os registros para qualquer perfil",
+      "scenario": "O locatário registra um problema já com status 'fechado', fora do fluxo de atendimento (item 9). Qualquer usuário autenticado vê totais globais de imóveis locados, problemas e vistorias (item 4).",
+      "impact": "Baixo: distorção do fluxo e vazamento de agregados de negócio.",
+      "recommendation": "Ignorar status na criação (sempre 'aberto'); aplicar no dashboard os mesmos filtros das listagens ou restringi-lo a admin/gestor.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-013",
+      "title": "Enumeração de e-mails pelo tempo de resposta do login",
+      "severity": "low",
+      "pillars": ["Confidencialidade"],
+      "principles": ["Fail secure"],
+      "stride": ["I"],
+      "cwe": "CWE-208",
+      "owasp": "A07:2021",
+      "locations": [{"file": "app/routers/auth_router.py", "line": 53}],
+      "evidence": "if not user or not verify_password(body.senha, user.senha_hash):  # sem bcrypt quando o e-mail não existe",
+      "scenario": "Para e-mail inexistente a resposta volta sem o custo do bcrypt; medindo o tempo, o atacante descobre quais e-mails são contas válidas e direciona a força bruta.",
+      "impact": "Baixo: facilita ataques direcionados.",
+      "recommendation": "Quando o usuário não existir, rodar verify_password contra um hash fixo de mesmo custo antes de responder.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-014",
+      "title": "CPF em texto puro, sem validação e devolvido em toda resposta de usuário",
+      "severity": "low",
+      "pillars": ["Confidencialidade"],
+      "principles": ["Menor privilégio"],
+      "stride": ["I"],
+      "cwe": "CWE-359",
+      "owasp": "API3:2023",
+      "locations": [
+        {"file": "app/serializers.py", "line": 188},
+        {"file": "app/models.py", "line": 33}
+      ],
+      "evidence": "\"cpf\": u.cpf,  # em serialize_usuario, usado em /me, listagens, PUT/POST e PDF",
+      "scenario": "Qualquer resposta com usuário (inclusive /usuarios/me e as listagens para gestor) devolve o CPF; um token de gestor roubado exporta os CPFs de todos os locatários. Não há política de retenção para logs e refresh tokens.",
+      "impact": "LGPD: minimização (art. 6º III) e segurança (art. 46). Baixo/médio dependendo do volume de dados reais.",
+      "recommendation": "response_model distintos (CPF só no detalhe para admin/gestor, mascarado nas listagens); validar formato; definir retenção e limpeza de log_operacao e auth_refresh_tokens expirados.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-015",
+      "title": "Admin escolhe e conhece o segredo TOTP de outro usuário",
+      "severity": "low",
+      "pillars": ["Não-repúdio", "Autenticidade"],
+      "principles": ["Separação de privilégios"],
+      "stride": ["R", "S"],
+      "cwe": "CWE-284",
+      "owasp": "API5:2023",
+      "locations": [
+        {"file": "app/routers/usuarios.py", "line": 254},
+        {"file": "app/routers/usuarios.py", "line": 268}
+      ],
+      "evidence": "POST /usuarios/{id}/mfa/setup devolve o segredo ao admin; POST /usuarios/{id}/mfa/enable grava um segredo escolhido pelo admin",
+      "scenario": "Um admin mal-intencionado (ou com conta comprometida) define o segundo fator de um vistoriador e passa a autenticar como ele; as ações ficam no log em nome do vistoriador.",
+      "impact": "Quebra o não-repúdio das ações do usuário-alvo. Exige admin, por isso baixa.",
+      "recommendation": "Remover setup/enable por terceiros: o admin só reseta (reset_mfa) e o próprio usuário configura no próximo login.",
+      "source": ["claude"]
+    },
+    {
+      "id": "SEC-016",
+      "title": "Cópias antigas e vulneráveis do código na raiz do repositório",
+      "severity": "info",
+      "pillars": ["Integridade"],
+      "principles": ["Superfície de ataque mínima"],
+      "stride": [],
+      "cwe": "CWE-1164",
+      "owasp": "",
+      "locations": [
+        {"file": "auth.py", "line": 1},
+        {"file": "routers/auth_router.py", "line": 1}
+      ],
+      "evidence": "auth.py e routers/*.py na raiz, com as versões anteriores às correções N1–N8",
+      "scenario": "A aplicação não importa esses arquivos (app.main usa app.routers), mas eles confundem revisões e scanners, e um import errado reativaria as falhas já corrigidas.",
+      "impact": "Informativo.",
+      "recommendation": "Apagar auth.py e routers/ da raiz.",
+      "source": ["claude"]
+    }
+  ]
+}
