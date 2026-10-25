@@ -219,7 +219,15 @@ SEED_SECRET=
 # RATE_LIMIT_FALHAS_CONTA=5
 # RATE_LIMIT_FALHAS_IP=20
 # RATE_LIMIT_JANELA_MIN=15
+# Tamanho máximo do corpo: uploads (MB) e demais requisições, como JSON (KB)
+# MAX_UPLOAD_MB=10
+# MAX_BODY_KB=1024
 ```
+
+### Dados de demonstração (seed)
+- Em `APP_ENV=development`, o `start.sh` popula o banco vazio com as contas `@onecheck.local` e credenciais fixas, exibidas pelo `python scripts/seed.py`.
+- Fora de desenvolvimento não há seed automático. O primeiro carregamento é feito por `POST /api/v1/admin/seed` (com `SEED_SECRET`), que gera senhas aleatórias, devolvidas uma única vez na resposta; os perfis com MFA configuram o autenticador no primeiro login.
+- Bancos criados pelo seed antigo (senhas e segredo TOTP públicos) geram um alerta `SEGURANÇA:` no log ao iniciar. Para corrigir, aponte `DATABASE_URL` para o banco e rode `python scripts/rotacionar_credenciais_demo.py` (lista as contas) e depois com `--aplicar` (troca a senha, reseta o MFA e revoga as sessões).
 
 ### 5. Iniciar a API
 ```bash

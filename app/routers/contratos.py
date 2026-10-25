@@ -363,7 +363,7 @@ async def create_problema(
     status_val = "aberto"
 
     if "multipart/form-data" in content_type:
-        form = await request.form()
+        form = await request.form(max_files=1, max_fields=10)
         titulo = str(form.get("titulo") or "").strip()
         descricao = form.get("descricao")
         if descricao is not None:

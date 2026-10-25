@@ -107,7 +107,7 @@ async def criar_atualizacao(
     foto_chave = None
 
     if "multipart/form-data" in content_type:
-        form = await request.form()
+        form = await request.form(max_files=1, max_fields=10)
         descricao = str(form.get("descricao") or "")
         foto = form.get("foto")
         if foto and hasattr(foto, "read"):

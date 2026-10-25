@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session, joinedload
 
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
@@ -210,11 +210,24 @@ def update_item(
     return ok(serialize_item(item))
 
 
-@router.post("/checklists/{checklist_id}/itens/{item_id}/fotos")
+# Multipart documentado à mão: a rota lê o formulário só depois da autenticação e das checagens
+_FOTO_OPENAPI = {
+    "requestBody": {
+        "required": True,
+        "content": {"multipart/form-data": {"schema": {
+            "type": "object",
+            "required": ["foto"],
+            "properties": {"foto": {"type": "string", "format": "binary"}},
+        }}},
+    }
+}
+
+
+@router.post("/checklists/{checklist_id}/itens/{item_id}/fotos", openapi_extra=_FOTO_OPENAPI)
 async def upload_foto(
     checklist_id: str,
     item_id: str,
-    foto: UploadFile = File(...),
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
@@ -241,6 +254,10 @@ async def upload_foto(
     if not item.estado:
         return fail("Selecione o estado do item antes de enviar a foto")
 
+    form = await request.form(max_files=1, max_fields=5)
+    foto = form.get("foto")
+    if not hasattr(foto, "read"):
+        return fail("Envie o arquivo no campo 'foto'")
     content = await foto.read()
     max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     if len(content) > max_bytes:

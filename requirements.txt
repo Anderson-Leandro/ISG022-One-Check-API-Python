@@ -1,13 +1,15 @@
-fastapi==0.115.6
+fastapi==0.162.0
+# Dependência do FastAPI fixada aqui: versões < 0.49.1 têm CVE de DoS (CVE-2025-62727)
+starlette==1.10.0
 uvicorn[standard]==0.34.0
 sqlalchemy==2.0.36
 pymysql==1.1.1
 psycopg2-binary==2.9.10
 python-jose[cryptography]==3.3.0
 bcrypt==4.2.1
-python-multipart==0.0.20
+python-multipart==0.0.32
 pyotp==2.9.0
 python-dotenv==1.0.1
-pillow==11.1.0
+pillow==13.0.0
 cryptography==44.0.0
 email-validator==2.2.0

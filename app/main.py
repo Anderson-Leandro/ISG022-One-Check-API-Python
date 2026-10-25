@@ -1,11 +1,13 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.config import CORS_ORIGINS, UPLOAD_DIR
-from app.database import Base, ensure_schema_updates, engine
+from app.config import CORS_ORIGINS, IS_DEV, UPLOAD_DIR
+from app.database import Base, SessionLocal, ensure_schema_updates, engine
+from app.limite_corpo import LimiteCorpoMiddleware
 from app.routers import (
     admin,
     agendamentos,
@@ -18,13 +20,27 @@ from app.routers import (
     problemas,
     usuarios,
 )
+from app.seed_service import contas_com_credenciais_publicas
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     ensure_schema_updates()
+    if not IS_DEV:
+        _alertar_credenciais_publicas()
     yield
+
+
+def _alertar_credenciais_publicas() -> None:
+    with SessionLocal() as db:
+        emails = [u.email for u in contas_com_credenciais_publicas(db)]
+    if emails:
+        logging.getLogger(__name__).critical(
+            "SEGURANÇA: contas com senha ou segredo MFA de demonstração (públicos no repositório): %s. "
+            "Rode scripts/rotacionar_credenciais_demo.py --aplicar.",
+            ", ".join(emails),
+        )
 
 
 app = FastAPI(
@@ -41,6 +57,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Adicionado por último para ficar por fora: recusa corpos grandes antes de qualquer leitura
+app.add_middleware(LimiteCorpoMiddleware)
 
 prefix = "/api/v1"
 

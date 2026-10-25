@@ -49,6 +49,8 @@ JWT_REFRESH_DAYS = int(os.getenv("JWT_REFRESH_DAYS", "30"))
 
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", BASE_DIR / "uploads"))
 MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "10"))
+# Corpo das requisições que não são multipart (JSON); uploads usam MAX_UPLOAD_MB
+MAX_BODY_KB = int(os.getenv("MAX_BODY_KB", "1024"))
 
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "http://localhost:8000").rstrip("/")
 

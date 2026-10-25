@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-10-25 (commit `f081c60`)_
+_Última atualização: 2026-10-25 (auditoria sobre `f081c60`; SEC-001 a SEC-003 corrigidos em seguida, ver [correção](correcao-sec-001-002-003-2026-10-25.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -54,17 +54,17 @@ flowchart LR
 ## 5. Fronteiras de confiança
 | Fronteira | Fluxos que cruzam | Controles |
 |---|---|---|
-| Internet ↔ API | todas as rotas | TLS no proxy; JWT HS256 com `type` verificado (`app/deps.py:19`); RBAC `require_roles`; rate limit de auth (`app/rate_limit.py`); validação de upload (`app/uploads.py`). **Falta:** limite de corpo antes da auth (SEC-003), CORS restrito (SEC-007) |
+| Internet ↔ API | todas as rotas | TLS no proxy; JWT HS256 com `type` verificado (`app/deps.py:19`); RBAC `require_roles`; rate limit de auth (`app/rate_limit.py`); validação de upload (`app/uploads.py`); limite de corpo antes do roteamento (`app/limite_corpo.py`). **Falta:** CORS restrito (SEC-007) |
 | API ↔ Banco | ORM SQLAlchemy | consultas parametrizadas; DDL estático (`app/database.py`). **Falta:** credencial dedicada de menor privilégio |
-| API ↔ Disco (uploads) | gravação e download de fotos | nome aleatório, tipo pelo conteúdo, `caminho_seguro`, `nosniff` + CSP. **Falta:** Pillow atualizado e formatos restritos no parser (SEC-002); autenticação no download |
+| API ↔ Disco (uploads) | gravação e download de fotos | nome aleatório, assinatura conferida antes do Pillow, parser restrito a JPEG/PNG/WebP, `caminho_seguro`, `nosniff` + CSP. **Falta:** autenticação no download |
 | API ↔ serviços externos | CEP e geocoding | URL fixa HTTPS, CEP só com dígitos, timeout 5 s |
-| Repositório público ↔ deploy | build e start | **Falha:** o seed com credenciais públicas roda em todo start (SEC-001); banco versionado (SEC-009) |
+| Repositório público ↔ deploy | build e start | seed automático só em desenvolvimento; fora dele, credenciais aleatórias (SEC-001). **Falta:** rotacionar contas antigas em produção; banco versionado (SEC-009) |
 | Container ↔ host | execução | **Falta:** usuário não root (SEC-008) |
 
 ## 6. Ameaças (STRIDE por elemento)
 | ID | Elemento | STRIDE | Ameaça | Pilar | Mitigação existente | Status | Achado |
 |---|---|---|---|---|---|---|---|
-| T-01 | Login | S | Entrar como admin com as credenciais públicas do seed | Autenticidade | `/admin/seed` exige segredo + admin (N2) | **Aberta** | SEC-001 |
+| T-01 | Login | S | Entrar como admin com as credenciais públicas do seed | Autenticidade | seed sem credenciais fixas fora de dev; alerta e script de rotação para contas antigas (`app/seed_service.py`) | Mitigada no código (rotação em produção pendente) | SEC-001 |
 | T-02 | Login / MFA | S | Força bruta de senha e TOTP | Autenticidade | `Tentativas` por conta e IP (`auth_router.py:47-58`) | Mitigada (por processo) | — |
 | T-03 | MFA | S | Login só com senha usando token de setup | Autenticidade | tipos `mfa` × `mfa_setup` (N1) | Mitigada | — |
 | T-04 | JWT | S | Forjar token com segredo padrão | Autenticidade | `JWT_SECRET` obrigatório e forte fora de dev (`config.py`) | Mitigada | — |
@@ -75,15 +75,15 @@ flowchart LR
 | T-09 | Contratos / Imóveis | I | Vistoriador lê qualquer contrato/imóvel pelo ID | Confidencialidade | só locatário restrito | **Aberta** | SEC-004 |
 | T-10 | Problemas | I | BOLA por ID | Confidencialidade | `assert_acesso_problemas` (item 6) | Mitigada | — |
 | T-11 | Usuários | I | Listagem de usuários com CPF para qualquer perfil | Confidencialidade | restrito a admin/gestor (item 2) | Parcial (CPF segue nas respostas) | SEC-014 |
-| T-12 | Uploads | T/E | Arquivo malicioso explora o decoder de imagem | Integridade | tipo validado, mas depois de `Image.open` com Pillow vulnerável | **Aberta** | SEC-002 |
+| T-12 | Uploads | T/E | Arquivo malicioso explora o decoder de imagem | Integridade | Pillow 13; assinatura antes do parser; `formats` restrito; limite de pixels (`app/uploads.py`) | Mitigada | SEC-002 |
 | T-13 | Uploads | T | XSS armazenado via HTML/SVG servido pela API | Integridade | validação de conteúdo + `nosniff` + CSP (N7) | Mitigada | — |
 | T-14 | Uploads / download | I | Fotos de vistoria acessíveis sem login | Confidencialidade (LGPD) | nomes aleatórios de 128 bits | Aceita? (decisão pendente) | — |
-| T-15 | API | D | Corpo multipart gigante processado antes da auth | Disponibilidade | — | **Aberta** | SEC-003 |
+| T-15 | API | D | Corpo multipart gigante processado antes da auth | Disponibilidade | `LimiteCorpoMiddleware`; formulário lido após a auth | Mitigada | SEC-003 |
 | T-16 | API | D | Limite de tentativas usado para bloquear contas de terceiros | Disponibilidade | janela de 15 min | Aceita (custo do T-02) | — |
 | T-17 | Problemas | T | Locatário abre problema já "fechado" | Integridade | status validado só contra a lista | **Aberta** | SEC-012 |
 | T-18 | Auditoria | R | Ações sem IP e sem os campos alterados | Não-repúdio | `log_operacao` em todas as escritas | Parcial | SEC-010 |
 | T-19 | MFA por admin | R | Admin define o TOTP de outro usuário e age em nome dele | Não-repúdio | reset separado do setup (parcial) | **Aberta** | SEC-015 |
-| T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | versões fixadas | **Aberta** | SEC-002, SEC-003, SEC-006 |
+| T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | versões fixadas; Pillow, multipart, FastAPI e Starlette atualizados | Parcial (python-jose, cryptography) | SEC-006 |
 | T-21 | Repositório | I | Banco e seed publicados no GitHub | Confidencialidade | só dados de seed hoje | Parcial | SEC-001, SEC-009 |
 | T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie) | Parcial | SEC-007 |
 | T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | — | **Aberta** | SEC-008 |
