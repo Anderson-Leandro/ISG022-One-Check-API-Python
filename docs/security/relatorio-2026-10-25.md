@@ -6,7 +6,7 @@
 - **Stack:** Python 3.12, FastAPI 0.115.6 (Starlette 0.41.3), SQLAlchemy 2.0, PostgreSQL 16 / SQLite, python-jose (JWT HS256), bcrypt, pyotp, Pillow. Deploy no Render (repositório **público**) e Docker Compose.
 - **Ferramentas:** revisão manual guiada (Claude) + semgrep 1.95.0 · bandit 1.7.10 · gitleaks v8.21.2 (working tree e histórico) · trivy 0.56.2 (fs + config) · osv-scanner v1.9.1. **Todos executaram sem falha.**
 
-> **Atualização:** SEC-001, SEC-002 e SEC-003 foram corrigidos depois desta auditoria. Ver [correção](correcao-sec-001-002-003-2026-10-25.md). As contas do seed antigo em produção ainda precisam ser rotacionadas.
+> **Atualização:** SEC-001 a SEC-005 foram corrigidos depois desta auditoria. Ver as correções [SEC-001 a 003](correcao-sec-001-002-003-2026-10-25.md) e [SEC-004 e 005](correcao-sec-004-005-2026-10-25.md). As contas do seed antigo em produção ainda precisam ser rotacionadas.
 
 Esta auditoria vem depois das correções N1–N8 e dos itens 1, 2, 3 e 6 do `PENDENCIAS_API.md` (commits `0e164b8`, `8e4d12d`, `648518e` e `f081c60`). Os pontos já corrigidos foram conferidos e aparecem em **Pontos positivos**.
 

@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import assert_acesso_imovel, get_current_user, require_roles
 from app.geocoding import buscar_coordenadas
 from app.models import Checklist, Contrato, Endereco, Imovel, ImovelComodo, Usuario
 from app.schemas import (
@@ -129,16 +129,7 @@ def get_imovel(
     )
     if not im:
         return fail("Imóvel não encontrado")
-
-    if user.role == "locatario":
-        tem_contrato = db.query(Contrato).filter(
-            Contrato.imovel_id == imovel_id,
-            Contrato.locatario_id == user.id,
-            Contrato.status == "ativo",
-        ).first()
-        if not tem_contrato:
-            raise HTTPException(status_code=403, detail="Você não tem acesso a este imóvel")
-
+    assert_acesso_imovel(db, imovel_id, user)
     return ok(serialize_imovel(im, include_endereco=True))
 
 
@@ -205,15 +196,7 @@ def get_endereco(
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
         return fail("Imóvel não encontrado")
-
-    if user.role == "locatario":
-        tem_contrato = db.query(Contrato).filter(
-            Contrato.imovel_id == imovel_id,
-            Contrato.locatario_id == user.id,
-            Contrato.status == "ativo",
-        ).first()
-        if not tem_contrato:
-            raise HTTPException(status_code=403, detail="Você não tem acesso a este imóvel")
+    assert_acesso_imovel(db, imovel_id, user)
 
     end = db.query(Endereco).filter(Endereco.imovel_id == imovel_id, Endereco.ativo == True).first()
     if not end:
@@ -254,11 +237,12 @@ def upsert_endereco(
 def list_comodos(
     imovel_id: str,
     db: Session = Depends(get_db),
-    _: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(get_current_user),
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
         return fail("Imóvel não encontrado")
+    assert_acesso_imovel(db, imovel_id, user)
 
     ensure_default_comodos(db, imovel_id)
     comodos = (

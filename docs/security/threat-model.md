@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-10-25 (auditoria sobre `f081c60`; SEC-001 a SEC-003 corrigidos em seguida, ver [correção](correcao-sec-001-002-003-2026-10-25.md))_
+_Última atualização: 2026-10-25 (auditoria sobre `f081c60`; SEC-001 a SEC-005 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md) e [004–005](correcao-sec-004-005-2026-10-25.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -68,11 +68,11 @@ flowchart LR
 | T-02 | Login / MFA | S | Força bruta de senha e TOTP | Autenticidade | `Tentativas` por conta e IP (`auth_router.py:47-58`) | Mitigada (por processo) | — |
 | T-03 | MFA | S | Login só com senha usando token de setup | Autenticidade | tipos `mfa` × `mfa_setup` (N1) | Mitigada | — |
 | T-04 | JWT | S | Forjar token com segredo padrão | Autenticidade | `JWT_SECRET` obrigatório e forte fora de dev (`config.py`) | Mitigada | — |
-| T-05 | Sessões | S | Token roubado continua válido após troca de senha/reset de MFA | Autenticidade | — | **Aberta** | SEC-005 |
+| T-05 | Sessões | S | Token roubado continua válido após troca de senha/reset de MFA | Autenticidade | `token_version` nos JWT + refresh tokens apagados (`encerrar_sessoes`, `app/auth.py`) | Mitigada | SEC-005 |
 | T-06 | Login | I | Enumerar e-mails pelo tempo de resposta | Confidencialidade | mensagem genérica | Parcial | SEC-013 |
 | T-07 | Usuários | E | Gestor se promove ou gerencia admins | Autorização | `_assert_pode_gerenciar` / `_assert_pode_atribuir` (N4) | Mitigada | — |
 | T-08 | Checklists | E/T | Locatário cria e aprova a própria vistoria | Integridade | criação só admin/gestor; separação de deveres (N3) | Mitigada | — |
-| T-09 | Contratos / Imóveis | I | Vistoriador lê qualquer contrato/imóvel pelo ID | Confidencialidade | só locatário restrito | **Aberta** | SEC-004 |
+| T-09 | Contratos / Imóveis | I | Vistoriador lê qualquer contrato/imóvel pelo ID | Confidencialidade | `assert_acesso_contrato` / `assert_acesso_imovel` (`app/deps.py`) | Mitigada (visualizador com leitura global, a decidir) | SEC-004 |
 | T-10 | Problemas | I | BOLA por ID | Confidencialidade | `assert_acesso_problemas` (item 6) | Mitigada | — |
 | T-11 | Usuários | I | Listagem de usuários com CPF para qualquer perfil | Confidencialidade | restrito a admin/gestor (item 2) | Parcial (CPF segue nas respostas) | SEC-014 |
 | T-12 | Uploads | T/E | Arquivo malicioso explora o decoder de imagem | Integridade | Pillow 13; assinatura antes do parser; `formats` restrito; limite de pixels (`app/uploads.py`) | Mitigada | SEC-002 |

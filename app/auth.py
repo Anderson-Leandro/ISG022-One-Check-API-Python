@@ -32,26 +32,45 @@ def verify_password(senha: str, senha_hash: str) -> bool:
         return False
 
 
-def create_access_token(usuario_id: str, role: str) -> str:
+def create_access_token(usuario_id: str, role: str, versao: int = 0) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_ACCESS_MINUTES)
-    payload = {"sub": usuario_id, "role": role, "type": "access", "exp": expire}
+    payload = {"sub": usuario_id, "role": role, "type": "access", "ver": versao, "exp": expire}
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def _create_short_token(usuario_id: str, token_type: str) -> str:
+def _create_short_token(usuario_id: str, token_type: str, versao: int) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=10)
-    payload = {"sub": usuario_id, "type": token_type, "exp": expire}
+    payload = {"sub": usuario_id, "type": token_type, "ver": versao, "exp": expire}
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def create_temp_token(usuario_id: str) -> str:
+def create_temp_token(usuario_id: str, versao: int = 0) -> str:
     """Token do passo de verificação MFA (usuário já tem autenticador)."""
-    return _create_short_token(usuario_id, "mfa")
+    return _create_short_token(usuario_id, "mfa", versao)
 
 
-def create_mfa_setup_token(usuario_id: str) -> str:
+def create_mfa_setup_token(usuario_id: str, versao: int = 0) -> str:
     """Token do primeiro acesso, para configurar o autenticador. Não serve para /mfa/verify."""
-    return _create_short_token(usuario_id, "mfa_setup")
+    return _create_short_token(usuario_id, "mfa_setup", versao)
+
+
+def sessao_vigente(payload: dict, user: Usuario) -> bool:
+    """O token foi emitido depois da última troca de credencial do usuário."""
+    return payload.get("ver", 0) == (user.token_version or 0)
+
+
+def encerrar_sessoes(db: Session, user: Usuario) -> None:
+    """Invalida todas as sessões do usuário: access tokens pela versão e refresh tokens apagados. Não faz commit."""
+    user.token_version = (user.token_version or 0) + 1
+    db.query(RefreshToken).filter(RefreshToken.usuario_id == user.id).delete()
+
+
+def nova_sessao(db: Session, user: Usuario) -> dict:
+    """Tokens novos para quem acabou de trocar a própria credencial (as outras sessões foram encerradas)."""
+    return {
+        "access_token": create_access_token(user.id, user.role, user.token_version),
+        "refresh_token": create_refresh_token(db, user.id),
+    }
 
 
 def decode_token(token: str) -> dict | None:

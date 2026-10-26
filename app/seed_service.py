@@ -5,7 +5,7 @@ from datetime import date, timedelta
 import pyotp
 from sqlalchemy.orm import Session
 
-from app.auth import MFA_REQUIRED_ROLES, hash_password, reset_mfa, verify_password
+from app.auth import MFA_REQUIRED_ROLES, encerrar_sessoes, hash_password, reset_mfa, verify_password
 from app.config import IS_DEV
 from app.models import (
     AgendamentoVistoria,
@@ -75,7 +75,7 @@ def rotacionar_credenciais_publicas(db: Session) -> list[dict]:
         senha = secrets.token_urlsafe(16)
         user.senha_hash = hash_password(senha)
         reset_mfa(user)
-        db.query(RefreshToken).filter(RefreshToken.usuario_id == user.id).delete()
+        encerrar_sessoes(db, user)
         log_operacao(db, None, "rotacao_credenciais", "usuario", user.id, "Credenciais de demonstração substituídas")
         novas.append({"email": user.email, "senha": senha, "mfa": user.mfa_enabled})
     db.commit()

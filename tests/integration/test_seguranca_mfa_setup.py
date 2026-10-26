@@ -118,10 +118,12 @@ class TestActivateTroca:
     def test_pendente_nao_e_reaproveitado(self, client, db, user_admin, token_admin):
         novo = self._setup(client, token_admin)
         body = {"codigo": pyotp.TOTP(novo).now(), "codigo_atual": totp_now()}
-        assert client.post(f"{AUTH}/mfa/activate", json=body, headers=auth(token_admin)).json()["sucesso"] is True
-        # segunda chamada: o pendente já foi consumido
+        r = client.post(f"{AUTH}/mfa/activate", json=body, headers=auth(token_admin))
+        assert r.json()["sucesso"] is True
+        # segunda chamada (com a sessão nova, pois a troca encerra as outras): o pendente já foi consumido
+        token_novo = r.json()["dados"]["sessao"]["access_token"]
         body2 = {"codigo": pyotp.TOTP(novo).now(), "codigo_atual": pyotp.TOTP(novo).now()}
-        assert client.post(f"{AUTH}/mfa/activate", json=body2, headers=auth(token_admin)).json()["sucesso"] is False
+        assert client.post(f"{AUTH}/mfa/activate", json=body2, headers=auth(token_novo)).json()["sucesso"] is False
 
     def test_primeira_configuracao_nao_exige_codigo_atual(self, client, db, user_locatario, token_locatario):
         novo = self._setup(client, token_locatario)

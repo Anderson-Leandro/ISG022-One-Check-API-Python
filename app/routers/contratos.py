@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.config import MAX_UPLOAD_MB
 from app.database import get_db
-from app.deps import assert_acesso_problemas, get_current_user, require_roles
+from app.deps import assert_acesso_contrato, assert_acesso_problemas, get_current_user, require_roles
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -126,9 +126,7 @@ def get_contrato(
     if not ct:
         return fail("Contrato não encontrado")
 
-    if user.role == "locatario" and ct.locatario_id != user.id:
-        raise HTTPException(status_code=403, detail="Você não tem acesso a este contrato")
-
+    assert_acesso_contrato(db, ct, user)
     return ok(serialize_contrato(ct))
 
 
@@ -208,6 +206,7 @@ def list_agendamentos(
 
     if user.role == "locatario":
         raise HTTPException(status_code=403, detail="Você não tem acesso aos agendamentos deste contrato")
+    assert_acesso_contrato(db, ct, user)
 
     rows = (
         db.query(AgendamentoVistoria)

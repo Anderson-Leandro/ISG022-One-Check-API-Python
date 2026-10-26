@@ -5,11 +5,13 @@ from app.auth import (
     MFA_REQUIRED_ROLES,
     PRIVILEGED_ROLES,
     ROLES,
+    encerrar_sessoes,
     generate_mfa_secret,
     hash_password,
     mfa_provisioning_data,
     mfa_self_disable_error,
     mfa_troca_error,
+    nova_sessao,
     reset_mfa,
     verify_password,
     verify_totp_code,
@@ -74,11 +76,15 @@ def update_me(
             return fail("Senha atual incorreta")
         tentativas.sucesso()
         user.senha_hash = hash_password(body.senha_nova)
+        encerrar_sessoes(db, user)
 
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "perfil")
-    return ok(serialize_usuario(user))
+    dados = serialize_usuario(user)
+    if body.senha_nova:
+        dados["sessao"] = nova_sessao(db, user)
+    return ok(dados)
 
 
 @router.put("/me/senha")
@@ -96,10 +102,11 @@ def alterar_senha_me(
     tentativas.sucesso()
 
     user.senha_hash = hash_password(body.nova_senha)
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "alteracao_de_senha")
-    return ok({"mensagem": "Senha alterada com sucesso"})
+    return ok({"mensagem": "Senha alterada com sucesso", "sessao": nova_sessao(db, user)})
 
 
 @router.post("/me/mfa/setup")
@@ -125,10 +132,11 @@ def mfa_enable_me(
         return fail("Código MFA inválido")
     user.mfa_secret = body.secret
     user.mfa_enabled = True
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "mfa_enable")
-    return ok(serialize_usuario(user))
+    return ok({**serialize_usuario(user), "sessao": nova_sessao(db, user)})
 
 
 @router.delete("/me/mfa")
@@ -151,10 +159,11 @@ def mfa_disable_me(
     user.mfa_secret = None
     user.mfa_secret_pendente = None
     user.mfa_enabled = False
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "mfa_disable")
-    return ok(serialize_usuario(user))
+    return ok({**serialize_usuario(user), "sessao": nova_sessao(db, user)})
 
 
 @router.get("")
@@ -214,16 +223,23 @@ def update_usuario(
 
     if body.nome is not None:
         user.nome = body.nome.strip()
+    # Perfil, MFA ou senha alterados pelo gestor/admin encerram as sessões do usuário
+    credencial_alterada = False
     if novo_role != user.role:
         user.role = novo_role
+        credencial_alterada = True
         if novo_role in MFA_REQUIRED_ROLES:
             user.mfa_enabled = True
     if body.mfa_enabled is not None:
+        credencial_alterada = credencial_alterada or body.mfa_enabled != user.mfa_enabled
         user.mfa_enabled = body.mfa_enabled
         if not body.mfa_enabled:
             user.mfa_secret = None
     if body.senha:
         user.senha_hash = hash_password(body.senha)
+        credencial_alterada = True
+    if credencial_alterada:
+        encerrar_sessoes(db, user)
 
     db.commit()
     db.refresh(user)
@@ -246,6 +262,7 @@ def delete_usuario(
     _assert_pode_gerenciar(current, user)
 
     user.ativo = False
+    encerrar_sessoes(db, user)
     db.commit()
     log_operacao(db, current.id, "delete", "usuario", user.id, f"email: {user.email}")
     return ok(None)
@@ -282,6 +299,7 @@ def mfa_enable_usuario(
         if not verify_totp_code(body.secret, body.codigo):
             return fail("Código MFA inválido")
         user.mfa_secret = body.secret
+        encerrar_sessoes(db, user)
 
     user.mfa_enabled = True
     db.commit()
@@ -302,6 +320,7 @@ def mfa_reset_usuario(
         return fail("Usuário não encontrado")
     _assert_pode_gerenciar(current, user)
     reset_mfa(user)
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, current.id, "update", "usuario", user.id, "mfa_reset")

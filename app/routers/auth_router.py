@@ -8,6 +8,7 @@ from app.auth import (
     create_refresh_token,
     create_temp_token,
     decode_token,
+    encerrar_sessoes,
     generate_mfa_secret,
     hash_password,
     mfa_provisioning_data,
@@ -15,8 +16,10 @@ from app.auth import (
     mfa_setup_required,
     mfa_troca_error,
     needs_mfa,
+    nova_sessao,
     reset_mfa,
     revoke_refresh_token,
+    sessao_vigente,
     usuario_to_dict,
     verify_password,
     verify_refresh_token,
@@ -57,7 +60,7 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     tentativas.sucesso()
 
     if needs_mfa(user):
-        temp = create_temp_token(user.id)
+        temp = create_temp_token(user.id, user.token_version)
         return ok({
             "mfa_required": True,
             "temp_token": temp,
@@ -65,14 +68,14 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
         })
 
     if mfa_setup_required(user):
-        temp = create_mfa_setup_token(user.id)
+        temp = create_mfa_setup_token(user.id, user.token_version)
         return ok({
             "mfa_setup_required": True,
             "temp_token": temp,
             "mfa_token": temp,
         })
 
-    access = create_access_token(user.id, user.role)
+    access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
     log_operacao(db, user.id, "login", "usuario", user.id, f"email: {user.email}")
     return ok({
@@ -91,6 +94,8 @@ def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(g
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    if not sessao_vigente(payload, user):
+        return fail("Token MFA inválido ou expirado")
 
     # A conta (e não o temp_token) é a chave: um novo login não zera as tentativas
     tentativas = Tentativas(request, "mfa", user.id)
@@ -101,7 +106,7 @@ def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(g
         return fail("Código MFA inválido")
     tentativas.sucesso()
 
-    access = create_access_token(user.id, user.role)
+    access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
     log_operacao(db, user.id, "mfa_verify", "usuario", user.id, "via: mfa")
     return ok({
@@ -122,6 +127,8 @@ def setup_login(temp_token: str = Query(...), db: Session = Depends(get_db)):
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    if not sessao_vigente(payload, user):
+        raise HTTPException(status_code=401, detail="Token MFA inválido ou expirado")
 
     # Revalida no momento da chamada: o token vale 10 min e pode ser reutilizado após a ativação
     if not mfa_setup_required(user):
@@ -143,6 +150,8 @@ def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    if not sessao_vigente(payload, user):
+        return fail("Token MFA inválido ou expirado")
 
     if not mfa_setup_required(user):
         return fail("MFA já configurado para este usuário")
@@ -161,7 +170,7 @@ def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session 
     db.commit()
     db.refresh(user)
 
-    access = create_access_token(user.id, user.role)
+    access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
     log_operacao(db, user.id, "login", "usuario", user.id, "via: mfa_setup")
     return ok({
@@ -206,10 +215,11 @@ def mfa_activate(
     user.mfa_secret = user.mfa_secret_pendente
     user.mfa_secret_pendente = None
     user.mfa_enabled = True
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "mfa_activate", "usuario", user.id)
-    return ok({"mensagem": "MFA ativado com sucesso"})
+    return ok({"mensagem": "MFA ativado com sucesso", "sessao": nova_sessao(db, user)})
 
 
 @router.post("/mfa/disable")
@@ -227,6 +237,7 @@ def mfa_disable(
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     reset_mfa(target)
+    encerrar_sessoes(db, target)
     db.commit()
     db.refresh(target)
     log_operacao(db, current_admin.id, "mfa_disable", "usuario", target.id)
@@ -265,10 +276,11 @@ def mfa_desabilitar(
     user.mfa_enabled = False
     user.mfa_secret = None
     user.mfa_secret_pendente = None
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "mfa_disable", "usuario", user.id)
-    return ok({"mensagem": "MFA desativado com sucesso"})
+    return ok({"mensagem": "MFA desativado com sucesso", "sessao": nova_sessao(db, user)})
 
 
 @router.post("/refresh")
@@ -277,7 +289,7 @@ def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
     if not user:
         return fail("Refresh token inválido ou expirado")
 
-    access = create_access_token(user.id, user.role)
+    access = create_access_token(user.id, user.role, user.token_version)
     new_refresh = create_refresh_token(db, user.id)
     revoke_refresh_token(db, body.refresh_token)
     return ok({"access_token": access, "refresh_token": new_refresh})
