@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-10-25 (auditoria sobre `f081c60`; SEC-001 a SEC-007 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md) e [006–007](correcao-sec-006-007-2026-10-25.md))_
+_Última atualização: 2026-10-26 (auditoria de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-009 e SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md) e [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -47,7 +47,7 @@ flowchart LR
   end
   API -->|HTTPS| VIA[ViaCEP]
   API -->|HTTPS| NOM[Nominatim]
-  GH[GitHub público<br/>código, seed, onecheck.db] -->|build| Render
+  GH[GitHub público<br/>código e seed] -->|build| Render
   CI[GitHub Actions] -->|testes| GH
 ```
 
@@ -58,8 +58,8 @@ flowchart LR
 | API ↔ Banco | ORM SQLAlchemy | consultas parametrizadas; DDL estático (`app/database.py`). **Falta:** credencial dedicada de menor privilégio |
 | API ↔ Disco (uploads) | gravação e download de fotos | nome aleatório, assinatura conferida antes do Pillow, parser restrito a JPEG/PNG/WebP, `caminho_seguro`, `nosniff` + CSP. **Falta:** autenticação no download |
 | API ↔ serviços externos | CEP e geocoding | URL fixa HTTPS, CEP só com dígitos, timeout 5 s |
-| Repositório público ↔ deploy | build e start | seed automático só em desenvolvimento; fora dele, credenciais aleatórias (SEC-001). **Falta:** rotacionar contas antigas em produção; banco versionado (SEC-009) |
-| Container ↔ host | execução | **Falta:** usuário não root (SEC-008) |
+| Repositório público ↔ deploy | build e start | seed automático só em desenvolvimento; fora dele, credenciais aleatórias (SEC-001). nenhum banco versionado (SEC-009). **Falta:** rotacionar contas antigas em produção |
+| Container ↔ host | execução | usuário `app` sem privilégio, código só leitura, sem compilador na imagem; CI com token só leitura e actions fixadas por SHA (SEC-008) |
 
 ## 6. Ameaças (STRIDE por elemento)
 | ID | Elemento | STRIDE | Ameaça | Pilar | Mitigação existente | Status | Achado |
@@ -84,9 +84,9 @@ flowchart LR
 | T-18 | Auditoria | R | Ações sem IP e sem os campos alterados | Não-repúdio | `log_operacao` em todas as escritas | Parcial | SEC-010 |
 | T-19 | MFA por admin | R | Admin define o TOTP de outro usuário e age em nome dele | Não-repúdio | reset separado do setup (parcial) | **Aberta** | SEC-015 |
 | T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | PyJWT no lugar do python-jose; `requirements.lock` com hashes, instalado com `--require-hashes`; `pip-audit` no CI | Mitigada | SEC-006 |
-| T-21 | Repositório | I | Banco e seed publicados no GitHub | Confidencialidade | só dados de seed hoje | Parcial | SEC-001, SEC-009 |
+| T-21 | Repositório | I | Banco e seed publicados no GitHub | Confidencialidade | `onecheck.db` fora do índice (o histórico só tem dados de seed); credenciais do seed só em desenvolvimento | Mitigada (falta a rotação em produção) | SEC-001, SEC-009 |
 | T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie); CORS só para `CORS_ORIGINS`, sem credenciais; `/docs` desligado em produção; `no-store`, `nosniff`, HSTS | Mitigada (depende de `CORS_ORIGINS` no Render) | SEC-007 |
-| T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | — | **Aberta** | SEC-008 |
+| T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | `USER app`, `--only-binary`, `permissions: contents: read`, actions por SHA | Mitigada | SEC-008 |
 
 Status: **Mitigada** · **Parcial** · **Aberta** · **Aceita**
 

@@ -66,8 +66,9 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | **Geocoding** | Nominatim (OpenStreetMap) + ViaCEP via `httpx` |
 | **Geração de PDF** | Motor PDF 1.4 Pure Python (sem dependências binárias C externas) |
 | **Dependências** | `requirements.txt` (diretas) + `requirements.lock` (todas, com hash) |
-| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (733 testes, 94% de cobertura) |
-| **CI / CD** | GitHub Actions (testes em PostgreSQL + auditoria de dependências com `pip-audit`) |
+| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (741 testes, 94% de cobertura) |
+| **CI / CD** | GitHub Actions (testes em PostgreSQL + auditoria de dependências com `pip-audit`; actions fixadas por SHA, token só leitura) |
+| **Container** | Docker (`python:3.12-slim`, usuário sem privilégio, só wheels) + Docker Compose com PostgreSQL |
 
 ---
 
@@ -324,11 +325,23 @@ uvicorn app.main:app --reload
 A API estará rodando em: `http://localhost:8000`  
 Documentação Swagger interativa (desenvolvimento ou `DOCS_ENABLED=true`): `http://localhost:8000/docs`
 
+### 6. Executando com Docker (opcional)
+```bash
+# .env com JWT_SECRET (32+ caracteres) e POSTGRES_PASSWORD
+docker compose up -d --build
+```
+- A API roda como o usuário `app` (uid 10001), sem privilégio: o código é só leitura e apenas `/app/uploads` é gravável.
+- **Volume de uploads criado antes dessa mudança:** ele pertence ao root, e os uploads falham com `Permission denied`. Corrija uma única vez:
+  ```bash
+  docker compose run --rm --user root api chown -R app:app /app/uploads
+  ```
+- O banco do container é o Postgres do compose. O `onecheck.db` (SQLite) é só para uso local e não é versionado.
+
 ---
 
 ## 🧪 Executando os Testes Automatizados
 
-A suíte cobre os fluxos de negócio e as correções de segurança com **733 testes automatizados** e **94% de cobertura**:
+A suíte cobre os fluxos de negócio e as correções de segurança com **741 testes automatizados** e **94% de cobertura**:
 
 ```bash
 # Executar todos os testes

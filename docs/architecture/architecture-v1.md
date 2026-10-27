@@ -1,6 +1,6 @@
 # Arquitetura do Sistema e Fronteiras de Confiança (v1)
 
-_Última atualização: 2026-10-25, depois das correções de segurança SEC-001 a SEC-007. Os detalhes de cada controle e os riscos ainda abertos estão em [`docs/security/`](../security/threat-model.md)._
+_Última atualização: 2026-10-26, depois das correções de segurança SEC-001 a SEC-009 e SEC-016. Os detalhes de cada controle e os riscos ainda abertos estão em [`docs/security/`](../security/threat-model.md)._
 
 ## 1. Contexto e Domínio do Sistema
 
@@ -117,3 +117,8 @@ flowchart TD
 5. **Cadeia de Suprimentos:**
    - `requirements.lock` com versão exata e hash de todas as dependências; o Render, o Docker e o CI instalam com `--require-hashes`.
    - O CI roda o `pip-audit` sobre o lockfile e falha quando há vulnerabilidade conhecida.
+   - As actions do CI são fixadas por SHA, e o `GITHUB_TOKEN` só tem `contents: read`.
+6. **Execução (container):**
+   - Imagem sem compilador, com pacotes instalados só a partir de wheels (`--only-binary`).
+   - A API roda como usuário sem privilégio (`app`); o código é só leitura e apenas `uploads/` é gravável.
+   - Nenhum banco de dados é versionado no repositório.
