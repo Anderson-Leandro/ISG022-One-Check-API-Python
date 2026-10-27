@@ -3,8 +3,8 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
+import jwt
 import pyotp
-from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from app.config import (
@@ -75,8 +75,9 @@ def nova_sessao(db: Session, user: Usuario) -> dict:
 
 def decode_token(token: str) -> dict | None:
     try:
-        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    except JWTError:
+        # algorithms fixo impede alg=none e troca de algoritmo; sem exp/sub/type, o token é recusado
+        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM], options={"require": ["exp", "sub", "type"]})
+    except jwt.InvalidTokenError:
         return None
 
 

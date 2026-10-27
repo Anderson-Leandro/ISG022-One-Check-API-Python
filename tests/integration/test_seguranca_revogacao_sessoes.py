@@ -16,9 +16,9 @@ Regras verificadas:
 """
 from datetime import datetime, timedelta, timezone
 
+import jwt
 import pyotp
 import pytest
-from jose import jwt
 
 from app.auth import create_access_token, create_refresh_token, create_temp_token
 from app.config import JWT_ALGORITHM, JWT_SECRET

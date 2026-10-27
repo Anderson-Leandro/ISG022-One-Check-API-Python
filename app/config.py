@@ -64,8 +64,14 @@ if SEED_SECRET and not IS_DEV and len(SEED_SECRET) < MIN_SECRET_LEN:
 # force=true e refresh_data apagam dados: só com opt-in explícito
 SEED_ALLOW_DESTRUCTIVE = os.getenv("SEED_ALLOW_DESTRUCTIVE", "false").strip().lower() in ("1", "true", "yes")
 
-_cors = os.getenv("CORS_ORIGINS", "*")
-CORS_ORIGINS = ["*"] if _cors.strip() == "*" else [o.strip() for o in _cors.split(",") if o.strip()]
+# Origens do front, separadas por vírgula. Sem valor, em produção nenhum site de outra
+# origem chama a API pelo navegador; em desenvolvimento, todas
+_cors = os.getenv("CORS_ORIGINS", "").strip() or ("*" if IS_DEV else "")
+CORS_ORIGINS = ["*"] if _cors == "*" else [o.strip().rstrip("/") for o in _cors.split(",") if o.strip()]
+
+# /docs, /redoc e /openapi.json: ligados só em desenvolvimento, salvo DOCS_ENABLED=true
+_docs = os.getenv("DOCS_ENABLED", "").strip().lower()
+DOCS_ENABLED = _docs in ("1", "true", "yes") if _docs else IS_DEV
 
 # Limite de tentativas falhas (login, MFA, reautenticação) por conta e por IP, numa janela deslizante
 RATE_LIMIT_FALHAS_CONTA = int(os.getenv("RATE_LIMIT_FALHAS_CONTA", "5"))

@@ -4,7 +4,8 @@ services:
     runtime: python
     region: oregon
     plan: free
-    buildCommand: pip install -r requirements.txt
+    # Versões e hashes travados: o build falha se algum pacote baixado for diferente
+    buildCommand: pip install --require-hashes -r requirements.lock
     startCommand: bash start.sh
     healthCheckPath: /api/v1/health
     envVars:
@@ -27,8 +28,10 @@ services:
         fromDatabase:
           name: onecheck-db
           property: connectionString
+      # Origens do front separadas por vírgula (ex.: https://onecheck-web.onrender.com).
+      # Sem valor, nenhum navegador em outra origem chama a API
       - key: CORS_ORIGINS
-        value: "*"
+        sync: false
 
 databases:
   - name: onecheck-db

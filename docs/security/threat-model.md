@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-10-25 (auditoria sobre `f081c60`; SEC-001 a SEC-005 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md) e [004–005](correcao-sec-004-005-2026-10-25.md))_
+_Última atualização: 2026-10-25 (auditoria sobre `f081c60`; SEC-001 a SEC-007 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md) e [006–007](correcao-sec-006-007-2026-10-25.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -23,7 +23,7 @@ API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóvei
 ## 3. Atores
 | Ator | Confiança | Acesso |
 |---|---|---|
-| Anônimo / atacante externo | Nenhuma | `/auth/login`, `/auth/mfa/*` com temp token, `/health`, `/uploads/{arquivo}`, `/docs`, `/admin/*` (com `SEED_SECRET`) |
+| Anônimo / atacante externo | Nenhuma | `/auth/login`, `/auth/mfa/*` com temp token, `/health`, `/uploads/{arquivo}`, `/docs` (só com `DOCS_ENABLED`), `/admin/*` (com `SEED_SECRET`) |
 | Locatário | Baixa | os próprios contratos, problemas, aceites; uploads de foto de problema |
 | Visualizador | Baixa | leitura de checklists e PDFs (global, por decisão a confirmar) |
 | Vistoriador | Média | checklists atribuídos (escrita), leitura de contratos/imóveis vinculados |
@@ -54,7 +54,7 @@ flowchart LR
 ## 5. Fronteiras de confiança
 | Fronteira | Fluxos que cruzam | Controles |
 |---|---|---|
-| Internet ↔ API | todas as rotas | TLS no proxy; JWT HS256 com `type` verificado (`app/deps.py:19`); RBAC `require_roles`; rate limit de auth (`app/rate_limit.py`); validação de upload (`app/uploads.py`); limite de corpo antes do roteamento (`app/limite_corpo.py`). **Falta:** CORS restrito (SEC-007) |
+| Internet ↔ API | todas as rotas | TLS no proxy; JWT HS256 com `type` verificado (`app/deps.py:19`); RBAC `require_roles`; rate limit de auth (`app/rate_limit.py`); validação de upload (`app/uploads.py`); limite de corpo antes do roteamento (`app/limite_corpo.py`); CORS só para as origens configuradas, sem credenciais, e cabeçalhos de segurança (`app/main.py`, `app/cabecalhos.py`) |
 | API ↔ Banco | ORM SQLAlchemy | consultas parametrizadas; DDL estático (`app/database.py`). **Falta:** credencial dedicada de menor privilégio |
 | API ↔ Disco (uploads) | gravação e download de fotos | nome aleatório, assinatura conferida antes do Pillow, parser restrito a JPEG/PNG/WebP, `caminho_seguro`, `nosniff` + CSP. **Falta:** autenticação no download |
 | API ↔ serviços externos | CEP e geocoding | URL fixa HTTPS, CEP só com dígitos, timeout 5 s |
@@ -83,9 +83,9 @@ flowchart LR
 | T-17 | Problemas | T | Locatário abre problema já "fechado" | Integridade | status validado só contra a lista | **Aberta** | SEC-012 |
 | T-18 | Auditoria | R | Ações sem IP e sem os campos alterados | Não-repúdio | `log_operacao` em todas as escritas | Parcial | SEC-010 |
 | T-19 | MFA por admin | R | Admin define o TOTP de outro usuário e age em nome dele | Não-repúdio | reset separado do setup (parcial) | **Aberta** | SEC-015 |
-| T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | versões fixadas; Pillow, multipart, FastAPI e Starlette atualizados | Parcial (python-jose, cryptography) | SEC-006 |
+| T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | PyJWT no lugar do python-jose; `requirements.lock` com hashes, instalado com `--require-hashes`; `pip-audit` no CI | Mitigada | SEC-006 |
 | T-21 | Repositório | I | Banco e seed publicados no GitHub | Confidencialidade | só dados de seed hoje | Parcial | SEC-001, SEC-009 |
-| T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie) | Parcial | SEC-007 |
+| T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie); CORS só para `CORS_ORIGINS`, sem credenciais; `/docs` desligado em produção; `no-store`, `nosniff`, HSTS | Mitigada (depende de `CORS_ORIGINS` no Render) | SEC-007 |
 | T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | — | **Aberta** | SEC-008 |
 
 Status: **Mitigada** · **Parcial** · **Aberta** · **Aceita**

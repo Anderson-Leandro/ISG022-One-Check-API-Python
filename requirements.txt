@@ -5,11 +5,13 @@ uvicorn[standard]==0.34.0
 sqlalchemy==2.0.36
 pymysql==1.1.1
 psycopg2-binary==2.9.10
-python-jose[cryptography]==3.3.0
+# JWT (HS256). Substitui o python-jose, sem manutenção e com CVEs (SEC-006)
+pyjwt==2.15.1
 bcrypt==4.2.1
 python-multipart==0.0.32
 pyotp==2.9.0
-python-dotenv==1.0.1
+python-dotenv==1.2.4
 pillow==13.0.0
-cryptography==44.0.0
+# Usado pelo PyMySQL na autenticação caching_sha2_password do MySQL 8
+cryptography==50.0.2
 email-validator==2.2.0

@@ -13,9 +13,9 @@ import base64
 import hashlib
 from datetime import datetime, timedelta, timezone
 
+import jwt
 import pyotp
 import pytest
-from jose import jwt
 
 from app.auth import (
     _hash_refresh,
@@ -86,7 +86,7 @@ def test_decode_token_invalid_signature():
             "type": "access",
             "exp": datetime.now(timezone.utc) + timedelta(hours=1),
         },
-        "chave-errada",
+        "chave-errada-com-32-caracteres-ou-mais",
         algorithm=JWT_ALGORITHM,
     )
     assert decode_token(token) is None
