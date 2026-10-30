@@ -1,18 +1,29 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
+from app.auditoria import campos_alterados
 from app.auth import (
+    MFA_REQUIRED_ROLES,
+    PRIVILEGED_ROLES,
+    ROLES,
+    encerrar_sessoes,
     generate_mfa_secret,
     hash_password,
     mfa_provisioning_data,
+    mfa_self_disable_error,
+    mfa_troca_error,
+    nova_sessao,
+    reset_mfa,
     verify_password,
     verify_totp_code,
 )
 from app.database import get_db
 from app.deps import get_current_user, require_roles
 from app.models import Usuario
+from app.rate_limit import Tentativas
 from app.schemas import (
     AlterarSenhaRequest,
+    MfaDisableSelfRequest,
     MfaEnableRequest,
     UsuarioCreate,
     UsuarioUpdate,
@@ -25,6 +36,19 @@ from app.serializers import log_operacao, paginate, serialize_usuario
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
 
+def _assert_pode_gerenciar(current: Usuario, target: Usuario) -> None:
+    """Rotas /usuarios/{id}: a própria conta só muda por /usuarios/me, e só admin gerencia admin/gestor."""
+    if target.id == current.id:
+        raise HTTPException(status_code=403, detail="Use /usuarios/me para alterar a própria conta")
+    if target.role in PRIVILEGED_ROLES and current.role != "admin":
+        raise HTTPException(status_code=403, detail="Permissão negada")
+
+
+def _assert_pode_atribuir(current: Usuario, role: str) -> None:
+    if role in PRIVILEGED_ROLES and current.role != "admin":
+        raise HTTPException(status_code=403, detail="Só administradores atribuem este perfil")
+
+
 @router.get("/me")
 def me(user: Usuario = Depends(get_current_user)):
     return ok(serialize_usuario(user))
@@ -33,6 +57,7 @@ def me(user: Usuario = Depends(get_current_user)):
 @router.patch("/me")
 def update_me(
     body: UsuarioUpdateMe,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
@@ -45,30 +70,46 @@ def update_me(
     if body.senha_nova:
         if not body.senha_atual:
             return fail("Informe a senha atual")
+        tentativas = Tentativas(request, "reauth", user.id)
+        tentativas.verificar()
         if not verify_password(body.senha_atual, user.senha_hash):
+            tentativas.falhou()
             return fail("Senha atual incorreta")
+        tentativas.sucesso()
         user.senha_hash = hash_password(body.senha_nova)
+    alterados = campos_alterados(user)
+    if body.senha_nova:
+        encerrar_sessoes(db, user)
 
     db.commit()
     db.refresh(user)
-    log_operacao(db, user.id, "update", "usuario", user.id, "perfil")
-    return ok(serialize_usuario(user))
+    log_operacao(db, user.id, "update", "usuario", user.id, "perfil", payload={"campos": alterados})
+    dados = serialize_usuario(user)
+    if body.senha_nova:
+        dados["sessao"] = nova_sessao(db, user)
+    return ok(dados)
 
 
 @router.put("/me/senha")
 def alterar_senha_me(
     body: AlterarSenhaRequest,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
     if not verify_password(body.senha_atual, user.senha_hash):
+        tentativas.falhou()
         return fail("Senha atual incorreta")
+    tentativas.sucesso()
 
     user.senha_hash = hash_password(body.nova_senha)
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "alteracao_de_senha")
-    return ok({"mensagem": "Senha alterada com sucesso"})
+    return ok({"mensagem": "Senha alterada com sucesso", "sessao": nova_sessao(db, user)})
 
 
 @router.post("/me/mfa/setup")
@@ -80,30 +121,52 @@ def mfa_setup_me(user: Usuario = Depends(get_current_user)):
 @router.post("/me/mfa/enable")
 def mfa_enable_me(
     body: MfaEnableRequest,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
+    erro = mfa_troca_error(user, body.codigo_atual)
+    if erro:
+        tentativas.falhou()
+        return fail(erro)
     if not verify_totp_code(body.secret, body.codigo):
         return fail("Código MFA inválido")
     user.mfa_secret = body.secret
     user.mfa_enabled = True
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "mfa_enable")
-    return ok(serialize_usuario(user))
+    return ok({**serialize_usuario(user), "sessao": nova_sessao(db, user)})
 
 
 @router.delete("/me/mfa")
 def mfa_disable_me(
+    body: MfaDisableSelfRequest,
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    if user.role in MFA_REQUIRED_ROLES:
+        raise HTTPException(status_code=403, detail="MFA é obrigatório para este perfil")
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
+    erro = mfa_self_disable_error(user, body.senha, body.codigo)
+    if erro:
+        tentativas.falhou()
+        return fail(erro)
+    tentativas.sucesso()
+
     user.mfa_secret = None
+    user.mfa_secret_pendente = None
     user.mfa_enabled = False
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "mfa_disable")
-    return ok(serialize_usuario(user))
+    return ok({**serialize_usuario(user), "sessao": nova_sessao(db, user)})
 
 
 @router.get("")
@@ -112,7 +175,7 @@ def list_usuarios(
     por_pagina: int = Query(20, ge=1, le=100),
     role: str | None = None,
     db: Session = Depends(get_db),
-    _: Usuario = Depends(get_current_user),
+    _: Usuario = Depends(require_roles("admin", "gestor")),
 ):
     q = db.query(Usuario).filter(Usuario.ativo == True)
     if role:
@@ -144,6 +207,16 @@ def update_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
+
+    novo_role = user.role
+    if body.role is not None:
+        if body.role not in ROLES:
+            return fail("Perfil inválido")
+        _assert_pode_atribuir(current, body.role)
+        novo_role = body.role
+    if body.mfa_enabled is False and novo_role in MFA_REQUIRED_ROLES:
+        return fail("MFA é obrigatório para este perfil")
 
     if body.email is not None and body.email != user.email:
         existente = db.query(Usuario).filter(Usuario.email == body.email, Usuario.id != usuario_id).first()
@@ -153,18 +226,28 @@ def update_usuario(
 
     if body.nome is not None:
         user.nome = body.nome.strip()
-    if body.role is not None:
-        user.role = body.role
+    # Perfil, MFA ou senha alterados pelo gestor/admin encerram as sessões do usuário
+    credencial_alterada = False
+    if novo_role != user.role:
+        user.role = novo_role
+        credencial_alterada = True
+        if novo_role in MFA_REQUIRED_ROLES:
+            user.mfa_enabled = True
     if body.mfa_enabled is not None:
+        credencial_alterada = credencial_alterada or body.mfa_enabled != user.mfa_enabled
         user.mfa_enabled = body.mfa_enabled
         if not body.mfa_enabled:
             user.mfa_secret = None
     if body.senha:
         user.senha_hash = hash_password(body.senha)
+        credencial_alterada = True
+    alterados = campos_alterados(user)
+    if credencial_alterada:
+        encerrar_sessoes(db, user)
 
     db.commit()
     db.refresh(user)
-    log_operacao(db, current.id, "update", "usuario", user.id)
+    log_operacao(db, current.id, "update", "usuario", user.id, payload={"campos": alterados})
     return ok(serialize_usuario(user))
 
 
@@ -180,8 +263,10 @@ def delete_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
 
     user.ativo = False
+    encerrar_sessoes(db, user)
     db.commit()
     log_operacao(db, current.id, "delete", "usuario", user.id, f"email: {user.email}")
     return ok(None)
@@ -196,6 +281,7 @@ def mfa_setup_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
     secret = generate_mfa_secret()
     return ok(mfa_provisioning_data(user.email, secret))
 
@@ -211,11 +297,13 @@ def mfa_enable_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
+    _assert_pode_gerenciar(current, user)
 
     if body and body.codigo:
         if not verify_totp_code(body.secret, body.codigo):
             return fail("Código MFA inválido")
         user.mfa_secret = body.secret
+        encerrar_sessoes(db, user)
 
     user.mfa_enabled = True
     db.commit()
@@ -234,8 +322,9 @@ def mfa_reset_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
-    user.mfa_secret = None
-    user.mfa_enabled = False
+    _assert_pode_gerenciar(current, user)
+    reset_mfa(user)
+    encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
     log_operacao(db, current.id, "update", "usuario", user.id, "mfa_reset")
@@ -248,6 +337,9 @@ def create_usuario(
     db: Session = Depends(get_db),
     current: Usuario = Depends(require_roles("admin", "gestor")),
 ):
+    if body.role not in ROLES:
+        return fail("Perfil inválido")
+    _assert_pode_atribuir(current, body.role)
     if db.query(Usuario).filter(Usuario.email == body.email).first():
         return fail("E-mail já cadastrado")
 
@@ -257,7 +349,7 @@ def create_usuario(
         senha_hash=hash_password(body.senha),
         role=body.role,
         cpf=body.cpf,
-        mfa_enabled=body.role in {"admin", "vistoriador", "gestor"},
+        mfa_enabled=body.role in MFA_REQUIRED_ROLES,
     )
     db.add(user)
     db.commit()

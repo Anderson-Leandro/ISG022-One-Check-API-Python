@@ -1,0 +1,1152 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "security-audit",
+          "informationUri": "https://owasp.org/www-project-application-security-verification-standard/",
+          "rules": [
+            {
+              "id": "SEC-001",
+              "name": "Seed automático cria admin com senha e segredo MFA públicos",
+              "shortDescription": {
+                "text": "Seed automático cria admin com senha e segredo MFA públicos"
+              },
+              "fullDescription": {
+                "text": "O repositório é público. Todo start do container (Render e Docker) roda scripts/seed.py; em banco vazio ele cria admin@onecheck.local com senha conhecida e mfa_secret fixo. O atacante faz POST /auth/login com a senha do código, gera o TOTP com o segredo público e recebe um access_token de admin."
+              },
+              "help": {
+                "text": "Remover a chamada do seed do start.sh (o bootstrap já é coberto por /admin/seed com SEED_SECRET). Em produção, gerar senha aleatória e não definir mfa_secret (o usuário configura no primeiro login, fluxo mfa_setup). Verificar agora em produção se admin@onecheck.local, gestor, vistoriadores e locatários de seed existem; se sim, trocar senha e resetar MFA (ou desativar as contas) e revogar refresh tokens."
+              },
+              "properties": {
+                "security-severity": "9.5",
+                "tags": [
+                  "security",
+                  "CWE-798",
+                  "A07:2021",
+                  "STRIDE:S",
+                  "STRIDE:E"
+                ],
+                "pillars": [
+                  "Autenticidade",
+                  "Confidencialidade",
+                  "Integridade"
+                ],
+                "principles": [
+                  "Secure by default",
+                  "Design aberto"
+                ]
+              }
+            },
+            {
+              "id": "SEC-002",
+              "name": "Pillow 11.1.0 com CVEs críticas e Image.open aceita qualquer formato do upload",
+              "shortDescription": {
+                "text": "Pillow 11.1.0 com CVEs críticas e Image.open aceita qualquer formato do upload"
+              },
+              "fullDescription": {
+                "text": "Um locatário autenticado envia como 'foto' de problema um arquivo PSD, TIFF, FITS ou JPEG2000 malicioso. Image.open testa todos os plugins de formato antes de o código checar se é JPEG/PNG/WebP, e o decoder vulnerável processa o arquivo (ex.: CVE-2026-42311, execução de código via PSD; CVE-2026-25990, escrita fora dos limites; dezenas de DoS)."
+              },
+              "help": {
+                "text": "Atualizar para pillow>=13.0.0 e restringir o parser: Image.open(buf, formats=[\"JPEG\", \"PNG\", \"WEBP\"]). Conferir a assinatura (magic bytes) antes de abrir e definir Image.MAX_IMAGE_PIXELS explicitamente."
+              },
+              "properties": {
+                "security-severity": "8.0",
+                "tags": [
+                  "security",
+                  "CWE-1395",
+                  "A06:2021",
+                  "STRIDE:E",
+                  "STRIDE:D"
+                ],
+                "pillars": [
+                  "Integridade",
+                  "Disponibilidade",
+                  "Confidencialidade"
+                ],
+                "principles": [
+                  "Superfície de ataque mínima",
+                  "Defesa em profundidade"
+                ]
+              }
+            },
+            {
+              "id": "SEC-003",
+              "name": "DoS anônimo: multipart processado antes da autenticação, sem limite de corpo e com dependências vulneráveis",
+              "shortDescription": {
+                "text": "DoS anônimo: multipart processado antes da autenticação, sem limite de corpo e com dependências vulneráveis"
+              },
+              "fullDescription": {
+                "text": "Sem token, o atacante envia POST /checklists/x/itens/y/fotos com multipart de vários GB (ou com milhares de partes/cabeçalhos). O FastAPI interpreta e grava o corpo em arquivo temporário antes de responder 401 (verificado: um upload anônimo de 5 MB foi processado e só então recebeu 401). Repetido em paralelo, enche o disco e consome CPU. CVEs de DoS no python-multipart (CVE-2026-42561, CVE-2026-53539) e no Starlette (FileResponse com Range, CVE-2025-62727, alcançável pelo GET /uploads público) somam-se ao vetor."
+              },
+              "help": {
+                "text": "Limitar o tamanho do corpo antes do roteamento (middleware que recusa Content-Length acima de MAX_UPLOAD_MB e corta corpos em streaming, além do limite no proxy). Atualizar python-multipart>=0.0.31 e FastAPI para uma versão com Starlette >= 0.49.1. Nas rotas de upload, fazer a autenticação como dependência de router e ler o arquivo em blocos, interrompendo ao passar do limite."
+              },
+              "properties": {
+                "security-severity": "8.0",
+                "tags": [
+                  "security",
+                  "CWE-770",
+                  "API4:2023",
+                  "STRIDE:D"
+                ],
+                "pillars": [
+                  "Disponibilidade"
+                ],
+                "principles": [
+                  "Fail secure",
+                  "Defesa em profundidade"
+                ]
+              }
+            },
+            {
+              "id": "SEC-004",
+              "name": "Leitura por ID ignora o vínculo do vistoriador (contratos, agendamentos, imóveis)",
+              "shortDescription": {
+                "text": "Leitura por ID ignora o vínculo do vistoriador (contratos, agendamentos, imóveis)"
+              },
+              "fullDescription": {
+                "text": "As listagens (contratos.py:51, imoveis.py:68-78) restringem o vistoriador aos contratos/imóveis em que tem checklist, mas GET /contratos/{id}, /contratos/{id}/agendamentos, /imoveis/{id}, /imoveis/{id}/endereco e /imoveis/{id}/comodos só restringem o locatário. Um vistoriador lê valor do aluguel, locatário, datas e endereço de qualquer contrato pelo ID."
+              },
+              "help": {
+                "text": "Um helper por recurso (como assert_acesso_problemas) aplicado igualmente à lista e ao acesso por ID; para o vistoriador, exigir Checklist.vistoriador_id == user.id no contrato. Definir com o negócio o alcance do perfil visualizador, que hoje lê tudo."
+              },
+              "properties": {
+                "security-severity": "5.5",
+                "tags": [
+                  "security",
+                  "CWE-639",
+                  "API1:2023",
+                  "STRIDE:I"
+                ],
+                "pillars": [
+                  "Confidencialidade"
+                ],
+                "principles": [
+                  "Mediação completa",
+                  "Menor privilégio"
+                ]
+              }
+            },
+            {
+              "id": "SEC-005",
+              "name": "Troca de senha e reset de MFA não revogam as sessões existentes",
+              "shortDescription": {
+                "text": "Troca de senha e reset de MFA não revogam as sessões existentes"
+              },
+              "fullDescription": {
+                "text": "Um atacante obtém a sessão da vítima (token roubado). A vítima, ou o admin, troca a senha e reseta o MFA. O refresh token do atacante continua gerando access tokens por até 30 dias, porque verify_refresh_token só confere hash, validade e usuário ativo."
+              },
+              "help": {
+                "text": "Ao trocar a senha (pelo próprio usuário ou pelo admin), resetar o MFA ou mudar o perfil: apagar todos os RefreshToken do usuário e incluir no JWT uma versão de credencial (ex.: token_version) conferida em get_current_user. Considerar reduzir JWT_REFRESH_DAYS e detectar reuso de refresh token rotacionado."
+              },
+              "properties": {
+                "security-severity": "5.5",
+                "tags": [
+                  "security",
+                  "CWE-613",
+                  "A07:2021",
+                  "STRIDE:S"
+                ],
+                "pillars": [
+                  "Autenticidade"
+                ],
+                "principles": [
+                  "Fail secure"
+                ]
+              }
+            },
+            {
+              "id": "SEC-006",
+              "name": "Outras dependências com CVEs e sem lockfile (dependências transitivas não verificadas)",
+              "shortDescription": {
+                "text": "Outras dependências com CVEs e sem lockfile (dependências transitivas não verificadas)"
+              },
+              "fullDescription": {
+                "text": "python-jose 3.3.0 tem CVEs críticas de confusão de algoritmo (CVE-2024-33663, CVE-2026-85394), mas a API usa só HS256 com algorithms fixo, então não são alcançáveis hoje. As CVEs do cryptography (PKCS#7, curvas SECT, X.509) também não estão no caminho de uso. Sem lockfile, Starlette, uvicorn, h11 e outras dependências transitivas não foram analisadas pelos scanners."
+              },
+              "help": {
+                "text": "Migrar de python-jose (sem manutenção ativa) para PyJWT; atualizar cryptography>=50, python-dotenv>=1.2.2 e pytest. Gerar lockfile com hashes (pip-tools/uv: requirements.lock) e rodar osv-scanner/trivy no CI."
+              },
+              "properties": {
+                "security-severity": "5.5",
+                "tags": [
+                  "security",
+                  "CWE-1104",
+                  "A06:2021",
+                  "STRIDE:T"
+                ],
+                "pillars": [
+                  "Integridade"
+                ],
+                "principles": [
+                  "Defesa em profundidade"
+                ]
+              }
+            },
+            {
+              "id": "SEC-007",
+              "name": "Hardening HTTP: CORS * com credenciais, /docs público e sem cabeçalhos de segurança",
+              "shortDescription": {
+                "text": "Hardening HTTP: CORS * com credenciais, /docs público e sem cabeçalhos de segurança"
+              },
+              "fullDescription": {
+                "text": "Qualquer site pode chamar a API pelo navegador do usuário e ler as respostas. O impacto é baixo porque a autenticação é por header Bearer (não há credencial automática), mas qualquer adoção futura de cookies vira CSRF/roubo de dados imediato. /docs e /openapi.json mapeiam toda a superfície para o atacante."
+              },
+              "help": {
+                "text": "CORS_ORIGINS com a lista explícita de origens do front e allow_credentials=False; desabilitar /docs e /openapi.json em produção (ou protegê-los); adicionar HSTS, X-Content-Type-Options e Cache-Control: no-store nas respostas autenticadas."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-942",
+                  "API8:2023",
+                  "STRIDE:I"
+                ],
+                "pillars": [
+                  "Confidencialidade"
+                ],
+                "principles": [
+                  "Secure by default",
+                  "Superfície de ataque mínima"
+                ]
+              }
+            },
+            {
+              "id": "SEC-008",
+              "name": "Container roda como root e CI usa actions por tag mutável sem permissions",
+              "shortDescription": {
+                "text": "Container roda como root e CI usa actions por tag mutável sem permissions"
+              },
+              "fullDescription": {
+                "text": "Uma execução de código no processo (ver SEC-002) roda como root no container, com compilador disponível. No CI, uma tag de action repontada executa código com o GITHUB_TOKEN de permissões padrão."
+              },
+              "help": {
+                "text": "Build multi-stage sem gcc na imagem final, usuário sem privilégio (USER app) e uploads com dono restrito. No workflow, declarar permissions: contents: read e fixar as actions por SHA."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "A05:2021",
+                  "STRIDE:E",
+                  "STRIDE:T"
+                ],
+                "pillars": [
+                  "Integridade"
+                ],
+                "principles": [
+                  "Menor privilégio"
+                ]
+              }
+            },
+            {
+              "id": "SEC-009",
+              "name": "Banco SQLite versionado em repositório público",
+              "shortDescription": {
+                "text": "Banco SQLite versionado em repositório público"
+              },
+              "fullDescription": {
+                "text": "Hoje o conteúdo é só de seed (verificado: só e-mails @onecheck.local). Mas o arquivo está versionado e modificado localmente: um commit descuidado publica dados reais de teste/uso, que ficam no histórico mesmo depois de removidos."
+              },
+              "help": {
+                "text": "git rm --cached onecheck.db e adicioná-lo ao .gitignore (os testes já usam onecheck_test.db). Avaliar limpar o histórico se algum dado real já tiver sido commitado."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-538",
+                  "A05:2021",
+                  "STRIDE:I"
+                ],
+                "pillars": [
+                  "Confidencialidade"
+                ],
+                "principles": [
+                  "Superfície de ataque mínima"
+                ]
+              }
+            },
+            {
+              "id": "SEC-010",
+              "name": "Trilha de auditoria incompleta (sem IP, sem o que mudou nas alterações de usuário)",
+              "shortDescription": {
+                "text": "Trilha de auditoria incompleta (sem IP, sem o que mudou nas alterações de usuário)"
+              },
+              "fullDescription": {
+                "text": "Um admin troca a senha ou o perfil de outro usuário e o log só registra 'update usuario'. Nenhum evento registra o IP de origem, nem o login falho. As notificações gravam e-mail e conteúdo da mensagem no log da aplicação."
+              },
+              "help": {
+                "text": "Passar o IP (request.client.host) em log_operacao; registrar os campos alterados (sem valores sensíveis: 'senha alterada', 'role: locatario→gestor'); remover e-mail e corpo da mensagem do logger de notificações."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-778",
+                  "A09:2021",
+                  "STRIDE:R"
+                ],
+                "pillars": [
+                  "Não-repúdio"
+                ],
+                "principles": [
+                  "Responsabilização"
+                ]
+              }
+            },
+            {
+              "id": "SEC-011",
+              "name": "Política de senha fraca",
+              "shortDescription": {
+                "text": "Política de senha fraca"
+              },
+              "fullDescription": {
+                "text": "Senhas de 6 caracteres e comuns (ex.: 123456) são aceitas. Mesmo com o limite de tentativas de N6, credential stuffing distribuído acerta contas com senhas vazadas. bcrypt ignora o que passa de 72 bytes."
+              },
+              "help": {
+                "text": "Mínimo de 10–12 caracteres, recusar senhas comuns/vazadas (lista local ou k-anonymity do HIBP) e max_length=72 bytes."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-521",
+                  "A07:2021",
+                  "STRIDE:S"
+                ],
+                "pillars": [
+                  "Autenticidade"
+                ],
+                "principles": [
+                  "Secure by default"
+                ]
+              }
+            },
+            {
+              "id": "SEC-012",
+              "name": "Regras de negócio sem validação no servidor e dashboard global",
+              "shortDescription": {
+                "text": "Regras de negócio sem validação no servidor e dashboard global"
+              },
+              "fullDescription": {
+                "text": "O locatário registra um problema já com status 'fechado', fora do fluxo de atendimento (item 9). Qualquer usuário autenticado vê totais globais de imóveis locados, problemas e vistorias (item 4)."
+              },
+              "help": {
+                "text": "Ignorar status na criação (sempre 'aberto'); aplicar no dashboard os mesmos filtros das listagens ou restringi-lo a admin/gestor."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-915",
+                  "API3:2023",
+                  "STRIDE:T",
+                  "STRIDE:I"
+                ],
+                "pillars": [
+                  "Integridade",
+                  "Confidencialidade"
+                ],
+                "principles": [
+                  "Mediação completa"
+                ]
+              }
+            },
+            {
+              "id": "SEC-013",
+              "name": "Enumeração de e-mails pelo tempo de resposta do login",
+              "shortDescription": {
+                "text": "Enumeração de e-mails pelo tempo de resposta do login"
+              },
+              "fullDescription": {
+                "text": "Para e-mail inexistente a resposta volta sem o custo do bcrypt; medindo o tempo, o atacante descobre quais e-mails são contas válidas e direciona a força bruta."
+              },
+              "help": {
+                "text": "Quando o usuário não existir, rodar verify_password contra um hash fixo de mesmo custo antes de responder."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-208",
+                  "A07:2021",
+                  "STRIDE:I"
+                ],
+                "pillars": [
+                  "Confidencialidade"
+                ],
+                "principles": [
+                  "Fail secure"
+                ]
+              }
+            },
+            {
+              "id": "SEC-014",
+              "name": "CPF em texto puro, sem validação e devolvido em toda resposta de usuário",
+              "shortDescription": {
+                "text": "CPF em texto puro, sem validação e devolvido em toda resposta de usuário"
+              },
+              "fullDescription": {
+                "text": "Qualquer resposta com usuário (inclusive /usuarios/me e as listagens para gestor) devolve o CPF; um token de gestor roubado exporta os CPFs de todos os locatários. Não há política de retenção para logs e refresh tokens."
+              },
+              "help": {
+                "text": "response_model distintos (CPF só no detalhe para admin/gestor, mascarado nas listagens); validar formato; definir retenção e limpeza de log_operacao e auth_refresh_tokens expirados."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-359",
+                  "API3:2023",
+                  "STRIDE:I"
+                ],
+                "pillars": [
+                  "Confidencialidade"
+                ],
+                "principles": [
+                  "Menor privilégio"
+                ]
+              }
+            },
+            {
+              "id": "SEC-015",
+              "name": "Admin escolhe e conhece o segredo TOTP de outro usuário",
+              "shortDescription": {
+                "text": "Admin escolhe e conhece o segredo TOTP de outro usuário"
+              },
+              "fullDescription": {
+                "text": "Um admin mal-intencionado (ou com conta comprometida) define o segundo fator de um vistoriador e passa a autenticar como ele; as ações ficam no log em nome do vistoriador."
+              },
+              "help": {
+                "text": "Remover setup/enable por terceiros: o admin só reseta (reset_mfa) e o próprio usuário configura no próximo login."
+              },
+              "properties": {
+                "security-severity": "3.0",
+                "tags": [
+                  "security",
+                  "CWE-284",
+                  "API5:2023",
+                  "STRIDE:R",
+                  "STRIDE:S"
+                ],
+                "pillars": [
+                  "Não-repúdio",
+                  "Autenticidade"
+                ],
+                "principles": [
+                  "Separação de privilégios"
+                ]
+              }
+            },
+            {
+              "id": "SEC-016",
+              "name": "Cópias antigas e vulneráveis do código na raiz do repositório",
+              "shortDescription": {
+                "text": "Cópias antigas e vulneráveis do código na raiz do repositório"
+              },
+              "fullDescription": {
+                "text": "A aplicação não importa esses arquivos (app.main usa app.routers), mas eles confundem revisões e scanners, e um import errado reativaria as falhas já corrigidas."
+              },
+              "help": {
+                "text": "Apagar auth.py e routers/ da raiz."
+              },
+              "properties": {
+                "security-severity": "0.0",
+                "tags": [
+                  "security",
+                  "CWE-1164"
+                ],
+                "pillars": [
+                  "Integridade"
+                ],
+                "principles": [
+                  "Superfície de ataque mínima"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "SEC-001",
+          "level": "error",
+          "message": {
+            "text": "Seed automático cria admin com senha e segredo MFA públicos. Tomada completa da API (todos os dados pessoais, contratos e vistorias) por anônimo pela internet. Probabilidade alta (técnica trivial, credenciais no repositório público) × impacto alto. A confirmar em produção: se as contas de seed ainda existem com a senha original (não testado contra o ambiente real)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "start.sh"
+                },
+                "region": {
+                  "startLine": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/seed.py"
+                },
+                "region": {
+                  "startLine": 25
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/seed.py"
+                },
+                "region": {
+                  "startLine": 36
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/seed_service.py"
+                },
+                "region": {
+                  "startLine": 25
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/seed_service.py"
+                },
+                "region": {
+                  "startLine": 290
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/seed_service.py"
+                },
+                "region": {
+                  "startLine": 364
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude",
+              "bandit"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-002",
+          "level": "error",
+          "message": {
+            "text": "Pillow 11.1.0 com CVEs críticas e Image.open aceita qualquer formato do upload. Execução de código ou queda do processo da API por qualquer usuário que possa enviar foto (locatário, vistoriador, admin). Probabilidade média (exige conta) × impacto alto."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/uploads.py"
+                },
+                "region": {
+                  "startLine": 25
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "requirements.txt"
+                },
+                "region": {
+                  "startLine": 11
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude",
+              "trivy",
+              "osv-scanner"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-003",
+          "level": "error",
+          "message": {
+            "text": "DoS anônimo: multipart processado antes da autenticação, sem limite de corpo e com dependências vulneráveis. Indisponibilidade da API por anônimo. Probabilidade alta × impacto médio (degradação/queda, sem perda de dados)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/checklists.py"
+                },
+                "region": {
+                  "startLine": 217
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/checklists.py"
+                },
+                "region": {
+                  "startLine": 244
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "requirements.txt"
+                },
+                "region": {
+                  "startLine": 8
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "requirements.txt"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude",
+              "trivy",
+              "osv-scanner"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-004",
+          "level": "warning",
+          "message": {
+            "text": "Leitura por ID ignora o vínculo do vistoriador (contratos, agendamentos, imóveis). Vazamento limitado de dados de negócio e de endereço a um usuário autenticado (mesmo padrão do item 6, corrigido em problemas). Probabilidade média × impacto médio."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/contratos.py"
+                },
+                "region": {
+                  "startLine": 129
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/contratos.py"
+                },
+                "region": {
+                  "startLine": 209
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/imoveis.py"
+                },
+                "region": {
+                  "startLine": 134
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/imoveis.py"
+                },
+                "region": {
+                  "startLine": 210
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/imoveis.py"
+                },
+                "region": {
+                  "startLine": 257
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-005",
+          "level": "warning",
+          "message": {
+            "text": "Troca de senha e reset de MFA não revogam as sessões existentes. A resposta a incidente não corta o acesso do atacante. Probabilidade média (exige token roubado) × impacto médio."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/usuarios.py"
+                },
+                "region": {
+                  "startLine": 76
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/usuarios.py"
+                },
+                "region": {
+                  "startLine": 98
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/usuarios.py"
+                },
+                "region": {
+                  "startLine": 226
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/auth.py"
+                },
+                "region": {
+                  "startLine": 80
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-006",
+          "level": "warning",
+          "message": {
+            "text": "Outras dependências com CVEs e sem lockfile (dependências transitivas não verificadas). Hoje sem exploração conhecida no uso atual; risco de regressão silenciosa e de CVEs transitivas não detectadas. Média pela regra 'CVE alta sem exploit no uso atual'."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "requirements.txt"
+                },
+                "region": {
+                  "startLine": 6
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "requirements.txt"
+                },
+                "region": {
+                  "startLine": 10
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "requirements.txt"
+                },
+                "region": {
+                  "startLine": 12
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "trivy",
+              "osv-scanner",
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-007",
+          "level": "note",
+          "message": {
+            "text": "Hardening HTTP: CORS * com credenciais, /docs público e sem cabeçalhos de segurança. Baixo hoje; vira alto se a autenticação passar a usar cookies."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/main.py"
+                },
+                "region": {
+                  "startLine": 40
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/config.py"
+                },
+                "region": {
+                  "startLine": 65
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "render.yaml"
+                },
+                "region": {
+                  "startLine": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-008",
+          "level": "note",
+          "message": {
+            "text": "Container roda como root e CI usa actions por tag mutável sem permissions. Amplifica outras falhas; sozinho tem impacto baixo."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Dockerfile"
+                },
+                "region": {
+                  "startLine": 22
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": ".github/workflows/tests.yml"
+                },
+                "region": {
+                  "startLine": 34
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": ".github/workflows/tests.yml"
+                },
+                "region": {
+                  "startLine": 37
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "semgrep",
+              "trivy"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-009",
+          "level": "note",
+          "message": {
+            "text": "Banco SQLite versionado em repositório público. Baixo com os dados atuais; alto se dados reais forem commitados."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "onecheck.db"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-010",
+          "level": "note",
+          "message": {
+            "text": "Trilha de auditoria incompleta (sem IP, sem o que mudou nas alterações de usuário). Investigação de incidente sem base (quem mudou o quê, de onde); PII em log de aplicação (LGPD)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/serializers.py"
+                },
+                "region": {
+                  "startLine": 230
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/usuarios.py"
+                },
+                "region": {
+                  "startLine": 230
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/notification_service.py"
+                },
+                "region": {
+                  "startLine": 17
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-011",
+          "level": "note",
+          "message": {
+            "text": "Política de senha fraca. Baixo com o rate limit e o MFA nos perfis privilegiados; maior para locatários sem MFA."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/schemas.py"
+                },
+                "region": {
+                  "startLine": 106
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-012",
+          "level": "note",
+          "message": {
+            "text": "Regras de negócio sem validação no servidor e dashboard global. Baixo: distorção do fluxo e vazamento de agregados de negócio."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/contratos.py"
+                },
+                "region": {
+                  "startLine": 429
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/dashboard.py"
+                },
+                "region": {
+                  "startLine": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-013",
+          "level": "note",
+          "message": {
+            "text": "Enumeração de e-mails pelo tempo de resposta do login. Baixo: facilita ataques direcionados."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/auth_router.py"
+                },
+                "region": {
+                  "startLine": 53
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-014",
+          "level": "note",
+          "message": {
+            "text": "CPF em texto puro, sem validação e devolvido em toda resposta de usuário. LGPD: minimização (art. 6º III) e segurança (art. 46). Baixo/médio dependendo do volume de dados reais."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/serializers.py"
+                },
+                "region": {
+                  "startLine": 188
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/models.py"
+                },
+                "region": {
+                  "startLine": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-015",
+          "level": "note",
+          "message": {
+            "text": "Admin escolhe e conhece o segredo TOTP de outro usuário. Quebra o não-repúdio das ações do usuário-alvo. Exige admin, por isso baixa."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/usuarios.py"
+                },
+                "region": {
+                  "startLine": 254
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/usuarios.py"
+                },
+                "region": {
+                  "startLine": 268
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-016",
+          "level": "note",
+          "message": {
+            "text": "Cópias antigas e vulneráveis do código na raiz do repositório. Informativo."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "auth.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "routers/auth_router.py"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

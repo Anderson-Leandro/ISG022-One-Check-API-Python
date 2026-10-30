@@ -1,21 +1,17 @@
-import uuid
-from pathlib import Path
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
+from app.config import MAX_UPLOAD_MB
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import assert_acesso_problemas, get_current_user, require_roles
 from app.models import AtualizacaoProblema, Contrato, Problema, Usuario
 from app.notification_service import notificar_usuario
 from app.serializers import log_operacao, serialize_atualizacao_problema, serialize_problema
+from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 
 router = APIRouter(tags=["problemas"])
-
-ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/jpg", "image/webp"}
-
 
 def _ok(dados: Any = None, mensagem: str | None = None, status_code: int = 200) -> JSONResponse:
     res = {"sucesso": True, "dados": dados}
@@ -35,8 +31,7 @@ def _assert_pode_acessar_problema(pb: Problema, user: Usuario, db: Session) -> C
     contrato = db.query(Contrato).filter(Contrato.id == pb.contrato_id).first()
     if not contrato:
         raise HTTPException(status_code=404, detail="Contrato não encontrado")
-    if user.role == "locatario" and contrato.locatario_id != user.id:
-        raise HTTPException(status_code=403, detail="Você não tem acesso a este problema")
+    assert_acesso_problemas(contrato, user)
     return contrato
 
 
@@ -112,7 +107,7 @@ async def criar_atualizacao(
     foto_chave = None
 
     if "multipart/form-data" in content_type:
-        form = await request.form()
+        form = await request.form(max_files=1, max_fields=10)
         descricao = str(form.get("descricao") or "")
         foto = form.get("foto")
         if foto and hasattr(foto, "read"):
@@ -120,19 +115,20 @@ async def criar_atualizacao(
             if len(content) > MAX_UPLOAD_MB * 1024 * 1024:
                 return _fail(f"A foto não pode exceder {MAX_UPLOAD_MB} MB", status_code=422, erros={"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"})
             
-            ext = Path(getattr(foto, "filename", "foto.jpg") or "foto.jpg").suffix or ".jpg"
-            filename = f"{uuid.uuid4().hex}{ext}"
-            UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-            filepath = UPLOAD_DIR / filename
-            filepath.write_bytes(content)
-            foto_chave = filename
+            try:
+                foto_chave = salvar_imagem(content)
+            except UploadInvalido as e:
+                return _fail(str(e), status_code=422, erros={"foto": str(e)})
     else:
         try:
             body = await request.json()
         except Exception:
             body = {}
         descricao = str(body.get("descricao") or "")
-        foto_chave = body.get("foto_url")
+        if body.get("foto_url"):
+            foto_chave = nome_de_upload_existente(body.get("foto_url"))
+            if not foto_chave:
+                return _fail("Foto inválida", status_code=422, erros={"foto_url": "Envie a foto pelo upload da API"})
 
     descricao = descricao.strip()
     if not descricao or len(descricao) < 5:

@@ -4,7 +4,12 @@ cd "$(dirname "$0")"
 
 PORT="${PORT:-8000}"
 
-# Seed apenas se banco vazio (primeiro deploy)
-python scripts/seed.py 2>/dev/null || true
+# Seed automático só em desenvolvimento. Em produção, o primeiro carregamento é feito
+# por POST /api/v1/admin/seed (exige SEED_SECRET), que gera senhas aleatórias.
+case "${APP_ENV,,}" in
+  development|dev|local)
+    python scripts/seed.py || echo "Aviso: seed falhou" >&2
+    ;;
+esac
 
 exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT"

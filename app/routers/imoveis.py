@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session, joinedload
 
+from app.auditoria import campos_alterados
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import assert_acesso_imovel, get_current_user, require_roles
 from app.geocoding import buscar_coordenadas
 from app.models import Checklist, Contrato, Endereco, Imovel, ImovelComodo, Usuario
 from app.schemas import (
@@ -129,16 +130,7 @@ def get_imovel(
     )
     if not im:
         return fail("Imóvel não encontrado")
-
-    if user.role == "locatario":
-        tem_contrato = db.query(Contrato).filter(
-            Contrato.imovel_id == imovel_id,
-            Contrato.locatario_id == user.id,
-            Contrato.status == "ativo",
-        ).first()
-        if not tem_contrato:
-            raise HTTPException(status_code=403, detail="Você não tem acesso a este imóvel")
-
+    assert_acesso_imovel(db, imovel_id, user)
     return ok(serialize_imovel(im, include_endereco=True))
 
 
@@ -158,6 +150,8 @@ def update_imovel(
 
     for field, value in data.items():
         setattr(im, field, value)
+    # Antes da consulta do endereço, cujo autoflush zeraria o histórico do imóvel
+    alterados = campos_alterados(im)
 
     if body.endereco:
         end = db.query(Endereco).filter(Endereco.imovel_id == imovel_id).first()
@@ -167,10 +161,11 @@ def update_imovel(
             end = Endereco(imovel_id=imovel_id, ativo=True)
             _apply_endereco(end, body.endereco, is_new=True)
             db.add(end)
+        alterados += [f"endereco.{c}" for c in campos_alterados(end)]
 
     db.commit()
     db.refresh(im)
-    log_operacao(db, user.id, "update", "imovel", im.id)
+    log_operacao(db, user.id, "update", "imovel", im.id, payload={"campos": alterados})
     return ok(serialize_imovel(im, include_endereco=True))
 
 
@@ -205,15 +200,7 @@ def get_endereco(
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
         return fail("Imóvel não encontrado")
-
-    if user.role == "locatario":
-        tem_contrato = db.query(Contrato).filter(
-            Contrato.imovel_id == imovel_id,
-            Contrato.locatario_id == user.id,
-            Contrato.status == "ativo",
-        ).first()
-        if not tem_contrato:
-            raise HTTPException(status_code=403, detail="Você não tem acesso a este imóvel")
+    assert_acesso_imovel(db, imovel_id, user)
 
     end = db.query(Endereco).filter(Endereco.imovel_id == imovel_id, Endereco.ativo == True).first()
     if not end:
@@ -242,9 +229,10 @@ def upsert_endereco(
         end = Endereco(imovel_id=imovel_id, ativo=True)
         _apply_endereco(end, body, is_new=True)
         db.add(end)
+    alterados = campos_alterados(end)
     db.commit()
     db.refresh(end)
-    log_operacao(db, user.id, "upsert", "endereco", imovel_id)
+    log_operacao(db, user.id, "upsert", "endereco", imovel_id, payload={"campos": alterados})
     return ok(serialize_endereco(end))
 
 
@@ -254,11 +242,12 @@ def upsert_endereco(
 def list_comodos(
     imovel_id: str,
     db: Session = Depends(get_db),
-    _: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(get_current_user),
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
         return fail("Imóvel não encontrado")
+    assert_acesso_imovel(db, imovel_id, user)
 
     ensure_default_comodos(db, imovel_id)
     comodos = (
@@ -316,10 +305,11 @@ def update_comodo(
         comodo.tipo = body.tipo
     if body.descricao is not None:
         comodo.descricao = body.descricao
+    alterados = campos_alterados(comodo)
 
     db.commit()
     db.refresh(comodo)
-    log_operacao(db, user.id, "update", "comodo", comodo.id)
+    log_operacao(db, user.id, "update", "comodo", comodo.id, payload={"campos": alterados})
     return ok(serialize_comodo(comodo))
 
 

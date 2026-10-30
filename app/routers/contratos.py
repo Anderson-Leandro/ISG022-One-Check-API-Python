@@ -1,14 +1,12 @@
-import uuid
 from datetime import date, datetime, timezone
-from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
+from app.config import MAX_UPLOAD_MB
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import assert_acesso_contrato, assert_acesso_problemas, get_current_user, require_roles
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -19,6 +17,7 @@ from app.models import (
     Usuario,
 )
 from app.notification_service import notificar_admins
+from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 from app.schemas import (
     AgendamentoCreate,
     ChecklistCreate,
@@ -127,9 +126,7 @@ def get_contrato(
     if not ct:
         return fail("Contrato não encontrado")
 
-    if user.role == "locatario" and ct.locatario_id != user.id:
-        raise HTTPException(status_code=403, detail="Você não tem acesso a este contrato")
-
+    assert_acesso_contrato(db, ct, user)
     return ok(serialize_contrato(ct))
 
 
@@ -209,6 +206,7 @@ def list_agendamentos(
 
     if user.role == "locatario":
         raise HTTPException(status_code=403, detail="Você não tem acesso aos agendamentos deste contrato")
+    assert_acesso_contrato(db, ct, user)
 
     rows = (
         db.query(AgendamentoVistoria)
@@ -282,14 +280,25 @@ def create_checklist(
     contrato_id: str,
     body: ChecklistCreate,
     db: Session = Depends(get_db),
-    user: Usuario = Depends(get_current_user),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
         return fail("Contrato não encontrado")
 
+    if ct.status != "ativo":
+        return fail("Vistorias só podem ser criadas em contratos ativos")
+
     if body.tipo not in ("inicial", "encerramento"):
         return fail("Tipo deve ser 'inicial' ou 'encerramento'")
+
+    vistoriador = (
+        db.query(Usuario)
+        .filter(Usuario.id == body.vistoriador_id, Usuario.ativo == True, Usuario.role == "vistoriador")
+        .first()
+    )
+    if not vistoriador:
+        return fail("Vistoriador não encontrado")
 
     existing = (
         db.query(Checklist)
@@ -322,14 +331,6 @@ def create_checklist(
     return ok(serialize_checklist(ck))
 
 
-def _assert_pode_problema(contrato: Contrato, user: Usuario) -> None:
-    if user.role in ("admin", "gestor"):
-        return
-    if user.role == "locatario" and contrato.locatario_id == user.id:
-        return
-    raise HTTPException(status_code=403, detail="Você não tem permissão para registrar problemas neste contrato")
-
-
 @router.post("/{contrato_id}/problemas")
 async def create_problema(
     contrato_id: str,
@@ -348,7 +349,7 @@ async def create_problema(
         )
 
     try:
-        _assert_pode_problema(ct, user)
+        assert_acesso_problemas(ct, user)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"sucesso": False, "erro": e.detail})
 
@@ -361,7 +362,7 @@ async def create_problema(
     status_val = "aberto"
 
     if "multipart/form-data" in content_type:
-        form = await request.form()
+        form = await request.form(max_files=1, max_fields=10)
         titulo = str(form.get("titulo") or "").strip()
         descricao = form.get("descricao")
         if descricao is not None:
@@ -382,12 +383,10 @@ async def create_problema(
                     status_code=422,
                     content={"sucesso": False, "erro": f"A foto não pode exceder {MAX_UPLOAD_MB} MB", "erros": {"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"}},
                 )
-            ext = Path(getattr(foto, "filename", "foto.jpg") or "foto.jpg").suffix or ".jpg"
-            filename = f"{uuid.uuid4().hex}{ext}"
-            UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-            filepath = UPLOAD_DIR / filename
-            filepath.write_bytes(content)
-            foto_chave = filename
+            try:
+                foto_chave = salvar_imagem(content)
+            except UploadInvalido as e:
+                return JSONResponse(status_code=422, content={"sucesso": False, "erro": str(e), "erros": {"foto": str(e)}})
     else:
         try:
             body = await request.json()
@@ -402,7 +401,13 @@ async def create_problema(
             comodo_id = str(comodo_id).strip()
         prioridade = str(body.get("prioridade") or "normal").strip()
         status_val = str(body.get("status") or "aberto").strip()
-        foto_chave = body.get("foto_url")
+        if body.get("foto_url"):
+            foto_chave = nome_de_upload_existente(body.get("foto_url"))
+            if not foto_chave:
+                return JSONResponse(
+                    status_code=422,
+                    content={"sucesso": False, "erro": "Foto inválida", "erros": {"foto_url": "Envie a foto pelo upload da API"}},
+                )
 
     erros = {}
     if not titulo:
@@ -467,7 +472,7 @@ def list_problemas(
     if not ct:
         return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Contrato não encontrado"})
     try:
-        _assert_pode_problema(ct, user)
+        assert_acesso_problemas(ct, user)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"sucesso": False, "erro": e.detail})
 

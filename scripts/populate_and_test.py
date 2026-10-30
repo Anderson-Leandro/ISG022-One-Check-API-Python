@@ -1,5 +1,6 @@
 """Popula e testa todas as funcionalidades usadas pelo web."""
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
@@ -12,7 +13,7 @@ except ImportError:
 
 BASE = sys.argv[1] if len(sys.argv) > 1 else "https://onecheck-api.onrender.com/api/v1"
 MFA_SECRET = "JBSWY3DPEHPK3PXP"
-SEED_SECRET = sys.argv[2] if len(sys.argv) > 2 else "onecheck-seed-dev"
+SEED_SECRET = sys.argv[2] if len(sys.argv) > 2 else os.getenv("SEED_SECRET", "")
 
 passed = 0
 failed = 0

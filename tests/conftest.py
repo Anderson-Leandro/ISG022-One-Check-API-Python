@@ -11,11 +11,13 @@ Estratégia de isolamento:
 import io
 import os
 import shutil
+import tempfile
 
 import bcrypt
 import pyotp
 import pytest
 from datetime import date
+from PIL import Image
 from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 
@@ -26,6 +28,9 @@ _raw_url = os.getenv("TEST_DATABASE_URL", "sqlite:///./onecheck_test.db")
 if _raw_url.startswith("postgres://"):
     _raw_url = _raw_url.replace("postgres://", "postgresql://", 1)
 os.environ["DATABASE_URL"] = _raw_url
+os.environ.setdefault("APP_ENV", "test")
+# Os testes gravam e, ao final, apagam UPLOAD_DIR: nunca apontar para o uploads/ real do projeto
+os.environ["UPLOAD_DIR"] = tempfile.mkdtemp(prefix="onecheck-test-uploads-")
 
 # Importações da app somente após definir DATABASE_URL
 from app.main import app  # noqa: E402
@@ -65,13 +70,14 @@ def totp_now() -> str:
 
 
 def small_image_bytes() -> bytes:
-    """Retorna bytes de uma imagem PNG mínima válida (1x1 pixel)."""
-    # PNG 1x1 pixel transparente codificado em bytes — sem dependência de Pillow aqui
-    return (
-        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01"
-        b"\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\xf8\x0f\x00"
-        b"\x00\x01\x01\x00\x05\x18\xd8N\x00\x00\x00\x00IEND\xaeB`\x82"
-    )
+    """Retorna bytes de uma imagem PNG válida (1x1 pixel).
+
+    Gerada pelo Pillow: os uploads validam o conteúdo, e o PNG fixo usado antes
+    tinha CRC inválido no chunk IDAT.
+    """
+    buf = io.BytesIO()
+    Image.new("RGB", (1, 1), (255, 0, 0)).save(buf, format="PNG")
+    return buf.getvalue()
 
 
 # ── Banco de dados ──────────────────────────────────────────────────────────────
@@ -84,6 +90,15 @@ def setup_database():
     Base.metadata.drop_all(test_engine)
     if UPLOAD_DIR.exists():
         shutil.rmtree(UPLOAD_DIR)
+
+
+@pytest.fixture(autouse=True)
+def limpar_rate_limit():
+    """Cada teste começa sem tentativas falhas acumuladas (o limitador vive na memória do processo)."""
+    from app.rate_limit import limitador
+    limitador.reset()
+    yield
+    limitador.reset()
 
 
 @pytest.fixture

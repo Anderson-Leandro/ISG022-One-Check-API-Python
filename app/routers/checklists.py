@@ -1,10 +1,9 @@
 from datetime import date
-import uuid
-from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session, joinedload
 
+from app.auditoria import campos_alterados
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
 from app.deps import get_current_user, require_roles
@@ -27,6 +26,7 @@ from app.schemas import (
     fail,
     ok,
 )
+from app.uploads import UploadInvalido, salvar_imagem
 from app.serializers import (
     foto_url,
     get_comodos_for_checklist,
@@ -64,6 +64,9 @@ def _assert_vistoriador(checklist: Checklist, user: Usuario) -> None:
 
 
 def _assert_pode_aceitar(checklist: Checklist, user: Usuario, db: Session) -> Contrato | None:
+    # Separação de deveres: quem vistoriou não aprova a própria vistoria
+    if checklist.vistoriador_id == user.id:
+        raise HTTPException(status_code=403, detail="O vistoriador não pode aceitar ou rejeitar a própria vistoria")
     contrato = db.query(Contrato).filter(Contrato.id == checklist.contrato_id).first()
     if user.role in ("admin", "gestor"):
         return contrato
@@ -201,18 +204,32 @@ def update_item(
         item.estado = body.estado
     if body.observacao is not None:
         item.observacao = body.observacao
+    alterados = campos_alterados(item)
 
     db.commit()
     db.refresh(item)
-    log_operacao(db, user.id, "update", "checklist_item", item.id)
+    log_operacao(db, user.id, "update", "checklist_item", item.id, payload={"campos": alterados})
     return ok(serialize_item(item))
 
 
-@router.post("/checklists/{checklist_id}/itens/{item_id}/fotos")
+# Multipart documentado à mão: a rota lê o formulário só depois da autenticação e das checagens
+_FOTO_OPENAPI = {
+    "requestBody": {
+        "required": True,
+        "content": {"multipart/form-data": {"schema": {
+            "type": "object",
+            "required": ["foto"],
+            "properties": {"foto": {"type": "string", "format": "binary"}},
+        }}},
+    }
+}
+
+
+@router.post("/checklists/{checklist_id}/itens/{item_id}/fotos", openapi_extra=_FOTO_OPENAPI)
 async def upload_foto(
     checklist_id: str,
     item_id: str,
-    foto: UploadFile = File(...),
+    request: Request,
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
@@ -239,16 +256,19 @@ async def upload_foto(
     if not item.estado:
         return fail("Selecione o estado do item antes de enviar a foto")
 
+    form = await request.form(max_files=1, max_fields=5)
+    foto = form.get("foto")
+    if not hasattr(foto, "read"):
+        return fail("Envie o arquivo no campo 'foto'")
     content = await foto.read()
     max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     if len(content) > max_bytes:
         return fail(f"Arquivo excede {MAX_UPLOAD_MB}MB")
 
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    ext = Path(foto.filename or "foto.jpg").suffix or ".jpg"
-    filename = f"{uuid.uuid4().hex}{ext}"
-    filepath = UPLOAD_DIR / filename
-    filepath.write_bytes(content)
+    try:
+        filename = salvar_imagem(content)
+    except UploadInvalido as e:
+        return fail(str(e))
 
     for old in list(item.fotos):
         old_path = UPLOAD_DIR / old.arquivo

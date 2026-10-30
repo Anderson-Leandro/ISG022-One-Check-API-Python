@@ -11,10 +11,23 @@ Rotas cobertas:
   POST /api/v1/admin/seed
 """
 from datetime import datetime
-from app.config import SEED_SECRET, UPLOAD_DIR
+
+import pytest
+
+import app.routers.admin as admin_router
+from app.config import UPLOAD_DIR
 from tests.conftest import auth, small_image_bytes
 
-SEED_HEADER = {"X-Seed-Secret": SEED_SECRET}
+# Os testes de /admin rodam com banco vazio (bootstrap), em que basta o segredo.
+# Regras de token admin e de operações destrutivas: tests/integration/test_seguranca_admin_seed.py
+SEED_TEST_SECRET = "segredo-de-teste-admin"
+SEED_HEADER = {"X-Seed-Secret": SEED_TEST_SECRET}
+
+
+@pytest.fixture
+def seed_configurado(monkeypatch):
+    monkeypatch.setattr(admin_router, "SEED_SECRET", SEED_TEST_SECRET)
+    monkeypatch.setattr(admin_router, "SEED_ALLOW_DESTRUCTIVE", True)
 
 
 # ── GET /dashboard ────────────────────────────────────────────────────────────────
@@ -159,6 +172,7 @@ class TestServeUpload:
 
 # ── GET /admin/data/status ────────────────────────────────────────────────────────
 
+@pytest.mark.usefixtures("seed_configurado")
 class TestAdminDataStatus:
     def test_secret_correto_retorna_status(self, client):
         r = client.get("/api/v1/admin/data/status", headers=SEED_HEADER)
@@ -178,6 +192,7 @@ class TestAdminDataStatus:
 
 # ── POST /admin/seed ──────────────────────────────────────────────────────────────
 
+@pytest.mark.usefixtures("seed_configurado")
 class TestAdminSeed:
     def test_sem_secret_retorna_403(self, client):
         r = client.post("/api/v1/admin/seed")
@@ -211,6 +226,7 @@ class TestAdminSeed:
 
 # ── POST /admin/refresh-data ──────────────────────────────────────────────────────
 
+@pytest.mark.usefixtures("seed_configurado")
 class TestAdminRefreshData:
     def test_sem_secret_retorna_403(self, client):
         r = client.post("/api/v1/admin/refresh-data")

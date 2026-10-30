@@ -150,8 +150,16 @@ class TestMfaEnableMe:
 # ── DELETE /me/mfa ────────────────────────────────────────────────────────────────
 
 class TestMfaDisableMe:
-    def test_disable_remove_mfa(self, client, db, user_admin, token_admin):
-        r = client.delete(f"{BASE}/me/mfa", headers=auth(token_admin))
+    def test_disable_remove_mfa(self, client, db, user_locatario, token_locatario):
+        # Perfil com MFA opcional e reautenticação; perfis obrigatórios: test_seguranca_mfa_desativacao.py
+        user_locatario.mfa_enabled = True
+        user_locatario.mfa_secret = MFA_TEST_SECRET
+        db.flush()
+        r = client.request(
+            "DELETE", f"{BASE}/me/mfa",
+            json={"senha": TEST_SENHA, "codigo": totp_now()},
+            headers=auth(token_locatario),
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["mfa_ativo"] is False
@@ -165,8 +173,8 @@ class TestMfaDisableMe:
 # ── GET /usuarios (listagem) ──────────────────────────────────────────────────────
 
 class TestListUsuarios:
-    def test_lista_usuarios_autenticado(self, client, user_locatario, token_locatario):
-        r = client.get(BASE, headers=auth(token_locatario))
+    def test_lista_usuarios_gestor(self, client, user_locatario, token_gestor):
+        r = client.get(BASE, headers=auth(token_gestor))
         data = r.json()
         assert data["sucesso"] is True
         assert isinstance(data["dados"], list)
@@ -243,9 +251,13 @@ class TestUpdateUsuario:
         assert data["sucesso"] is True
         assert data["dados"]["role"] == "visualizador"
 
-    def test_desativar_mfa_limpa_secret(self, client, user_admin, token_admin):
+    def test_desativar_mfa_limpa_secret(self, client, db, user_locatario, token_admin):
+        # Perfil com MFA opcional; em perfis obrigatórios o PUT recusa (test_seguranca_mfa_desativacao.py)
+        user_locatario.mfa_enabled = True
+        user_locatario.mfa_secret = MFA_TEST_SECRET
+        db.flush()
         r = client.put(
-            f"{BASE}/{user_admin.id}",
+            f"{BASE}/{user_locatario.id}",
             json={"mfa_enabled": False},
             headers=auth(token_admin),
         )
@@ -364,9 +376,9 @@ class TestMfaAdminRoutes:
         assert data["sucesso"] is True
         assert data["dados"]["mfa_ativo"] is True
 
-    def test_admin_reseta_mfa_de_usuario(self, client, user_admin, token_admin):
-        # user_admin já tem MFA configurado
-        r = client.delete(f"{BASE}/{user_admin.id}/mfa", headers=auth(token_admin))
+    def test_admin_reseta_mfa_de_usuario(self, client, user_vistoriador, token_admin):
+        # user_vistoriador já tem MFA configurado; o próprio MFA não se reseta por esta rota
+        r = client.delete(f"{BASE}/{user_vistoriador.id}/mfa", headers=auth(token_admin))
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["mfa_ativo"] is False

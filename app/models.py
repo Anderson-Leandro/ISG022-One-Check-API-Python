@@ -6,6 +6,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     ForeignKey,
+    Integer,
     JSON,
     Numeric,
     String,
@@ -32,7 +33,11 @@ class Usuario(Base):
     role: Mapped[str] = mapped_column(String(50), nullable=False, default="visualizador")
     cpf: Mapped[str | None] = mapped_column(String(14))
     mfa_secret: Mapped[str | None] = mapped_column(String(64))
+    # Segredo gerado no setup; só vira mfa_secret depois que um código válido confirmar
+    mfa_secret_pendente: Mapped[str | None] = mapped_column(String(64))
     mfa_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Vai nos JWT ("ver"); incrementar invalida todos os tokens já emitidos para o usuário
+    token_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
     ativo: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 

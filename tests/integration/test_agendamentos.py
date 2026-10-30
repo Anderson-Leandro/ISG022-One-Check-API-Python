@@ -109,7 +109,9 @@ class TestCriarAgendamento:
 
 
 class TestListarAgendamentos:
-    def test_admin_e_vistoriador_listam_agendamentos(self, client, contrato, token_admin, token_vistoriador):
+    # O vistoriador lista os agendamentos dos contratos em que tem vistoria (fixture checklist).
+    # Sem vínculo: tests/integration/test_seguranca_acesso_vistoriador.py
+    def test_admin_e_vistoriador_listam_agendamentos(self, client, contrato, checklist, token_admin, token_vistoriador):
         r_admin = client.get(f"{BASE_CONTRATOS}/{contrato.id}/agendamentos", headers=auth(token_admin))
         assert r_admin.status_code == 200
         assert r_admin.json()["sucesso"] is True

@@ -35,6 +35,13 @@ def ensure_schema_updates() -> None:
     tables = set(insp.get_table_names())
 
     with engine.begin() as conn:
+        if "usuarios" in tables:
+            cols = {c["name"] for c in insp.get_columns("usuarios")}
+            if "mfa_secret_pendente" not in cols:
+                conn.execute(text("ALTER TABLE usuarios ADD COLUMN mfa_secret_pendente VARCHAR(64)"))
+            if "token_version" not in cols:
+                conn.execute(text("ALTER TABLE usuarios ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0"))
+
         if "enderecos" in tables:
             cols = {c["name"] for c in insp.get_columns("enderecos")}
             if "latitude" not in cols:

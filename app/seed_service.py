@@ -1,10 +1,12 @@
 """Seed completo + modo expand para enriquecer banco existente."""
+import secrets
 from datetime import date, timedelta
 
 import pyotp
 from sqlalchemy.orm import Session
 
-from app.auth import hash_password
+from app.auth import MFA_REQUIRED_ROLES, encerrar_sessoes, hash_password, reset_mfa, verify_password
+from app.config import IS_DEV
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -22,7 +24,62 @@ from app.models import (
 )
 from app.serializers import ensure_default_comodos, log_operacao
 
-MFA_SECRET = "JBSWY3DPEHPK3PXP"
+# Credenciais fixas de demonstração: estão no repositório público, então só valem em APP_ENV=development/test.
+# Fora disso o seed gera senha aleatória e deixa o MFA para configurar no primeiro login.
+MFA_SECRET_DEV = "JBSWY3DPEHPK3PXP"
+SENHAS_DEV = {
+    "admin@onecheck.local": "admin123",
+    "gestor@onecheck.local": "gestor123",
+    "vistoriador@onecheck.local": "vistor123",
+    "ana.vistoriadora@onecheck.local": "vistor123",
+    "locatario@onecheck.local": "locat123",
+    "pedro.locatario@onecheck.local": "locat123",
+    "julia.locatario@onecheck.local": "locat123",
+}
+
+
+def _novo_usuario(nome: str, email: str, role: str, credenciais: list[dict]) -> Usuario:
+    """Cria o usuário de seed e anota a senha em `credenciais` (exibida uma única vez na resposta)."""
+    mfa = role in MFA_REQUIRED_ROLES
+    if IS_DEV:
+        senha, mfa_secret = SENHAS_DEV[email], MFA_SECRET_DEV if mfa else None
+    else:
+        senha, mfa_secret = secrets.token_urlsafe(16), None
+    credenciais.append({"email": email, "senha": senha, "mfa": mfa})
+    # Sem mfa_secret, perfis com MFA obrigatório configuram o autenticador no primeiro login
+    return Usuario(
+        nome=nome, email=email, senha_hash=hash_password(senha), role=role,
+        mfa_enabled=mfa, mfa_secret=mfa_secret,
+    )
+
+
+def _info_mfa() -> dict:
+    if IS_DEV:
+        return {"mfa_secret": MFA_SECRET_DEV, "mfa_codigo_atual": pyotp.TOTP(MFA_SECRET_DEV).now()}
+    return {"mfa": "Perfis com MFA configuram o autenticador no primeiro login"}
+
+
+def contas_com_credenciais_publicas(db: Session) -> list[Usuario]:
+    """Usuários ativos que ainda usam a senha ou o segredo TOTP de demonstração publicados no repositório."""
+    expostos = db.query(Usuario).filter(Usuario.ativo == True, Usuario.mfa_secret == MFA_SECRET_DEV).all()
+    for user in db.query(Usuario).filter(Usuario.ativo == True, Usuario.email.in_(SENHAS_DEV)).all():
+        if user not in expostos and verify_password(SENHAS_DEV[user.email], user.senha_hash):
+            expostos.append(user)
+    return expostos
+
+
+def rotacionar_credenciais_publicas(db: Session) -> list[dict]:
+    """Troca a senha, reseta o MFA e revoga as sessões das contas com credenciais públicas."""
+    novas = []
+    for user in contas_com_credenciais_publicas(db):
+        senha = secrets.token_urlsafe(16)
+        user.senha_hash = hash_password(senha)
+        reset_mfa(user)
+        encerrar_sessoes(db, user)
+        log_operacao(db, None, "rotacao_credenciais", "usuario", user.id, "Credenciais de demonstração substituídas")
+        novas.append({"email": user.email, "senha": senha, "mfa": user.mfa_enabled})
+    db.commit()
+    return novas
 
 
 def _clear_all(db: Session) -> None:
@@ -284,56 +341,14 @@ def run_seed(db: Session, force: bool = False) -> dict:
     if force:
         _clear_all(db)
 
-    admin = Usuario(
-        nome="Administrador",
-        email="admin@onecheck.local",
-        senha_hash=hash_password("admin123"),
-        role="admin",
-        mfa_enabled=True,
-        mfa_secret=MFA_SECRET,
-    )
-    gestor = Usuario(
-        nome="Carlos Gestor",
-        email="gestor@onecheck.local",
-        senha_hash=hash_password("gestor123"),
-        role="gestor",
-        mfa_enabled=True,
-        mfa_secret=MFA_SECRET,
-    )
-    vist1 = Usuario(
-        nome="João Vistoriador",
-        email="vistoriador@onecheck.local",
-        senha_hash=hash_password("vistor123"),
-        role="vistoriador",
-        mfa_enabled=True,
-        mfa_secret=MFA_SECRET,
-    )
-    vist2 = Usuario(
-        nome="Ana Vistoriadora",
-        email="ana.vistoriadora@onecheck.local",
-        senha_hash=hash_password("vistor123"),
-        role="vistoriador",
-        mfa_enabled=True,
-        mfa_secret=MFA_SECRET,
-    )
-    loc1 = Usuario(
-        nome="Maria Locatária",
-        email="locatario@onecheck.local",
-        senha_hash=hash_password("locat123"),
-        role="locatario",
-    )
-    loc2 = Usuario(
-        nome="Pedro Locatário",
-        email="pedro.locatario@onecheck.local",
-        senha_hash=hash_password("locat123"),
-        role="locatario",
-    )
-    loc3 = Usuario(
-        nome="Julia Locatária",
-        email="julia.locatario@onecheck.local",
-        senha_hash=hash_password("locat123"),
-        role="locatario",
-    )
+    credenciais: list[dict] = []
+    admin = _novo_usuario("Administrador", "admin@onecheck.local", "admin", credenciais)
+    gestor = _novo_usuario("Carlos Gestor", "gestor@onecheck.local", "gestor", credenciais)
+    vist1 = _novo_usuario("João Vistoriador", "vistoriador@onecheck.local", "vistoriador", credenciais)
+    vist2 = _novo_usuario("Ana Vistoriadora", "ana.vistoriadora@onecheck.local", "vistoriador", credenciais)
+    loc1 = _novo_usuario("Maria Locatária", "locatario@onecheck.local", "locatario", credenciais)
+    loc2 = _novo_usuario("Pedro Locatário", "pedro.locatario@onecheck.local", "locatario", credenciais)
+    loc3 = _novo_usuario("Julia Locatária", "julia.locatario@onecheck.local", "locatario", credenciais)
     db.add_all([admin, gestor, vist1, vist2, loc1, loc2, loc3])
     db.flush()
 
@@ -348,21 +363,11 @@ def run_seed(db: Session, force: bool = False) -> dict:
         loc3=loc3,
     )
 
-    totp = pyotp.TOTP(MFA_SECRET)
     return {
         **result,
         "message": "Banco populado com dados completos",
-        "usuarios": [
-            {"email": "admin@onecheck.local", "senha": "admin123", "mfa": True},
-            {"email": "gestor@onecheck.local", "senha": "gestor123", "mfa": True},
-            {"email": "vistoriador@onecheck.local", "senha": "vistor123", "mfa": True},
-            {"email": "ana.vistoriadora@onecheck.local", "senha": "vistor123", "mfa": True},
-            {"email": "locatario@onecheck.local", "senha": "locat123", "mfa": False},
-            {"email": "pedro.locatario@onecheck.local", "senha": "locat123", "mfa": False},
-            {"email": "julia.locatario@onecheck.local", "senha": "locat123", "mfa": False},
-        ],
-        "mfa_secret": MFA_SECRET,
-        "mfa_codigo_atual": totp.now(),
+        "usuarios": credenciais,
+        **_info_mfa(),
     }
 
 
@@ -371,23 +376,17 @@ def run_expand(db: Session) -> dict:
     if db.query(Usuario).filter(Usuario.email == "ana.vistoriadora@onecheck.local").first():
         return {"seeded": False, "message": "Dados expandidos já existem (ana.vistoriadora@onecheck.local)."}
 
-    vist2 = Usuario(
-        nome="Ana Vistoriadora",
-        email="ana.vistoriadora@onecheck.local",
-        senha_hash=hash_password("vistor123"),
-        role="vistoriador",
-        mfa_enabled=True,
-        mfa_secret=MFA_SECRET,
-    )
+    credenciais: list[dict] = []
+    vist2 = _novo_usuario("Ana Vistoriadora", "ana.vistoriadora@onecheck.local", "vistoriador", credenciais)
     loc2 = db.query(Usuario).filter(Usuario.email == "pedro.locatario@onecheck.local").first()
     loc3 = db.query(Usuario).filter(Usuario.email == "julia.locatario@onecheck.local").first()
     vist1 = db.query(Usuario).filter(Usuario.email == "vistoriador@onecheck.local").first()
 
     if not loc2:
-        loc2 = Usuario(nome="Pedro Locatário", email="pedro.locatario@onecheck.local", senha_hash=hash_password("locat123"), role="locatario")
+        loc2 = _novo_usuario("Pedro Locatário", "pedro.locatario@onecheck.local", "locatario", credenciais)
         db.add(loc2)
     if not loc3:
-        loc3 = Usuario(nome="Julia Locatária", email="julia.locatario@onecheck.local", senha_hash=hash_password("locat123"), role="locatario")
+        loc3 = _novo_usuario("Julia Locatária", "julia.locatario@onecheck.local", "locatario", credenciais)
         db.add(loc3)
     db.add(vist2)
     db.flush()
@@ -419,6 +418,7 @@ def run_expand(db: Session) -> dict:
         "seeded": True,
         "message": "Dados expandidos adicionados",
         "registros": created,
+        "usuarios": credenciais,
         "totals": {
             "usuarios": db.query(Usuario).count(),
             "imoveis": db.query(Imovel).count(),
