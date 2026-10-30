@@ -14,11 +14,12 @@ def notificar_usuario(db: Session, usuario_id: str, assunto: str, mensagem: str)
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return
-    logger.info("Notificação enviada para [%s] %s: %s\n%s", user.id, user.email, assunto, mensagem)
+    # Sem e-mail, assunto nem corpo: trazem dados pessoais e texto livre do usuário
+    logger.info("Notificação enviada para o usuário %s", user.id)
 
 
 def notificar_admins(db: Session, assunto: str, mensagem: str) -> None:
     """Envia notificação para todos os administradores ativos."""
     admins = db.query(Usuario).filter(Usuario.role == "admin", Usuario.ativo == True).all()
     for admin in admins:
-        logger.info("Notificação ADMIN enviada para [%s] %s: %s\n%s", admin.id, admin.email, assunto, mensagem)
+        logger.info("Notificação ADMIN enviada para o usuário %s", admin.id)

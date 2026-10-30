@@ -32,6 +32,16 @@ def verify_password(senha: str, senha_hash: str) -> bool:
         return False
 
 
+# Mesmo custo de hash_password: conferir contra ele leva o mesmo tempo que contra uma conta real
+_HASH_FICTICIO = bcrypt.hashpw(secrets.token_bytes(16), bcrypt.gensalt()).decode()
+
+
+def conferir_credenciais(user: Usuario | None, senha: str) -> bool:
+    """Confere a senha gastando o mesmo tempo quando a conta não existe, para não revelar quais e-mails existem."""
+    senha_ok = verify_password(senha, user.senha_hash if user else _HASH_FICTICIO)
+    return user is not None and senha_ok
+
+
 def create_access_token(usuario_id: str, role: str, versao: int = 0) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_ACCESS_MINUTES)
     payload = {"sub": usuario_id, "role": role, "type": "access", "ver": versao, "exp": expire}

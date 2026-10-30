@@ -2,6 +2,7 @@ from datetime import date, datetime
 
 from sqlalchemy.orm import Session
 
+from app.auditoria import ip_atual
 from app.config import PUBLIC_BASE_URL
 from typing import Any
 from app.models import (
@@ -227,7 +228,7 @@ def log_operacao(
             entidade_id=entidade_id,
             detalhes=detalhes,
             payload=sanitized_payload,
-            ip=ip,
+            ip=ip or ip_atual(),
         )
     )
     db.commit()

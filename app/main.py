@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.auditoria import IpRequisicaoMiddleware
 from app.cabecalhos import CabecalhosSegurancaMiddleware
 from app.config import CORS_ORIGINS, DOCS_ENABLED, IS_DEV, UPLOAD_DIR
 from app.database import Base, SessionLocal, ensure_schema_updates, engine
@@ -69,6 +70,8 @@ app.add_middleware(
     # Lidos pelo front: espera do limite de tentativas e nome do PDF do laudo
     expose_headers=["Retry-After", "Content-Disposition"],
 )
+# IP de origem para a trilha de auditoria (log_operacao)
+app.add_middleware(IpRequisicaoMiddleware)
 # Adicionado depois do CORS para ficar por fora: recusa corpos grandes antes de qualquer leitura
 app.add_middleware(LimiteCorpoMiddleware)
 # O mais externo: os cabeçalhos valem também para as respostas 413 e 400 do limite de corpo

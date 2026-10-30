@@ -2,6 +2,7 @@ from datetime import date, datetime, timezone
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.auditoria import campos_alterados
 from app.database import get_db
 from app.deps import require_roles
 from app.models import AgendamentoVistoria, Usuario
@@ -53,10 +54,11 @@ def update_agendamento(
 
     if body.observacao is not None:
         ag.observacao = body.observacao
+    alterados = campos_alterados(ag)
 
     db.commit()
     db.refresh(ag)
-    log_operacao(db, user.id, "update", "agendamento_vistoria", ag.id)
+    log_operacao(db, user.id, "update", "agendamento_vistoria", ag.id, payload={"campos": alterados})
     return ok(serialize_agendamento(ag))
 
 

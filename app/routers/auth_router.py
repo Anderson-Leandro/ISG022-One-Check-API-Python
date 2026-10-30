@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import (
     MFA_REQUIRED_ROLES,
+    conferir_credenciais,
     create_access_token,
     create_mfa_setup_token,
     create_refresh_token,
@@ -21,7 +22,6 @@ from app.auth import (
     revoke_refresh_token,
     sessao_vigente,
     usuario_to_dict,
-    verify_password,
     verify_refresh_token,
     verify_totp,
     verify_totp_code,
@@ -53,7 +53,7 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     tentativas.verificar()
 
     user = db.query(Usuario).filter(Usuario.email == body.email, Usuario.ativo == True).first()
-    if not user or not verify_password(body.senha, user.senha_hash):
+    if not conferir_credenciais(user, body.senha):
         tentativas.falhou()
         log_operacao(db, None, "login_falho", "usuario", None, f"email: {body.email}")
         return fail("Credenciais inválidas")

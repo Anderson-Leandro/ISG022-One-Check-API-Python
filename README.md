@@ -49,7 +49,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 
 - **📊 Dashboard & Auditoria Avançada**:
   - Métricas agregadas em tempo real (`/dashboard`): imóveis locados, checklists pendentes, problemas abertos e vistorias agendadas.
-  - Central de auditoria (`GET /logs`) com rastreamento de IP, usuário, ação, entidade e payload JSON sanitizado (senhas e segredos são automaticamente ocultados).
+  - Central de auditoria (`GET /logs`) com IP de origem, usuário, ação, entidade e payload JSON sanitizado (senhas e segredos são automaticamente ocultados). Nas edições, o payload traz `{"campos": [...]}` com os nomes dos campos alterados, sem os valores.
   - Filtros avançados por data (`de`, `ate`), entidade e usuário.
 
 ---
@@ -66,7 +66,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | **Geocoding** | Nominatim (OpenStreetMap) + ViaCEP via `httpx` |
 | **Geração de PDF** | Motor PDF 1.4 Pure Python (sem dependências binárias C externas) |
 | **Dependências** | `requirements.txt` (diretas) + `requirements.lock` (todas, com hash) |
-| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (741 testes, 94% de cobertura) |
+| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (757 testes, 94% de cobertura) |
 | **CI / CD** | GitHub Actions (testes em PostgreSQL + auditoria de dependências com `pip-audit`; actions fixadas por SHA, token só leitura) |
 | **Container** | Docker (`python:3.12-slim`, usuário sem privilégio, só wheels) + Docker Compose com PostgreSQL |
 
@@ -341,7 +341,7 @@ docker compose up -d --build
 
 ## 🧪 Executando os Testes Automatizados
 
-A suíte cobre os fluxos de negócio e as correções de segurança com **741 testes automatizados** e **94% de cobertura**:
+A suíte cobre os fluxos de negócio e as correções de segurança com **757 testes automatizados** e **94% de cobertura**:
 
 ```bash
 # Executar todos os testes

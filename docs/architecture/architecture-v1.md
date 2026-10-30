@@ -1,6 +1,6 @@
 # Arquitetura do Sistema e Fronteiras de Confiança (v1)
 
-_Última atualização: 2026-10-26, depois das correções de segurança SEC-001 a SEC-009 e SEC-016. Os detalhes de cada controle e os riscos ainda abertos estão em [`docs/security/`](../security/threat-model.md)._
+_Última atualização: 2026-10-26, depois das correções de segurança SEC-001 a SEC-010, SEC-013 e SEC-016. Os detalhes de cada controle e os riscos ainda abertos estão em [`docs/security/`](../security/threat-model.md)._
 
 ## 1. Contexto e Domínio do Sistema
 
@@ -88,7 +88,7 @@ flowchart TD
 
 **Limitações conhecidas** (detalhes no [modelo de ameaças](../security/threat-model.md)):
 - O CPF fica em texto no banco e volta em toda resposta de usuário (SEC-014). O segredo TOTP também fica em texto no banco.
-- O log de auditoria não registra o IP nem os campos alterados (SEC-010).
+- O log de auditoria fica no mesmo banco e pode ser alterado por quem tem acesso direto a ele (não é append-only).
 - As fotos em `/uploads` são públicas para quem tem a URL (T-14).
 
 ---
@@ -112,8 +112,11 @@ flowchart TD
    - Schemas Pydantic tipados com restrições de tamanho, regex e enums válidos.
    - Máquina de estados para checklists e contratos (ex.: laudo finalizado ou imóvel locado com restrição de exclusão).
 4. **Trilha de Auditoria e Não-Repúdio:**
-   - Cada mutação de estado registra autor, ação, entidade e ID da entidade no banco, com o payload sanitizado (senhas e segredos ocultados).
+   - Cada mutação de estado registra autor, ação, entidade, ID da entidade e IP de origem no banco, com o payload sanitizado (senhas e segredos ocultados).
+   - As edições registram os nomes dos campos alterados, sem os valores.
    - Logins falhos, falhas de MFA e rotação de credenciais também são registrados.
+   - O log da aplicação (stdout) não recebe e-mail nem conteúdo das notificações.
+   - O login leva o mesmo tempo com e-mail inexistente e com senha errada: a senha é conferida contra um hash fictício de mesmo custo.
 5. **Cadeia de Suprimentos:**
    - `requirements.lock` com versão exata e hash de todas as dependências; o Render, o Docker e o CI instalam com `--require-hashes`.
    - O CI roda o `pip-audit` sobre o lockfile e falha quando há vulnerabilidade conhecida.

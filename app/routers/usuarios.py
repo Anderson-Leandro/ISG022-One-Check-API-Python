@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
+from app.auditoria import campos_alterados
 from app.auth import (
     MFA_REQUIRED_ROLES,
     PRIVILEGED_ROLES,
@@ -76,11 +77,13 @@ def update_me(
             return fail("Senha atual incorreta")
         tentativas.sucesso()
         user.senha_hash = hash_password(body.senha_nova)
+    alterados = campos_alterados(user)
+    if body.senha_nova:
         encerrar_sessoes(db, user)
 
     db.commit()
     db.refresh(user)
-    log_operacao(db, user.id, "update", "usuario", user.id, "perfil")
+    log_operacao(db, user.id, "update", "usuario", user.id, "perfil", payload={"campos": alterados})
     dados = serialize_usuario(user)
     if body.senha_nova:
         dados["sessao"] = nova_sessao(db, user)
@@ -238,12 +241,13 @@ def update_usuario(
     if body.senha:
         user.senha_hash = hash_password(body.senha)
         credencial_alterada = True
+    alterados = campos_alterados(user)
     if credencial_alterada:
         encerrar_sessoes(db, user)
 
     db.commit()
     db.refresh(user)
-    log_operacao(db, current.id, "update", "usuario", user.id)
+    log_operacao(db, current.id, "update", "usuario", user.id, payload={"campos": alterados})
     return ok(serialize_usuario(user))
 
 

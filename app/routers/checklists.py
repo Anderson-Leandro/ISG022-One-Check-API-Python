@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session, joinedload
 
+from app.auditoria import campos_alterados
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
 from app.deps import get_current_user, require_roles
@@ -203,10 +204,11 @@ def update_item(
         item.estado = body.estado
     if body.observacao is not None:
         item.observacao = body.observacao
+    alterados = campos_alterados(item)
 
     db.commit()
     db.refresh(item)
-    log_operacao(db, user.id, "update", "checklist_item", item.id)
+    log_operacao(db, user.id, "update", "checklist_item", item.id, payload={"campos": alterados})
     return ok(serialize_item(item))
 
 
