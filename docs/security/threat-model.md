@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-10-26 (auditoria de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-010, SEC-013 e SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md) [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md) e [010 e 013](correcao-sec-010-013-2026-10-26.md))_
+_Última atualização: 2026-10-30 (auditoria de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-013 e SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md) e [011 e 012](correcao-sec-011-012-2026-10-30.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -65,7 +65,7 @@ flowchart LR
 | ID | Elemento | STRIDE | Ameaça | Pilar | Mitigação existente | Status | Achado |
 |---|---|---|---|---|---|---|---|
 | T-01 | Login | S | Entrar como admin com as credenciais públicas do seed | Autenticidade | seed sem credenciais fixas fora de dev; alerta e script de rotação para contas antigas (`app/seed_service.py`) | Mitigada no código (rotação em produção pendente) | SEC-001 |
-| T-02 | Login / MFA | S | Força bruta de senha e TOTP | Autenticidade | `Tentativas` por conta e IP (`auth_router.py:47-58`) | Mitigada (por processo) | — |
+| T-02 | Login / MFA | S | Força bruta de senha e TOTP; credential stuffing com senhas comuns | Autenticidade | `Tentativas` por conta e IP (`auth_router.py:47-58`); senhas novas com 10+ caracteres, até 72 bytes e sem padrões comuns (`app/senhas.py`) | Mitigada (por processo; senhas antigas seguem valendo) | SEC-011 |
 | T-03 | MFA | S | Login só com senha usando token de setup | Autenticidade | tipos `mfa` × `mfa_setup` (N1) | Mitigada | — |
 | T-04 | JWT | S | Forjar token com segredo padrão | Autenticidade | `JWT_SECRET` obrigatório e forte fora de dev (`config.py`) | Mitigada | — |
 | T-05 | Sessões | S | Token roubado continua válido após troca de senha/reset de MFA | Autenticidade | `token_version` nos JWT + refresh tokens apagados (`encerrar_sessoes`, `app/auth.py`) | Mitigada | SEC-005 |
@@ -80,7 +80,8 @@ flowchart LR
 | T-14 | Uploads / download | I | Fotos de vistoria acessíveis sem login | Confidencialidade (LGPD) | nomes aleatórios de 128 bits | Aceita? (decisão pendente) | — |
 | T-15 | API | D | Corpo multipart gigante processado antes da auth | Disponibilidade | `LimiteCorpoMiddleware`; formulário lido após a auth | Mitigada | SEC-003 |
 | T-16 | API | D | Limite de tentativas usado para bloquear contas de terceiros | Disponibilidade | janela de 15 min | Aceita (custo do T-02) | — |
-| T-17 | Problemas | T | Locatário abre problema já "fechado" | Integridade | status validado só contra a lista | **Aberta** | SEC-012 |
+| T-17 | Problemas | T | Locatário abre problema já "fechado" | Integridade | o problema nasce `aberto`; outro status no corpo dá `422` (`contratos.py`) | Mitigada | SEC-012 |
+| T-24 | Dashboard | I | Qualquer perfil vê totais de toda a operação | Confidencialidade | mesmo recorte das listagens por perfil; `null` no que o perfil não acessa (`dashboard.py`) | Mitigada | SEC-012 |
 | T-18 | Auditoria | R | Ações sem IP e sem os campos alterados | Não-repúdio | `log_operacao` em todas as escritas, com IP de origem (`app/auditoria.py`) e nomes dos campos alterados | Mitigada (log não é append-only) | SEC-010 |
 | T-19 | MFA por admin | R | Admin define o TOTP de outro usuário e age em nome dele | Não-repúdio | reset separado do setup (parcial) | **Aberta** | SEC-015 |
 | T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | PyJWT no lugar do python-jose; `requirements.lock` com hashes, instalado com `--require-hashes`; `pip-audit` no CI | Mitigada | SEC-006 |

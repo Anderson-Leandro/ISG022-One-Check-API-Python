@@ -186,23 +186,23 @@ class TestMfaEnableRequest:
 
 class TestUsuarioCreate:
     def test_valido(self):
-        u = UsuarioCreate(nome="João", email="joao@test.com", senha="senha1", role="locatario")
+        u = UsuarioCreate(nome="João", email="joao@test.com", senha="Vistoria-Casa-42", role="locatario")
         assert u.nome == "João"
         assert u.role == "locatario"
 
-    def test_senha_minimo_6_chars_ok(self):
-        UsuarioCreate(nome="A", email="a@b.com", senha="123456", role="locatario")
+    def test_senha_minimo_10_chars_ok(self):
+        UsuarioCreate(nome="A", email="a@b.com", senha="Kq8#vT2!mZ", role="locatario")
 
     def test_senha_abaixo_do_minimo(self):
         with pytest.raises(ValidationError):
-            UsuarioCreate(nome="A", email="a@b.com", senha="12345", role="locatario")
+            UsuarioCreate(nome="A", email="a@b.com", senha="Kq8#vT2!m", role="locatario")
 
     def test_cpf_opcional(self):
-        u = UsuarioCreate(nome="A", email="a@b.com", senha="123456", role="locatario")
+        u = UsuarioCreate(nome="A", email="a@b.com", senha="Kq8#vT2!mZ", role="locatario")
         assert u.cpf is None
 
     def test_cpf_preenchido(self):
-        u = UsuarioCreate(nome="A", email="a@b.com", senha="123456", role="locatario", cpf="000.000.000-00")
+        u = UsuarioCreate(nome="A", email="a@b.com", senha="Kq8#vT2!mZ", role="locatario", cpf="000.000.000-00")
         assert u.cpf == "000.000.000-00"
 
 
@@ -213,12 +213,12 @@ class TestUsuarioUpdateMe:
         assert u.senha_atual is None
         assert u.senha_nova is None
 
-    def test_senha_nova_minimo_6_chars_ok(self):
-        UsuarioUpdateMe(senha_nova="123456")
+    def test_senha_nova_minimo_10_chars_ok(self):
+        UsuarioUpdateMe(senha_nova="Kq8#vT2!mZ")
 
     def test_senha_nova_abaixo_do_minimo(self):
         with pytest.raises(ValidationError):
-            UsuarioUpdateMe(senha_nova="12345")
+            UsuarioUpdateMe(senha_nova="Kq8#vT2!m")
 
 
 class TestUsuarioUpdate:
@@ -231,7 +231,7 @@ class TestUsuarioUpdate:
 
     def test_senha_abaixo_do_minimo(self):
         with pytest.raises(ValidationError):
-            UsuarioUpdate(senha="12345")
+            UsuarioUpdate(senha="Kq8#vT2!m")
 
     def test_mfa_enabled_bool(self):
         u = UsuarioUpdate(mfa_enabled=False)

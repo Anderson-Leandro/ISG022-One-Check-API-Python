@@ -94,7 +94,7 @@ class TestGestorNaoEscala:
     def test_gestor_nao_cria_usuario_privilegiado(self, client, db, token_gestor, role):
         r = client.post(
             BASE,
-            json={"nome": "Novo", "email": f"novo_{role}@x.com", "senha": "senha123", "role": role},
+            json={"nome": "Novo", "email": f"novo_{role}@x.com", "senha": "Vistoria-Casa-42", "role": role},
             headers=auth(token_gestor),
         )
         assert r.status_code == 403
@@ -112,7 +112,7 @@ class TestPerfisValidos:
     def test_nao_cria_usuario_com_perfil_inexistente(self, client, db, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "X", "email": "perfil_x@x.com", "senha": "senha123", "role": "root"},
+            json={"nome": "X", "email": "perfil_x@x.com", "senha": "Vistoria-Casa-42", "role": "root"},
             headers=auth(token_admin),
         )
         assert r.json()["sucesso"] is False
@@ -143,7 +143,7 @@ class TestGestaoLegitima:
     def test_gestor_cria_vistoriador_com_mfa_exigido(self, client, token_gestor):
         r = client.post(
             BASE,
-            json={"nome": "Vist", "email": "vist_novo@x.com", "senha": "senha123", "role": "vistoriador"},
+            json={"nome": "Vist", "email": "vist_novo@x.com", "senha": "Vistoria-Casa-42", "role": "vistoriador"},
             headers=auth(token_gestor),
         )
         assert r.json()["sucesso"] is True

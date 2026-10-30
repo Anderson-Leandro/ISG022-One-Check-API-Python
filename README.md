@@ -48,7 +48,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
   - Notificações automáticas por e-mail/sistema para administradores e locatários (`NotificationService`).
 
 - **📊 Dashboard & Auditoria Avançada**:
-  - Métricas agregadas em tempo real (`/dashboard`): imóveis locados, checklists pendentes, problemas abertos e vistorias agendadas.
+  - Métricas agregadas em tempo real (`/dashboard`): imóveis locados, checklists pendentes, problemas abertos e vistorias agendadas, com o mesmo recorte por perfil das listagens. O valor vem `null` quando o perfil não acessa aquele dado (problemas para vistoriador e visualizador; agendamentos para locatário).
   - Central de auditoria (`GET /logs`) com IP de origem, usuário, ação, entidade e payload JSON sanitizado (senhas e segredos são automaticamente ocultados). Nas edições, o payload traz `{"campos": [...]}` com os nomes dos campos alterados, sem os valores.
   - Filtros avançados por data (`de`, `ate`), entidade e usuário.
 
@@ -66,7 +66,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | **Geocoding** | Nominatim (OpenStreetMap) + ViaCEP via `httpx` |
 | **Geração de PDF** | Motor PDF 1.4 Pure Python (sem dependências binárias C externas) |
 | **Dependências** | `requirements.txt` (diretas) + `requirements.lock` (todas, com hash) |
-| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (757 testes, 94% de cobertura) |
+| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (794 testes, 95% de cobertura) |
 | **CI / CD** | GitHub Actions (testes em PostgreSQL + auditoria de dependências com `pip-audit`; actions fixadas por SHA, token só leitura) |
 | **Container** | Docker (`python:3.12-slim`, usuário sem privilégio, só wheels) + Docker Compose com PostgreSQL |
 
@@ -120,6 +120,12 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 1. `POST /auth/login` → tokens direto (usuário sem MFA), ou `mfa_required` / `mfa_setup_required` com um `temp_token` (10 min) que só vale para o passo seguinte.
 2. `mfa_required` → `POST /auth/mfa/verify` com `{temp_token, codigo}`.
 3. `mfa_setup_required` → `GET /auth/mfa/setup-login` (segredo e QR code) e `POST /auth/mfa/activate-login` com o código. O segredo só passa a valer depois da ativação.
+
+### Política de senha
+Vale para senhas novas: `POST /usuarios`, `PUT /usuarios/{id}` (`senha`), `PUT /usuarios/me/senha` (`nova_senha`) e `PATCH /usuarios/me` (`senha_nova`).
+- Pelo menos 10 caracteres e no máximo 72 bytes (o limite do bcrypt; acentos ocupam 2 bytes).
+- Recusa senhas só com números e símbolos, senhas comuns mesmo com números e símbolos em volta (`Senha@2024`, `qwertyuiop`) e senhas com menos de 5 caracteres distintos.
+- Fora da regra → `422` no formato do FastAPI, com a mensagem em `detail[0].msg`. O login continua aceitando senhas cadastradas antes da política.
 
 ### Limite de tentativas
 5 falhas por conta ou 20 por IP em 15 minutos → `429`. Vale para login, MFA (`verify`, `activate-login`, `activate`, `desabilitar`) e para as rotas de `/usuarios/me` que pedem senha ou código.
@@ -222,7 +228,7 @@ GET    /api/v1/checklists/{id}/download    # Laudo em PDF; também /pdf e /downl
 ### 🛠️ Problemas & Linha do Tempo
 ```http
 GET    /api/v1/contratos/{id}/problemas    # Listar problemas (admin, gestor, locatário do contrato)
-POST   /api/v1/contratos/{id}/problemas    # Registrar ocorrência, JSON ou multipart com foto (admin, gestor, locatário do contrato)
+POST   /api/v1/contratos/{id}/problemas    # Registrar ocorrência, JSON ou multipart com foto (admin, gestor, locatário do contrato); nasce "aberto", outro status dá 422
 GET    /api/v1/problemas/{id}              # Detalhes da ocorrência (admin, gestor, locatário do contrato)
 PATCH  /api/v1/problemas/{id}/status       # Atualizar status (admin, gestor)
 GET    /api/v1/problemas/{id}/atualizacoes # Linha do tempo (admin, gestor, locatário do contrato)
@@ -231,7 +237,7 @@ POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (a
 
 ### 📊 Dashboard, Logs & Sistema
 ```http
-GET    /api/v1/dashboard                   # Métricas consolidadas em tempo real
+GET    /api/v1/dashboard                   # Métricas no recorte do perfil; null no que o perfil não acessa
 GET    /api/v1/logs                        # Logs de auditoria, com filtros e paginação (admin, gestor)
 GET    /api/v1/health                      # Health check da API (público)
 GET    /api/v1/uploads/{filename}          # Fotos enviadas (público, nome aleatório)
@@ -341,7 +347,7 @@ docker compose up -d --build
 
 ## 🧪 Executando os Testes Automatizados
 
-A suíte cobre os fluxos de negócio e as correções de segurança com **757 testes automatizados** e **94% de cobertura**:
+A suíte cobre os fluxos de negócio e as correções de segurança com **794 testes automatizados** e **95% de cobertura**:
 
 ```bash
 # Executar todos os testes

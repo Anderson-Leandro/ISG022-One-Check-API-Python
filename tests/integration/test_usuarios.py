@@ -289,7 +289,7 @@ class TestCreateUsuario:
     def test_admin_cria_usuario(self, client, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Novo User", "email": "novo@test.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "Novo User", "email": "novo@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -300,7 +300,7 @@ class TestCreateUsuario:
     def test_gestor_cria_usuario(self, client, token_gestor):
         r = client.post(
             BASE,
-            json={"nome": "User Gestor", "email": "usergestor@test.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "User Gestor", "email": "usergestor@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_gestor),
         )
         data = r.json()
@@ -309,7 +309,7 @@ class TestCreateUsuario:
     def test_email_duplicado_retorna_falha(self, client, user_locatario, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Duplicado", "email": user_locatario.email, "senha": "senha123", "role": "locatario"},
+            json={"nome": "Duplicado", "email": user_locatario.email, "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -319,7 +319,7 @@ class TestCreateUsuario:
     def test_role_admin_ativa_mfa_automaticamente(self, client, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Novo Admin", "email": "novoadmin@test.com", "senha": "senha123", "role": "admin"},
+            json={"nome": "Novo Admin", "email": "novoadmin@test.com", "senha": "Vistoria-Casa-42", "role": "admin"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -329,7 +329,7 @@ class TestCreateUsuario:
     def test_role_locatario_nao_ativa_mfa(self, client, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Loc Sem Mfa", "email": "locsemmfa@test.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "Loc Sem Mfa", "email": "locsemmfa@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -339,7 +339,7 @@ class TestCreateUsuario:
     def test_locatario_nao_pode_criar_usuario(self, client, token_locatario):
         r = client.post(
             BASE,
-            json={"nome": "X", "email": "x@x.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "X", "email": "x@x.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_locatario),
         )
         assert r.status_code == 403
@@ -347,7 +347,7 @@ class TestCreateUsuario:
     def test_sem_autenticacao_retorna_401(self, client):
         r = client.post(
             BASE,
-            json={"nome": "X", "email": "x@x.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "X", "email": "x@x.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
         )
         assert r.status_code == 401
 
