@@ -77,3 +77,10 @@ DOCS_ENABLED = _docs in ("1", "true", "yes") if _docs else IS_DEV
 RATE_LIMIT_FALHAS_CONTA = int(os.getenv("RATE_LIMIT_FALHAS_CONTA", "5"))
 RATE_LIMIT_FALHAS_IP = int(os.getenv("RATE_LIMIT_FALHAS_IP", "20"))
 RATE_LIMIT_JANELA_MIN = int(os.getenv("RATE_LIMIT_JANELA_MIN", "15"))
+
+# Retenção do log_operacao (tem IP e e-mail). O Marco Civil (art. 15) exige guardar
+# registros de acesso por 6 meses, então o mínimo é 180 dias
+LOG_RETENCAO_MIN_DIAS = 180
+LOG_RETENCAO_DIAS = int(os.getenv("LOG_RETENCAO_DIAS", "365"))
+if LOG_RETENCAO_DIAS < LOG_RETENCAO_MIN_DIAS:
+    raise RuntimeError(f"LOG_RETENCAO_DIAS precisa ser de pelo menos {LOG_RETENCAO_MIN_DIAS} dias (registros de acesso, Marco Civil art. 15).")

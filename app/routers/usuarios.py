@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.auditoria import campos_alterados
@@ -51,7 +52,7 @@ def _assert_pode_atribuir(current: Usuario, role: str) -> None:
 
 @router.get("/me")
 def me(user: Usuario = Depends(get_current_user)):
-    return ok(serialize_usuario(user))
+    return ok(serialize_usuario(user, cpf_completo=True))
 
 
 @router.patch("/me")
@@ -84,7 +85,7 @@ def update_me(
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "perfil", payload={"campos": alterados})
-    dados = serialize_usuario(user)
+    dados = serialize_usuario(user, cpf_completo=True)
     if body.senha_nova:
         dados["sessao"] = nova_sessao(db, user)
     return ok(dados)
@@ -139,7 +140,7 @@ def mfa_enable_me(
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "mfa_enable")
-    return ok({**serialize_usuario(user), "sessao": nova_sessao(db, user)})
+    return ok({**serialize_usuario(user, cpf_completo=True), "sessao": nova_sessao(db, user)})
 
 
 @router.delete("/me/mfa")
@@ -166,7 +167,7 @@ def mfa_disable_me(
     db.commit()
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "mfa_disable")
-    return ok({**serialize_usuario(user), "sessao": nova_sessao(db, user)})
+    return ok({**serialize_usuario(user, cpf_completo=True), "sessao": nova_sessao(db, user)})
 
 
 @router.get("")
@@ -194,7 +195,7 @@ def get_usuario(
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado")
-    return ok(serialize_usuario(user))
+    return ok(serialize_usuario(user, cpf_completo=True))
 
 
 @router.put("/{usuario_id}")
@@ -272,25 +273,13 @@ def delete_usuario(
     return ok(None)
 
 
-@router.post("/{usuario_id}/mfa/setup")
-def mfa_setup_usuario(
-    usuario_id: str,
-    db: Session = Depends(get_db),
-    current: Usuario = Depends(require_roles("admin", "gestor")),
-):
-    user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
-    if not user:
-        return fail("Usuário não encontrado")
-    _assert_pode_gerenciar(current, user)
-    secret = generate_mfa_secret()
-    return ok(mfa_provisioning_data(user.email, secret))
-
-
+# Não há setup de MFA para outro usuário: quem conhece o segredo gera os códigos.
+# Admin/gestor só exigem (enable) ou resetam o MFA; o segredo é criado no login do próprio usuário
 @router.post("/{usuario_id}/mfa/enable")
 @router.post("/{usuario_id}/mfa/habilitar")
 def mfa_enable_usuario(
     usuario_id: str,
-    body: MfaEnableRequest | None = None,
+    body: dict | None = Body(None),
     db: Session = Depends(get_db),
     current: Usuario = Depends(require_roles("admin", "gestor")),
 ):
@@ -298,14 +287,13 @@ def mfa_enable_usuario(
     if not user:
         return fail("Usuário não encontrado")
     _assert_pode_gerenciar(current, user)
+    if body and ("secret" in body or "codigo" in body):
+        msg = "O autenticador é configurado pelo próprio usuário no próximo login"
+        return JSONResponse(status_code=422, content={"sucesso": False, "erro": msg, "erros": {"secret": msg}})
 
-    if body and body.codigo:
-        if not verify_totp_code(body.secret, body.codigo):
-            return fail("Código MFA inválido")
-        user.mfa_secret = body.secret
+    if not user.mfa_enabled:
+        user.mfa_enabled = True
         encerrar_sessoes(db, user)
-
-    user.mfa_enabled = True
     db.commit()
     db.refresh(user)
     log_operacao(db, current.id, "update", "usuario", user.id, "mfa_enable")

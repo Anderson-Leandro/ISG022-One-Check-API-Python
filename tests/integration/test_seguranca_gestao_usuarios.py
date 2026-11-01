@@ -81,10 +81,6 @@ class TestGestorNaoEscala:
         assert r.status_code == 403
         assert _recarregar(db, user_admin).mfa_secret == MFA_TEST_SECRET
 
-    def test_gestor_nao_ve_setup_mfa_de_admin(self, client, user_admin, token_gestor):
-        r = client.post(f"{BASE}/{user_admin.id}/mfa/setup", headers=auth(token_gestor))
-        assert r.status_code == 403
-
     def test_gestor_nao_desativa_admin(self, client, db, user_admin, token_gestor):
         r = client.delete(f"{BASE}/{user_admin.id}", headers=auth(token_gestor))
         assert r.status_code == 403

@@ -155,7 +155,7 @@ def test_serialize_endereco_objeto_falsy_retorna_none():
 def test_serialize_usuario_contem_todos_campos():
     u = Usuario(
         nome="Ana", email="ana@test.com", role="admin",
-        senha_hash="h", mfa_enabled=True, mfa_secret="SECRET", cpf="000.000.000-00",
+        senha_hash="h", mfa_enabled=True, mfa_secret="SECRET", cpf="529.982.247-25",
     )
     result = serialize_usuario(u)
     assert set(result.keys()) == {

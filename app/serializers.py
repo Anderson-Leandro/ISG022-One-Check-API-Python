@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.auditoria import ip_atual
 from app.config import PUBLIC_BASE_URL
+from app.cpf import mascarar_cpf
 from typing import Any
 from app.models import (
     AceiteChecklist,
@@ -180,13 +181,14 @@ def serialize_agendamento(ag) -> dict:
     }
 
 
-def serialize_usuario(u: Usuario) -> dict:
+def serialize_usuario(u: Usuario, cpf_completo: bool = False) -> dict:
+    """cpf_completo só para o próprio usuário e o detalhe visto por admin/gestor; nas demais respostas vai mascarado."""
     return {
         "id": u.id,
         "nome": u.nome,
         "email": u.email,
         "role": u.role,
-        "cpf": u.cpf,
+        "cpf": u.cpf if cpf_completo else mascarar_cpf(u.cpf),
         "mfa_enabled": bool(u.mfa_enabled),
         "mfa_configurado": bool(u.mfa_secret),
         "mfa_ativo": bool(u.mfa_enabled and u.mfa_secret),

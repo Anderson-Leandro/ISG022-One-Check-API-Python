@@ -66,7 +66,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | **Geocoding** | Nominatim (OpenStreetMap) + ViaCEP via `httpx` |
 | **Geração de PDF** | Motor PDF 1.4 Pure Python (sem dependências binárias C externas) |
 | **Dependências** | `requirements.txt` (diretas) + `requirements.lock` (todas, com hash) |
-| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (794 testes, 95% de cobertura) |
+| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (824 testes, 95% de cobertura) |
 | **CI / CD** | GitHub Actions (testes em PostgreSQL + auditoria de dependências com `pip-audit`; actions fixadas por SHA, token só leitura) |
 | **Container** | Docker (`python:3.12-slim`, usuário sem privilégio, só wheels) + Docker Compose com PostgreSQL |
 
@@ -174,11 +174,12 @@ POST   /api/v1/usuarios                    # Criar usuário (admin, gestor; só 
 GET    /api/v1/usuarios/{id}               # Detalhes de usuário (admin, gestor)
 PUT    /api/v1/usuarios/{id}               # Atualizar usuário; não aceita o próprio id (admin, gestor)
 DELETE /api/v1/usuarios/{id}               # Exclusão lógica (admin, gestor)
-POST   /api/v1/usuarios/{id}/mfa/setup     # Gera segredo para o usuário (admin, gestor)
-POST   /api/v1/usuarios/{id}/mfa/enable    # Define o segredo do usuário; também /habilitar (admin, gestor)
+POST   /api/v1/usuarios/{id}/mfa/enable    # Exige o MFA; o usuário configura o autenticador no próximo login; também /habilitar (admin, gestor)
 DELETE /api/v1/usuarios/{id}/mfa           # Reset do MFA; também POST /desabilitar (admin, gestor)
 ```
 Gestor não age sobre contas `admin`/`gestor`. Toda mudança de credencial feita aqui encerra as sessões do usuário afetado.
+- **MFA de outro usuário:** admin e gestor só exigem ou resetam o MFA. O segredo é gerado no login do próprio usuário (`mfa_setup_required`); enviar `secret` ou `codigo` em `/{id}/mfa/enable` dá `422`.
+- **CPF:** vem completo só em `/usuarios/me` e em `GET /usuarios/{id}`; nas demais respostas (listagem, criação, edição, MFA), mascarado como `***.982.247-**`. No cadastro, aceita com ou sem pontuação, recusa CPF inválido com `422` e grava como `000.000.000-00`.
 
 ### 🏠 Imóveis & Cômodos
 ```http
@@ -315,9 +316,13 @@ SEED_SECRET=
 # Tamanho máximo do corpo: uploads (MB) e demais requisições, como JSON (KB)
 # MAX_UPLOAD_MB=10
 # MAX_BODY_KB=1024
+# Dias de log_operacao guardados (mínimo 180, registros de acesso do Marco Civil)
+# LOG_RETENCAO_DIAS=365
 ```
 
 No Render, defina `CORS_ORIGINS` com a URL do front (o `render.yaml` deixa o valor para o painel).
+
+A cada start, o `start.sh` apaga os refresh tokens vencidos e os eventos de `log_operacao` com mais de `LOG_RETENCAO_DIAS` dias. Se a instância fica muito tempo no ar sem reiniciar, agende também `python scripts/limpar_dados_vencidos.py` (Render Cron Job ou cron do host).
 
 ### Dados de demonstração (seed)
 - Em `APP_ENV=development`, o `start.sh` popula o banco vazio com as contas `@onecheck.local` e credenciais fixas, exibidas pelo `python scripts/seed.py`.
@@ -347,7 +352,7 @@ docker compose up -d --build
 
 ## 🧪 Executando os Testes Automatizados
 
-A suíte cobre os fluxos de negócio e as correções de segurança com **794 testes automatizados** e **95% de cobertura**:
+A suíte cobre os fluxos de negócio e as correções de segurança com **824 testes automatizados** e **95% de cobertura**:
 
 ```bash
 # Executar todos os testes
@@ -369,9 +374,11 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
 
 ```
 ├── app/
+│   ├── auditoria.py             # IP de origem e campos alterados no log de auditoria
 │   ├── auth.py                  # JWT, Bcrypt, TOTP MFA e revogação de sessões
 │   ├── cabecalhos.py            # Cabeçalhos de segurança em todas as respostas
 │   ├── config.py                # Configurações e variáveis de ambiente
+│   ├── cpf.py                   # Validação e máscara de CPF
 │   ├── database.py              # Conexão SQLAlchemy e migração incremental
 │   ├── deps.py                  # Autenticação, roles (RBAC) e regras de acesso por recurso
 │   ├── geocoding.py             # Módulo de integração OpenStreetMap e ViaCEP
@@ -381,8 +388,10 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
 │   ├── notification_service.py  # Serviço de notificações para admins e locatários
 │   ├── pdf_generator.py         # Motor de renderização de Laudos em PDF (Pure Python)
 │   ├── rate_limit.py            # Limite de tentativas falhas por conta e por IP
+│   ├── retencao.py              # Limpeza de refresh tokens vencidos e logs antigos
 │   ├── schemas.py               # Schemas Pydantic, DTOs e envelopes de resposta
 │   ├── seed_service.py          # Carga de dados de demonstração e rotação de credenciais
+│   ├── senhas.py                # Política de senha
 │   ├── serializers.py           # Serializadores de dados e registro de auditoria
 │   ├── uploads.py               # Validação e gravação segura de imagens
 │   └── routers/                 # Roteadores modulares organizados por recurso
@@ -399,7 +408,7 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
 ├── docs/
 │   ├── architecture/            # Arquitetura e fronteiras de confiança
 │   └── security/                # Auditoria, modelo de ameaças e relatórios de correção
-├── scripts/                     # Seed, rotação de credenciais e utilitários de carga
+├── scripts/                     # Seed, rotação de credenciais, limpeza de dados vencidos e utilitários de carga
 ├── requirements.txt             # Dependências diretas
 ├── requirements.lock            # Todas as dependências, com hash (instalação)
 └── tests/

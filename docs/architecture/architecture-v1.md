@@ -1,6 +1,6 @@
 # Arquitetura do Sistema e Fronteiras de Confiança (v1)
 
-_Última atualização: 2026-10-30, depois das correções de segurança SEC-001 a SEC-013 e SEC-016. Os detalhes de cada controle e os riscos ainda abertos estão em [`docs/security/`](../security/threat-model.md)._
+_Última atualização: 2026-10-30, depois das correções de segurança SEC-001 a SEC-016. Os detalhes de cada controle e os riscos ainda abertos estão em [`docs/security/`](../security/threat-model.md)._
 
 ## 1. Contexto e Domínio do Sistema
 
@@ -83,11 +83,11 @@ flowchart TD
 | Fronteira | Descrição | Nível de Risco | Controles Implementados |
 |---|---|---|---|
 | **FC-01: Internet ➔ Backend** | Ponto de entrada de requisições públicas de navegadores, apps e atacantes. | **Alto** | - TLS/HTTPS terminado no proxy do Render; HSTS fora de desenvolvimento.<br>- CORS restrito às origens de `CORS_ORIGINS`, sem credenciais.<br>- Limite de tamanho do corpo antes do roteamento (`413`).<br>- Validação estrita de schema e tipos com Pydantic.<br>- Autenticação JWT (HS256, PyJWT) com access token de 60 min e refresh token rotativo de 30 dias.<br>- Fluxo de MFA (TOTP) obrigatório para `admin`, `gestor` e `vistoriador`, com setup bloqueante no login.<br>- Limite de tentativas falhas por conta e por IP (`429` com `Retry-After`).<br>- Senhas novas com 10+ caracteres, até 72 bytes e sem padrões comuns.<br>- Documentação interativa (`/docs`, `/openapi.json`) desligada em produção. |
-| **FC-02: Backend ➔ Banco de Dados / Storage** | Acesso às tabelas relacionais, credenciais protegidas e arquivos de mídia. | **Crítico** | - ORM SQLAlchemy com consultas parametrizadas (proteção contra SQL Injection).<br>- Senhas hasheadas via Bcrypt com salt aleatório.<br>- Segredo MFA novo fica pendente (`mfa_secret_pendente`) até um código válido confirmar.<br>- Uploads só JPEG, PNG e WebP, validados pelo conteúdo, com nome aleatório e servidos com `nosniff` e CSP `sandbox`.<br>- Soft delete com flag `ativo` impedindo perda acidental de dados.<br>- Tabela de auditoria `log_operacao` gravada a cada escrita. |
+| **FC-02: Backend ➔ Banco de Dados / Storage** | Acesso às tabelas relacionais, credenciais protegidas e arquivos de mídia. | **Crítico** | - ORM SQLAlchemy com consultas parametrizadas (proteção contra SQL Injection).<br>- Senhas hasheadas via Bcrypt com salt aleatório.<br>- Segredo MFA novo fica pendente (`mfa_secret_pendente`) até um código válido confirmar.<br>- Uploads só JPEG, PNG e WebP, validados pelo conteúdo, com nome aleatório e servidos com `nosniff` e CSP `sandbox`.<br>- Soft delete com flag `ativo` impedindo perda acidental de dados.<br>- Tabela de auditoria `log_operacao` gravada a cada escrita e guardada por `LOG_RETENCAO_DIAS` (padrão 365, mínimo 180); refresh tokens vencidos apagados a cada start.<br>- O segredo TOTP é gerado no login do próprio usuário; admin e gestor só exigem ou resetam o MFA. |
 | **FC-03: Backend ➔ APIs Externas (ViaCEP / Nominatim)** | Saída de requisições do backend para serviços de terceiros para enriquecimento de endereço. | **Médio** | - Requisições com timeout curto e explícito (5 segundos).<br>- Tratamento de exceções com fallback gracioso (Fail-safe: não quebra a requisição caso a API externa esteja fora).<br>- User-Agent customizado e sanitização rigorosa de parâmetros de busca. |
 
 **Limitações conhecidas** (detalhes no [modelo de ameaças](../security/threat-model.md)):
-- O CPF fica em texto no banco e volta em toda resposta de usuário (SEC-014). O segredo TOTP também fica em texto no banco.
+- O CPF e o segredo TOTP ficam em texto no banco. O CPF é validado no cadastro e só vai completo ao próprio usuário e ao detalhe visto por admin/gestor (SEC-014).
 - O log de auditoria fica no mesmo banco e pode ser alterado por quem tem acesso direto a ele (não é append-only).
 - As fotos em `/uploads` são públicas para quem tem a URL (T-14).
 

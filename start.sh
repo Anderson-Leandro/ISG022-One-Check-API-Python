@@ -12,4 +12,7 @@ case "${APP_ENV,,}" in
     ;;
 esac
 
+# Refresh tokens vencidos e logs além de LOG_RETENCAO_DIAS (SEC-014). Uma falha não impede o start
+python scripts/limpar_dados_vencidos.py || echo "Aviso: limpeza de dados vencidos falhou" >&2
+
 exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT"

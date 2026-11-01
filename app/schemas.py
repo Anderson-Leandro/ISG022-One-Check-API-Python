@@ -3,12 +3,14 @@ from typing import Annotated, Any, Generic, TypeVar
 
 from pydantic import AfterValidator, BaseModel, Field
 
+from app.cpf import validar_cpf
 from app.senhas import validar_senha
 
 T = TypeVar("T")
 
 # Senha nova (criação e troca). O login aceita a senha já cadastrada, mesmo fora da política
 SenhaNova = Annotated[str, AfterValidator(validar_senha)]
+Cpf = Annotated[str | None, AfterValidator(validar_cpf)]
 
 
 class Paginacao(BaseModel):
@@ -110,7 +112,7 @@ class UsuarioCreate(BaseModel):
     email: str
     senha: SenhaNova
     role: str
-    cpf: str | None = None
+    cpf: Cpf = None
 
 
 class UsuarioUpdateMe(BaseModel):

@@ -202,8 +202,8 @@ class TestUsuarioCreate:
         assert u.cpf is None
 
     def test_cpf_preenchido(self):
-        u = UsuarioCreate(nome="A", email="a@b.com", senha="Kq8#vT2!mZ", role="locatario", cpf="000.000.000-00")
-        assert u.cpf == "000.000.000-00"
+        u = UsuarioCreate(nome="A", email="a@b.com", senha="Kq8#vT2!mZ", role="locatario", cpf="52998224725")
+        assert u.cpf == "529.982.247-25"
 
 
 class TestUsuarioUpdateMe:

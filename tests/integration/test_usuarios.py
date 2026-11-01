@@ -10,7 +10,6 @@ Rotas cobertas:
   GET    /api/v1/usuarios
   GET    /api/v1/usuarios/{id}
   PUT    /api/v1/usuarios/{id}
-  POST   /api/v1/usuarios/{id}/mfa/setup
   POST   /api/v1/usuarios/{id}/mfa/enable
   DELETE /api/v1/usuarios/{id}/mfa
   POST   /api/v1/usuarios
@@ -352,29 +351,21 @@ class TestCreateUsuario:
         assert r.status_code == 401
 
 
-# ── POST /usuarios/{id}/mfa/setup e enable e DELETE /mfa ─────────────────────────
+# ── POST /usuarios/{id}/mfa/enable e DELETE /mfa ─────────────────────────────────
 
 class TestMfaAdminRoutes:
-    def test_admin_faz_setup_mfa_de_usuario(self, client, user_locatario, token_admin):
-        r = client.post(f"{BASE}/{user_locatario.id}/mfa/setup", headers=auth(token_admin))
-        data = r.json()
-        assert data["sucesso"] is True
-        assert "secret" in data["dados"]
-
-    def test_setup_usuario_inexistente(self, client, token_admin):
-        r = client.post(f"{BASE}/id-invalido/mfa/setup", headers=auth(token_admin))
+    def test_enable_usuario_inexistente(self, client, token_admin):
+        r = client.post(f"{BASE}/id-invalido/mfa/enable", headers=auth(token_admin))
         data = r.json()
         assert data["sucesso"] is False
 
     def test_admin_habilita_mfa_de_usuario(self, client, user_locatario, token_admin):
-        r = client.post(
-            f"{BASE}/{user_locatario.id}/mfa/enable",
-            json={"secret": MFA_TEST_SECRET, "codigo": totp_now()},
-            headers=auth(token_admin),
-        )
+        # SEC-015: sem segredo; o próprio usuário configura o autenticador
+        r = client.post(f"{BASE}/{user_locatario.id}/mfa/enable", headers=auth(token_admin))
         data = r.json()
         assert data["sucesso"] is True
-        assert data["dados"]["mfa_ativo"] is True
+        assert data["dados"]["mfa_enabled"] is True
+        assert data["dados"]["mfa_configurado"] is False
 
     def test_admin_reseta_mfa_de_usuario(self, client, user_vistoriador, token_admin):
         # user_vistoriador já tem MFA configurado; o próprio MFA não se reseta por esta rota

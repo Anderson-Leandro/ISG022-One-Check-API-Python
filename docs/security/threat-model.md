@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-10-30 (auditoria de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-013 e SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md) e [011 e 012](correcao-sec-011-012-2026-10-30.md))_
+_Última atualização: 2026-10-30 (auditoria de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md), [011 e 012](correcao-sec-011-012-2026-10-30.md) e [014 e 015](correcao-sec-014-015-2026-10-30.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -74,7 +74,7 @@ flowchart LR
 | T-08 | Checklists | E/T | Locatário cria e aprova a própria vistoria | Integridade | criação só admin/gestor; separação de deveres (N3) | Mitigada | — |
 | T-09 | Contratos / Imóveis | I | Vistoriador lê qualquer contrato/imóvel pelo ID | Confidencialidade | `assert_acesso_contrato` / `assert_acesso_imovel` (`app/deps.py`) | Mitigada (visualizador com leitura global, a decidir) | SEC-004 |
 | T-10 | Problemas | I | BOLA por ID | Confidencialidade | `assert_acesso_problemas` (item 6) | Mitigada | — |
-| T-11 | Usuários | I | Listagem de usuários com CPF para qualquer perfil | Confidencialidade | restrito a admin/gestor (item 2) | Parcial (CPF segue nas respostas) | SEC-014 |
+| T-11 | Usuários | I | Listagem de usuários com CPF para qualquer perfil | Confidencialidade (LGPD) | restrito a admin/gestor (item 2); CPF mascarado fora de `/me` e do detalhe (`app/cpf.py`); retenção de logs e tokens (`app/retencao.py`) | Mitigada (CPF em texto no banco) | SEC-014 |
 | T-12 | Uploads | T/E | Arquivo malicioso explora o decoder de imagem | Integridade | Pillow 13; assinatura antes do parser; `formats` restrito; limite de pixels (`app/uploads.py`) | Mitigada | SEC-002 |
 | T-13 | Uploads | T | XSS armazenado via HTML/SVG servido pela API | Integridade | validação de conteúdo + `nosniff` + CSP (N7) | Mitigada | — |
 | T-14 | Uploads / download | I | Fotos de vistoria acessíveis sem login | Confidencialidade (LGPD) | nomes aleatórios de 128 bits | Aceita? (decisão pendente) | — |
@@ -83,7 +83,7 @@ flowchart LR
 | T-17 | Problemas | T | Locatário abre problema já "fechado" | Integridade | o problema nasce `aberto`; outro status no corpo dá `422` (`contratos.py`) | Mitigada | SEC-012 |
 | T-24 | Dashboard | I | Qualquer perfil vê totais de toda a operação | Confidencialidade | mesmo recorte das listagens por perfil; `null` no que o perfil não acessa (`dashboard.py`) | Mitigada | SEC-012 |
 | T-18 | Auditoria | R | Ações sem IP e sem os campos alterados | Não-repúdio | `log_operacao` em todas as escritas, com IP de origem (`app/auditoria.py`) e nomes dos campos alterados | Mitigada (log não é append-only) | SEC-010 |
-| T-19 | MFA por admin | R | Admin define o TOTP de outro usuário e age em nome dele | Não-repúdio | reset separado do setup (parcial) | **Aberta** | SEC-015 |
+| T-19 | MFA por admin | R | Admin define o TOTP de outro usuário e age em nome dele | Não-repúdio | sem setup de MFA para terceiros; o segredo é gerado no login do próprio usuário; admin só exige ou reseta (`usuarios.py`) | Mitigada (admin ainda define a senha de outro usuário) | SEC-015 |
 | T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | PyJWT no lugar do python-jose; `requirements.lock` com hashes, instalado com `--require-hashes`; `pip-audit` no CI | Mitigada | SEC-006 |
 | T-21 | Repositório | I | Banco e seed publicados no GitHub | Confidencialidade | `onecheck.db` fora do índice (o histórico só tem dados de seed); credenciais do seed só em desenvolvimento | Mitigada (falta a rotação em produção) | SEC-001, SEC-009 |
 | T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie); CORS só para `CORS_ORIGINS`, sem credenciais; `/docs` desligado em produção; `no-store`, `nosniff`, HSTS | Mitigada (depende de `CORS_ORIGINS` no Render) | SEC-007 |
