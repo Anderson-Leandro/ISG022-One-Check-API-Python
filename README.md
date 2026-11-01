@@ -284,7 +284,7 @@ pip install -r requirements-test.txt
 Para adicionar ou mudar uma dependência, edite `requirements.txt` e regenere o lockfile com o comando do cabeçalho de `requirements.lock` (usa o [`uv`](https://docs.astral.sh/uv/)). O teste `test_lockfile_coerente_com_requirements` falha se os dois arquivos divergirem.
 
 ### 4. Configurar Variáveis de Ambiente (`.env`)
-Crie um arquivo `.env` na raiz do projeto:
+Copie o exemplo e preencha: `cp .env.example .env`. O `.env.example` traz todas as variáveis; as principais:
 ```env
 # Sem APP_ENV, vale a regra de produção: a API não sobe sem JWT_SECRET forte.
 # Em desenvolvimento, APP_ENV=development dispensa o JWT_SECRET (gera um aleatório por execução).
@@ -341,6 +341,8 @@ Documentação Swagger interativa (desenvolvimento ou `DOCS_ENABLED=true`): `htt
 # .env com JWT_SECRET (32+ caracteres) e POSTGRES_PASSWORD
 docker compose up -d --build
 ```
+- O projeto do Compose se chama `api-python` (fixo no `docker-compose.yml`): os volumes são `api-python_pgdata` e `api-python_uploads`, seja qual for o nome da pasta.
+- O container da API roda sem nenhuma capability do Linux (`cap_drop: ALL`) e com `no-new-privileges`.
 - A API roda como o usuário `app` (uid 10001), sem privilégio: o código é só leitura e apenas `/app/uploads` é gravável.
 - **Volume de uploads criado antes dessa mudança:** ele pertence ao root, e os uploads falham com `Permission denied`. Corrija uma única vez:
   ```bash

@@ -1,0 +1,38 @@
+# Ambiente e cache Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Bancos locais e uploads
+*.db
+uploads/
+
+# Segredos
+.env
+.env.*
+
+# Git, CI e editores
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+
+# Testes e documentação
+tests/
+docs/
+requirements-test.txt
+pytest.ini
+PLANO_TESTES.md
+README.md
+
+# Configuração de deploy/docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+render.yaml
+start.ps1
