@@ -1,0 +1,3353 @@
+version: 1
+items:
+- id: EP-001
+  type: epic
+  title: Identidade e Acesso
+  epic: null
+  story: ''
+  description: Cadastro, autenticação JWT, MFA, sessões e gestão de usuários com RBAC (E-01 do docs/product-backlog.md).
+  acceptance_criteria: []
+  priority: must
+  rank: 1000
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F3
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP API2:2023
+    - OWASP A07:2021
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: EP-002
+  type: epic
+  title: Carteira Imobiliária
+  epic: null
+  story: ''
+  description: Imóveis, endereços, cômodos, geocoding e ciclo de vida da propriedade (E-02).
+  acceptance_criteria: []
+  priority: must
+  rank: 1010
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F3
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: EP-003
+  type: epic
+  title: Contratos e Agendamentos
+  epic: null
+  story: ''
+  description: Locação, vínculo locatário–imóvel e agendamento de vistorias (E-03).
+  acceptance_criteria: []
+  priority: must
+  rank: 1020
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F3
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: EP-004
+  type: epic
+  title: Vistorias e Laudos
+  epic: null
+  story: ''
+  description: Checklists, fotos, aceite/rejeição e emissão de laudo em PDF (E-04).
+  acceptance_criteria: []
+  priority: must
+  rank: 1030
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - STRIDE:T
+    - OWASP API1:2023
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: EP-005
+  type: epic
+  title: Ocorrências e Comunicação
+  epic: null
+  story: ''
+  description: Problemas, linha do tempo, anexos e notificações (E-05).
+  acceptance_criteria: []
+  priority: should
+  rank: 1040
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: EP-006
+  type: epic
+  title: Auditoria, Segurança e Conformidade
+  epic: null
+  story: ''
+  description: Autorização por recurso, logs de auditoria, hardening, LGPD e correções das auditorias de segurança
+    (E-06). Recebe os achados da skill security-audit.
+  acceptance_criteria: []
+  priority: must
+  rank: 1050
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP Top 10
+    - OWASP API Top 10
+    - LGPD
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: EP-007
+  type: epic
+  title: Fundação e Qualidade
+  epic: null
+  story: ''
+  description: Processo, documentação, lint, dependências, releases e contrato da API (lacunas do diagnóstico de
+    maturidade).
+  acceptance_criteria: []
+  priority: should
+  rank: 1060
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F0
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: EP-008
+  type: epic
+  title: Operação e Deploy
+  epic: null
+  story: ''
+  description: Render, Docker Compose, configuração de produção, backup e rotinas de manutenção.
+  acceptance_criteria: []
+  priority: must
+  rank: 1070
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP A05:2021
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-001
+  type: security
+  title: '[SEC-001] Seed automático cria admin com senha e segredo MFA públicos'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: critical
+    Locais: start.sh:8, scripts/seed.py:25, scripts/seed.py:36, app/seed_service.py:25, app/seed_service.py:290, app/seed_service.py:364
+    Cenário: O repositório é público. Todo start do container (Render e Docker) roda scripts/seed.py; em banco vazio ele cria admin@onecheck.local com senha conhecida e mfa_secret fixo. O atacante faz POST /auth/login com a senha do código, gera o TOTP com o segredo público e recebe um access_token de admin.
+    Impacto: Tomada completa da API (todos os dados pessoais, contratos e vistorias) por anônimo pela internet. Probabilidade alta (técnica trivial, credenciais no repositório público) × impacto alto. A confirmar em produção: se as contas de seed ainda existem com a senha original (não testado contra o ambiente real).
+    Recomendação: Remover a chamada do seed do start.sh (o bootstrap já é coberto por /admin/seed com SEED_SECRET). Em produção, gerar senha aleatória e não definir mfa_secret (o usuário configura no primeiro login, fluxo mfa_setup). Verificar agora em produção se admin@onecheck.local, gestor, vistoriadores e locatários de seed existem; se sim, trocar senha e resetar MFA (ou desativar as contas) e revogar refresh tokens.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: must
+  rank: 1080
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP A07:2021
+    - CWE-798
+    - STRIDE:S
+    - STRIDE:E
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-001
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit f009847 fix(seguranca): seed sem credenciais públicas (SEC-001), decoders do Pillow (SEC-002) e limite
+    de corpo (SEC-003)'
+  - docs/security/correcao-sec-001-002-003-2026-10-25.md
+  - tests/integration/test_seguranca_seed_credenciais.py
+  - tests/integration/test_seguranca_decoders_imagem.py
+  - tests/integration/test_seguranca_limite_corpo.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-25'
+    status: done
+- id: SEC-002
+  type: security
+  title: '[SEC-002] Pillow 11.1.0 com CVEs críticas e Image.open aceita qualquer formato do upload'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: high
+    Locais: app/uploads.py:25, requirements.txt:11
+    Cenário: Um locatário autenticado envia como 'foto' de problema um arquivo PSD, TIFF, FITS ou JPEG2000 malicioso. Image.open testa todos os plugins de formato antes de o código checar se é JPEG/PNG/WebP, e o decoder vulnerável processa o arquivo (ex.: CVE-2026-42311, execução de código via PSD; CVE-2026-25990, escrita fora dos limites; dezenas de DoS).
+    Impacto: Execução de código ou queda do processo da API por qualquer usuário que possa enviar foto (locatário, vistoriador, admin). Probabilidade média (exige conta) × impacto alto.
+    Recomendação: Atualizar para pillow>=13.0.0 e restringir o parser: Image.open(buf, formats=["JPEG", "PNG", "WEBP"]). Conferir a assinatura (magic bytes) antes de abrir e definir Image.MAX_IMAGE_PIXELS explicitamente.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: must
+  rank: 1090
+  estimate: 2
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP A06:2021
+    - CWE-1395
+    - STRIDE:E
+    - STRIDE:D
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-002
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit f009847 fix(seguranca): seed sem credenciais públicas (SEC-001), decoders do Pillow (SEC-002) e limite
+    de corpo (SEC-003)'
+  - docs/security/correcao-sec-001-002-003-2026-10-25.md
+  - tests/integration/test_seguranca_seed_credenciais.py
+  - tests/integration/test_seguranca_decoders_imagem.py
+  - tests/integration/test_seguranca_limite_corpo.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-25'
+    status: done
+- id: SEC-003
+  type: security
+  title: '[SEC-003] DoS anônimo: multipart processado antes da autenticação, sem limite de corpo e com dependências
+    vulneráveis'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: high
+    Locais: app/routers/checklists.py:217, app/routers/checklists.py:244, requirements.txt:8, requirements.txt:1
+    Cenário: Sem token, o atacante envia POST /checklists/x/itens/y/fotos com multipart de vários GB (ou com milhares de partes/cabeçalhos). O FastAPI interpreta e grava o corpo em arquivo temporário antes de responder 401 (verificado: um upload anônimo de 5 MB foi processado e só então recebeu 401). Repetido em paralelo, enche o disco e consome CPU. CVEs de DoS no python-multipart (CVE-2026-42561, CVE-2026-53539) e no Starlette (FileResponse com Range, CVE-2025-62727, alcançável pelo GET /uploads público) somam-se ao vetor.
+    Impacto: Indisponibilidade da API por anônimo. Probabilidade alta × impacto médio (degradação/queda, sem perda de dados).
+    Recomendação: Limitar o tamanho do corpo antes do roteamento (middleware que recusa Content-Length acima de MAX_UPLOAD_MB e corta corpos em streaming, além do limite no proxy). Atualizar python-multipart>=0.0.31 e FastAPI para uma versão com Starlette >= 0.49.1. Nas rotas de upload, fazer a autenticação como dependência de router e ler o arquivo em blocos, interrompendo ao passar do limite.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: must
+  rank: 1100
+  estimate: 2
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP API4:2023
+    - CWE-770
+    - STRIDE:D
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-003
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit f009847 fix(seguranca): seed sem credenciais públicas (SEC-001), decoders do Pillow (SEC-002) e limite
+    de corpo (SEC-003)'
+  - docs/security/correcao-sec-001-002-003-2026-10-25.md
+  - tests/integration/test_seguranca_seed_credenciais.py
+  - tests/integration/test_seguranca_decoders_imagem.py
+  - tests/integration/test_seguranca_limite_corpo.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-25'
+    status: done
+- id: SEC-004
+  type: security
+  title: '[SEC-004] Leitura por ID ignora o vínculo do vistoriador (contratos, agendamentos, imóveis)'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: medium
+    Locais: app/routers/contratos.py:129, app/routers/contratos.py:209, app/routers/imoveis.py:134, app/routers/imoveis.py:210, app/routers/imoveis.py:257
+    Cenário: As listagens (contratos.py:51, imoveis.py:68-78) restringem o vistoriador aos contratos/imóveis em que tem checklist, mas GET /contratos/{id}, /contratos/{id}/agendamentos, /imoveis/{id}, /imoveis/{id}/endereco e /imoveis/{id}/comodos só restringem o locatário. Um vistoriador lê valor do aluguel, locatário, datas e endereço de qualquer contrato pelo ID.
+    Impacto: Vazamento limitado de dados de negócio e de endereço a um usuário autenticado (mesmo padrão do item 6, corrigido em problemas). Probabilidade média × impacto médio.
+    Recomendação: Um helper por recurso (como assert_acesso_problemas) aplicado igualmente à lista e ao acesso por ID; para o vistoriador, exigir Checklist.vistoriador_id == user.id no contrato. Definir com o negócio o alcance do perfil visualizador, que hoje lê tudo.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: should
+  rank: 1110
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    - CWE-639
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-004
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 210181d fix(seguranca): acesso por ID do vistoriador (SEC-004) e revogação de sessões na troca de credencial
+    (SEC-005)'
+  - docs/security/correcao-sec-004-005-2026-10-25.md
+  - tests/integration/test_seguranca_acesso_vistoriador.py
+  - tests/integration/test_seguranca_revogacao_sessoes.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-25'
+    status: done
+- id: SEC-005
+  type: security
+  title: '[SEC-005] Troca de senha e reset de MFA não revogam as sessões existentes'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: medium
+    Locais: app/routers/usuarios.py:76, app/routers/usuarios.py:98, app/routers/usuarios.py:226, app/auth.py:80
+    Cenário: Um atacante obtém a sessão da vítima (token roubado). A vítima, ou o admin, troca a senha e reseta o MFA. O refresh token do atacante continua gerando access tokens por até 30 dias, porque verify_refresh_token só confere hash, validade e usuário ativo.
+    Impacto: A resposta a incidente não corta o acesso do atacante. Probabilidade média (exige token roubado) × impacto médio.
+    Recomendação: Ao trocar a senha (pelo próprio usuário ou pelo admin), resetar o MFA ou mudar o perfil: apagar todos os RefreshToken do usuário e incluir no JWT uma versão de credencial (ex.: token_version) conferida em get_current_user. Considerar reduzir JWT_REFRESH_DAYS e detectar reuso de refresh token rotacionado.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: should
+  rank: 1120
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A07:2021
+    - CWE-613
+    - STRIDE:S
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-005
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 210181d fix(seguranca): acesso por ID do vistoriador (SEC-004) e revogação de sessões na troca de credencial
+    (SEC-005)'
+  - docs/security/correcao-sec-004-005-2026-10-25.md
+  - tests/integration/test_seguranca_acesso_vistoriador.py
+  - tests/integration/test_seguranca_revogacao_sessoes.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-25'
+    status: done
+- id: SEC-006
+  type: security
+  title: '[SEC-006] Outras dependências com CVEs e sem lockfile (dependências transitivas não verificadas)'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: medium
+    Locais: requirements.txt:6, requirements.txt:10, requirements.txt:12
+    Cenário: python-jose 3.3.0 tem CVEs críticas de confusão de algoritmo (CVE-2024-33663, CVE-2026-85394), mas a API usa só HS256 com algorithms fixo, então não são alcançáveis hoje. As CVEs do cryptography (PKCS#7, curvas SECT, X.509) também não estão no caminho de uso. Sem lockfile, Starlette, uvicorn, h11 e outras dependências transitivas não foram analisadas pelos scanners.
+    Impacto: Hoje sem exploração conhecida no uso atual; risco de regressão silenciosa e de CVEs transitivas não detectadas. Média pela regra 'CVE alta sem exploit no uso atual'.
+    Recomendação: Migrar de python-jose (sem manutenção ativa) para PyJWT; atualizar cryptography>=50, python-dotenv>=1.2.2 e pytest. Gerar lockfile com hashes (pip-tools/uv: requirements.lock) e rodar osv-scanner/trivy no CI.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: should
+  rank: 1130
+  estimate: 2
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A06:2021
+    - CWE-1104
+    - STRIDE:T
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-006
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 35c7f46 fix(seguranca): PyJWT e lockfile com hashes (SEC-006), CORS, /docs e cabeçalhos de segurança
+    (SEC-007)'
+  - docs/security/correcao-sec-006-007-2026-10-25.md
+  - tests/unit/test_seguranca_dependencias_jwt.py
+  - tests/integration/test_seguranca_cabecalhos_http.py
+  created: '2026-11-02'
+  updated: '2026-10-26'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-26'
+    status: done
+- id: SEC-007
+  type: security
+  title: '[SEC-007] Hardening HTTP: CORS * com credenciais, /docs público e sem cabeçalhos de segurança'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/main.py:40, app/config.py:65, render.yaml:30
+    Cenário: Qualquer site pode chamar a API pelo navegador do usuário e ler as respostas. O impacto é baixo porque a autenticação é por header Bearer (não há credencial automática), mas qualquer adoção futura de cookies vira CSRF/roubo de dados imediato. /docs e /openapi.json mapeiam toda a superfície para o atacante.
+    Impacto: Baixo hoje; vira alto se a autenticação passar a usar cookies.
+    Recomendação: CORS_ORIGINS com a lista explícita de origens do front e allow_credentials=False; desabilitar /docs e /openapi.json em produção (ou protegê-los); adicionar HSTS, X-Content-Type-Options e Cache-Control: no-store nas respostas autenticadas.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1140
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API8:2023
+    - CWE-942
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-007
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 35c7f46 fix(seguranca): PyJWT e lockfile com hashes (SEC-006), CORS, /docs e cabeçalhos de segurança
+    (SEC-007)'
+  - docs/security/correcao-sec-006-007-2026-10-25.md
+  - tests/unit/test_seguranca_dependencias_jwt.py
+  - tests/integration/test_seguranca_cabecalhos_http.py
+  created: '2026-11-02'
+  updated: '2026-10-26'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-26'
+    status: done
+- id: SEC-008
+  type: security
+  title: '[SEC-008] Container roda como root e CI usa actions por tag mutável sem permissions'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: Dockerfile:22, .github/workflows/tests.yml:34, .github/workflows/tests.yml:37
+    Cenário: Uma execução de código no processo (ver SEC-002) roda como root no container, com compilador disponível. No CI, uma tag de action repontada executa código com o GITHUB_TOKEN de permissões padrão.
+    Impacto: Amplifica outras falhas; sozinho tem impacto baixo.
+    Recomendação: Build multi-stage sem gcc na imagem final, usuário sem privilégio (USER app) e uploads com dono restrito. No workflow, declarar permissions: contents: read e fixar as actions por SHA.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1150
+  estimate: 2
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A05:2021
+    - CWE-250
+    - STRIDE:E
+    - STRIDE:T
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-008
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 7719993 fix(seguranca): container sem root e CI fixado por SHA (SEC-008), banco fora do repositório
+    (SEC-009) e cópias antigas removidas (SEC-016)'
+  - docs/security/correcao-sec-008-009-016-2026-10-26.md
+  - tests/unit/test_seguranca_infra.py
+  created: '2026-11-02'
+  updated: '2026-10-26'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-26'
+    status: done
+- id: SEC-009
+  type: security
+  title: '[SEC-009] Banco SQLite versionado em repositório público'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: onecheck.db:1
+    Cenário: Hoje o conteúdo é só de seed (verificado: só e-mails @onecheck.local). Mas o arquivo está versionado e modificado localmente: um commit descuidado publica dados reais de teste/uso, que ficam no histórico mesmo depois de removidos.
+    Impacto: Baixo com os dados atuais; alto se dados reais forem commitados.
+    Recomendação: git rm --cached onecheck.db e adicioná-lo ao .gitignore (os testes já usam onecheck_test.db). Avaliar limpar o histórico se algum dado real já tiver sido commitado.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1160
+  estimate: 1
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A05:2021
+    - CWE-538
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-009
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 7719993 fix(seguranca): container sem root e CI fixado por SHA (SEC-008), banco fora do repositório
+    (SEC-009) e cópias antigas removidas (SEC-016)'
+  - docs/security/correcao-sec-008-009-016-2026-10-26.md
+  - tests/unit/test_seguranca_infra.py
+  created: '2026-11-02'
+  updated: '2026-10-26'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-26'
+    status: done
+- id: SEC-010
+  type: security
+  title: '[SEC-010] Trilha de auditoria incompleta (sem IP, sem o que mudou nas alterações de usuário)'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/serializers.py:230, app/routers/usuarios.py:230, app/notification_service.py:17
+    Cenário: Um admin troca a senha ou o perfil de outro usuário e o log só registra 'update usuario'. Nenhum evento registra o IP de origem, nem o login falho. As notificações gravam e-mail e conteúdo da mensagem no log da aplicação.
+    Impacto: Investigação de incidente sem base (quem mudou o quê, de onde); PII em log de aplicação (LGPD).
+    Recomendação: Passar o IP (request.client.host) em log_operacao; registrar os campos alterados (sem valores sensíveis: 'senha alterada', 'role: locatario→gestor'); remover e-mail e corpo da mensagem do logger de notificações.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1170
+  estimate: 5
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A09:2021
+    - CWE-778
+    - STRIDE:R
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-010
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit f176167 fix(seguranca): auditoria com IP e campos alterados (SEC-010) e login sem enumeração de e-mails
+    pelo tempo (SEC-013)'
+  - docs/security/correcao-sec-010-013-2026-10-26.md
+  - tests/integration/test_seguranca_auditoria.py
+  created: '2026-11-02'
+  updated: '2026-10-30'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-30'
+    status: done
+- id: SEC-011
+  type: security
+  title: '[SEC-011] Política de senha fraca'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/schemas.py:106
+    Cenário: Senhas de 6 caracteres e comuns (ex.: 123456) são aceitas. Mesmo com o limite de tentativas de N6, credential stuffing distribuído acerta contas com senhas vazadas. bcrypt ignora o que passa de 72 bytes.
+    Impacto: Baixo com o rate limit e o MFA nos perfis privilegiados; maior para locatários sem MFA.
+    Recomendação: Mínimo de 10–12 caracteres, recusar senhas comuns/vazadas (lista local ou k-anonymity do HIBP) e max_length=72 bytes.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1180
+  estimate: 2
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A07:2021
+    - CWE-521
+    - STRIDE:S
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-011
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 8682b2e fix(seguranca): política de senha (SEC-011), problema nasce aberto e dashboard por perfil (SEC-012)'
+  - docs/security/correcao-sec-011-012-2026-10-30.md
+  - tests/integration/test_seguranca_senha_regras.py
+  created: '2026-11-02'
+  updated: '2026-10-30'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-30'
+    status: done
+- id: SEC-012
+  type: security
+  title: '[SEC-012] Regras de negócio sem validação no servidor e dashboard global'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/routers/contratos.py:429, app/routers/dashboard.py:23
+    Cenário: O locatário registra um problema já com status 'fechado', fora do fluxo de atendimento (item 9). Qualquer usuário autenticado vê totais globais de imóveis locados, problemas e vistorias (item 4).
+    Impacto: Baixo: distorção do fluxo e vazamento de agregados de negócio.
+    Recomendação: Ignorar status na criação (sempre 'aberto'); aplicar no dashboard os mesmos filtros das listagens ou restringi-lo a admin/gestor.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1190
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API3:2023
+    - CWE-915
+    - STRIDE:T
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-012
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 8682b2e fix(seguranca): política de senha (SEC-011), problema nasce aberto e dashboard por perfil (SEC-012)'
+  - docs/security/correcao-sec-011-012-2026-10-30.md
+  - tests/integration/test_seguranca_senha_regras.py
+  created: '2026-11-02'
+  updated: '2026-10-30'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-30'
+    status: done
+- id: SEC-013
+  type: security
+  title: '[SEC-013] Enumeração de e-mails pelo tempo de resposta do login'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/routers/auth_router.py:53
+    Cenário: Para e-mail inexistente a resposta volta sem o custo do bcrypt; medindo o tempo, o atacante descobre quais e-mails são contas válidas e direciona a força bruta.
+    Impacto: Baixo: facilita ataques direcionados.
+    Recomendação: Quando o usuário não existir, rodar verify_password contra um hash fixo de mesmo custo antes de responder.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1200
+  estimate: 1
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A07:2021
+    - CWE-208
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-013
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit f176167 fix(seguranca): auditoria com IP e campos alterados (SEC-010) e login sem enumeração de e-mails
+    pelo tempo (SEC-013)'
+  - docs/security/correcao-sec-010-013-2026-10-26.md
+  - tests/integration/test_seguranca_auditoria.py
+  created: '2026-11-02'
+  updated: '2026-10-30'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-30'
+    status: done
+- id: SEC-014
+  type: security
+  title: '[SEC-014] CPF em texto puro, sem validação e devolvido em toda resposta de usuário'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/serializers.py:188, app/models.py:33
+    Cenário: Qualquer resposta com usuário (inclusive /usuarios/me e as listagens para gestor) devolve o CPF; um token de gestor roubado exporta os CPFs de todos os locatários. Não há política de retenção para logs e refresh tokens.
+    Impacto: LGPD: minimização (art. 6º III) e segurança (art. 46). Baixo/médio dependendo do volume de dados reais.
+    Recomendação: response_model distintos (CPF só no detalhe para admin/gestor, mascarado nas listagens); validar formato; definir retenção e limpeza de log_operacao e auth_refresh_tokens expirados.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1210
+  estimate: 5
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API3:2023
+    - CWE-359
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-014
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit cf39ab8 fix(seguranca): CPF mascarado e validado com retenção de logs e tokens (SEC-014) e admin sem
+    acesso ao TOTP de outro usuário (SEC-015)'
+  - docs/security/correcao-sec-014-015-2026-10-30.md
+  - tests/integration/test_seguranca_lgpd_mfa.py
+  created: '2026-11-02'
+  updated: '2026-11-01'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-01'
+    status: done
+- id: SEC-015
+  type: security
+  title: '[SEC-015] Admin escolhe e conhece o segredo TOTP de outro usuário'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/routers/usuarios.py:254, app/routers/usuarios.py:268
+    Cenário: Um admin mal-intencionado (ou com conta comprometida) define o segundo fator de um vistoriador e passa a autenticar como ele; as ações ficam no log em nome do vistoriador.
+    Impacto: Quebra o não-repúdio das ações do usuário-alvo. Exige admin, por isso baixa.
+    Recomendação: Remover setup/enable por terceiros: o admin só reseta (reset_mfa) e o próprio usuário configura no próximo login.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1220
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API5:2023
+    - CWE-284
+    - STRIDE:R
+    - STRIDE:S
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-015
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit cf39ab8 fix(seguranca): CPF mascarado e validado com retenção de logs e tokens (SEC-014) e admin sem
+    acesso ao TOTP de outro usuário (SEC-015)'
+  - docs/security/correcao-sec-014-015-2026-10-30.md
+  - tests/integration/test_seguranca_lgpd_mfa.py
+  created: '2026-11-02'
+  updated: '2026-11-01'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-01'
+    status: done
+- id: SEC-016
+  type: security
+  title: '[SEC-016] Cópias antigas e vulneráveis do código na raiz do repositório'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: info
+    Locais: auth.py:1, routers/auth_router.py:1
+    Cenário: A aplicação não importa esses arquivos (app.main usa app.routers), mas eles confundem revisões e scanners, e um import errado reativaria as falhas já corrigidas.
+    Impacto: Informativo.
+    Recomendação: Apagar auth.py e routers/ da raiz.
+  acceptance_criteria:
+  - O cenário de ataque descrito não é mais reproduzível (teste automatizado demonstra o caso negado).
+  - Existe teste do caso legítimo (permitido) que continua passando.
+  - A correção segue a recomendação ou há ADR justificando outra abordagem.
+  - Nenhum segredo ou dado sensível novo em código, log ou mensagem de erro.
+  priority: could
+  rank: 1230
+  estimate: 1
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-1164
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-10-25:SEC-016
+    file: docs/security/findings-2026-10-25.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - 'commit 7719993 fix(seguranca): container sem root e CI fixado por SHA (SEC-008), banco fora do repositório
+    (SEC-009) e cópias antigas removidas (SEC-016)'
+  - docs/security/correcao-sec-008-009-016-2026-10-26.md
+  - tests/unit/test_seguranca_infra.py
+  created: '2026-11-02'
+  updated: '2026-10-26'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-10-26'
+    status: done
+- id: SEC-017
+  type: security
+  title: '[SEC-017] IP de origem lido do primeiro item do X-Forwarded-For, controlado pelo cliente'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: render.yaml:18, app/rate_limit.py:74, app/auditoria.py:41
+    Cenário: Se o proxy do Render acrescenta o IP real ao X-Forwarded-For enviado pelo cliente (em vez de sobrescrever), o cliente manda 'X-Forwarded-For: <IP aleatório>' a cada tentativa: o limite por IP (20 falhas/15 min) nunca dispara e log_operacao grava o IP forjado.
+    Impacto: Contorna a camada por IP do limite de tentativas (o limite por conta continua) e torna o IP da trilha de auditoria (SEC-010) inconfiável. Baixa porque depende do comportamento do proxy, não verificado; vira Média se confirmado.
+    Recomendação: Conferir no Render (enviar X-Forwarded-For forjado e ver o ip gravado em /logs). Se for acrescentado, usar o último item do cabeçalho (o que o proxy do Render adiciona) num middleware próprio, ou restringir FORWARDED_ALLOW_IPS à rede do proxy.
+  acceptance_criteria:
+  - 'Dado um login falho com ''X-Forwarded-For: 203.0.113.9'' enviado ao Render, quando consultar GET /logs, então
+    fica registrado se o IP gravado é o forjado (resultado anotado no item).'
+  - Dado que o proxy acrescenta o cabeçalho, quando o cliente forjar o X-Forwarded-For, então o IP usado no limite
+    de tentativas e na auditoria é o adicionado pelo proxy, e não o enviado pelo cliente (teste automatizado).
+  - Dado 21 logins falhos do mesmo cliente com X-Forwarded-For diferentes a cada vez, quando a 21ª chegar, então
+    a resposta é 429.
+  - FORWARDED_ALLOW_IPS deixa de ser '*' ou há ADR justificando.
+  priority: should
+  rank: 40
+  estimate: 3
+  status: backlog
+  sprint: 13
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API4:2023
+    - CWE-348
+    - STRIDE:S
+    - STRIDE:R
+    risk_id: R-008
+  source:
+    kind: security-audit
+    ref: 2026-11-02:SEC-017
+    file: docs/security/findings-2026-11-02.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-018
+  type: security
+  title: '[SEC-018] Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: low
+    Locais: app/routers/dashboard.py:85, app/routers/dashboard.py:118
+    Cenário: Um gestor chama GET /logs?acao=login e obtém IP e horário de login de todos os usuários, inclusive dos admins, e os e-mails digitados nos logins falhos.
+    Impacto: Exposição de dados pessoais (IP, padrão de acesso) além da necessidade do perfil; o backlog do produto define a auditoria como atribuição do admin. Exige conta de gestor.
+    Recomendação: Restringir GET /logs ao admin, ou para o gestor omitir ip/detalhes e eventos de contas admin/gestor.
+  acceptance_criteria:
+  - Dado um gestor autenticado, quando chamar GET /logs, então recebe 403 (ou a lista sem ip/detalhes e sem eventos
+    de contas admin/gestor, conforme a decisão registrada).
+  - Dado um admin, quando chamar GET /logs, então continua vendo a trilha completa.
+  - O front e o README refletem a nova regra.
+  priority: should
+  rank: 50
+  estimate: 2
+  status: backlog
+  sprint: 13
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API3:2023
+    - CWE-359
+    - STRIDE:I
+    risk_id: R-009
+  source:
+    kind: security-audit
+    ref: 2026-11-02:SEC-018
+    file: docs/security/findings-2026-11-02.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-019
+  type: security
+  title: '[SEC-019] Login falho grava o texto digitado no campo e-mail'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: info
+    Locais: app/routers/auth_router.py:58
+    Cenário: Usuário digita a senha no campo de e-mail por engano; o texto fica em log_operacao e aparece em GET /logs.
+    Impacto: Dado sem finalidade guardado por até LOG_RETENCAO_DIAS. Mitigado pela retenção (SEC-014).
+    Recomendação: Gravar usuario_id quando a conta existir e, quando não existir, só um hash ou o domínio do e-mail.
+  acceptance_criteria:
+  - Dado um login falho com e-mail inexistente, quando o evento for gravado, então o log não contém o texto digitado
+    (só domínio ou hash).
+  - Dado um login falho com e-mail existente, quando o evento for gravado, então ele traz o usuario_id da conta.
+  priority: could
+  rank: 190
+  estimate: 1
+  status: backlog
+  sprint: 13
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A09:2021
+    - CWE-532
+    - STRIDE:I
+    risk_id: R-009
+  source:
+    kind: security-audit
+    ref: 2026-11-02:SEC-019
+    file: docs/security/findings-2026-11-02.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-020
+  type: security
+  title: '[SEC-020] Filtros de data inválidos em /logs são ignorados em silêncio'
+  epic: EP-006
+  story: ''
+  description: |-
+    Severidade: info
+    Locais: app/routers/dashboard.py:98, app/routers/dashboard.py:104
+    Cenário: de=31/10/2026 (formato inválido) devolve logs de todo o período, sem aviso, a quem pediu um recorte.
+    Impacto: Sem ganho de acesso (só admin/gestor); pode levar a conclusões erradas numa investigação.
+    Recomendação: Responder 422 para data inválida (declarar os parâmetros como date/datetime).
+  acceptance_criteria:
+  - Dado de=31/10/2026 (formato inválido), quando chamar GET /logs, então a resposta é 422 e não a lista completa.
+  - Dado de/ate em ISO válidos, quando chamar GET /logs, então o filtro continua funcionando.
+  priority: could
+  rank: 200
+  estimate: 1
+  status: backlog
+  sprint: 13
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP —
+    - CWE-390
+    - STRIDE:I
+    risk_id: null
+  source:
+    kind: security-audit
+    ref: 2026-11-02:SEC-020
+    file: docs/security/findings-2026-11-02.json
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: US-001
+  type: story
+  title: Autenticar identidade com JWT e refresh
+  epic: EP-001
+  story: Como usuário cadastrado, quero autenticar minha identidade e renovar a sessão, para acessar funcionalidades
+    protegidas sem reenviar senha a cada chamada.
+  description: ''
+  acceptance_criteria:
+  - Login válido retorna access token, ou o fluxo MFA quando aplicável.
+  - Credenciais inválidas retornam erro genérico, sem enumerar e-mail.
+  - Refresh rotaciona e revoga o refresh token anterior.
+  - Logout invalida o refresh token vigente.
+  - Requisição sem token em rota protegida é negada (401).
+  priority: must
+  rank: 1240
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-001
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 5c7decd
+  - app/auth.py
+  - app/routers/auth_router.py
+  - tests/integration/test_auth_routes.py
+  - tests/unit/test_auth.py
+  created: '2026-11-02'
+  updated: '2026-09-03'
+  history:
+  - date: '2026-09-03'
+    status: done
+- id: US-002
+  type: story
+  title: Configurar e validar MFA (TOTP) em papéis críticos
+  epic: EP-001
+  story: Como admin, gestor ou vistoriador, quero configurar e validar MFA no primeiro acesso, para reduzir o risco
+    de sessão privilegiada com senha vazada.
+  description: ''
+  acceptance_criteria:
+  - Conta privilegiada sem segredo recebe mfa_setup_required e temp_token de escopo restrito.
+  - Access token só é emitido após TOTP válido.
+  - Tentativas inválidas de MFA não concedem acesso.
+  - Admin reseta o MFA de outro usuário, com registro em auditoria.
+  priority: must
+  rank: 1250
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-002
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 5c7decd
+  - commit 0e164b8 (N1)
+  - commit 648518e (item 1)
+  - tests/integration/test_seguranca_mfa_bypass.py
+  - tests/integration/test_seguranca_mfa_setup.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: US-003
+  type: story
+  title: Administrar usuários com papéis e soft delete seguro
+  epic: EP-001
+  story: Como administrador, quero criar, atualizar e desativar usuários com papéis definidos, para operar o acesso
+    da imobiliária com menor privilégio.
+  description: ''
+  acceptance_criteria:
+  - Admin cria usuário com perfil válido.
+  - Usuário consulta só /usuarios/me para dados próprios.
+  - Soft delete não remove fisicamente o registro.
+  - Auto-desativação é bloqueada.
+  - Respostas não expõem senha_hash nem segredo MFA.
+  priority: must
+  rank: 1260
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-003
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit c6a7cae
+  - app/routers/usuarios.py
+  - tests/integration/test_usuarios.py
+  - tests/integration/test_seguranca_gestao_usuarios.py
+  created: '2026-11-02'
+  updated: '2026-09-03'
+  history:
+  - date: '2026-09-03'
+    status: done
+- id: US-004
+  type: story
+  title: Cadastrar imóvel com endereço e geocoding
+  epic: EP-002
+  story: Como gestor ou admin, quero cadastrar imóvel com endereço e coordenadas automáticas, para manter a carteira
+    georreferenciada.
+  description: ''
+  acceptance_criteria:
+  - Criação atômica de imóvel e endereço.
+  - Falha de ViaCEP/Nominatim não quebra a criação.
+  - Locatário não cria nem edita imóveis.
+  - Soft delete de imóvel com locação ativa é bloqueado.
+  priority: must
+  rank: 1270
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-004
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit f68c812
+  - app/routers/imoveis.py
+  - app/geocoding.py
+  - tests/integration/test_imoveis.py
+  - tests/unit/test_geocoding.py
+  created: '2026-11-02'
+  updated: '2026-09-03'
+  history:
+  - date: '2026-09-03'
+    status: done
+- id: US-005
+  type: story
+  title: Criar e consultar contrato com titularidade
+  epic: EP-003
+  story: Como gestor, quero vincular imóvel a locatário com datas válidas, para estabelecer o vínculo jurídico e
+    a âncora de autorização.
+  description: ''
+  acceptance_criteria:
+  - Contrato só é criado para imóvel disponível e locatário válido.
+  - Locatário consulta só os contratos de que é titular.
+  - Status do imóvel reflete a locação ativa.
+  priority: must
+  rank: 1280
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-005
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit ee20607
+  - app/routers/contratos.py
+  - tests/integration/test_contratos.py
+  - tests/integration/test_seguranca_acesso_vistoriador.py
+  created: '2026-11-02'
+  updated: '2026-09-07'
+  history:
+  - date: '2026-09-07'
+    status: done
+- id: US-006
+  type: story
+  title: Agendar vistoria vinculada a contrato ativo
+  epic: EP-003
+  story: Como gestor, quero agendar vistoria inicial ou de encerramento, para organizar a execução técnica no tempo
+    certo.
+  description: ''
+  acceptance_criteria:
+  - Agendamento exige contrato ativo e data válida.
+  - Perfis não autorizados não criam nem alteram agendamento.
+  - A listagem do contrato traz só os agendamentos dele.
+  priority: must
+  rank: 1290
+  estimate: 3
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-006
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 52734f5
+  - app/routers/agendamentos.py
+  - tests/integration/test_agendamentos.py
+  created: '2026-11-02'
+  updated: '2026-09-07'
+  history:
+  - date: '2026-09-07'
+    status: done
+- id: US-007
+  type: story
+  title: Preencher checklist com itens e fotos
+  epic: EP-004
+  story: Como vistoriador, quero registrar itens por cômodo com fotos e observações, para documentar o estado do
+    imóvel com evidências.
+  description: ''
+  acceptance_criteria:
+  - Checklist vinculado a contrato.
+  - Itens e fotos só mudam em em_preenchimento (antigo SEC-002 do product-backlog).
+  - Upload rejeita tipos e tamanhos inválidos.
+  - Submissão trava novas edições.
+  priority: must
+  rank: 1300
+  estimate: 8
+  status: done
+  sprint: 7
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-007
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit c02f652
+  - commit 8e4d12d (N3)
+  - app/routers/checklists.py
+  - tests/integration/test_checklists.py
+  - tests/integration/test_seguranca_checklist_autorizacao.py
+  - tests/integration/test_seguranca_uploads.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: US-008
+  type: story
+  title: Aceitar ou rejeitar laudo de vistoria
+  epic: EP-004
+  story: Como locatário titular, quero aceitar ou rejeitar o laudo com motivo, para formalizar concordância ou contestar
+    o estado registrado.
+  description: ''
+  acceptance_criteria:
+  - Só o locatário titular aceita ou rejeita.
+  - Rejeição exige motivo persistido.
+  - Aceite gera registro com data e hora.
+  - Quem fez a vistoria não aceita a própria vistoria (N3).
+  priority: must
+  rank: 1310
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-008
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit eeb6436
+  - commit 8e4d12d (N3)
+  - tests/integration/test_checklists.py
+  - tests/integration/test_seguranca_checklist_autorizacao.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: US-009
+  type: story
+  title: Baixar laudo de vistoria em PDF
+  epic: EP-004
+  story: Como usuário autorizado, quero baixar o laudo em PDF, para usar o documento em processos operacionais e
+    como evidência.
+  description: ''
+  acceptance_criteria:
+  - PDF contém imóvel, contrato, itens e aceite.
+  - Download exige autenticação e autorização por recurso.
+  - Erros de geração não expõem stack trace.
+  priority: must
+  rank: 1320
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-009
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit eeb6436
+  - app/pdf_generator.py
+  - tests/unit/test_pdf_generator.py
+  - tests/integration/test_checklists.py
+  created: '2026-11-02'
+  updated: '2026-09-07'
+  history:
+  - date: '2026-09-07'
+    status: done
+- id: US-010
+  type: story
+  title: Registrar problema com foto e linha do tempo
+  epic: EP-005
+  story: Como locatário, quero abrir ocorrência vinculada ao meu contrato e acompanhar atualizações, para registrar
+    defeitos com rastreabilidade.
+  description: ''
+  acceptance_criteria:
+  - Problema só é aberto pelo titular do contrato ou por perfil autorizado.
+  - Linha do tempo em ordem cronológica.
+  - Só gestor/admin muda o status; o problema nasce aberto (SEC-012).
+  - Anexos seguem a autorização do problema.
+  priority: must
+  rank: 1330
+  estimate: 5
+  status: done
+  sprint: 7
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-010
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 3d227e4
+  - commit 648518e (item 6)
+  - commit 8682b2e (SEC-012)
+  - tests/integration/test_problemas.py
+  - tests/integration/test_seguranca_problemas_bola.py
+  created: '2026-11-02'
+  updated: '2026-10-30'
+  history:
+  - date: '2026-10-30'
+    status: done
+- id: US-011
+  type: story
+  title: Consultar dashboard operacional
+  epic: EP-006
+  story: Como gestor ou admin, quero ver métricas consolidadas, para priorizar a operação.
+  description: ''
+  acceptance_criteria:
+  - Contagens coerentes com o banco.
+  - Cada perfil vê só o recorte das suas listagens, com null no que não acessa (SEC-012).
+  - Resposta sem segredos nem payloads internos.
+  priority: must
+  rank: 1340
+  estimate: 3
+  status: done
+  sprint: 7
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-011
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 69d7dcb
+  - commit 8682b2e (SEC-012)
+  - tests/integration/test_dashboard.py
+  - tests/integration/test_seguranca_senha_regras.py::TestDashboardPorPerfil
+  created: '2026-11-02'
+  updated: '2026-10-30'
+  history:
+  - date: '2026-10-30'
+    status: done
+- id: US-012
+  type: story
+  title: Isolar cômodos do imóvel com CRUD protegido
+  epic: EP-002
+  story: Como gestor, quero manter os cômodos do imóvel, para estruturar a vistoria por ambiente.
+  description: ''
+  acceptance_criteria:
+  - CRUD de cômodo exige papel autorizado.
+  - Cômodo sempre pertence a um imóvel existente.
+  - Locatário e vistoriador só leem cômodos de imóveis a que têm acesso (SEC-004).
+  priority: must
+  rank: 1350
+  estimate: 3
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-012
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit f68c812
+  - commit 210181d (SEC-004)
+  - tests/integration/test_imoveis.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: US-013
+  type: story
+  title: Encerrar ou cancelar contrato liberando imóvel
+  epic: EP-003
+  story: Como gestor, quero encerrar ou cancelar contrato, para liberar o imóvel para nova locação com consistência.
+  description: ''
+  acceptance_criteria:
+  - Encerrar/cancelar muda o status do contrato e libera o imóvel atomicamente.
+  - Operação auditada.
+  - Perfis sem permissão são negados.
+  priority: must
+  rank: 1360
+  estimate: 3
+  status: done
+  sprint: 7
+  phase: F3
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-013
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit ee20607
+  - tests/integration/test_contratos.py
+  created: '2026-11-02'
+  updated: '2026-09-07'
+  history:
+  - date: '2026-09-07'
+    status: done
+- id: US-014
+  type: story
+  title: Enviar checklist para aceite formal
+  epic: EP-004
+  story: Como gestor, quero enviar o checklist preenchido para aceite do locatário, para iniciar o rito formal de
+    concordância.
+  description: ''
+  acceptance_criteria:
+  - Transição para pendente_aceite só a partir de em_preenchimento e com ao menos um item preenchido.
+  - Locatário titular passa a poder aceitar ou rejeitar.
+  - Edição técnica bloqueada após o envio.
+  priority: must
+  rank: 1370
+  estimate: 3
+  status: done
+  sprint: 7
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: US-014
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit c02f652
+  - app/routers/checklists.py (enviar_para_aceite)
+  - tests/integration/test_checklists.py
+  created: '2026-11-02'
+  updated: '2026-09-07'
+  history:
+  - date: '2026-09-07'
+    status: done
+- id: TK-001
+  type: task
+  title: Manter threat model e baseline alinhados ao backlog
+  epic: EP-006
+  story: ''
+  description: 'Antigo DOC-001 do product-backlog. Prática contínua: agora faz parte da DoD (working-agreement.md).'
+  acceptance_criteria:
+  - Itens SEC referenciam risco quando aplicável.
+  - docs/security e arquitetura refletem as decisões.
+  - Nenhum segredo real na documentação.
+  priority: must
+  rank: 1380
+  estimate: 2
+  status: done
+  sprint: 11
+  phase: F2
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: DOC-001
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 6d3692a (docs/security/threat-model.md)
+  - commit fbaf99e (architecture-v1.md)
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: SEC-021
+  type: security
+  title: '[N1, N2] Bypass de MFA com token de verificação e reset do banco via /admin/seed'
+  epic: EP-006
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Token de verificação MFA não serve para o setup, e vice-versa.
+  - /admin/seed exige SEED_SECRET e token de admin com banco populado.
+  priority: must
+  rank: 1390
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/security/validacao-pendencias-2026-10-25.md
+    ref: N1, N2
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 0e164b8
+  - docs/security/correcao-n1-n2-2026-10-25.md
+  - tests/integration/test_seguranca_mfa_bypass.py
+  - tests/integration/test_seguranca_admin_seed.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: SEC-022
+  type: security
+  title: '[N3, N4, N5] Autorização de checklists, escalada do gestor e desativação de MFA'
+  epic: EP-006
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Só admin/gestor criam checklist; quem vistoriou não aceita.
+  - Gestor não gerencia admin/gestor nem a própria conta por /usuarios/{id}.
+  - Desativar MFA exige senha e código; perfis obrigatórios recebem 403.
+  priority: must
+  rank: 1400
+  estimate: 5
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/security/validacao-pendencias-2026-10-25.md
+    ref: N3, N4, N5
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 8e4d12d
+  - docs/security/correcao-n3-n4-n5-2026-10-25.md
+  - tests/integration/test_seguranca_checklist_autorizacao.py
+  - tests/integration/test_seguranca_gestao_usuarios.py
+  - tests/integration/test_seguranca_mfa_desativacao.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: SEC-023
+  type: security
+  title: '[Itens 1, 2, 6] Setup de MFA pendente, listagem de usuários e BOLA em problemas'
+  epic: EP-006
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Setup de MFA não troca o autenticador antes da confirmação.
+  - GET /usuarios só para admin/gestor.
+  - Problema por ID segue a mesma regra da listagem (antigo SEC-001 do product-backlog).
+  priority: must
+  rank: 1410
+  estimate: 3
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/security/validacao-pendencias-2026-10-25.md
+    ref: itens 1, 2, 6 do PENDENCIAS_API.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 648518e
+  - docs/security/correcao-itens-1-2-6-2026-10-25.md
+  - tests/integration/test_seguranca_mfa_setup.py
+  - tests/integration/test_seguranca_listagem_usuarios.py
+  - tests/integration/test_seguranca_problemas_bola.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: SEC-024
+  type: security
+  title: '[N6, N7, N8] Limite de tentativas, validação de uploads e segredos sem valor padrão'
+  epic: EP-006
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Login, MFA e reautenticação com limite por conta e por IP (429 + Retry-After) — antigo SEC-004 do product-backlog.
+  - Uploads só JPEG/PNG/WebP validados pelo conteúdo.
+  - API não sobe sem JWT_SECRET forte fora de desenvolvimento.
+  priority: must
+  rank: 1420
+  estimate: 5
+  status: done
+  sprint: 11
+  phase: F4
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: docs/security/validacao-pendencias-2026-10-25.md
+    ref: N6, N7, N8
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit f081c60
+  - docs/security/correcao-n6-n7-n8-2026-10-25.md
+  - tests/integration/test_seguranca_rate_limit.py
+  - tests/integration/test_seguranca_uploads.py
+  - tests/unit/test_config_segredos.py
+  created: '2026-11-02'
+  updated: '2026-10-25'
+  history:
+  - date: '2026-10-25'
+    status: done
+- id: TK-002
+  type: task
+  title: Rotacionar as credenciais de demonstração em produção
+  epic: EP-008
+  story: ''
+  description: 'Risco residual do SEC-001: contas criadas pelo seed antigo ainda podem ter senha e TOTP públicos.'
+  acceptance_criteria:
+  - Dado o banco de produção, quando rodar scripts/rotacionar_credenciais_demo.py, então ele lista as contas expostas.
+  - Depois do --aplicar, nenhuma conta ativa usa senha ou segredo TOTP do repositório e o alerta 'SEGURANÇA:' some
+    do log do Render.
+  - As novas senhas são entregues por canal seguro, não ficam em commit, issue nem chat.
+  priority: must
+  rank: 20
+  estimate: 1
+  status: backlog
+  sprint: 12
+  phase: F6
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - CWE-798
+    risk_id: R-006
+  source:
+    kind: security-audit
+    file: docs/security/correcao-sec-001-002-003-2026-10-25.md
+    ref: SEC-001 (residual)
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: TK-003
+  type: task
+  title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render
+  epic: EP-008
+  story: ''
+  description: Pendência operacional dos SEC-007 e N2.
+  acceptance_criteria:
+  - CORS_ORIGINS no painel do Render tem só as URLs do front.
+  - O front de produção chama a API sem erro de CORS; uma origem fora da lista é bloqueada.
+  - SEED_SECRET está vazio ou tem 32+ caracteres; não é o antigo valor público.
+  priority: must
+  rank: 30
+  estimate: 1
+  status: backlog
+  sprint: 12
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A05:2021
+    risk_id: null
+  source:
+    kind: security-audit
+    file: docs/security/correcao-sec-006-007-2026-10-25.md
+    ref: SEC-007 (operação)
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: TK-004
+  type: task
+  title: Agendar a limpeza de dados vencidos no Render
+  epic: EP-008
+  story: ''
+  description: A limpeza já roda em todo start (SEC-014); o cron cobre instâncias que ficam semanas sem reiniciar.
+  acceptance_criteria:
+  - Um Cron Job roda python scripts/limpar_dados_vencidos.py pelo menos uma vez por semana.
+  - O log do job mostra a contagem de tokens e eventos apagados.
+  priority: could
+  rank: 260
+  estimate: 1
+  status: backlog
+  sprint: 14
+  phase: F7
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: TK-005
+  type: task
+  title: Backup e restauração do Postgres
+  epic: EP-008
+  story: ''
+  description: Evidência de saída da F6 (backup/restauração).
+  acceptance_criteria:
+  - Existe rotina de backup do banco de produção com retenção definida.
+  - Dado um backup, quando restaurar num banco vazio, então a API sobe e os dados conferem (teste documentado).
+  - O procedimento está no README ou em docs/, sem credenciais.
+  priority: should
+  rank: 60
+  estimate: 3
+  status: backlog
+  sprint: 13
+  phase: F6
+  depends_on: []
+  security:
+    impact: high
+    refs: []
+    risk_id: R-015
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-025
+  type: security
+  title: Log de auditoria append-only
+  epic: EP-006
+  story: ''
+  description: 'Resto do antigo SEC-003 do product-backlog: IP e campos alterados já existem (SEC-010); falta a
+    integridade do log.'
+  acceptance_criteria:
+  - Dado um usuário do banco da aplicação, quando tentar UPDATE ou DELETE em log_operacao, então a operação é negada
+    (papel só com INSERT/SELECT) — exceto a rotina de retenção, com papel próprio.
+  - Não existe rota de edição ou exclusão de logs.
+  - A decisão está num ADR.
+  priority: should
+  rank: 110
+  estimate: 5
+  status: backlog
+  sprint: 14
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - CWE-778
+    - STRIDE:R
+    risk_id: R-005
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: SEC-003
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-026
+  type: security
+  title: Fotos de vistoria com URL assinada e expiração
+  epic: EP-004
+  story: ''
+  description: Antigo SEC-005 do product-backlog e ameaça T-14. Depende da decisão do SPK-002; quebrar antes de
+    entrar em sprint.
+  acceptance_criteria:
+  - Dado um usuário sem acesso ao checklist, quando usar a URL de uma foto, então não recebe o arquivo.
+  - URL expirada não entrega o arquivo.
+  - Fotos existentes continuam acessíveis a quem tem acesso.
+  priority: could
+  rank: 250
+  estimate: 8
+  status: backlog
+  sprint: 14
+  phase: F6
+  depends_on:
+  - SPK-002
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    - STRIDE:I
+    risk_id: R-007
+  source:
+    kind: pendencias
+    file: docs/product-backlog.md
+    ref: SEC-005
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-027
+  type: security
+  title: Encerrar a sessão quando um refresh token já trocado for reutilizado
+  epic: EP-001
+  story: ''
+  description: Risco residual registrado no arquivo do front e na correção do SEC-005.
+  acceptance_criteria:
+  - Dado um refresh token já rotacionado, quando ele for reenviado, então a API nega e encerra todas as sessões
+    do usuário.
+  - O uso legítimo (um refresh por vez) continua funcionando.
+  - O evento fica no log de auditoria.
+  priority: should
+  rank: 70
+  estimate: 3
+  status: backlog
+  sprint: 13
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API2:2023
+    - CWE-613
+    - STRIDE:S
+    risk_id: R-011
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-028
+  type: security
+  title: 'Direitos do titular (LGPD): exportar e anonimizar os próprios dados'
+  epic: EP-006
+  story: ''
+  description: LGPD art. 18. Hoje a exclusão é lógica e mantém nome, e-mail e CPF.
+  acceptance_criteria:
+  - Dado um usuário autenticado, quando pedir a exportação, então recebe só os próprios dados pessoais.
+  - Dado um pedido de exclusão aprovado, quando for executado, então nome, e-mail e CPF são anonimizados e os laudos
+    continuam válidos.
+  - Um usuário não exporta nem anonimiza dados de outro (teste negado).
+  priority: should
+  rank: 120
+  estimate: 5
+  status: backlog
+  sprint: 14
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - LGPD art. 18
+    risk_id: R-016
+  source:
+    kind: security-audit
+    file: docs/security/correcao-sec-014-015-2026-10-30.md
+    ref: SEC-014 (residual)
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-029
+  type: security
+  title: Forçar a troca das senhas fracas cadastradas antes da política
+  epic: EP-001
+  story: ''
+  description: Risco residual do SEC-011.
+  acceptance_criteria:
+  - Dado um usuário marcado com senha_expirada, quando fizer login, então só consegue trocar a senha.
+  - Contas com senha forte não são afetadas.
+  priority: could
+  rank: 220
+  estimate: 3
+  status: backlog
+  sprint: 14
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-521
+    risk_id: null
+  source:
+    kind: security-audit
+    file: docs/security/correcao-sec-011-012-2026-10-30.md
+    ref: SEC-011 (residual)
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-030
+  type: security
+  title: Recusar senhas que aparecem em vazamentos conhecidos
+  epic: EP-001
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Dado uma senha nova presente na base de vazadas, quando cadastrar, então recebe 422.
+  - A consulta usa k-anonymity (só o prefixo do hash sai da API) e tem timeout com fallback.
+  priority: could
+  rank: 230
+  estimate: 3
+  status: backlog
+  sprint: 14
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-521
+    - OWASP A07:2021
+    risk_id: null
+  source:
+    kind: security-audit
+    file: docs/security/correcao-sec-011-012-2026-10-30.md
+    ref: SEC-011 (residual)
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SEC-031
+  type: security
+  title: Cifrar o CPF em repouso
+  epic: EP-006
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Dado acesso direto ao banco ou a um backup, quando ler a coluna cpf, então o valor está cifrado.
+  - A chave fica fora do banco (variável de ambiente) e há procedimento de rotação.
+  - As respostas da API não mudam.
+  priority: could
+  rank: 240
+  estimate: 5
+  status: backlog
+  sprint: 13
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - LGPD art. 46
+    - CWE-311
+    risk_id: R-014
+  source:
+    kind: security-audit
+    file: docs/security/correcao-sec-014-015-2026-10-30.md
+    ref: SEC-014 (residual)
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SPK-001
+  type: spike
+  title: Definir o alcance do perfil visualizador
+  epic: EP-006
+  story: ''
+  description: 'Timebox: 1 dia. Hoje o visualizador lê todos os imóveis, contratos, vistorias e PDFs (premissa do
+    threat model).'
+  acceptance_criteria:
+  - 'Decisão registrada em ADR: leitura global ou recortada (e por qual critério).'
+  - Se recortada, item de backlog criado com os testes de cenário negado.
+  priority: should
+  rank: 80
+  estimate: 2
+  status: backlog
+  sprint: 12
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: R-010
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SPK-002
+  type: spike
+  title: Decidir sobre as fotos públicas em /uploads (T-14)
+  epic: EP-006
+  story: ''
+  description: 'Timebox: meio dia.'
+  acceptance_criteria:
+  - 'Decisão registrada: aceitar o risco (com justificativa em risk-register) ou implementar URL assinada (SEC-026).'
+  - Se aceitar, o risco R-007 fica como aceito com data de revisão.
+  priority: should
+  rank: 90
+  estimate: 2
+  status: backlog
+  sprint: 12
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: R-007
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SPK-003
+  type: spike
+  title: Decidir se o MFA vale para locatário e visualizador
+  epic: EP-001
+  story: ''
+  description: Risco residual do SEC-015.
+  acceptance_criteria:
+  - 'Decisão registrada: hoje needs_mfa só vale para admin, gestor e vistoriador, mesmo com MFA ligado em outros
+    perfis.'
+  priority: could
+  rank: 210
+  estimate: 1
+  status: backlog
+  sprint: 12
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: SPK-004
+  type: spike
+  title: Fechar as regras de negócio em aberto do PENDENCIAS_API.md (itens 5, 7, 8 e 11)
+  epic: EP-004
+  story: ''
+  description: 'O item 8 já está parcialmente resolvido: enviar-para-aceite exige ao menos um item preenchido. O
+    item 6 deixou de ser inconsistente: o vistoriador recebe 403 na listagem e por ID.'
+  acceptance_criteria:
+  - 'Para cada item há decisão registrada: locatário ver os agendamentos do próprio contrato (5); locatário comentar
+    no próprio problema (7); uso do status pendente_revisao após rejeição (8); tipos de agendamento além de inicial/encerramento
+    (11).'
+  - Cada decisão que muda a API vira um item de backlog.
+  priority: should
+  rank: 100
+  estimate: 2
+  status: backlog
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PENDENCIAS_API.md
+    ref: itens 5, 7, 8, 11
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: US-015
+  type: story
+  title: Excluir checklist, contrato e problema criados por engano
+  epic: EP-003
+  story: Como admin, quero excluir checklists, contratos e problemas criados por engano, para manter a base limpa
+    sem perder rastreabilidade.
+  description: ''
+  acceptance_criteria:
+  - Dado um admin, quando excluir um registro criado por engano, então ele some das listagens e a exclusão fica
+    no log.
+  - Dado um checklist aceito ou um contrato com laudo, quando tentar excluir, então a API recusa (preserva evidência).
+  - Perfis sem permissão recebem 403.
+  priority: could
+  rank: 270
+  estimate: 5
+  status: backlog
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PENDENCIAS_API.md
+    ref: item 12
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: US-016
+  type: story
+  title: Anexos e assinatura de contrato
+  epic: EP-003
+  story: Como gestor, quero anexar o contrato assinado, para centralizar a documentação da locação.
+  description: O front PHP antigo tinha as telas, sem endpoint. Quebrar antes de entrar em sprint.
+  acceptance_criteria:
+  - Dado um contrato, quando o gestor anexar um PDF, então só quem acessa o contrato consegue baixá-lo.
+  - Arquivos que não são PDF são recusados pelo conteúdo.
+  priority: could
+  rank: 290
+  estimate: 8
+  status: backlog
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PENDENCIAS_API.md
+    ref: item 12
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: US-017
+  type: story
+  title: Histórico do imóvel
+  epic: EP-002
+  story: Como gestor, quero ver o histórico de um imóvel, para acompanhar locações e vistorias anteriores.
+  description: ''
+  acceptance_criteria:
+  - Dado um imóvel, quando consultar o histórico, então vejo contratos, vistorias e problemas em ordem cronológica.
+  - Locatário e vistoriador só veem o que já acessam pelas listagens.
+  priority: could
+  rank: 280
+  estimate: 3
+  status: backlog
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PENDENCIAS_API.md
+    ref: item 12
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-001
+  type: debt
+  title: Modelos Pydantic nos corpos das rotas de problemas
+  epic: EP-005
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - POST /contratos/{id}/problemas, PATCH /problemas/{id}/status e POST /problemas/{id}/atualizacoes aparecem no
+    OpenAPI com requestBody.
+  - Os testes existentes continuam passando.
+  priority: should
+  rank: 160
+  estimate: 3
+  status: backlog
+  sprint: 13
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PENDENCIAS_API.md
+    ref: item 9
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-002
+  type: debt
+  title: response_model e nomes consistentes no OpenAPI
+  epic: EP-007
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - As rotas principais declaram o envelope {sucesso, dados, erro} no OpenAPI.
+  - A divergência role/perfil e mfa_ativo/mfa_enabled está resolvida ou documentada.
+  priority: could
+  rank: 300
+  estimate: 5
+  status: backlog
+  sprint: 13
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PENDENCIAS_API.md
+    ref: item 10
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-003
+  type: debt
+  title: Consolidar as rotas duplicadas de MFA e remover GET /auth/mfa/setup
+  epic: EP-001
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Cada operação de MFA tem uma rota canônica; os aliases estão marcados como deprecated com data de remoção.
+  - GET /auth/mfa/setup (obsoleto) é removido depois de avisar o front.
+  priority: should
+  rank: 150
+  estimate: 3
+  status: backlog
+  sprint: 13
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - superfície de ataque mínima
+    risk_id: null
+  source:
+    kind: pendencias
+    file: PENDENCIAS_API.md
+    ref: item 12
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-004
+  type: debt
+  title: Lint e formatação (ruff) no CI
+  epic: EP-007
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - ruff check e ruff format --check rodam no workflow e falham o PR com erro.
+  - A base atual passa sem avisos.
+  priority: should
+  rank: 140
+  estimate: 2
+  status: backlog
+  sprint: 13
+  phase: F5
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Lint/format configurado
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-005
+  type: debt
+  title: Dependabot para pip e GitHub Actions
+  epic: EP-007
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Existe .github/dependabot.yml para pip e github-actions.
+  - PRs de atualização mantêm o requirements.lock com hashes e as actions fixadas por SHA.
+  priority: should
+  rank: 130
+  estimate: 1
+  status: backlog
+  sprint: 13
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A06:2021
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Atualização de dependências automatizada
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-006
+  type: debt
+  title: Definir a licença do repositório público
+  epic: EP-007
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - Existe LICENSE na raiz e o README cita a licença.
+  priority: should
+  rank: 180
+  estimate: 1
+  status: backlog
+  sprint: 12
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Licença definida
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-007
+  type: debt
+  title: CHANGELOG e release v0.1.0
+  epic: EP-007
+  story: ''
+  description: Evidência que falta para concluir a F3.
+  acceptance_criteria:
+  - Existe CHANGELOG.md com as entregas até agora (a partir dos commits e dos relatórios de correção).
+  - Existe a tag v0.1.0 apontando para um commit com o CI verde.
+  priority: must
+  rank: 10
+  estimate: 2
+  status: backlog
+  sprint: 12
+  phase: F3
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Releases/tags e CHANGELOG
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-008
+  type: debt
+  title: Conventional Commits em pelo menos 70% dos commits
+  epic: EP-007
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - 'Os próximos 10 commits seguem o padrão do working-agreement.md (tipo(escopo): descrição (ID)).'
+  - diagnose.py mostra ≥ 70%.
+  priority: could
+  rank: 320
+  estimate: 1
+  status: backlog
+  sprint: 13
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Conventional Commits
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-009
+  type: debt
+  title: ADRs retroativos das decisões principais
+  epic: EP-007
+  story: ''
+  description: ''
+  acceptance_criteria:
+  - 'Há ADRs para: JWT com refresh rotativo e token_version; MFA TOTP obrigatório por perfil; uploads em disco local;
+    deploy no Render com 1 worker (limite de tentativas em memória).'
+  priority: should
+  rank: 170
+  estimate: 3
+  status: backlog
+  sprint: 12
+  phase: F2
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Decisões registradas (ADRs)
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: DEBT-010
+  type: debt
+  title: Cobrir os ramos não testados de agendamentos, geocoding e database
+  epic: EP-007
+  story: ''
+  description: 'Cobertura atual: agendamentos 84%, geocoding 82%, database 70%.'
+  acceptance_criteria:
+  - app/routers/agendamentos.py e app/geocoding.py com ≥ 90% de cobertura, incluindo cenários negados.
+  - ensure_schema_updates testado com um banco antigo.
+  priority: could
+  rank: 310
+  estimate: 3
+  status: backlog
+  sprint: 13
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source: null
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: TK-006
+  type: task
+  title: Auditoria de segurança completa antes da release candidata
+  epic: EP-006
+  story: ''
+  description: A auditoria de 2026-11-02 foi diff; a última completa é de 2026-10-25 (f081c60).
+  acceptance_criteria:
+  - /security-audit full executada sobre o commit da v0.9.0, com relatório em docs/security/.
+  - Nenhum achado crítico, alto ou médio em aberto; os demais estão no backlog ou aceitos no risk-register.
+  priority: should
+  rank: 65
+  estimate: 2
+  status: backlog
+  sprint: 14
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - security-audit
+    risk_id: null
+  source:
+    kind: maturity
+    ref: Auditoria de segurança recente
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: TK-007
+  type: task
+  title: Primeira versão da API em FastAPI
+  epic: EP-007
+  story: ''
+  description: Rotas iniciais de auth, MFA, usuários, imóveis, contratos, checklists, dashboard e seed, mais o Dockerfile.
+    Commits de Gabriel Henrique.
+  acceptance_criteria:
+  - Entrega reconstruída do histórico do git na adoção; a evidência é o commit citado.
+  priority: must
+  rank: 1430
+  estimate: 8
+  status: done
+  sprint: 1
+  phase: F0
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit ab390a3
+  - commit 53a6924
+  - commit ccdcd1e
+  - app/main.py
+  - app/routers/
+  created: '2026-11-02'
+  updated: '2026-06-10'
+  history:
+  - date: '2026-06-10'
+    status: done
+- id: TK-008
+  type: task
+  title: Infraestrutura de testes, testes de integração e CI
+  epic: EP-007
+  story: ''
+  description: Fixtures de teste, testes unitários e de integração por router e o workflow de CI.
+  acceptance_criteria:
+  - Entrega reconstruída do histórico do git na adoção; a evidência é o commit citado.
+  priority: must
+  rank: 1440
+  estimate: 5
+  status: done
+  sprint: 1
+  phase: F0
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 1d4291f
+  - commit b76aa5a
+  - 'PR #1 (0b2e8fc, branch gbhenri20/feature/testes)'
+  - .github/workflows/tests.yml
+  - tests/
+  created: '2026-11-02'
+  updated: '2026-06-13'
+  history:
+  - date: '2026-06-13'
+    status: done
+- id: TK-009
+  type: task
+  title: README inicial do projeto
+  epic: EP-007
+  story: ''
+  description: Primeira versão do README com as informações do projeto.
+  acceptance_criteria:
+  - Entrega reconstruída do histórico do git na adoção; a evidência é o commit citado.
+  priority: must
+  rank: 1450
+  estimate: 1
+  status: done
+  sprint: 1
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit 25381a2
+  - README.md
+  created: '2026-11-02'
+  updated: '2026-06-13'
+  history:
+  - date: '2026-06-13'
+    status: done
+- id: TK-010
+  type: task
+  title: Baseline de segurança, riscos iniciais e arquitetura v1
+  epic: EP-006
+  story: ''
+  description: Baseline de segurança, cenários de risco R-01 a R-05 e diagrama de arquitetura.
+  acceptance_criteria:
+  - Entrega reconstruída do histórico do git na adoção; a evidência é o commit citado.
+  priority: must
+  rank: 1460
+  estimate: 3
+  status: done
+  sprint: 7
+  phase: F1
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit fbaf99e
+  - docs/security/security-baseline.md
+  - docs/security/initial-risks.md
+  - docs/architecture/architecture-v1.md
+  created: '2026-11-02'
+  updated: '2026-09-07'
+  history:
+  - date: '2026-09-07'
+    status: done
+- id: TK-011
+  type: task
+  title: README com a documentação dos módulos e endpoints
+  epic: EP-007
+  story: ''
+  description: README atualizado com os módulos entregues na sprint.
+  acceptance_criteria:
+  - Entrega reconstruída do histórico do git na adoção; a evidência é o commit citado.
+  priority: must
+  rank: 1470
+  estimate: 1
+  status: done
+  sprint: 7
+  phase: F0
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit e85e0df
+  - 'PR #9'
+  - README.md
+  created: '2026-11-02'
+  updated: '2026-09-07'
+  history:
+  - date: '2026-09-07'
+    status: done
+- id: TK-012
+  type: task
+  title: Product backlog da disciplina
+  epic: EP-007
+  story: ''
+  description: Product Goal, histórias US-001 a US-014 e itens SEC/DOC da disciplina.
+  acceptance_criteria:
+  - Entrega reconstruída do histórico do git na adoção; a evidência é o commit citado.
+  priority: must
+  rank: 1480
+  estimate: 2
+  status: done
+  sprint: 8
+  phase: F1
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit db09944
+  - docs/product-backlog.md
+  created: '2026-11-02'
+  updated: '2026-09-16'
+  history:
+  - date: '2026-09-16'
+    status: done
+- id: TK-013
+  type: task
+  title: Docker Compose, .dockerignore e .env.example sem segredos
+  epic: EP-008
+  story: ''
+  description: Compose versionado com nome fixo, CORS sem curinga, container sem capabilities e exemplo de ambiente
+    sem valores.
+  acceptance_criteria:
+  - Entrega reconstruída do histórico do git na adoção; a evidência é o commit citado.
+  priority: must
+  rank: 1490
+  estimate: 2
+  status: done
+  sprint: 11
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - commit d0b5f35
+  - docker-compose.yml
+  - .dockerignore
+  - .env.example
+  created: '2026-11-02'
+  updated: '2026-11-01'
+  history:
+  - date: '2026-11-01'
+    status: done
+- id: TK-014
+  type: task
+  title: 'Adoção da gestão ágil: roadmap, backlog, riscos, ADRs e auditoria diff'
+  epic: EP-007
+  story: ''
+  description: Executado com /project-kickoff adopt e /security-audit diff f081c60. Fica em review até o commit.
+  acceptance_criteria:
+  - Arquivos de docs/roadmap, docs/risks, docs/adr e .github versionados.
+  - backlog.py validate sem erros.
+  - Relatório da auditoria diff publicado em docs/security/.
+  priority: must
+  rank: 1500
+  estimate: 3
+  status: review
+  sprint: 11
+  phase: F1
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: git
+    ref: reconstruído na adoção
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence:
+  - docs/roadmap/
+  - docs/risks/
+  - docs/adr/
+  - docs/security/relatorio-2026-11-02.md
+  - .github/PULL_REQUEST_TEMPLATE.md
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: review
+- id: TK-015
+  type: task
+  title: Release candidata v0.9.0
+  epic: EP-007
+  story: ''
+  description: Marco v0.9.0 do roadmap.
+  acceptance_criteria:
+  - Existe a tag v0.9.0 num commit com o CI verde, depois da auditoria completa (TK-006).
+  - CHANGELOG.md tem a seção da v0.9.0.
+  priority: should
+  rank: 66
+  estimate: 1
+  status: backlog
+  sprint: 14
+  phase: F6
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: roadmap
+    ref: marco do roadmap.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: TK-016
+  type: task
+  title: Relatório final, roteiro de demonstração e release v1.0.0
+  epic: EP-007
+  story: ''
+  description: Marco v1.0.0 do roadmap (entrega da disciplina).
+  acceptance_criteria:
+  - Existe o relatório final (skill project-docs) com histórico, decisões, controles e riscos residuais.
+  - Existe um roteiro de demonstração que mostra pelo menos um cenário negado por perfil.
+  - Existe a tag v1.0.0 num commit com o CI verde.
+  priority: must
+  rank: 255
+  estimate: 3
+  status: backlog
+  sprint: 14
+  phase: F7
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: roadmap
+    ref: marco do roadmap.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog

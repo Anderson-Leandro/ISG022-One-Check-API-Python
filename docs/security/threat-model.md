@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-10-30 (auditoria de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md), [011 e 012](correcao-sec-011-012-2026-10-30.md) e [014 e 015](correcao-sec-014-015-2026-10-30.md))_
+_Última atualização: 2026-11-02 ([auditoria diff](relatorio-2026-11-02.md) sobre `d0b5f35`: SEC-017 a SEC-020 abertos; auditoria completa de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md), [011 e 012](correcao-sec-011-012-2026-10-30.md) e [014 e 015](correcao-sec-014-015-2026-10-30.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -87,7 +87,9 @@ flowchart LR
 | T-20 | Dependências | T/E | CVE em pacote (Pillow, python-multipart, python-jose) | Integridade | PyJWT no lugar do python-jose; `requirements.lock` com hashes, instalado com `--require-hashes`; `pip-audit` no CI | Mitigada | SEC-006 |
 | T-21 | Repositório | I | Banco e seed publicados no GitHub | Confidencialidade | `onecheck.db` fora do índice (o histórico só tem dados de seed); credenciais do seed só em desenvolvimento | Mitigada (falta a rotação em produção) | SEC-001, SEC-009 |
 | T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie); CORS só para `CORS_ORIGINS`, sem credenciais; `/docs` desligado em produção; `no-store`, `nosniff`, HSTS | Mitigada (depende de `CORS_ORIGINS` no Render) | SEC-007 |
-| T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | `USER app`, `--only-binary`, `permissions: contents: read`, actions por SHA | Mitigada | SEC-008 |
+| T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | `USER app`, `--only-binary`, `permissions: contents: read`, actions por SHA; compose com `cap_drop: ALL` e `no-new-privileges` | Mitigada | SEC-008 |
+| T-25 | Proxy / IP de origem | S/R | Cliente forja o `X-Forwarded-For` para escapar do limite por IP e gravar IP falso na auditoria | Não-repúdio, Disponibilidade | limite por conta independe do IP; `FORWARDED_ALLOW_IPS=*` usa o primeiro item do cabeçalho (`render.yaml:18`) | **Aberta** (a confirmar no Render) | SEC-017 |
+| T-26 | Auditoria (`GET /logs`) | I | Gestor consulta IP e padrão de acesso de todas as contas, inclusive admins | Confidencialidade (LGPD) | rota restrita a admin/gestor; retenção de `LOG_RETENCAO_DIAS` | **Aberta** | SEC-018, SEC-019 |
 
 Status: **Mitigada** · **Parcial** · **Aberta** · **Aceita**
 
@@ -99,6 +101,6 @@ _Seção mantida manualmente pela equipe — preservar entre execuções._
 ## 8. Premissas
 - TLS é terminado pelo proxy do Render, e o banco gerenciado não fica exposto à internet.
 - O deploy roda com **uma instância e um worker**; o limite de tentativas em memória depende disso.
-- O proxy do Render sobrescreve o `X-Forwarded-For` (não verificado; se não sobrescrever, o limite por IP pode ser contornado).
+- O proxy do Render sobrescreve o `X-Forwarded-For` (não verificado). Com `FORWARDED_ALLOW_IPS=*`, o uvicorn usa o **primeiro** item do cabeçalho; se o proxy só acrescentar, o cliente escolhe o IP (T-25, SEC-017).
 - A autenticação do front é só por header Bearer; não há cookies de sessão.
 - O perfil `visualizador` tem leitura global de checklists e PDFs por decisão de negócio (a confirmar).

@@ -1,0 +1,64 @@
+project:
+  name: OneCheck API
+  slug: onecheck-api
+  description: 'API REST de gestão de vistorias e locações imobiliárias: contratos, checklists com fotos, laudos
+    em PDF com aceite do locatário e registro de problemas, com controle de acesso por perfil e trilha de auditoria.'
+  profile: api
+  start_date: '2026-06-03'
+  language: pt-BR
+team:
+  mode: team
+  members:
+  - name: Gabriel Henrique Santana
+    roles:
+    - PO
+    github: null
+    trello: null
+  - name: Anderson Mendes Leandro
+    roles:
+    - TL
+    github: Anderson-Leandro
+    trello: null
+  - name: Ismael Alves de Almeida
+    roles:
+    - Dev
+    github: null
+    trello: null
+  - name: Luiz Felipe dos Santos
+    roles:
+    - Dev
+    github: null
+    trello: null
+scrum:
+  sprint_length_days: 14
+  estimation: points
+  scale:
+  - 1
+  - 2
+  - 3
+  - 5
+  - 8
+  - 13
+  tshirt_points:
+    P: 1
+    M: 3
+    G: 5
+    GG: 8
+  max_item_size: 8
+  capacity: 20
+  current_sprint: 11
+security:
+  profile: standard
+  personal_data: true
+  audit_skill: security-audit
+board:
+  provider: none
+  trello:
+    board_id: null
+    lists: {}
+    labels: {}
+  github:
+    repo: Anderson-Leandro/ISG022-One-Check-API-Python
+    use_milestones: true
+roadmap:
+  current_phase: F3

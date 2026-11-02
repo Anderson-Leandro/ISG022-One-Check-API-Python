@@ -1,0 +1,145 @@
+{
+ "project": "OneCheck API",
+ "mode": "diff",
+ "base": "f081c60",
+ "commit": "d0b5f35",
+ "date": "2026-11-02",
+ "findings": [
+  {
+   "id": "SEC-017",
+   "title": "IP de origem lido do primeiro item do X-Forwarded-For, controlado pelo cliente",
+   "severity": "low",
+   "pillars": [
+    "Não-repúdio",
+    "Disponibilidade"
+   ],
+   "principles": [
+    "Fail secure",
+    "Defesa em profundidade"
+   ],
+   "stride": [
+    "S",
+    "R"
+   ],
+   "cwe": "CWE-348",
+   "owasp": "API4:2023",
+   "locations": [
+    {
+     "file": "render.yaml",
+     "line": 18
+    },
+    {
+     "file": "app/rate_limit.py",
+     "line": 74
+    },
+    {
+     "file": "app/auditoria.py",
+     "line": 41
+    }
+   ],
+   "evidence": "FORWARDED_ALLOW_IPS: \"*\" -> uvicorn 0.34 (proxy_headers.py:132) devolve x_forwarded_for_hosts[0]",
+   "scenario": "Se o proxy do Render acrescenta o IP real ao X-Forwarded-For enviado pelo cliente (em vez de sobrescrever), o cliente manda 'X-Forwarded-For: <IP aleatório>' a cada tentativa: o limite por IP (20 falhas/15 min) nunca dispara e log_operacao grava o IP forjado.",
+   "impact": "Contorna a camada por IP do limite de tentativas (o limite por conta continua) e torna o IP da trilha de auditoria (SEC-010) inconfiável. Baixa porque depende do comportamento do proxy, não verificado; vira Média se confirmado.",
+   "recommendation": "Conferir no Render (enviar X-Forwarded-For forjado e ver o ip gravado em /logs). Se for acrescentado, usar o último item do cabeçalho (o que o proxy do Render adiciona) num middleware próprio, ou restringir FORWARDED_ALLOW_IPS à rede do proxy.",
+   "source": [
+    "claude"
+   ]
+  },
+  {
+   "id": "SEC-018",
+   "title": "Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas",
+   "severity": "low",
+   "pillars": [
+    "Confidencialidade"
+   ],
+   "principles": [
+    "Menor privilégio"
+   ],
+   "stride": [
+    "I"
+   ],
+   "cwe": "CWE-359",
+   "owasp": "API3:2023",
+   "locations": [
+    {
+     "file": "app/routers/dashboard.py",
+     "line": 85
+    },
+    {
+     "file": "app/routers/dashboard.py",
+     "line": 118
+    }
+   ],
+   "evidence": "_: Usuario = Depends(require_roles(\"admin\", \"gestor\")) ... \"detalhes\": l.detalhes, \"ip\": l.ip",
+   "scenario": "Um gestor chama GET /logs?acao=login e obtém IP e horário de login de todos os usuários, inclusive dos admins, e os e-mails digitados nos logins falhos.",
+   "impact": "Exposição de dados pessoais (IP, padrão de acesso) além da necessidade do perfil; o backlog do produto define a auditoria como atribuição do admin. Exige conta de gestor.",
+   "recommendation": "Restringir GET /logs ao admin, ou para o gestor omitir ip/detalhes e eventos de contas admin/gestor.",
+   "source": [
+    "claude"
+   ]
+  },
+  {
+   "id": "SEC-019",
+   "title": "Login falho grava o texto digitado no campo e-mail",
+   "severity": "info",
+   "pillars": [
+    "Confidencialidade"
+   ],
+   "principles": [
+    "Minimização (LGPD)"
+   ],
+   "stride": [
+    "I"
+   ],
+   "cwe": "CWE-532",
+   "owasp": "A09:2021",
+   "locations": [
+    {
+     "file": "app/routers/auth_router.py",
+     "line": 58
+    }
+   ],
+   "evidence": "log_operacao(db, None, \"login_falho\", \"usuario\", None, f\"email: {body.email}\")",
+   "scenario": "Usuário digita a senha no campo de e-mail por engano; o texto fica em log_operacao e aparece em GET /logs.",
+   "impact": "Dado sem finalidade guardado por até LOG_RETENCAO_DIAS. Mitigado pela retenção (SEC-014).",
+   "recommendation": "Gravar usuario_id quando a conta existir e, quando não existir, só um hash ou o domínio do e-mail.",
+   "source": [
+    "claude"
+   ]
+  },
+  {
+   "id": "SEC-020",
+   "title": "Filtros de data inválidos em /logs são ignorados em silêncio",
+   "severity": "info",
+   "pillars": [
+    "Integridade"
+   ],
+   "principles": [
+    "Fail secure"
+   ],
+   "stride": [
+    "I"
+   ],
+   "cwe": "CWE-390",
+   "owasp": "—",
+   "locations": [
+    {
+     "file": "app/routers/dashboard.py",
+     "line": 98
+    },
+    {
+     "file": "app/routers/dashboard.py",
+     "line": 104
+    }
+   ],
+   "evidence": "except Exception:\n    pass",
+   "scenario": "de=31/10/2026 (formato inválido) devolve logs de todo o período, sem aviso, a quem pediu um recorte.",
+   "impact": "Sem ganho de acesso (só admin/gestor); pode levar a conclusões erradas numa investigação.",
+   "recommendation": "Responder 422 para data inválida (declarar os parâmetros como date/datetime).",
+   "source": [
+    "bandit",
+    "claude"
+   ]
+  }
+ ]
+}
