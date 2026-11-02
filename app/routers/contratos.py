@@ -425,8 +425,10 @@ async def create_problema(
     if prioridade not in ("normal", "alta", "urgente"):
         return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Prioridade inválida", "erros": {"prioridade": "Prioridade inválida"}})
 
-    if status_val not in ("aberto", "em_andamento", "em_analise", "resolvido", "fechado"):
-        return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Status inválido", "erros": {"status": "Status inválido"}})
+    # O problema nasce aberto: o andamento só muda por PATCH /problemas/{id}/status (admin/gestor)
+    if status_val != "aberto":
+        msg = "O problema é criado com status 'aberto'"
+        return JSONResponse(status_code=422, content={"sucesso": False, "erro": msg, "erros": {"status": msg}})
 
     if erros:
         return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Dados inválidos", "erros": erros})

@@ -91,3 +91,10 @@ class TestStartSh:
     @pytest.mark.parametrize("app_env", ["development", "Dev", "local"])
     def test_em_desenvolvimento_roda_seed(self, stubs, app_env):
         assert "python scripts/seed.py" in self._start(stubs, app_env)
+
+    @pytest.mark.parametrize("app_env", [None, "production", "development"])
+    def test_limpeza_de_dados_vencidos_roda_em_todo_start(self, stubs, app_env):
+        # SEC-014: refresh tokens vencidos e logs além da retenção
+        chamadas = self._start(stubs, app_env)
+        assert "python scripts/limpar_dados_vencidos.py" in chamadas
+        assert chamadas.index("limpar_dados_vencidos") < chamadas.index("uvicorn")

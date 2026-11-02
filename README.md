@@ -48,7 +48,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
   - Notificações automáticas por e-mail/sistema para administradores e locatários (`NotificationService`).
 
 - **📊 Dashboard & Auditoria Avançada**:
-  - Métricas agregadas em tempo real (`/dashboard`): imóveis locados, checklists pendentes, problemas abertos e vistorias agendadas.
+  - Métricas agregadas em tempo real (`/dashboard`): imóveis locados, checklists pendentes, problemas abertos e vistorias agendadas, com o mesmo recorte por perfil das listagens. O valor vem `null` quando o perfil não acessa aquele dado (problemas para vistoriador e visualizador; agendamentos para locatário).
   - Central de auditoria (`GET /logs`) com IP de origem, usuário, ação, entidade e payload JSON sanitizado (senhas e segredos são automaticamente ocultados). Nas edições, o payload traz `{"campos": [...]}` com os nomes dos campos alterados, sem os valores.
   - Filtros avançados por data (`de`, `ate`), entidade e usuário.
 
@@ -66,7 +66,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | **Geocoding** | Nominatim (OpenStreetMap) + ViaCEP via `httpx` |
 | **Geração de PDF** | Motor PDF 1.4 Pure Python (sem dependências binárias C externas) |
 | **Dependências** | `requirements.txt` (diretas) + `requirements.lock` (todas, com hash) |
-| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (757 testes, 94% de cobertura) |
+| **Testes Automatizados** | `pytest` + `pytest-cov` + `httpx` (824 testes, 95% de cobertura) |
 | **CI / CD** | GitHub Actions (testes em PostgreSQL + auditoria de dependências com `pip-audit`; actions fixadas por SHA, token só leitura) |
 | **Container** | Docker (`python:3.12-slim`, usuário sem privilégio, só wheels) + Docker Compose com PostgreSQL |
 
@@ -121,6 +121,12 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 2. `mfa_required` → `POST /auth/mfa/verify` com `{temp_token, codigo}`.
 3. `mfa_setup_required` → `GET /auth/mfa/setup-login` (segredo e QR code) e `POST /auth/mfa/activate-login` com o código. O segredo só passa a valer depois da ativação.
 
+### Política de senha
+Vale para senhas novas: `POST /usuarios`, `PUT /usuarios/{id}` (`senha`), `PUT /usuarios/me/senha` (`nova_senha`) e `PATCH /usuarios/me` (`senha_nova`).
+- Pelo menos 10 caracteres e no máximo 72 bytes (o limite do bcrypt; acentos ocupam 2 bytes).
+- Recusa senhas só com números e símbolos, senhas comuns mesmo com números e símbolos em volta (`Senha@2024`, `qwertyuiop`) e senhas com menos de 5 caracteres distintos.
+- Fora da regra → `422` no formato do FastAPI, com a mensagem em `detail[0].msg`. O login continua aceitando senhas cadastradas antes da política.
+
 ### Limite de tentativas
 5 falhas por conta ou 20 por IP em 15 minutos → `429`. Vale para login, MFA (`verify`, `activate-login`, `activate`, `desabilitar`) e para as rotas de `/usuarios/me` que pedem senha ou código.
 
@@ -168,11 +174,12 @@ POST   /api/v1/usuarios                    # Criar usuário (admin, gestor; só 
 GET    /api/v1/usuarios/{id}               # Detalhes de usuário (admin, gestor)
 PUT    /api/v1/usuarios/{id}               # Atualizar usuário; não aceita o próprio id (admin, gestor)
 DELETE /api/v1/usuarios/{id}               # Exclusão lógica (admin, gestor)
-POST   /api/v1/usuarios/{id}/mfa/setup     # Gera segredo para o usuário (admin, gestor)
-POST   /api/v1/usuarios/{id}/mfa/enable    # Define o segredo do usuário; também /habilitar (admin, gestor)
+POST   /api/v1/usuarios/{id}/mfa/enable    # Exige o MFA; o usuário configura o autenticador no próximo login; também /habilitar (admin, gestor)
 DELETE /api/v1/usuarios/{id}/mfa           # Reset do MFA; também POST /desabilitar (admin, gestor)
 ```
 Gestor não age sobre contas `admin`/`gestor`. Toda mudança de credencial feita aqui encerra as sessões do usuário afetado.
+- **MFA de outro usuário:** admin e gestor só exigem ou resetam o MFA. O segredo é gerado no login do próprio usuário (`mfa_setup_required`); enviar `secret` ou `codigo` em `/{id}/mfa/enable` dá `422`.
+- **CPF:** vem completo só em `/usuarios/me` e em `GET /usuarios/{id}`; nas demais respostas (listagem, criação, edição, MFA), mascarado como `***.982.247-**`. No cadastro, aceita com ou sem pontuação, recusa CPF inválido com `422` e grava como `000.000.000-00`.
 
 ### 🏠 Imóveis & Cômodos
 ```http
@@ -222,7 +229,7 @@ GET    /api/v1/checklists/{id}/download    # Laudo em PDF; também /pdf e /downl
 ### 🛠️ Problemas & Linha do Tempo
 ```http
 GET    /api/v1/contratos/{id}/problemas    # Listar problemas (admin, gestor, locatário do contrato)
-POST   /api/v1/contratos/{id}/problemas    # Registrar ocorrência, JSON ou multipart com foto (admin, gestor, locatário do contrato)
+POST   /api/v1/contratos/{id}/problemas    # Registrar ocorrência, JSON ou multipart com foto (admin, gestor, locatário do contrato); nasce "aberto", outro status dá 422
 GET    /api/v1/problemas/{id}              # Detalhes da ocorrência (admin, gestor, locatário do contrato)
 PATCH  /api/v1/problemas/{id}/status       # Atualizar status (admin, gestor)
 GET    /api/v1/problemas/{id}/atualizacoes # Linha do tempo (admin, gestor, locatário do contrato)
@@ -231,7 +238,7 @@ POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (a
 
 ### 📊 Dashboard, Logs & Sistema
 ```http
-GET    /api/v1/dashboard                   # Métricas consolidadas em tempo real
+GET    /api/v1/dashboard                   # Métricas no recorte do perfil; null no que o perfil não acessa
 GET    /api/v1/logs                        # Logs de auditoria, com filtros e paginação (admin, gestor)
 GET    /api/v1/health                      # Health check da API (público)
 GET    /api/v1/uploads/{filename}          # Fotos enviadas (público, nome aleatório)
@@ -277,7 +284,7 @@ pip install -r requirements-test.txt
 Para adicionar ou mudar uma dependência, edite `requirements.txt` e regenere o lockfile com o comando do cabeçalho de `requirements.lock` (usa o [`uv`](https://docs.astral.sh/uv/)). O teste `test_lockfile_coerente_com_requirements` falha se os dois arquivos divergirem.
 
 ### 4. Configurar Variáveis de Ambiente (`.env`)
-Crie um arquivo `.env` na raiz do projeto:
+Copie o exemplo e preencha: `cp .env.example .env`. O `.env.example` traz todas as variáveis; as principais:
 ```env
 # Sem APP_ENV, vale a regra de produção: a API não sobe sem JWT_SECRET forte.
 # Em desenvolvimento, APP_ENV=development dispensa o JWT_SECRET (gera um aleatório por execução).
@@ -309,9 +316,13 @@ SEED_SECRET=
 # Tamanho máximo do corpo: uploads (MB) e demais requisições, como JSON (KB)
 # MAX_UPLOAD_MB=10
 # MAX_BODY_KB=1024
+# Dias de log_operacao guardados (mínimo 180, registros de acesso do Marco Civil)
+# LOG_RETENCAO_DIAS=365
 ```
 
 No Render, defina `CORS_ORIGINS` com a URL do front (o `render.yaml` deixa o valor para o painel).
+
+A cada start, o `start.sh` apaga os refresh tokens vencidos e os eventos de `log_operacao` com mais de `LOG_RETENCAO_DIAS` dias. Se a instância fica muito tempo no ar sem reiniciar, agende também `python scripts/limpar_dados_vencidos.py` (Render Cron Job ou cron do host).
 
 ### Dados de demonstração (seed)
 - Em `APP_ENV=development`, o `start.sh` popula o banco vazio com as contas `@onecheck.local` e credenciais fixas, exibidas pelo `python scripts/seed.py`.
@@ -330,6 +341,8 @@ Documentação Swagger interativa (desenvolvimento ou `DOCS_ENABLED=true`): `htt
 # .env com JWT_SECRET (32+ caracteres) e POSTGRES_PASSWORD
 docker compose up -d --build
 ```
+- O projeto do Compose se chama `api-python` (fixo no `docker-compose.yml`): os volumes são `api-python_pgdata` e `api-python_uploads`, seja qual for o nome da pasta.
+- O container da API roda sem nenhuma capability do Linux (`cap_drop: ALL`) e com `no-new-privileges`.
 - A API roda como o usuário `app` (uid 10001), sem privilégio: o código é só leitura e apenas `/app/uploads` é gravável.
 - **Volume de uploads criado antes dessa mudança:** ele pertence ao root, e os uploads falham com `Permission denied`. Corrija uma única vez:
   ```bash
@@ -341,7 +354,7 @@ docker compose up -d --build
 
 ## 🧪 Executando os Testes Automatizados
 
-A suíte cobre os fluxos de negócio e as correções de segurança com **757 testes automatizados** e **94% de cobertura**:
+A suíte cobre os fluxos de negócio e as correções de segurança com **824 testes automatizados** e **95% de cobertura**:
 
 ```bash
 # Executar todos os testes
@@ -363,9 +376,11 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
 
 ```
 ├── app/
+│   ├── auditoria.py             # IP de origem e campos alterados no log de auditoria
 │   ├── auth.py                  # JWT, Bcrypt, TOTP MFA e revogação de sessões
 │   ├── cabecalhos.py            # Cabeçalhos de segurança em todas as respostas
 │   ├── config.py                # Configurações e variáveis de ambiente
+│   ├── cpf.py                   # Validação e máscara de CPF
 │   ├── database.py              # Conexão SQLAlchemy e migração incremental
 │   ├── deps.py                  # Autenticação, roles (RBAC) e regras de acesso por recurso
 │   ├── geocoding.py             # Módulo de integração OpenStreetMap e ViaCEP
@@ -375,8 +390,10 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
 │   ├── notification_service.py  # Serviço de notificações para admins e locatários
 │   ├── pdf_generator.py         # Motor de renderização de Laudos em PDF (Pure Python)
 │   ├── rate_limit.py            # Limite de tentativas falhas por conta e por IP
+│   ├── retencao.py              # Limpeza de refresh tokens vencidos e logs antigos
 │   ├── schemas.py               # Schemas Pydantic, DTOs e envelopes de resposta
 │   ├── seed_service.py          # Carga de dados de demonstração e rotação de credenciais
+│   ├── senhas.py                # Política de senha
 │   ├── serializers.py           # Serializadores de dados e registro de auditoria
 │   ├── uploads.py               # Validação e gravação segura de imagens
 │   └── routers/                 # Roteadores modulares organizados por recurso
@@ -393,7 +410,7 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
 ├── docs/
 │   ├── architecture/            # Arquitetura e fronteiras de confiança
 │   └── security/                # Auditoria, modelo de ameaças e relatórios de correção
-├── scripts/                     # Seed, rotação de credenciais e utilitários de carga
+├── scripts/                     # Seed, rotação de credenciais, limpeza de dados vencidos e utilitários de carga
 ├── requirements.txt             # Dependências diretas
 ├── requirements.lock            # Todas as dependências, com hash (instalação)
 └── tests/

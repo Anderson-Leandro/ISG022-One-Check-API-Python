@@ -1,9 +1,16 @@
 from datetime import date, datetime
-from typing import Any, Generic, TypeVar
+from typing import Annotated, Any, Generic, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import AfterValidator, BaseModel, Field
+
+from app.cpf import validar_cpf
+from app.senhas import validar_senha
 
 T = TypeVar("T")
+
+# Senha nova (criação e troca). O login aceita a senha já cadastrada, mesmo fora da política
+SenhaNova = Annotated[str, AfterValidator(validar_senha)]
+Cpf = Annotated[str | None, AfterValidator(validar_cpf)]
 
 
 class Paginacao(BaseModel):
@@ -103,27 +110,27 @@ class TokenResponse(BaseModel):
 class UsuarioCreate(BaseModel):
     nome: str
     email: str
-    senha: str = Field(min_length=6)
+    senha: SenhaNova
     role: str
-    cpf: str | None = None
+    cpf: Cpf = None
 
 
 class UsuarioUpdateMe(BaseModel):
     nome: str | None = None
     senha_atual: str | None = None
-    senha_nova: str | None = Field(default=None, min_length=6)
+    senha_nova: SenhaNova | None = None
 
 
 class AlterarSenhaRequest(BaseModel):
     senha_atual: str
-    nova_senha: str = Field(min_length=6)
+    nova_senha: SenhaNova
 
 
 class UsuarioUpdate(BaseModel):
     nome: str | None = None
     email: str | None = None
     role: str | None = None
-    senha: str | None = Field(default=None, min_length=6)
+    senha: SenhaNova | None = None
     mfa_enabled: bool | None = None
 
 

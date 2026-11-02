@@ -1,0 +1,283 @@
+sprints:
+- number: 1
+  goal: Primeira versão da API no ar, com testes de integração e CI
+  start: '2026-06-03'
+  end: '2026-06-16'
+  status: closed
+  capacity: null
+  committed:
+  - TK-007
+  - TK-008
+  - TK-009
+  committed_points: 14.0
+  completed_points: 14.0
+  completed:
+  - TK-007
+  - TK-008
+  - TK-009
+  carried_over: []
+  closed_on: '2026-06-16'
+  retroactive: true
+- number: 2
+  goal: Sem desenvolvimento registrado no git
+  start: '2026-06-17'
+  end: '2026-06-30'
+  status: closed
+  capacity: null
+  committed: []
+  committed_points: 0
+  completed_points: null
+  completed: []
+  carried_over: []
+  closed_on: '2026-06-30'
+  retroactive: true
+  note: Nenhum commit no período (sprint sem trabalho; fora do cálculo de velocity).
+- number: 3
+  goal: Sem desenvolvimento registrado no git
+  start: '2026-07-01'
+  end: '2026-07-14'
+  status: closed
+  capacity: null
+  committed: []
+  committed_points: 0
+  completed_points: null
+  completed: []
+  carried_over: []
+  closed_on: '2026-07-14'
+  retroactive: true
+  note: Nenhum commit no período (sprint sem trabalho; fora do cálculo de velocity).
+- number: 4
+  goal: Sem desenvolvimento registrado no git
+  start: '2026-07-15'
+  end: '2026-07-28'
+  status: closed
+  capacity: null
+  committed: []
+  committed_points: 0
+  completed_points: null
+  completed: []
+  carried_over: []
+  closed_on: '2026-07-28'
+  retroactive: true
+  note: Nenhum commit no período (sprint sem trabalho; fora do cálculo de velocity).
+- number: 5
+  goal: Sem desenvolvimento registrado no git
+  start: '2026-07-29'
+  end: '2026-08-11'
+  status: closed
+  capacity: null
+  committed: []
+  committed_points: 0
+  completed_points: null
+  completed: []
+  carried_over: []
+  closed_on: '2026-08-11'
+  retroactive: true
+  note: Nenhum commit no período (sprint sem trabalho; fora do cálculo de velocity).
+- number: 6
+  goal: Sem desenvolvimento registrado no git
+  start: '2026-08-12'
+  end: '2026-08-25'
+  status: closed
+  capacity: null
+  committed: []
+  committed_points: 0
+  completed_points: null
+  completed: []
+  carried_over: []
+  closed_on: '2026-08-25'
+  retroactive: true
+  note: Nenhum commit no período (sprint sem trabalho; fora do cálculo de velocity).
+- number: 7
+  goal: 'MVP completo: paridade com a API PHP e todos os módulos (US-001 a US-014)'
+  start: '2026-08-26'
+  end: '2026-09-08'
+  status: closed
+  capacity: null
+  committed:
+  - US-001
+  - US-002
+  - US-003
+  - US-004
+  - US-005
+  - US-006
+  - US-007
+  - US-008
+  - US-009
+  - US-010
+  - US-011
+  - US-012
+  - US-013
+  - US-014
+  - TK-010
+  - TK-011
+  committed_points: 67.0
+  completed_points: 67.0
+  completed:
+  - US-001
+  - US-002
+  - US-003
+  - US-004
+  - US-005
+  - US-006
+  - US-007
+  - US-008
+  - US-009
+  - US-010
+  - US-011
+  - US-012
+  - US-013
+  - US-014
+  - TK-010
+  - TK-011
+  carried_over: []
+  closed_on: '2026-09-08'
+  retroactive: true
+- number: 8
+  goal: Product backlog da disciplina registrado
+  start: '2026-09-09'
+  end: '2026-09-22'
+  status: closed
+  capacity: null
+  committed:
+  - TK-012
+  committed_points: 2.0
+  completed_points: 2.0
+  completed:
+  - TK-012
+  carried_over: []
+  closed_on: '2026-09-22'
+  retroactive: true
+- number: 9
+  goal: Sem desenvolvimento registrado no git
+  start: '2026-09-23'
+  end: '2026-10-06'
+  status: closed
+  capacity: null
+  committed: []
+  committed_points: 0
+  completed_points: null
+  completed: []
+  carried_over: []
+  closed_on: '2026-10-06'
+  retroactive: true
+  note: Nenhum commit no período (sprint sem trabalho; fora do cálculo de velocity).
+- number: 10
+  goal: Sem desenvolvimento registrado no git
+  start: '2026-10-07'
+  end: '2026-10-20'
+  status: closed
+  capacity: null
+  committed: []
+  committed_points: 0
+  completed_points: null
+  completed: []
+  carried_over: []
+  closed_on: '2026-10-20'
+  retroactive: true
+  note: Nenhum commit no período (sprint sem trabalho; fora do cálculo de velocity).
+- number: 11
+  goal: Corrigir as pendências e os 16 achados da auditoria completa; adotar a gestão ágil
+  start: '2026-10-21'
+  end: '2026-11-03'
+  status: active
+  capacity: null
+  committed:
+  - SEC-021
+  - SEC-022
+  - SEC-023
+  - SEC-024
+  - SEC-001
+  - SEC-002
+  - SEC-003
+  - SEC-004
+  - SEC-005
+  - SEC-006
+  - SEC-007
+  - SEC-008
+  - SEC-009
+  - SEC-010
+  - SEC-011
+  - SEC-012
+  - SEC-013
+  - SEC-014
+  - SEC-015
+  - SEC-016
+  - TK-001
+  - TK-013
+  - TK-014
+  committed_points: 64.0
+  completed_points: null
+  completed: []
+  carried_over: []
+  retroactive: true
+  note: Reconstruída na adoção. O trabalho foi feito antes do planejamento formal.
+- number: 12
+  goal: Release v0.1.0, produção segura e escopo da F4 fechado
+  start: '2026-11-04'
+  end: '2026-11-17'
+  status: planned
+  capacity: 31.0
+  committed:
+  - DEBT-007
+  - TK-002
+  - TK-003
+  - DEBT-006
+  - DEBT-009
+  - SPK-004
+  - SPK-001
+  - SPK-002
+  - SPK-003
+  - US-015
+  - US-017
+  - US-016
+  committed_points: 31.0
+  completed_points: null
+  completed: []
+  carried_over: []
+- number: 13
+  goal: Qualidade contínua e hardening
+  start: '2026-11-18'
+  end: '2026-12-01'
+  status: planned
+  capacity: 36.0
+  committed:
+  - DEBT-004
+  - DEBT-005
+  - DEBT-008
+  - DEBT-001
+  - DEBT-003
+  - DEBT-002
+  - DEBT-010
+  - SEC-017
+  - SEC-018
+  - SEC-019
+  - SEC-020
+  - SEC-027
+  - TK-005
+  - SEC-031
+  committed_points: 36.0
+  completed_points: null
+  completed: []
+  carried_over: []
+- number: 14
+  goal: Conformidade, release candidata v0.9.0 e entrega final v1.0.0
+  start: '2026-12-02'
+  end: '2026-12-11'
+  status: planned
+  capacity: 31.0
+  committed:
+  - SEC-025
+  - SEC-028
+  - SEC-029
+  - SEC-030
+  - SEC-026
+  - TK-006
+  - TK-015
+  - TK-004
+  - TK-016
+  committed_points: 31.0
+  completed_points: null
+  completed: []
+  carried_over: []
+  note: 'Sprint de 10 dias: termina no prazo final de 11/12/2026.'

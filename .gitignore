@@ -1,5 +1,6 @@
 # Ambiente virtual
 .venv/
+venv/
 
 # Python
 __pycache__/
@@ -19,3 +20,8 @@ uploads/
 
 # Plano de testes (documento interno)
 PLANO_TESTES.md
+
+# Variáveis de ambiente (o exemplo, sem valores, é versionado)
+.env
+.env.*
+!.env.example

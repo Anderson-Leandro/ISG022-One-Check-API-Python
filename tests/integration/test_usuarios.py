@@ -10,7 +10,6 @@ Rotas cobertas:
   GET    /api/v1/usuarios
   GET    /api/v1/usuarios/{id}
   PUT    /api/v1/usuarios/{id}
-  POST   /api/v1/usuarios/{id}/mfa/setup
   POST   /api/v1/usuarios/{id}/mfa/enable
   DELETE /api/v1/usuarios/{id}/mfa
   POST   /api/v1/usuarios
@@ -289,7 +288,7 @@ class TestCreateUsuario:
     def test_admin_cria_usuario(self, client, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Novo User", "email": "novo@test.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "Novo User", "email": "novo@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -300,7 +299,7 @@ class TestCreateUsuario:
     def test_gestor_cria_usuario(self, client, token_gestor):
         r = client.post(
             BASE,
-            json={"nome": "User Gestor", "email": "usergestor@test.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "User Gestor", "email": "usergestor@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_gestor),
         )
         data = r.json()
@@ -309,7 +308,7 @@ class TestCreateUsuario:
     def test_email_duplicado_retorna_falha(self, client, user_locatario, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Duplicado", "email": user_locatario.email, "senha": "senha123", "role": "locatario"},
+            json={"nome": "Duplicado", "email": user_locatario.email, "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -319,7 +318,7 @@ class TestCreateUsuario:
     def test_role_admin_ativa_mfa_automaticamente(self, client, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Novo Admin", "email": "novoadmin@test.com", "senha": "senha123", "role": "admin"},
+            json={"nome": "Novo Admin", "email": "novoadmin@test.com", "senha": "Vistoria-Casa-42", "role": "admin"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -329,7 +328,7 @@ class TestCreateUsuario:
     def test_role_locatario_nao_ativa_mfa(self, client, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Loc Sem Mfa", "email": "locsemmfa@test.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "Loc Sem Mfa", "email": "locsemmfa@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_admin),
         )
         data = r.json()
@@ -339,7 +338,7 @@ class TestCreateUsuario:
     def test_locatario_nao_pode_criar_usuario(self, client, token_locatario):
         r = client.post(
             BASE,
-            json={"nome": "X", "email": "x@x.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "X", "email": "x@x.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_locatario),
         )
         assert r.status_code == 403
@@ -347,34 +346,26 @@ class TestCreateUsuario:
     def test_sem_autenticacao_retorna_401(self, client):
         r = client.post(
             BASE,
-            json={"nome": "X", "email": "x@x.com", "senha": "senha123", "role": "locatario"},
+            json={"nome": "X", "email": "x@x.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
         )
         assert r.status_code == 401
 
 
-# ── POST /usuarios/{id}/mfa/setup e enable e DELETE /mfa ─────────────────────────
+# ── POST /usuarios/{id}/mfa/enable e DELETE /mfa ─────────────────────────────────
 
 class TestMfaAdminRoutes:
-    def test_admin_faz_setup_mfa_de_usuario(self, client, user_locatario, token_admin):
-        r = client.post(f"{BASE}/{user_locatario.id}/mfa/setup", headers=auth(token_admin))
-        data = r.json()
-        assert data["sucesso"] is True
-        assert "secret" in data["dados"]
-
-    def test_setup_usuario_inexistente(self, client, token_admin):
-        r = client.post(f"{BASE}/id-invalido/mfa/setup", headers=auth(token_admin))
+    def test_enable_usuario_inexistente(self, client, token_admin):
+        r = client.post(f"{BASE}/id-invalido/mfa/enable", headers=auth(token_admin))
         data = r.json()
         assert data["sucesso"] is False
 
     def test_admin_habilita_mfa_de_usuario(self, client, user_locatario, token_admin):
-        r = client.post(
-            f"{BASE}/{user_locatario.id}/mfa/enable",
-            json={"secret": MFA_TEST_SECRET, "codigo": totp_now()},
-            headers=auth(token_admin),
-        )
+        # SEC-015: sem segredo; o próprio usuário configura o autenticador
+        r = client.post(f"{BASE}/{user_locatario.id}/mfa/enable", headers=auth(token_admin))
         data = r.json()
         assert data["sucesso"] is True
-        assert data["dados"]["mfa_ativo"] is True
+        assert data["dados"]["mfa_enabled"] is True
+        assert data["dados"]["mfa_configurado"] is False
 
     def test_admin_reseta_mfa_de_usuario(self, client, user_vistoriador, token_admin):
         # user_vistoriador já tem MFA configurado; o próprio MFA não se reseta por esta rota

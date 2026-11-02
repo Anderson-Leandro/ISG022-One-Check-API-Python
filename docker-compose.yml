@@ -1,0 +1,68 @@
+# Nome fixo: volumes e containers não dependem do nome da pasta do repositório
+name: api-python
+
+services:
+  api:
+    build: .
+    container_name: onecheck-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      PORT: 8000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-onecheck}:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}@db:5432/${POSTGRES_DB:-onecheck}
+      # Sem valor padrão: a API não sobe com segredo ausente, público ou com menos de 32 caracteres
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env (32+ caracteres)}
+      APP_ENV: ${APP_ENV:-production}
+      JWT_ACCESS_MINUTES: ${JWT_ACCESS_MINUTES:-60}
+      JWT_REFRESH_DAYS: ${JWT_REFRESH_DAYS:-30}
+      UPLOAD_DIR: /app/uploads
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-10}
+      MAX_BODY_KB: ${MAX_BODY_KB:-1024}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8000}
+      # Vazio = rotas /admin/* desabilitadas. force/refresh_data exigem também SEED_ALLOW_DESTRUCTIVE=true
+      SEED_SECRET: ${SEED_SECRET:-}
+      SEED_ALLOW_DESTRUCTIVE: ${SEED_ALLOW_DESTRUCTIVE:-false}
+      # Vazio: a API decide (todas as origens em development, nenhuma em production)
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      DOCS_ENABLED: ${DOCS_ENABLED:-}
+      LOG_RETENCAO_DIAS: ${LOG_RETENCAO_DIAS:-365}
+    # A API não precisa de nenhuma capability do Linux nem de ganhar privilégio (setuid)
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  db:
+    image: postgres:16-alpine
+    container_name: onecheck-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-onecheck}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      POSTGRES_DB: ${POSTGRES_DB:-onecheck}
+    ports:
+      # Só na máquina local: o banco não fica exposto na rede
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
+  uploads:
