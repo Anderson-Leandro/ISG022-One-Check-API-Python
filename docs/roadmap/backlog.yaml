@@ -2894,8 +2894,8 @@ items:
   priority: could
   rank: 290
   estimate: 8
-  status: in_sprint
-  sprint: 12
+  status: backlog
+  sprint: null
   phase: F4
   depends_on: []
   security:
@@ -2918,10 +2918,12 @@ items:
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-02'
+    status: backlog
   sync:
     github:
-      hash: 8fc1e83a4bf6bb2e
-      remote_at: '2026-11-03T01:16:34Z'
+      hash: 6762c8422cfddf2b
+      remote_at: '2026-11-03T01:46:56Z'
 - id: US-017
   type: story
   title: Histórico do imóvel
@@ -3828,3 +3830,54 @@ items:
     github:
       hash: 6580331e67dc75d3
       remote_at: '2026-11-03T01:16:40Z'
+- id: SPK-005
+  type: spike
+  title: Avaliar a qualidade e a cobertura real da suíte de testes
+  epic: EP-007
+  story: ''
+  description: 'Pergunta: a suíte cobre todos os caminhos e realmente detecta quando o comportamento da aplicação
+    quebra? Hoje há 824 testes e 95% de cobertura de linhas, mas sem medida de ramos nem de mutação. Timebox: 3
+    pontos. A avaliação é só leitura e execução local: não altera código nem testes; as lacunas viram itens no backlog.'
+  acceptance_criteria:
+  - Existe docs/quality/avaliacao-testes-AAAA-MM-DD.md com a cobertura de ramos (pytest --cov --cov-branch) por
+    módulo, comparada à de linhas.
+  - O relatório tem a matriz de autorização (rotas × perfis × dono/não dono) indicando, para cada combinação, se
+    há teste do cenário negado e qual é.
+  - Testes de mutação (mutmut ou equivalente) rodados em app/auth.py, app/deps.py, na máquina de estados dos checklists
+    e em app/rate_limit.py, com a taxa de mutantes mortos por módulo e a lista dos sobreviventes relevantes.
+  - Revisão dos testes dos módulos com mutantes sobreviventes, apontando testes fracos (só status HTTP, sem conferir
+    corpo ou efeito no banco, mock excessivo).
+  - Cada lacuna relevante virou item no backlog (DEBT ou SEC) com critério de aceite objetivo; o DEBT-010 foi absorvido
+    ou refinado com base no resultado.
+  priority: must
+  rank: 35
+  estimate: 3
+  status: in_sprint
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    - OWASP API5:2023
+    risk_id: null
+  source:
+    kind: board
+    ref: pedido do time em 2026-11-03
+  links:
+    trello_card: null
+    gh_issue: 102
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  sync:
+    github:
+      hash: db0308b7b5e6dc66
+      remote_at: '2026-11-03T01:46:57Z'
