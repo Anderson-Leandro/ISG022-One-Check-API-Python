@@ -36,7 +36,7 @@ Para imobiliárias e locatários que precisam registrar o estado de um imóvel s
 - Checklists com itens e fotos, envio para aceite, aceite/rejeição e laudo em PDF.
 - Problemas com fotos, linha do tempo e notificações.
 - Dashboard por perfil e consulta da trilha de auditoria.
-- Até a entrega final: anexos de contrato (US-016) e fotos com URL assinada (SEC-026), se o prazo permitir.
+- Até a entrega final: fotos com URL assinada (SEC-026), se o prazo permitir. Anexos de contrato (US-016) ficaram fora das sprints e entram só se sobrar tempo.
 
 ## Fora de escopo (por enquanto)
 - Pagamentos e cobrança do aluguel.

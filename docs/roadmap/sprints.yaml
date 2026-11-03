@@ -255,8 +255,8 @@ sprints:
   - SPK-003
   - US-015
   - US-017
-  - US-016
-  committed_points: 32.0
+  - SPK-005
+  committed_points: 27.0
   completed_points: null
   completed: []
   carried_over: []
