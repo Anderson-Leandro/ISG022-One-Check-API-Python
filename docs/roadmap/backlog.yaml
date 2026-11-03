@@ -23,7 +23,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 12
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -31,6 +31,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 7738bbeb271d3ea9
+      remote_at: '2026-11-03T00:32:23Z'
 - id: EP-002
   type: epic
   title: Carteira Imobiliária
@@ -53,7 +57,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 13
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -61,6 +65,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 185e0726577137f6
+      remote_at: '2026-11-03T00:32:24Z'
 - id: EP-003
   type: epic
   title: Contratos e Agendamentos
@@ -83,7 +91,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 14
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -91,6 +99,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 45651bde6e72a529
+      remote_at: '2026-11-03T00:32:25Z'
 - id: EP-004
   type: epic
   title: Vistorias e Laudos
@@ -114,7 +126,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 15
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -122,6 +134,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 4a7eb8bfb6214e3c
+      remote_at: '2026-11-03T00:32:25Z'
 - id: EP-005
   type: epic
   title: Ocorrências e Comunicação
@@ -144,7 +160,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 16
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -152,6 +168,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 990840fd83d13489
+      remote_at: '2026-11-03T00:32:26Z'
 - id: EP-006
   type: epic
   title: Auditoria, Segurança e Conformidade
@@ -177,7 +197,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 17
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -185,6 +205,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: e9046d544f00d6b1
+      remote_at: '2026-11-03T00:32:27Z'
 - id: EP-007
   type: epic
   title: Fundação e Qualidade
@@ -207,7 +231,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 18
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -215,6 +239,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: cffba0ba7d94457c
+      remote_at: '2026-11-03T00:32:27Z'
 - id: EP-008
   type: epic
   title: Operação e Deploy
@@ -237,7 +265,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 19
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -245,9 +273,13 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 2e7c471e390e9f07
+      remote_at: '2026-11-03T00:32:28Z'
 - id: SEC-001
   type: security
-  title: '[SEC-001] Seed automático cria admin com senha e segredo MFA públicos'
+  title: Seed automático cria admin com senha e segredo MFA públicos
   epic: EP-006
   story: ''
   description: |-
@@ -282,7 +314,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 20
     prs:
     - '#10'
   evidence:
@@ -300,9 +332,13 @@ items:
     status: backlog
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: a2316d1a24b232cd
+      remote_at: '2026-11-03T00:32:30Z'
 - id: SEC-002
   type: security
-  title: '[SEC-002] Pillow 11.1.0 com CVEs críticas e Image.open aceita qualquer formato do upload'
+  title: Pillow 11.1.0 com CVEs críticas e Image.open aceita qualquer formato do upload
   epic: EP-006
   story: ''
   description: |-
@@ -337,7 +373,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 21
     prs:
     - '#10'
   evidence:
@@ -355,10 +391,13 @@ items:
     status: backlog
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: a54c2ae2d098686a
+      remote_at: '2026-11-03T00:32:33Z'
 - id: SEC-003
   type: security
-  title: '[SEC-003] DoS anônimo: multipart processado antes da autenticação, sem limite de corpo e com dependências
-    vulneráveis'
+  title: 'DoS anônimo: multipart processado antes da autenticação, sem limite de corpo e com dependências vulneráveis'
   epic: EP-006
   story: ''
   description: |-
@@ -392,7 +431,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 22
     prs:
     - '#10'
   evidence:
@@ -410,9 +449,13 @@ items:
     status: backlog
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 0a1b6ad3443d3916
+      remote_at: '2026-11-03T00:32:35Z'
 - id: SEC-004
   type: security
-  title: '[SEC-004] Leitura por ID ignora o vínculo do vistoriador (contratos, agendamentos, imóveis)'
+  title: Leitura por ID ignora o vínculo do vistoriador (contratos, agendamentos, imóveis)
   epic: EP-006
   story: ''
   description: |-
@@ -446,7 +489,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 23
     prs:
     - '#10'
   evidence:
@@ -463,9 +506,13 @@ items:
     status: backlog
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 611df185d6a3ce04
+      remote_at: '2026-11-03T00:32:37Z'
 - id: SEC-005
   type: security
-  title: '[SEC-005] Troca de senha e reset de MFA não revogam as sessões existentes'
+  title: Troca de senha e reset de MFA não revogam as sessões existentes
   epic: EP-006
   story: ''
   description: |-
@@ -499,7 +546,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 24
     prs:
     - '#10'
   evidence:
@@ -516,9 +563,13 @@ items:
     status: backlog
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: d4343acaead8d71a
+      remote_at: '2026-11-03T00:32:39Z'
 - id: SEC-006
   type: security
-  title: '[SEC-006] Outras dependências com CVEs e sem lockfile (dependências transitivas não verificadas)'
+  title: Outras dependências com CVEs e sem lockfile (dependências transitivas não verificadas)
   epic: EP-006
   story: ''
   description: |-
@@ -552,7 +603,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 25
     prs:
     - '#10'
   evidence:
@@ -569,9 +620,13 @@ items:
     status: backlog
   - date: '2026-10-26'
     status: done
+  sync:
+    github:
+      hash: e32d3273509168e1
+      remote_at: '2026-11-03T00:32:42Z'
 - id: SEC-007
   type: security
-  title: '[SEC-007] Hardening HTTP: CORS * com credenciais, /docs público e sem cabeçalhos de segurança'
+  title: 'Hardening HTTP: CORS * com credenciais, /docs público e sem cabeçalhos de segurança'
   epic: EP-006
   story: ''
   description: |-
@@ -605,7 +660,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 26
     prs:
     - '#10'
   evidence:
@@ -622,9 +677,13 @@ items:
     status: backlog
   - date: '2026-10-26'
     status: done
+  sync:
+    github:
+      hash: dd6f17049c9482b2
+      remote_at: '2026-11-03T00:32:45Z'
 - id: SEC-008
   type: security
-  title: '[SEC-008] Container roda como root e CI usa actions por tag mutável sem permissions'
+  title: Container roda como root e CI usa actions por tag mutável sem permissions
   epic: EP-006
   story: ''
   description: |-
@@ -659,7 +718,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 27
     prs:
     - '#10'
   evidence:
@@ -675,9 +734,13 @@ items:
     status: backlog
   - date: '2026-10-26'
     status: done
+  sync:
+    github:
+      hash: 39a1db10f134fd70
+      remote_at: '2026-11-03T00:32:47Z'
 - id: SEC-009
   type: security
-  title: '[SEC-009] Banco SQLite versionado em repositório público'
+  title: Banco SQLite versionado em repositório público
   epic: EP-006
   story: ''
   description: |-
@@ -711,7 +774,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 28
     prs:
     - '#10'
   evidence:
@@ -727,9 +790,13 @@ items:
     status: backlog
   - date: '2026-10-26'
     status: done
+  sync:
+    github:
+      hash: cb953e64ef9bb1d5
+      remote_at: '2026-11-03T00:32:49Z'
 - id: SEC-010
   type: security
-  title: '[SEC-010] Trilha de auditoria incompleta (sem IP, sem o que mudou nas alterações de usuário)'
+  title: Trilha de auditoria incompleta (sem IP, sem o que mudou nas alterações de usuário)
   epic: EP-006
   story: ''
   description: |-
@@ -763,7 +830,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 29
     prs:
     - '#10'
   evidence:
@@ -779,9 +846,13 @@ items:
     status: backlog
   - date: '2026-10-30'
     status: done
+  sync:
+    github:
+      hash: 05b3e2221b047f01
+      remote_at: '2026-11-03T00:32:51Z'
 - id: SEC-011
   type: security
-  title: '[SEC-011] Política de senha fraca'
+  title: Política de senha fraca
   epic: EP-006
   story: ''
   description: |-
@@ -815,7 +886,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 30
     prs:
     - '#11'
   evidence:
@@ -834,9 +905,13 @@ items:
     status: review
   - date: '2026-11-02'
     status: done
+  sync:
+    github:
+      hash: ac4d76f86b1f1e6a
+      remote_at: '2026-11-03T00:32:54Z'
 - id: SEC-012
   type: security
-  title: '[SEC-012] Regras de negócio sem validação no servidor e dashboard global'
+  title: Regras de negócio sem validação no servidor e dashboard global
   epic: EP-006
   story: ''
   description: |-
@@ -871,7 +946,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 31
     prs:
     - '#11'
   evidence:
@@ -890,9 +965,13 @@ items:
     status: review
   - date: '2026-11-02'
     status: done
+  sync:
+    github:
+      hash: eadc39d248ee78ab
+      remote_at: '2026-11-03T00:32:56Z'
 - id: SEC-013
   type: security
-  title: '[SEC-013] Enumeração de e-mails pelo tempo de resposta do login'
+  title: Enumeração de e-mails pelo tempo de resposta do login
   epic: EP-006
   story: ''
   description: |-
@@ -926,7 +1005,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 32
     prs:
     - '#10'
   evidence:
@@ -942,9 +1021,13 @@ items:
     status: backlog
   - date: '2026-10-30'
     status: done
+  sync:
+    github:
+      hash: d92272e0ecaa2f9e
+      remote_at: '2026-11-03T00:32:59Z'
 - id: SEC-014
   type: security
-  title: '[SEC-014] CPF em texto puro, sem validação e devolvido em toda resposta de usuário'
+  title: CPF em texto puro, sem validação e devolvido em toda resposta de usuário
   epic: EP-006
   story: ''
   description: |-
@@ -978,7 +1061,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 33
     prs:
     - '#11'
   evidence:
@@ -998,9 +1081,13 @@ items:
     status: review
   - date: '2026-11-02'
     status: done
+  sync:
+    github:
+      hash: 0d7bfd3cbd52c26a
+      remote_at: '2026-11-03T00:33:01Z'
 - id: SEC-015
   type: security
-  title: '[SEC-015] Admin escolhe e conhece o segredo TOTP de outro usuário'
+  title: Admin escolhe e conhece o segredo TOTP de outro usuário
   epic: EP-006
   story: ''
   description: |-
@@ -1035,7 +1122,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 34
     prs:
     - '#11'
   evidence:
@@ -1055,9 +1142,13 @@ items:
     status: review
   - date: '2026-11-02'
     status: done
+  sync:
+    github:
+      hash: 2d85a94e000ef1af
+      remote_at: '2026-11-03T00:33:04Z'
 - id: SEC-016
   type: security
-  title: '[SEC-016] Cópias antigas e vulneráveis do código na raiz do repositório'
+  title: Cópias antigas e vulneráveis do código na raiz do repositório
   epic: EP-006
   story: ''
   description: |-
@@ -1089,7 +1180,7 @@ items:
     file: docs/security/findings-2026-10-25.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 35
     prs:
     - '#10'
   evidence:
@@ -1105,9 +1196,13 @@ items:
     status: backlog
   - date: '2026-10-26'
     status: done
+  sync:
+    github:
+      hash: bd2680cfac190bd2
+      remote_at: '2026-11-03T00:33:07Z'
 - id: SEC-017
   type: security
-  title: '[SEC-017] IP de origem lido do primeiro item do X-Forwarded-For, controlado pelo cliente'
+  title: IP de origem lido do primeiro item do X-Forwarded-For, controlado pelo cliente
   epic: EP-006
   story: ''
   description: |-
@@ -1145,7 +1240,7 @@ items:
     file: docs/security/findings-2026-11-02.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 36
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -1153,9 +1248,13 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: e18df59c726e265d
+      remote_at: '2026-11-03T00:33:09Z'
 - id: SEC-018
   type: security
-  title: '[SEC-018] Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas'
+  title: Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas
   epic: EP-006
   story: ''
   description: |-
@@ -1189,7 +1288,7 @@ items:
     file: docs/security/findings-2026-11-02.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 37
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -1197,9 +1296,13 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: bff56b703a66a502
+      remote_at: '2026-11-03T00:33:10Z'
 - id: SEC-019
   type: security
-  title: '[SEC-019] Login falho grava o texto digitado no campo e-mail'
+  title: Login falho grava o texto digitado no campo e-mail
   epic: EP-006
   story: ''
   description: |-
@@ -1232,7 +1335,7 @@ items:
     file: docs/security/findings-2026-11-02.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 38
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -1240,9 +1343,13 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 95970699ff14ada9
+      remote_at: '2026-11-03T00:33:11Z'
 - id: SEC-020
   type: security
-  title: '[SEC-020] Filtros de data inválidos em /logs são ignorados em silêncio'
+  title: Filtros de data inválidos em /logs são ignorados em silêncio
   epic: EP-006
   story: ''
   description: |-
@@ -1274,7 +1381,7 @@ items:
     file: docs/security/findings-2026-11-02.json
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 39
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -1282,6 +1389,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: da1131d3c79ea2be
+      remote_at: '2026-11-03T00:33:12Z'
 - id: US-001
   type: story
   title: Autenticar identidade com JWT e refresh
@@ -1312,7 +1423,7 @@ items:
     ref: US-001
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 40
     prs: []
   evidence:
   - commit 5c7decd
@@ -1325,6 +1436,10 @@ items:
   history:
   - date: '2026-09-03'
     status: done
+  sync:
+    github:
+      hash: 7344775b35d3567d
+      remote_at: '2026-11-03T00:33:14Z'
 - id: US-002
   type: story
   title: Configurar e validar MFA (TOTP) em papéis críticos
@@ -1354,7 +1469,7 @@ items:
     ref: US-002
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 41
     prs: []
   evidence:
   - commit 5c7decd
@@ -1367,6 +1482,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 367ae2580821aae1
+      remote_at: '2026-11-03T00:33:17Z'
 - id: US-003
   type: story
   title: Administrar usuários com papéis e soft delete seguro
@@ -1397,7 +1516,7 @@ items:
     ref: US-003
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 42
     prs: []
   evidence:
   - commit c6a7cae
@@ -1409,6 +1528,10 @@ items:
   history:
   - date: '2026-09-03'
     status: done
+  sync:
+    github:
+      hash: 2e49b9b4ba6386c8
+      remote_at: '2026-11-03T00:33:19Z'
 - id: US-004
   type: story
   title: Cadastrar imóvel com endereço e geocoding
@@ -1438,7 +1561,7 @@ items:
     ref: US-004
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 43
     prs: []
   evidence:
   - commit f68c812
@@ -1451,6 +1574,10 @@ items:
   history:
   - date: '2026-09-03'
     status: done
+  sync:
+    github:
+      hash: 663c3b571e718040
+      remote_at: '2026-11-03T00:33:22Z'
 - id: US-005
   type: story
   title: Criar e consultar contrato com titularidade
@@ -1479,7 +1606,7 @@ items:
     ref: US-005
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 44
     prs: []
   evidence:
   - commit ee20607
@@ -1491,6 +1618,10 @@ items:
   history:
   - date: '2026-09-07'
     status: done
+  sync:
+    github:
+      hash: e11ce5770d85a250
+      remote_at: '2026-11-03T00:33:24Z'
 - id: US-006
   type: story
   title: Agendar vistoria vinculada a contrato ativo
@@ -1519,7 +1650,7 @@ items:
     ref: US-006
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 45
     prs: []
   evidence:
   - commit 52734f5
@@ -1530,6 +1661,10 @@ items:
   history:
   - date: '2026-09-07'
     status: done
+  sync:
+    github:
+      hash: 1fad408e48b3526a
+      remote_at: '2026-11-03T00:33:28Z'
 - id: US-007
   type: story
   title: Preencher checklist com itens e fotos
@@ -1559,7 +1694,7 @@ items:
     ref: US-007
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 46
     prs: []
   evidence:
   - commit c02f652
@@ -1573,6 +1708,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 5fea229fd4db76d3
+      remote_at: '2026-11-03T00:33:30Z'
 - id: US-008
   type: story
   title: Aceitar ou rejeitar laudo de vistoria
@@ -1602,7 +1741,7 @@ items:
     ref: US-008
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 47
     prs: []
   evidence:
   - commit eeb6436
@@ -1614,6 +1753,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: fffd5273425ea214
+      remote_at: '2026-11-03T00:33:32Z'
 - id: US-009
   type: story
   title: Baixar laudo de vistoria em PDF
@@ -1642,7 +1785,7 @@ items:
     ref: US-009
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 48
     prs: []
   evidence:
   - commit eeb6436
@@ -1654,6 +1797,10 @@ items:
   history:
   - date: '2026-09-07'
     status: done
+  sync:
+    github:
+      hash: 236ebb9bea22e3f5
+      remote_at: '2026-11-03T00:33:35Z'
 - id: US-010
   type: story
   title: Registrar problema com foto e linha do tempo
@@ -1683,7 +1830,7 @@ items:
     ref: US-010
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 49
     prs: []
   evidence:
   - commit 3d227e4
@@ -1696,6 +1843,10 @@ items:
   history:
   - date: '2026-10-30'
     status: done
+  sync:
+    github:
+      hash: a422b1906d569904
+      remote_at: '2026-11-03T00:33:37Z'
 - id: US-011
   type: story
   title: Consultar dashboard operacional
@@ -1723,7 +1874,7 @@ items:
     ref: US-011
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 50
     prs: []
   evidence:
   - commit 69d7dcb
@@ -1735,6 +1886,10 @@ items:
   history:
   - date: '2026-10-30'
     status: done
+  sync:
+    github:
+      hash: 1460ed6c8c59ae5d
+      remote_at: '2026-11-03T00:33:39Z'
 - id: US-012
   type: story
   title: Isolar cômodos do imóvel com CRUD protegido
@@ -1762,7 +1917,7 @@ items:
     ref: US-012
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 51
     prs: []
   evidence:
   - commit f68c812
@@ -1773,6 +1928,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 70ac525f51850cfd
+      remote_at: '2026-11-03T00:33:42Z'
 - id: US-013
   type: story
   title: Encerrar ou cancelar contrato liberando imóvel
@@ -1800,7 +1959,7 @@ items:
     ref: US-013
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 52
     prs: []
   evidence:
   - commit ee20607
@@ -1810,6 +1969,10 @@ items:
   history:
   - date: '2026-09-07'
     status: done
+  sync:
+    github:
+      hash: 15434e9bfe841655
+      remote_at: '2026-11-03T00:33:44Z'
 - id: US-014
   type: story
   title: Enviar checklist para aceite formal
@@ -1838,7 +2001,7 @@ items:
     ref: US-014
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 53
     prs: []
   evidence:
   - commit c02f652
@@ -1849,6 +2012,10 @@ items:
   history:
   - date: '2026-09-07'
     status: done
+  sync:
+    github:
+      hash: ebaae99da928b3a9
+      remote_at: '2026-11-03T00:33:46Z'
 - id: TK-001
   type: task
   title: Manter threat model e baseline alinhados ao backlog
@@ -1876,7 +2043,7 @@ items:
     ref: DOC-001
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 54
     prs:
     - '#10'
   evidence:
@@ -1888,6 +2055,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 6e2d7097cef15353
+      remote_at: '2026-11-03T00:33:48Z'
 - id: SEC-021
   type: security
   title: '[N1, N2] Bypass de MFA com token de verificação e reset do banco via /admin/seed'
@@ -1914,7 +2085,7 @@ items:
     ref: N1, N2
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 55
     prs:
     - '#10'
   evidence:
@@ -1928,6 +2099,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: fdbc8c63858ccbfb
+      remote_at: '2026-11-03T00:33:51Z'
 - id: SEC-022
   type: security
   title: '[N3, N4, N5] Autorização de checklists, escalada do gestor e desativação de MFA'
@@ -1955,7 +2130,7 @@ items:
     ref: N3, N4, N5
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 56
     prs:
     - '#10'
   evidence:
@@ -1970,6 +2145,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 6b9e295d88476259
+      remote_at: '2026-11-03T00:33:54Z'
 - id: SEC-023
   type: security
   title: '[Itens 1, 2, 6] Setup de MFA pendente, listagem de usuários e BOLA em problemas'
@@ -1997,7 +2176,7 @@ items:
     ref: itens 1, 2, 6 do PENDENCIAS_API.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 57
     prs:
     - '#10'
   evidence:
@@ -2012,6 +2191,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: a08708912768bd5e
+      remote_at: '2026-11-03T00:33:57Z'
 - id: SEC-024
   type: security
   title: '[N6, N7, N8] Limite de tentativas, validação de uploads e segredos sem valor padrão'
@@ -2039,7 +2222,7 @@ items:
     ref: N6, N7, N8
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 58
     prs:
     - '#10'
   evidence:
@@ -2054,6 +2237,10 @@ items:
   history:
   - date: '2026-10-25'
     status: done
+  sync:
+    github:
+      hash: 58960f0fab22847c
+      remote_at: '2026-11-03T00:33:59Z'
 - id: TK-002
   type: task
   title: Rotacionar as credenciais de demonstração em produção
@@ -2083,7 +2270,7 @@ items:
     ref: SEC-001 (residual)
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 59
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2091,6 +2278,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 0d88030d306860c5
+      remote_at: '2026-11-03T00:34:01Z'
 - id: TK-003
   type: task
   title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render
@@ -2119,7 +2310,7 @@ items:
     ref: SEC-007 (operação)
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 60
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2127,6 +2318,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 4d3b09bb84343908
+      remote_at: '2026-11-03T00:34:02Z'
 - id: TK-004
   type: task
   title: Agendar a limpeza de dados vencidos no Render
@@ -2150,7 +2345,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 61
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2158,6 +2353,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 41dac48b39820e29
+      remote_at: '2026-11-03T00:34:03Z'
 - id: TK-005
   type: task
   title: Backup e restauração do Postgres
@@ -2182,7 +2381,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 62
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2190,6 +2389,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 57695ea24e111693
+      remote_at: '2026-11-03T00:34:04Z'
 - id: SEC-025
   type: security
   title: Log de auditoria append-only
@@ -2221,7 +2424,7 @@ items:
     ref: SEC-003
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 63
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2229,6 +2432,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 4ece98b97e77acb1
+      remote_at: '2026-11-03T00:34:05Z'
 - id: SEC-026
   type: security
   title: Fotos de vistoria com URL assinada e expiração
@@ -2260,7 +2467,7 @@ items:
     ref: SEC-005
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 64
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2268,6 +2475,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 555d091bec0eec6a
+      remote_at: '2026-11-03T00:34:06Z'
 - id: SEC-027
   type: security
   title: Encerrar a sessão quando um refresh token já trocado for reutilizado
@@ -2296,7 +2507,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 65
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2304,6 +2515,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 0a26be499f6fcfdc
+      remote_at: '2026-11-03T00:34:07Z'
 - id: SEC-028
   type: security
   title: 'Direitos do titular (LGPD): exportar e anonimizar os próprios dados'
@@ -2333,7 +2548,7 @@ items:
     ref: SEC-014 (residual)
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 66
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2341,6 +2556,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 163a76643762a059
+      remote_at: '2026-11-03T00:34:08Z'
 - id: SEC-029
   type: security
   title: Forçar a troca das senhas fracas cadastradas antes da política
@@ -2368,7 +2587,7 @@ items:
     ref: SEC-011 (residual)
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 67
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2376,6 +2595,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 574d9476fce1aa57
+      remote_at: '2026-11-03T00:34:09Z'
 - id: SEC-030
   type: security
   title: Recusar senhas que aparecem em vazamentos conhecidos
@@ -2404,7 +2627,7 @@ items:
     ref: SEC-011 (residual)
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 68
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2412,6 +2635,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 83d3288be8e11290
+      remote_at: '2026-11-03T00:34:10Z'
 - id: SEC-031
   type: security
   title: Cifrar o CPF em repouso
@@ -2441,7 +2668,7 @@ items:
     ref: SEC-014 (residual)
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 69
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2449,6 +2676,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 0b54b3a9cd8b3ee5
+      remote_at: '2026-11-03T00:34:12Z'
 - id: SPK-001
   type: spike
   title: Definir o alcance do perfil visualizador
@@ -2473,7 +2704,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 70
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2481,6 +2712,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 3364f504ad8649ef
+      remote_at: '2026-11-03T00:34:13Z'
 - id: SPK-002
   type: spike
   title: Decidir sobre as fotos públicas em /uploads (T-14)
@@ -2504,7 +2739,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 71
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2512,6 +2747,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: d46883193fec86f8
+      remote_at: '2026-11-03T00:34:14Z'
 - id: SPK-003
   type: spike
   title: Decidir se o MFA vale para locatário e visualizador
@@ -2535,7 +2774,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 72
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2543,6 +2782,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: d7bfe90333048023
+      remote_at: '2026-11-03T00:34:15Z'
 - id: SPK-004
   type: spike
   title: Fechar as regras de negócio em aberto do PENDENCIAS_API.md (itens 5, 7, 8 e 11)
@@ -2572,7 +2815,7 @@ items:
     ref: itens 5, 7, 8, 11
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 73
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2580,6 +2823,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 4f32fe9a3eafe4de
+      remote_at: '2026-11-03T00:34:17Z'
 - id: US-015
   type: story
   title: Excluir checklist, contrato e problema criados por engano
@@ -2609,7 +2856,7 @@ items:
     ref: item 12
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 74
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2617,6 +2864,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: a8d37817f1050334
+      remote_at: '2026-11-03T00:34:18Z'
 - id: US-016
   type: story
   title: Anexos e assinatura de contrato
@@ -2643,7 +2894,7 @@ items:
     ref: item 12
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 75
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2651,6 +2902,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: c5e4fdb83286bb32
+      remote_at: '2026-11-03T00:34:19Z'
 - id: US-017
   type: story
   title: Histórico do imóvel
@@ -2677,7 +2932,7 @@ items:
     ref: item 12
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 76
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2685,6 +2940,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 51c2b3999438d86d
+      remote_at: '2026-11-03T00:34:20Z'
 - id: DEBT-001
   type: debt
   title: Modelos Pydantic nos corpos das rotas de problemas
@@ -2712,7 +2971,7 @@ items:
     ref: item 9
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 77
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2720,6 +2979,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 19ab35c6459244aa
+      remote_at: '2026-11-03T00:34:21Z'
 - id: DEBT-002
   type: debt
   title: response_model e nomes consistentes no OpenAPI
@@ -2746,7 +3009,7 @@ items:
     ref: item 10
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 78
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2754,6 +3017,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 2146fff6bfaed324
+      remote_at: '2026-11-03T00:34:23Z'
 - id: DEBT-003
   type: debt
   title: Consolidar as rotas duplicadas de MFA e remover GET /auth/mfa/setup
@@ -2781,7 +3048,7 @@ items:
     ref: item 12
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 79
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2789,6 +3056,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: d880829069314979
+      remote_at: '2026-11-03T00:34:24Z'
 - id: DEBT-004
   type: debt
   title: Lint e formatação (ruff) no CI
@@ -2814,7 +3085,7 @@ items:
     ref: Lint/format configurado
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 80
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2822,6 +3093,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 0c10484799c34796
+      remote_at: '2026-11-03T00:34:25Z'
 - id: DEBT-005
   type: debt
   title: Dependabot para pip e GitHub Actions
@@ -2848,7 +3123,7 @@ items:
     ref: Atualização de dependências automatizada
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 81
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2856,6 +3131,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: f33bddeb2c0eace6
+      remote_at: '2026-11-03T00:34:26Z'
 - id: DEBT-006
   type: debt
   title: Definir a licença do repositório público
@@ -2880,7 +3159,7 @@ items:
     ref: Licença definida
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 82
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2888,6 +3167,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 919a8b10e98033ef
+      remote_at: '2026-11-03T00:34:27Z'
 - id: DEBT-007
   type: debt
   title: CHANGELOG e release v0.1.0
@@ -2913,7 +3196,7 @@ items:
     ref: Releases/tags e CHANGELOG
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 83
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2921,6 +3204,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 564cde054c6bf2b9
+      remote_at: '2026-11-03T00:34:28Z'
 - id: DEBT-008
   type: debt
   title: Conventional Commits em pelo menos 70% dos commits
@@ -2946,7 +3233,7 @@ items:
     ref: Conventional Commits
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 84
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2954,6 +3241,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: daa3a6d266b3de91
+      remote_at: '2026-11-03T00:34:29Z'
 - id: DEBT-009
   type: debt
   title: ADRs retroativos das decisões principais
@@ -2979,7 +3270,7 @@ items:
     ref: Decisões registradas (ADRs)
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 85
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -2987,6 +3278,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 1865f57c3d06aedd
+      remote_at: '2026-11-03T00:34:30Z'
 - id: DEBT-010
   type: debt
   title: Cobrir os ramos não testados de agendamentos, geocoding e database
@@ -3010,7 +3305,7 @@ items:
   source: null
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 86
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -3018,6 +3313,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 7319fa6566b5940f
+      remote_at: '2026-11-03T00:34:31Z'
 - id: TK-006
   type: task
   title: Auditoria de segurança completa antes da release candidata
@@ -3044,7 +3343,7 @@ items:
     ref: Auditoria de segurança recente
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 87
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -3052,6 +3351,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: f390ad12d85ffe2d
+      remote_at: '2026-11-03T00:34:32Z'
 - id: TK-007
   type: task
   title: Primeira versão da API em FastAPI
@@ -3077,7 +3380,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 88
     prs: []
   evidence:
   - commit ab390a3
@@ -3090,6 +3393,10 @@ items:
   history:
   - date: '2026-06-10'
     status: done
+  sync:
+    github:
+      hash: d1a4016c18762cd4
+      remote_at: '2026-11-03T00:34:34Z'
 - id: TK-008
   type: task
   title: Infraestrutura de testes, testes de integração e CI
@@ -3114,7 +3421,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 89
     prs: []
   evidence:
   - commit 1d4291f
@@ -3127,6 +3434,10 @@ items:
   history:
   - date: '2026-06-13'
     status: done
+  sync:
+    github:
+      hash: 6a9b5cbf51815f56
+      remote_at: '2026-11-03T00:34:37Z'
 - id: TK-009
   type: task
   title: README inicial do projeto
@@ -3151,7 +3462,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 90
     prs: []
   evidence:
   - commit 25381a2
@@ -3161,6 +3472,10 @@ items:
   history:
   - date: '2026-06-13'
     status: done
+  sync:
+    github:
+      hash: c29ef6529105cf4b
+      remote_at: '2026-11-03T00:34:39Z'
 - id: TK-010
   type: task
   title: Baseline de segurança, riscos iniciais e arquitetura v1
@@ -3185,7 +3500,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 91
     prs: []
   evidence:
   - commit fbaf99e
@@ -3197,6 +3512,10 @@ items:
   history:
   - date: '2026-09-07'
     status: done
+  sync:
+    github:
+      hash: 8fa9a232b7294beb
+      remote_at: '2026-11-03T00:34:42Z'
 - id: TK-011
   type: task
   title: README com a documentação dos módulos e endpoints
@@ -3221,7 +3540,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 92
     prs: []
   evidence:
   - commit e85e0df
@@ -3232,6 +3551,10 @@ items:
   history:
   - date: '2026-09-07'
     status: done
+  sync:
+    github:
+      hash: fe3c87bcfed00a04
+      remote_at: '2026-11-03T00:34:44Z'
 - id: TK-012
   type: task
   title: Product backlog da disciplina
@@ -3256,7 +3579,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 93
     prs: []
   evidence:
   - commit db09944
@@ -3266,6 +3589,10 @@ items:
   history:
   - date: '2026-09-16'
     status: done
+  sync:
+    github:
+      hash: d736270a8fb03579
+      remote_at: '2026-11-03T00:34:47Z'
 - id: TK-013
   type: task
   title: Docker Compose, .dockerignore e .env.example sem segredos
@@ -3291,7 +3618,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 94
     prs:
     - '#11'
   evidence:
@@ -3309,6 +3636,10 @@ items:
     status: review
   - date: '2026-11-02'
     status: done
+  sync:
+    github:
+      hash: df37d30bacf8f233
+      remote_at: '2026-11-03T00:34:49Z'
 - id: TK-014
   type: task
   title: 'Adoção da gestão ágil: roadmap, backlog, riscos, ADRs e auditoria diff'
@@ -3335,7 +3666,7 @@ items:
     ref: reconstruído na adoção
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 95
     prs:
     - '#11'
   evidence:
@@ -3352,6 +3683,10 @@ items:
     status: review
   - date: '2026-11-02'
     status: done
+  sync:
+    github:
+      hash: 9a67435180648d23
+      remote_at: '2026-11-03T00:34:51Z'
 - id: TK-015
   type: task
   title: Release candidata v0.9.0
@@ -3377,7 +3712,7 @@ items:
     ref: marco do roadmap.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 96
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -3385,6 +3720,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: fc3b50634590ed00
+      remote_at: '2026-11-03T00:34:53Z'
 - id: TK-016
   type: task
   title: Relatório final, roteiro de demonstração e release v1.0.0
@@ -3411,7 +3750,7 @@ items:
     ref: marco do roadmap.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 97
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -3419,6 +3758,10 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: d3adbf9b3d77ef90
+      remote_at: '2026-11-03T00:34:54Z'
 - id: TK-017
   type: task
   title: 'Proteger a branch main: PR com 1 aprovação e CI verde'
@@ -3446,7 +3789,7 @@ items:
     ref: Sprint 11
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 98
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -3454,3 +3797,7 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  sync:
+    github:
+      hash: 51d2156350bd8e15
+      remote_at: '2026-11-03T00:34:55Z'

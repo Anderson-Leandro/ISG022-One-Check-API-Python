@@ -52,7 +52,7 @@ security:
   personal_data: true
   audit_skill: security-audit
 board:
-  provider: none
+  provider: github
   trello:
     board_id: null
     lists: {}
