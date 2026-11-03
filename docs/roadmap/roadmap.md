@@ -56,3 +56,4 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 2026-11-02 | Sprints reconstruídas desde 03/06/2026 (Sprints 1 a 11) e pendências distribuídas nas Sprints 12 a 16 | Pedido do PO: calendário desde o início do projeto |
 | 2026-11-02 | Sprints 15 e 16 removidas; todos os itens em aberto distribuídos nas Sprints 12 a 14, com a 14 encurtada para terminar em 11/12/2026 | Prazo final da entrega: 11/12/2026 |
 | 2026-11-02 | Sprint 11 fechada com 64/64 pts; fase continua F3 (falta a v0.1.0). Retro gerou o TK-017, incluído na Sprint 12 | Fechamento da Sprint 11 |
+| 2026-11-02 | PR deixa de exigir aprovação de outra pessoa; TK-017 passa a exigir só merge por PR e CI verde | Decisão do time |

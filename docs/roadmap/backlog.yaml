@@ -3764,12 +3764,13 @@ items:
       remote_at: '2026-11-03T00:34:54Z'
 - id: TK-017
   type: task
-  title: 'Proteger a branch main: PR com 1 aprovação e CI verde'
+  title: 'Proteger a branch main: merge só por PR e com CI verde'
   epic: EP-007
   story: ''
-  description: 'Ação da retrospectiva da Sprint 11: os PRs #10 e #11 foram mergeados pelo autor sem revisão.'
+  description: 'Ação da retrospectiva da Sprint 11: os PRs #10 e #11 foram mergeados pelo autor sem revisão. Em
+    2026-11-02 o time decidiu que o PR não exige aprovação de outra pessoa; a proteção garante só o PR e o CI.'
   acceptance_criteria:
-  - 'A main tem regra de proteção: merge só por PR, com pelo menos 1 aprovação de alguém que não seja o autor.'
+  - 'A main tem regra de proteção: merge só por PR, sem exigir aprovação (o autor pode mergear o próprio PR).'
   - O check do workflow tests.yml é obrigatório para o merge.
   - Push direto na main é recusado (cenário negado testado uma vez e registrado como evidência).
   priority: must

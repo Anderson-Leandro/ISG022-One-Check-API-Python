@@ -51,7 +51,7 @@
   - SEC-011, SEC-012, SEC-014, SEC-015, TK-013 e TK-014 pelo PR #11 (`d633d9f`, 02/11).
 - **Evidências:** commits `0e164b8` a `29045fa`; PRs #10 e #11; 824 testes, 95% de cobertura; relatórios `docs/security/correcao-*.md`; `docs/security/relatorio-2026-11-02.md`.
 - **Checagem de segurança:** auditoria diff de 02/11 (base `f081c60`, gitleaks incluído) com 2 achados baixos (SEC-017, SEC-018) e 2 informativos (SEC-019, SEC-020), já planejados para a Sprint 13. Nenhum padrão de segredo no commit `29045fa`.
-- **Ponto de atenção da DoD:** os PRs #10 e #11 foram abertos e mergeados pelo autor, sem revisão de outra pessoa. O acordo de trabalho de time, que exige essa revisão, foi definido em 02/11 e passa a valer na Sprint 12. Levado para a retrospectiva.
+- **Ponto de atenção da DoD:** os PRs #10 e #11 foram abertos e mergeados pelo autor, sem revisão de outra pessoa. O acordo de trabalho de time, que exige essa revisão, foi definido em 02/11 e passa a valer na Sprint 12. Levado para a retrospectiva. **Atualização (02/11):** o time decidiu depois que o PR não exige aprovação de outra pessoa; o merge pelo próprio autor passa a ser permitido.
 - **Feedback do PO (Gabriel Henrique Santana):** <!-- a registrar -->
 
 ## Retrospectiva (2026-11-02)
@@ -62,6 +62,8 @@ Proposta a partir dos dados da sprint; ajuste com o time se algo não refletir a
 | Correção guiada por teste: cada achado ganhou um teste de cenário negado que falhava antes da correção, e os 11 relatórios `correcao-*.md` deixaram claro o antes e o depois | PRs #10 e #11 foram mergeados pelo próprio autor, sem revisão | **TK-017**: proteger a `main` com PR, 1 aprovação e CI obrigatório (Sprint 12) |
 | Commits pequenos por grupo de achados, citando os IDs: rastrear o que foi corrigido onde foi direto | Quatro commits ficaram só na `dev` até o último dia; o goal quase saiu parcial por falta de integração, não de trabalho | Abrir o PR para a `main` ao terminar cada item ou grupo de itens, não só no fim da sprint (combinar com o time e, se aprovado, incluir no acordo de trabalho) |
 | Auditoria (completa no início, diff no fim) deu uma lista objetiva do que fazer e confirmou que nada novo e grave entrou | Planejamento só foi formalizado no fim da sprint; o trabalho de 25/10 a 01/11 não tinha backlog nem goal prévio | A partir da Sprint 12, planejar no primeiro dia com `/sprint-manager plan` e registrar o acompanhamento com `track` |
+
+**Atualização (02/11):** depois da retro, o time decidiu que o PR não exige aprovação de outra pessoa. O TK-017 foi ajustado para exigir só o PR e o CI verde.
 
 **Ações da retrospectiva anterior:** não houve retrospectiva antes desta.
 
