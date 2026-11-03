@@ -180,7 +180,7 @@ sprints:
   goal: Corrigir as pendências e os 16 achados da auditoria completa; adotar a gestão ágil
   start: '2026-10-21'
   end: '2026-11-03'
-  status: active
+  status: closed
   capacity: null
   committed:
   - SEC-021
@@ -207,21 +207,46 @@ sprints:
   - TK-013
   - TK-014
   committed_points: 64.0
-  completed_points: null
-  completed: []
+  completed_points: 64.0
+  completed:
+  - SEC-001
+  - SEC-002
+  - SEC-003
+  - SEC-004
+  - SEC-005
+  - SEC-006
+  - SEC-007
+  - SEC-008
+  - SEC-009
+  - SEC-010
+  - SEC-011
+  - SEC-012
+  - SEC-013
+  - SEC-014
+  - SEC-015
+  - SEC-016
+  - TK-001
+  - SEC-021
+  - SEC-022
+  - SEC-023
+  - SEC-024
+  - TK-013
+  - TK-014
   carried_over: []
   retroactive: true
   note: Reconstruída na adoção. O trabalho foi feito antes do planejamento formal.
+  closed_on: '2026-11-02'
 - number: 12
   goal: Release v0.1.0, produção segura e escopo da F4 fechado
   start: '2026-11-04'
   end: '2026-11-17'
   status: planned
-  capacity: 31.0
+  capacity: 32.0
   committed:
   - DEBT-007
   - TK-002
   - TK-003
+  - TK-017
   - DEBT-006
   - DEBT-009
   - SPK-004
@@ -231,7 +256,7 @@ sprints:
   - US-015
   - US-017
   - US-016
-  committed_points: 31.0
+  committed_points: 32.0
   completed_points: null
   completed: []
   carried_over: []

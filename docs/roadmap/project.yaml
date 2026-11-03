@@ -46,13 +46,13 @@ scrum:
     GG: 8
   max_item_size: 8
   capacity: 20
-  current_sprint: 11
+  current_sprint: 12
 security:
   profile: standard
   personal_data: true
   audit_skill: security-audit
 board:
-  provider: none
+  provider: github
   trello:
     board_id: null
     lists: {}
