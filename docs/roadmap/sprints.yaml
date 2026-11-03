@@ -240,18 +240,18 @@ sprints:
   goal: Release v0.1.0, produção segura e escopo da F4 fechado
   start: '2026-11-04'
   end: '2026-11-17'
-  status: planned
-  capacity: 32.0
+  status: active
+  capacity: 32
   committed:
-  - DEBT-007
   - TK-002
   - TK-003
   - TK-017
+  - DEBT-007
   - DEBT-006
   - DEBT-009
-  - SPK-004
   - SPK-001
   - SPK-002
+  - SPK-004
   - SPK-003
   - US-015
   - US-017
