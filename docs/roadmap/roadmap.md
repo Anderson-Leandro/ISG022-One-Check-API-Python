@@ -15,7 +15,7 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 8 | 09/09 → 22/09 | fechada (retroativa) | Product backlog da disciplina registrado | 2 |
 | 9–10 | 23/09 → 20/10 | fechadas, sem commits | — | — |
 | 11 | 21/10 → 03/11 | fechada (retroativa) | Corrigir as pendências e os 16 achados da auditoria; adotar a gestão ágil | 64 |
-| **12** | 04/11 → 17/11 | **próxima** | Release v0.1.0, produção segura e escopo da F4 fechado | 32 |
+| **12** | 04/11 → 17/11 | **ativa** | Release v0.1.0, produção segura e escopo da F4 fechado | 32 |
 | 13 | 18/11 → 01/12 | planejada | Qualidade contínua e hardening | 36 |
 | 14 | 02/12 → 11/12 (10 dias) | planejada | Conformidade, release candidata v0.9.0 e entrega final v1.0.0 | 31 |
 

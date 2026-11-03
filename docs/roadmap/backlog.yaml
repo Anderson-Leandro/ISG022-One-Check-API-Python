@@ -2255,7 +2255,7 @@ items:
   priority: must
   rank: 20
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F6
   depends_on: []
@@ -2278,10 +2278,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 0d88030d306860c5
-      remote_at: '2026-11-03T00:34:01Z'
+      hash: 104b56054e29666e
+      remote_at: '2026-11-03T01:16:24Z'
 - id: TK-003
   type: task
   title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render
@@ -2295,7 +2297,7 @@ items:
   priority: must
   rank: 30
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F6
   depends_on: []
@@ -2318,10 +2320,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 4d3b09bb84343908
-      remote_at: '2026-11-03T00:34:02Z'
+      hash: 06f5c97e0d98ede3
+      remote_at: '2026-11-03T01:16:26Z'
 - id: TK-004
   type: task
   title: Agendar a limpeza de dados vencidos no Render
@@ -2693,7 +2697,7 @@ items:
   priority: should
   rank: 80
   estimate: 2
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F6
   depends_on: []
@@ -2712,10 +2716,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 3364f504ad8649ef
-      remote_at: '2026-11-03T00:34:13Z'
+      hash: 436fe6e4649f0e29
+      remote_at: '2026-11-03T01:16:27Z'
 - id: SPK-002
   type: spike
   title: Decidir sobre as fotos públicas em /uploads (T-14)
@@ -2728,7 +2734,7 @@ items:
   priority: should
   rank: 90
   estimate: 2
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F6
   depends_on: []
@@ -2747,10 +2753,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: d46883193fec86f8
-      remote_at: '2026-11-03T00:34:14Z'
+      hash: 58d5e0592773cce5
+      remote_at: '2026-11-03T01:16:28Z'
 - id: SPK-003
   type: spike
   title: Decidir se o MFA vale para locatário e visualizador
@@ -2763,7 +2771,7 @@ items:
   priority: could
   rank: 210
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F6
   depends_on: []
@@ -2782,10 +2790,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: d7bfe90333048023
-      remote_at: '2026-11-03T00:34:15Z'
+      hash: 58cddc66b4d3b10a
+      remote_at: '2026-11-03T01:16:29Z'
 - id: SPK-004
   type: spike
   title: Fechar as regras de negócio em aberto do PENDENCIAS_API.md (itens 5, 7, 8 e 11)
@@ -2801,7 +2811,7 @@ items:
   priority: should
   rank: 100
   estimate: 2
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F4
   depends_on: []
@@ -2823,10 +2833,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 4f32fe9a3eafe4de
-      remote_at: '2026-11-03T00:34:17Z'
+      hash: 4ebed76afd522fc5
+      remote_at: '2026-11-03T01:16:31Z'
 - id: US-015
   type: story
   title: Excluir checklist, contrato e problema criados por engano
@@ -2842,7 +2854,7 @@ items:
   priority: could
   rank: 270
   estimate: 5
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F4
   depends_on: []
@@ -2864,10 +2876,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: a8d37817f1050334
-      remote_at: '2026-11-03T00:34:18Z'
+      hash: 26c70d918718a34f
+      remote_at: '2026-11-03T01:16:32Z'
 - id: US-016
   type: story
   title: Anexos e assinatura de contrato
@@ -2880,7 +2894,7 @@ items:
   priority: could
   rank: 290
   estimate: 8
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F4
   depends_on: []
@@ -2902,10 +2916,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: c5e4fdb83286bb32
-      remote_at: '2026-11-03T00:34:19Z'
+      hash: 8fc1e83a4bf6bb2e
+      remote_at: '2026-11-03T01:16:34Z'
 - id: US-017
   type: story
   title: Histórico do imóvel
@@ -2918,7 +2934,7 @@ items:
   priority: could
   rank: 280
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F4
   depends_on: []
@@ -2940,10 +2956,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 51c2b3999438d86d
-      remote_at: '2026-11-03T00:34:20Z'
+      hash: d1cedf2b4ed7a18b
+      remote_at: '2026-11-03T01:16:35Z'
 - id: DEBT-001
   type: debt
   title: Modelos Pydantic nos corpos das rotas de problemas
@@ -3146,7 +3164,7 @@ items:
   priority: should
   rank: 180
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F0
   depends_on: []
@@ -3167,10 +3185,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 919a8b10e98033ef
-      remote_at: '2026-11-03T00:34:27Z'
+      hash: 51774f0b184c05b1
+      remote_at: '2026-11-03T01:16:36Z'
 - id: DEBT-007
   type: debt
   title: CHANGELOG e release v0.1.0
@@ -3183,7 +3203,7 @@ items:
   priority: must
   rank: 10
   estimate: 2
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F3
   depends_on: []
@@ -3204,10 +3224,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 564cde054c6bf2b9
-      remote_at: '2026-11-03T00:34:28Z'
+      hash: d39929e55afc5e8b
+      remote_at: '2026-11-03T01:16:37Z'
 - id: DEBT-008
   type: debt
   title: Conventional Commits em pelo menos 70% dos commits
@@ -3257,7 +3279,7 @@ items:
   priority: should
   rank: 170
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F2
   depends_on: []
@@ -3278,10 +3300,12 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 1865f57c3d06aedd
-      remote_at: '2026-11-03T00:34:30Z'
+      hash: 6035c287bcc40e84
+      remote_at: '2026-11-03T01:16:39Z'
 - id: DEBT-010
   type: debt
   title: Cobrir os ramos não testados de agendamentos, geocoding e database
@@ -3776,7 +3800,7 @@ items:
   priority: must
   rank: 15
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 12
   phase: F0
   depends_on: []
@@ -3798,7 +3822,9 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
   sync:
     github:
-      hash: 51d2156350bd8e15
-      remote_at: '2026-11-03T00:34:55Z'
+      hash: 6580331e67dc75d3
+      remote_at: '2026-11-03T01:16:40Z'
