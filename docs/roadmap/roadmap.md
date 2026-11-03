@@ -14,8 +14,8 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 7 | 26/08 → 08/09 | fechada (retroativa) | MVP completo: paridade com a API PHP e todos os módulos | 67 |
 | 8 | 09/09 → 22/09 | fechada (retroativa) | Product backlog da disciplina registrado | 2 |
 | 9–10 | 23/09 → 20/10 | fechadas, sem commits | — | — |
-| **11** | 21/10 → 03/11 | **ativa** (retroativa) | Corrigir as pendências e os 16 achados da auditoria; adotar a gestão ágil | 64 |
-| 12 | 04/11 → 17/11 | planejada | Release v0.1.0, produção segura e escopo da F4 fechado | 31 |
+| 11 | 21/10 → 03/11 | fechada (retroativa) | Corrigir as pendências e os 16 achados da auditoria; adotar a gestão ágil | 64 |
+| **12** | 04/11 → 17/11 | **próxima** | Release v0.1.0, produção segura e escopo da F4 fechado | 32 |
 | 13 | 18/11 → 01/12 | planejada | Qualidade contínua e hardening | 36 |
 | 14 | 02/12 → 11/12 (10 dias) | planejada | Conformidade, release candidata v0.9.0 e entrega final v1.0.0 | 31 |
 
@@ -24,7 +24,7 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 ## Fases
 | Fase | Foco | Sprints | Status | Evidências de saída |
 |---|---|---|---|---|
-| **F0 Fundação** | começar certo | 1 (+ 12: licença) | concluída no kickoff | README, CI (`tests.yml`) e testes na Sprint 1; `vision.md`, `working-agreement.md`, backlog com épicos e `.env.example` na 11. Falta: licença (DEBT-006, Sprint 12) |
+| **F0 Fundação** | começar certo | 1 (+ 12: licença) | concluída no kickoff | README, CI (`tests.yml`) e testes na Sprint 1; `vision.md`, `working-agreement.md`, backlog com épicos e `.env.example` na 11. Faltam: licença (DEBT-006) e proteção da `main` (TK-017, ação da retro 11), na Sprint 12 |
 | **F1 Requisitos e riscos** | o que construir e proteger | 7–8, 11 | concluída no kickoff | `initial-risks.md` (Sprint 7), `product-backlog.md` (8), `asset-inventory.md` e `risk-register.md` (11) |
 | **F2 Arquitetura** | decidir antes de codar | 7, 11 (+ 12: ADRs) | concluída (ADRs incompletos) | `architecture-v1.md` (7), `threat-model.md` e ADR-0001/0002 (11). ADRs retroativos: DEBT-009, Sprint 12 |
 | **F3 MVP + identidade e acesso** | fluxo de valor ponta a ponta | 1, 7 → 12 | **em andamento** | testes de cenário permitido e negado ✓, threat model revisado ✓, **release v0.1.0 ✗ (DEBT-007, Sprint 12)** |
@@ -55,3 +55,4 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 2026-11-02 | Roadmap criado pela adoção (`project-kickoff adopt`) | Projeto existente, com auditoria diff no mesmo dia |
 | 2026-11-02 | Sprints reconstruídas desde 03/06/2026 (Sprints 1 a 11) e pendências distribuídas nas Sprints 12 a 16 | Pedido do PO: calendário desde o início do projeto |
 | 2026-11-02 | Sprints 15 e 16 removidas; todos os itens em aberto distribuídos nas Sprints 12 a 14, com a 14 encurtada para terminar em 11/12/2026 | Prazo final da entrega: 11/12/2026 |
+| 2026-11-02 | Sprint 11 fechada com 64/64 pts; fase continua F3 (falta a v0.1.0). Retro gerou o TK-017, incluído na Sprint 12 | Fechamento da Sprint 11 |

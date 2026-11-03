@@ -283,7 +283,8 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit f009847 fix(seguranca): seed sem credenciais públicas (SEC-001), decoders do Pillow (SEC-002) e limite
     de corpo (SEC-003)'
@@ -291,8 +292,9 @@ items:
   - tests/integration/test_seguranca_seed_credenciais.py
   - tests/integration/test_seguranca_decoders_imagem.py
   - tests/integration/test_seguranca_limite_corpo.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -336,7 +338,8 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit f009847 fix(seguranca): seed sem credenciais públicas (SEC-001), decoders do Pillow (SEC-002) e limite
     de corpo (SEC-003)'
@@ -344,8 +347,9 @@ items:
   - tests/integration/test_seguranca_seed_credenciais.py
   - tests/integration/test_seguranca_decoders_imagem.py
   - tests/integration/test_seguranca_limite_corpo.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -389,7 +393,8 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit f009847 fix(seguranca): seed sem credenciais públicas (SEC-001), decoders do Pillow (SEC-002) e limite
     de corpo (SEC-003)'
@@ -397,8 +402,9 @@ items:
   - tests/integration/test_seguranca_seed_credenciais.py
   - tests/integration/test_seguranca_decoders_imagem.py
   - tests/integration/test_seguranca_limite_corpo.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -441,15 +447,17 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit 210181d fix(seguranca): acesso por ID do vistoriador (SEC-004) e revogação de sessões na troca de credencial
     (SEC-005)'
   - docs/security/correcao-sec-004-005-2026-10-25.md
   - tests/integration/test_seguranca_acesso_vistoriador.py
   - tests/integration/test_seguranca_revogacao_sessoes.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -492,15 +500,17 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit 210181d fix(seguranca): acesso por ID do vistoriador (SEC-004) e revogação de sessões na troca de credencial
     (SEC-005)'
   - docs/security/correcao-sec-004-005-2026-10-25.md
   - tests/integration/test_seguranca_acesso_vistoriador.py
   - tests/integration/test_seguranca_revogacao_sessoes.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -543,15 +553,17 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit 35c7f46 fix(seguranca): PyJWT e lockfile com hashes (SEC-006), CORS, /docs e cabeçalhos de segurança
     (SEC-007)'
   - docs/security/correcao-sec-006-007-2026-10-25.md
   - tests/unit/test_seguranca_dependencias_jwt.py
   - tests/integration/test_seguranca_cabecalhos_http.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-26'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -594,15 +606,17 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit 35c7f46 fix(seguranca): PyJWT e lockfile com hashes (SEC-006), CORS, /docs e cabeçalhos de segurança
     (SEC-007)'
   - docs/security/correcao-sec-006-007-2026-10-25.md
   - tests/unit/test_seguranca_dependencias_jwt.py
   - tests/integration/test_seguranca_cabecalhos_http.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-26'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -646,14 +660,16 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit 7719993 fix(seguranca): container sem root e CI fixado por SHA (SEC-008), banco fora do repositório
     (SEC-009) e cópias antigas removidas (SEC-016)'
   - docs/security/correcao-sec-008-009-016-2026-10-26.md
   - tests/unit/test_seguranca_infra.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-26'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -696,14 +712,16 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit 7719993 fix(seguranca): container sem root e CI fixado por SHA (SEC-008), banco fora do repositório
     (SEC-009) e cópias antigas removidas (SEC-016)'
   - docs/security/correcao-sec-008-009-016-2026-10-26.md
   - tests/unit/test_seguranca_infra.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-26'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -746,14 +764,16 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit f176167 fix(seguranca): auditoria com IP e campos alterados (SEC-010) e login sem enumeração de e-mails
     pelo tempo (SEC-013)'
   - docs/security/correcao-sec-010-013-2026-10-26.md
   - tests/integration/test_seguranca_auditoria.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-30'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -796,17 +816,23 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#11'
   evidence:
   - 'commit 8682b2e fix(seguranca): política de senha (SEC-011), problema nasce aberto e dashboard por perfil (SEC-012)'
   - docs/security/correcao-sec-011-012-2026-10-30.md
   - tests/integration/test_seguranca_senha_regras.py
+  - 'PR #11 (d633d9f) mergeado na main em 2026-11-02'
   created: '2026-11-02'
-  updated: '2026-10-30'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-10-30'
+    status: done
+  - date: '2026-11-02'
+    status: review
+  - date: '2026-11-02'
     status: done
 - id: SEC-012
   type: security
@@ -846,17 +872,23 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#11'
   evidence:
   - 'commit 8682b2e fix(seguranca): política de senha (SEC-011), problema nasce aberto e dashboard por perfil (SEC-012)'
   - docs/security/correcao-sec-011-012-2026-10-30.md
   - tests/integration/test_seguranca_senha_regras.py
+  - 'PR #11 (d633d9f) mergeado na main em 2026-11-02'
   created: '2026-11-02'
-  updated: '2026-10-30'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-10-30'
+    status: done
+  - date: '2026-11-02'
+    status: review
+  - date: '2026-11-02'
     status: done
 - id: SEC-013
   type: security
@@ -895,14 +927,16 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit f176167 fix(seguranca): auditoria com IP e campos alterados (SEC-010) e login sem enumeração de e-mails
     pelo tempo (SEC-013)'
   - docs/security/correcao-sec-010-013-2026-10-26.md
   - tests/integration/test_seguranca_auditoria.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-30'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -945,18 +979,24 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#11'
   evidence:
   - 'commit cf39ab8 fix(seguranca): CPF mascarado e validado com retenção de logs e tokens (SEC-014) e admin sem
     acesso ao TOTP de outro usuário (SEC-015)'
   - docs/security/correcao-sec-014-015-2026-10-30.md
   - tests/integration/test_seguranca_lgpd_mfa.py
+  - 'PR #11 (d633d9f) mergeado na main em 2026-11-02'
   created: '2026-11-02'
-  updated: '2026-11-01'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-01'
+    status: done
+  - date: '2026-11-02'
+    status: review
+  - date: '2026-11-02'
     status: done
 - id: SEC-015
   type: security
@@ -996,18 +1036,24 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#11'
   evidence:
   - 'commit cf39ab8 fix(seguranca): CPF mascarado e validado com retenção de logs e tokens (SEC-014) e admin sem
     acesso ao TOTP de outro usuário (SEC-015)'
   - docs/security/correcao-sec-014-015-2026-10-30.md
   - tests/integration/test_seguranca_lgpd_mfa.py
+  - 'PR #11 (d633d9f) mergeado na main em 2026-11-02'
   created: '2026-11-02'
-  updated: '2026-11-01'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-01'
+    status: done
+  - date: '2026-11-02'
+    status: review
+  - date: '2026-11-02'
     status: done
 - id: SEC-016
   type: security
@@ -1044,14 +1090,16 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - 'commit 7719993 fix(seguranca): container sem root e CI fixado por SHA (SEC-008), banco fora do repositório
     (SEC-009) e cópias antigas removidas (SEC-016)'
   - docs/security/correcao-sec-008-009-016-2026-10-26.md
   - tests/unit/test_seguranca_infra.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-26'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -1829,12 +1877,14 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - commit 6d3692a (docs/security/threat-model.md)
   - commit fbaf99e (architecture-v1.md)
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-10-25'
     status: done
@@ -1865,14 +1915,16 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - commit 0e164b8
   - docs/security/correcao-n1-n2-2026-10-25.md
   - tests/integration/test_seguranca_mfa_bypass.py
   - tests/integration/test_seguranca_admin_seed.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-10-25'
     status: done
@@ -1904,15 +1956,17 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - commit 8e4d12d
   - docs/security/correcao-n3-n4-n5-2026-10-25.md
   - tests/integration/test_seguranca_checklist_autorizacao.py
   - tests/integration/test_seguranca_gestao_usuarios.py
   - tests/integration/test_seguranca_mfa_desativacao.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-10-25'
     status: done
@@ -1944,15 +1998,17 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - commit 648518e
   - docs/security/correcao-itens-1-2-6-2026-10-25.md
   - tests/integration/test_seguranca_mfa_setup.py
   - tests/integration/test_seguranca_listagem_usuarios.py
   - tests/integration/test_seguranca_problemas_bola.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-10-25'
     status: done
@@ -1984,15 +2040,17 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#10'
   evidence:
   - commit f081c60
   - docs/security/correcao-n6-n7-n8-2026-10-25.md
   - tests/integration/test_seguranca_rate_limit.py
   - tests/integration/test_seguranca_uploads.py
   - tests/unit/test_config_segredos.py
+  - 'PR #10 (c1718d6) mergeado na main em 2026-10-30'
   created: '2026-11-02'
-  updated: '2026-10-25'
+  updated: '2026-11-02'
   history:
   - date: '2026-10-25'
     status: done
@@ -3234,16 +3292,22 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#11'
   evidence:
   - commit d0b5f35
   - docker-compose.yml
   - .dockerignore
   - .env.example
+  - 'PR #11 (d633d9f) mergeado na main em 2026-11-02'
   created: '2026-11-02'
-  updated: '2026-11-01'
+  updated: '2026-11-02'
   history:
   - date: '2026-11-01'
+    status: done
+  - date: '2026-11-02'
+    status: review
+  - date: '2026-11-02'
     status: done
 - id: TK-014
   type: task
@@ -3258,7 +3322,7 @@ items:
   priority: must
   rank: 1500
   estimate: 3
-  status: review
+  status: done
   sprint: 11
   phase: F1
   depends_on: []
@@ -3272,18 +3336,22 @@ items:
   links:
     trello_card: null
     gh_issue: null
-    prs: []
+    prs:
+    - '#11'
   evidence:
   - docs/roadmap/
   - docs/risks/
   - docs/adr/
   - docs/security/relatorio-2026-11-02.md
   - .github/PULL_REQUEST_TEMPLATE.md
+  - 'PR #11 (d633d9f) mergeado na main em 2026-11-02'
   created: '2026-11-02'
   updated: '2026-11-02'
   history:
   - date: '2026-11-02'
     status: review
+  - date: '2026-11-02'
+    status: done
 - id: TK-015
   type: task
   title: Release candidata v0.9.0
@@ -3341,6 +3409,41 @@ items:
   source:
     kind: roadmap
     ref: marco do roadmap.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-02'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+- id: TK-017
+  type: task
+  title: 'Proteger a branch main: PR com 1 aprovação e CI verde'
+  epic: EP-007
+  story: ''
+  description: 'Ação da retrospectiva da Sprint 11: os PRs #10 e #11 foram mergeados pelo autor sem revisão.'
+  acceptance_criteria:
+  - 'A main tem regra de proteção: merge só por PR, com pelo menos 1 aprovação de alguém que não seja o autor.'
+  - O check do workflow tests.yml é obrigatório para o merge.
+  - Push direto na main é recusado (cenário negado testado uma vez e registrado como evidência).
+  priority: must
+  rank: 15
+  estimate: 1
+  status: backlog
+  sprint: 12
+  phase: F0
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A08:2021
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 11
   links:
     trello_card: null
     gh_issue: null
