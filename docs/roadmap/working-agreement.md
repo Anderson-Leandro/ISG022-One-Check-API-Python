@@ -21,7 +21,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 - **Retrospectiva** (fim): 1 coisa que funcionou, 1 melhoria → vira ação no backlog.
 
 ## Contexto deste projeto
-- **Time de quatro pessoas:** o PO prioriza e aceita as entregas na review; o TL revisa os PRs; os devs implementam. Todo PR é revisado por alguém que não é o autor, e o TL pode usar `/code-review` como apoio.
+- **Time de quatro pessoas:** o PO prioriza e aceita as entregas na review; o TL cuida dos padrões técnicos; os devs implementam. O autor pode mergear o próprio PR sem aprovação de outra pessoa (decisão do time em 2026-11-02).
 - **Branches:** hoje o trabalho vai para `dev`, e a `main` recebe PR de `dev`. As branches curtas de item (`tipo/ID-descricao`) saem de `dev`.
 - **Origem:** a DoR e a DoD abaixo completam as do [`docs/product-backlog.md`](../product-backlog.md), seções 9 e 10.
 - **Segurança:** toda correção de segurança tem relatório em `docs/security/correcao-*.md` (causa, mudança, testes, impacto e riscos residuais), escrito com testes que falham antes da correção.
@@ -32,7 +32,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
   (ex.: `feat/US-012-login`, `fix/BUG-004-timeout`, `sec/SEC-003-rate-limit`).
 - Commits pequenos no padrão **Conventional Commits**, citando o ID: `feat(auth): login com MFA (US-012)`.
 - Todo merge na `main` passa por **Pull Request** com o template preenchido (DoD).
-- Todo PR tem pelo menos uma revisão de outra pessoa do time antes do merge; mudanças de segurança passam pelo TL.
+- Todo merge passa por PR, mas **não exige aprovação de outra pessoa**: antes de mergear, o próprio autor lê o diff inteiro e confere o CI verde. Revisão de outra pessoa ou `/code-review` é recomendada para mudanças de segurança, sem ser obrigatória.
 - Releases com tag SemVer (`v0.1.0`) ao fim de cada marco; CHANGELOG atualizado.
 - **Nunca** versionar segredos: `.env` no `.gitignore`, `.env.example` só com valores fictícios.
 
@@ -45,7 +45,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 
 ## Definition of Done (DoD) — item só está pronto quando
 - [ ] Critérios de aceite atendidos e demonstráveis
-- [ ] Código integrado na `main` via PR revisado
+- [ ] Código integrado na `main` via PR, com CI verde e o diff relido pelo autor
 - [ ] Testes relevantes escritos e passando no CI (incluindo o cenário negado, se houver)
 - [ ] Nenhum segredo, credencial ou dado pessoal real adicionado ao repositório
 - [ ] Logs não expõem dados sensíveis; erros não vazam detalhes internos
