@@ -56,7 +56,7 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     if not conferir_credenciais(user, body.senha):
         tentativas.falhou()
         log_operacao(db, None, "login_falho", "usuario", None, f"email: {body.email}")
-        return fail("Credenciais inválidas")
+        return fail("Credenciais inválidas", status_code=401)
     tentativas.sucesso()
 
     if needs_mfa(user):
@@ -89,13 +89,13 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
 def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
     if not payload or payload.get("type") != "mfa":
-        return fail("Token MFA inválido ou expirado")
+        return fail("Token MFA inválido ou expirado", status_code=401)
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
-        return fail("Usuário não encontrado")
+        return fail("Usuário não encontrado", status_code=401)
     if not sessao_vigente(payload, user):
-        return fail("Token MFA inválido ou expirado")
+        return fail("Token MFA inválido ou expirado", status_code=401)
 
     # A conta (e não o temp_token) é a chave: um novo login não zera as tentativas
     tentativas = Tentativas(request, "mfa", user.id)
@@ -103,7 +103,7 @@ def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(g
     if not verify_totp(user, body.codigo.strip()):
         tentativas.falhou()
         log_operacao(db, user.id, "mfa_falho", "usuario", user.id, "via: mfa")
-        return fail("Código MFA inválido")
+        return fail("Código MFA inválido", status_code=401)
     tentativas.sucesso()
 
     access = create_access_token(user.id, user.role, user.token_version)
@@ -145,23 +145,23 @@ def setup_login(temp_token: str = Query(...), db: Session = Depends(get_db)):
 def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
     if not payload or payload.get("type") != "mfa_setup":
-        return fail("Token MFA inválido ou expirado")
+        return fail("Token MFA inválido ou expirado", status_code=401)
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
-        return fail("Usuário não encontrado")
+        return fail("Usuário não encontrado", status_code=401)
     if not sessao_vigente(payload, user):
-        return fail("Token MFA inválido ou expirado")
+        return fail("Token MFA inválido ou expirado", status_code=401)
 
     if not mfa_setup_required(user):
-        return fail("MFA já configurado para este usuário")
+        return fail("MFA já configurado para este usuário", status_code=409)
 
     tentativas = Tentativas(request, "mfa", user.id)
     tentativas.verificar()
     if not user.mfa_secret_pendente or not verify_totp_code(user.mfa_secret_pendente, body.codigo):
         tentativas.falhou()
         log_operacao(db, user.id, "mfa_falho", "usuario", user.id, "via: mfa_setup")
-        return fail("Código MFA inválido")
+        return fail("Código MFA inválido", status_code=401)
     tentativas.sucesso()
 
     user.mfa_secret = user.mfa_secret_pendente
@@ -200,17 +200,17 @@ def mfa_activate(
     db: Session = Depends(get_db),
 ):
     if not user.mfa_secret_pendente:
-        return fail("Configuração MFA não encontrada")
+        return fail("Configuração MFA não encontrada", status_code=409)
 
     tentativas = Tentativas(request, "reauth", user.id)
     tentativas.verificar()
     erro = mfa_troca_error(user, body.codigo_atual)
     if erro:
         tentativas.falhou()
-        return fail(erro)
+        return fail(erro, status_code=403)
 
     if not verify_totp_code(user.mfa_secret_pendente, body.codigo.strip()):
-        return fail("Código MFA inválido")
+        return fail("Código MFA inválido", erros={"codigo": "Código MFA inválido"}, status_code=422)
 
     user.mfa_secret = user.mfa_secret_pendente
     user.mfa_secret_pendente = None
@@ -270,7 +270,7 @@ def mfa_desabilitar(
     erro = mfa_self_disable_error(user, body.senha, body.codigo)
     if erro:
         tentativas.falhou()
-        return fail(erro)
+        return fail(erro, status_code=403)
     tentativas.sucesso()
 
     user.mfa_enabled = False
@@ -287,7 +287,7 @@ def mfa_desabilitar(
 def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
     user = verify_refresh_token(db, body.refresh_token)
     if not user:
-        return fail("Refresh token inválido ou expirado")
+        return fail("Refresh token inválido ou expirado", status_code=401)
 
     access = create_access_token(user.id, user.role, user.token_version)
     new_refresh = create_refresh_token(db, user.id)

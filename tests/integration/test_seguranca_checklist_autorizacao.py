@@ -85,7 +85,7 @@ class TestQuemPodeCriarChecklist:
 class TestValidacaoCriacaoChecklist:
     def test_vistoriador_inexistente_nao_gera_500(self, client, db, contrato, token_admin):
         r = _criar(client, contrato.id, "00000000-0000-0000-0000-000000000000", token_admin)
-        assert r.status_code == 200
+        assert r.status_code == 404
         assert r.json()["sucesso"] is False
         assert "Vistoriador não encontrado" in r.json()["erro"]
         assert _checklists(db, contrato.id) == 0

@@ -129,7 +129,7 @@ def get_imovel(
         .first()
     )
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
     assert_acesso_imovel(db, imovel_id, user)
     return ok(serialize_imovel(im, include_endereco=True))
 
@@ -143,7 +143,7 @@ def update_imovel(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     data = body.model_dump(exclude_unset=True)
     endereco_data = data.pop("endereco", None)
@@ -177,10 +177,10 @@ def delete_imovel(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     if im.status == "locado":
-        return fail("Não é possível excluir um imóvel com contrato ativo (status: locado)")
+        return fail("Não é possível excluir um imóvel com contrato ativo (status: locado)", status_code=409)
 
     im.ativo = False
     if im.endereco:
@@ -199,12 +199,12 @@ def get_endereco(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
     assert_acesso_imovel(db, imovel_id, user)
 
     end = db.query(Endereco).filter(Endereco.imovel_id == imovel_id, Endereco.ativo == True).first()
     if not end:
-        return fail("Endereço não encontrado")
+        return fail("Endereço não encontrado", status_code=404)
     return ok(serialize_endereco(end))
 
 
@@ -219,7 +219,7 @@ def upsert_endereco(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     end = db.query(Endereco).filter(Endereco.imovel_id == imovel_id).first()
     if end:
@@ -246,7 +246,7 @@ def list_comodos(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
     assert_acesso_imovel(db, imovel_id, user)
 
     ensure_default_comodos(db, imovel_id)
@@ -268,7 +268,7 @@ def create_comodo(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     comodo = ImovelComodo(
         imovel_id=imovel_id,
@@ -292,14 +292,14 @@ def update_comodo(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     comodo = db.query(ImovelComodo).filter(
         ImovelComodo.id == comodo_id,
         ImovelComodo.imovel_id == imovel_id,
     ).first()
     if not comodo:
-        return fail("Cômodo não encontrado")
+        return fail("Cômodo não encontrado", status_code=404)
 
     if body.tipo is not None:
         comodo.tipo = body.tipo
@@ -322,14 +322,14 @@ def delete_comodo(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     comodo = db.query(ImovelComodo).filter(
         ImovelComodo.id == comodo_id,
         ImovelComodo.imovel_id == imovel_id,
     ).first()
     if not comodo:
-        return fail("Cômodo não encontrado")
+        return fail("Cômodo não encontrado", status_code=404)
 
     db.delete(comodo)
     db.commit()

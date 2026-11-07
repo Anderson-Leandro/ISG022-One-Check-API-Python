@@ -65,17 +65,17 @@ def update_me(
     if body.nome is not None:
         nome = body.nome.strip()
         if not nome:
-            return fail("Nome é obrigatório")
+            return fail("Nome é obrigatório", erros={"nome": "Nome é obrigatório"}, status_code=422)
         user.nome = nome
 
     if body.senha_nova:
         if not body.senha_atual:
-            return fail("Informe a senha atual")
+            return fail("Informe a senha atual", erros={"senha_atual": "Informe a senha atual"}, status_code=422)
         tentativas = Tentativas(request, "reauth", user.id)
         tentativas.verificar()
         if not verify_password(body.senha_atual, user.senha_hash):
             tentativas.falhou()
-            return fail("Senha atual incorreta")
+            return fail("Senha atual incorreta", status_code=403)
         tentativas.sucesso()
         user.senha_hash = hash_password(body.senha_nova)
     alterados = campos_alterados(user)
@@ -102,7 +102,7 @@ def alterar_senha_me(
     tentativas.verificar()
     if not verify_password(body.senha_atual, user.senha_hash):
         tentativas.falhou()
-        return fail("Senha atual incorreta")
+        return fail("Senha atual incorreta", status_code=403)
     tentativas.sucesso()
 
     user.senha_hash = hash_password(body.nova_senha)
@@ -131,9 +131,9 @@ def mfa_enable_me(
     erro = mfa_troca_error(user, body.codigo_atual)
     if erro:
         tentativas.falhou()
-        return fail(erro)
+        return fail(erro, status_code=403)
     if not verify_totp_code(body.secret, body.codigo):
-        return fail("Código MFA inválido")
+        return fail("Código MFA inválido", erros={"codigo": "Código MFA inválido"}, status_code=422)
     user.mfa_secret = body.secret
     user.mfa_enabled = True
     encerrar_sessoes(db, user)
@@ -157,7 +157,7 @@ def mfa_disable_me(
     erro = mfa_self_disable_error(user, body.senha, body.codigo)
     if erro:
         tentativas.falhou()
-        return fail(erro)
+        return fail(erro, status_code=403)
     tentativas.sucesso()
 
     user.mfa_secret = None
@@ -194,7 +194,7 @@ def get_usuario(
 ):
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
-        return fail("Usuário não encontrado")
+        return fail("Usuário não encontrado", status_code=404)
     return ok(serialize_usuario(user, cpf_completo=True))
 
 
@@ -207,22 +207,22 @@ def update_usuario(
 ):
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
-        return fail("Usuário não encontrado")
+        return fail("Usuário não encontrado", status_code=404)
     _assert_pode_gerenciar(current, user)
 
     novo_role = user.role
     if body.role is not None:
         if body.role not in ROLES:
-            return fail("Perfil inválido")
+            return fail("Perfil inválido", erros={"role": "Perfil inválido"}, status_code=422)
         _assert_pode_atribuir(current, body.role)
         novo_role = body.role
     if body.mfa_enabled is False and novo_role in MFA_REQUIRED_ROLES:
-        return fail("MFA é obrigatório para este perfil")
+        return fail("MFA é obrigatório para este perfil", erros={"mfa_enabled": "MFA é obrigatório para este perfil"}, status_code=422)
 
     if body.email is not None and body.email != user.email:
         existente = db.query(Usuario).filter(Usuario.email == body.email, Usuario.id != usuario_id).first()
         if existente:
-            return fail("Este e-mail já está cadastrado por outro usuário")
+            return fail("Este e-mail já está cadastrado por outro usuário", status_code=409)
         user.email = body.email
 
     if body.nome is not None:
@@ -259,11 +259,11 @@ def delete_usuario(
     current: Usuario = Depends(require_roles("admin", "gestor")),
 ):
     if current.id == usuario_id:
-        return fail("Não é possível desativar a própria conta")
+        return fail("Não é possível desativar a própria conta", status_code=403)
 
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
-        return fail("Usuário não encontrado")
+        return fail("Usuário não encontrado", status_code=404)
     _assert_pode_gerenciar(current, user)
 
     user.ativo = False
@@ -285,7 +285,7 @@ def mfa_enable_usuario(
 ):
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
-        return fail("Usuário não encontrado")
+        return fail("Usuário não encontrado", status_code=404)
     _assert_pode_gerenciar(current, user)
     if body and ("secret" in body or "codigo" in body):
         msg = "O autenticador é configurado pelo próprio usuário no próximo login"
@@ -309,7 +309,7 @@ def mfa_reset_usuario(
 ):
     user = db.query(Usuario).filter(Usuario.id == usuario_id, Usuario.ativo == True).first()
     if not user:
-        return fail("Usuário não encontrado")
+        return fail("Usuário não encontrado", status_code=404)
     _assert_pode_gerenciar(current, user)
     reset_mfa(user)
     encerrar_sessoes(db, user)
@@ -326,10 +326,10 @@ def create_usuario(
     current: Usuario = Depends(require_roles("admin", "gestor")),
 ):
     if body.role not in ROLES:
-        return fail("Perfil inválido")
+        return fail("Perfil inválido", erros={"role": "Perfil inválido"}, status_code=422)
     _assert_pode_atribuir(current, body.role)
     if db.query(Usuario).filter(Usuario.email == body.email).first():
-        return fail("E-mail já cadastrado")
+        return fail("E-mail já cadastrado", status_code=409)
 
     user = Usuario(
         nome=body.nome,

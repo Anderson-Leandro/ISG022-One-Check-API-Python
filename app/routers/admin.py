@@ -55,7 +55,7 @@ def _require_destructive_allowed() -> None:
 def _refresh_data(db: Session) -> dict:
     result = run_refresh_data(db)
     if not result.get("seeded"):
-        return fail(result["message"])
+        return fail(result["message"], status_code=409)
     result["preservado"] = "usuarios"
     return ok(result)
 
@@ -102,7 +102,7 @@ def seed_database(
         result = run_seed(db, force=body.force)
 
     if not result.get("seeded"):
-        return fail(result["message"])
+        return fail(result["message"], status_code=409)
 
     if body.mode == "refresh_data":
         result["preservado"] = "usuarios"
