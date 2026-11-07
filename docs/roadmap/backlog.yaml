@@ -4122,3 +4122,54 @@ items:
     github:
       hash: 05a3b418344d351f
       remote_at: '2026-11-07T16:15:12Z'
+- id: DEBT-013
+  type: debt
+  title: Mensagem de erro específica para token de verificação usado no setup-login e no activate-login
+  epic: EP-001
+  story: ''
+  description: 'Hoje GET /auth/mfa/setup-login (auth_router.py:136) e POST /auth/mfa/activate-login respondem "Token
+    MFA inválido ou expirado" tanto para token ilegível/expirado quanto para um token válido do tipo mfa (emitido
+    para quem já tem autenticador). A recusa é correta (barreira da falha N1, SEC-021); só a mensagem confunde quem
+    integra o front. Separar os casos sem consultar a conta antes de recusar. Achado em teste manual com a collection
+    do Insomnia (PR #110). Relacionado: DEBT-003 (consolidar rotas de MFA).'
+  acceptance_criteria:
+  - Dado um token temporário válido do tipo mfa, quando chamar GET /auth/mfa/setup-login, então recebe 401 com mensagem
+    indicando que o token é de verificação e deve ser usado em /auth/mfa/verify.
+  - Dado o mesmo token, quando chamar POST /auth/mfa/activate-login, então recebe sucesso=false com a mesma mensagem
+    específica, e nenhum segredo é gerado ou alterado.
+  - Dado um token ilegível, com assinatura inválida ou expirado, quando chamar qualquer das duas rotas, então a
+    mensagem continua genérica (Token MFA inválido ou expirado).
+  - A recusa do token do tipo mfa acontece antes de consultar o usuário no banco; os testes de test_seguranca_mfa_bypass.py
+    continuam passando e há teste novo para cada mensagem.
+  - Os casos da collection do Insomnia (pastas 01 e 00a) são atualizados com a nova mensagem.
+  priority: could
+  rank: 155
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - fail secure
+    - CWE-209
+    risk_id: null
+  source:
+    kind: manual-test
+    file: docs/insomnia/onecheck-api.insomnia.json
+    ref: 01 / Token de verificação não serve no setup-login
+  links:
+    trello_card: null
+    gh_issue: 112
+    prs: []
+  evidence: []
+  created: '2026-11-07'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-07'
+    status: backlog
+  sync:
+    github:
+      hash: 6e24c2c6cd5e7829
+      remote_at: '2026-11-07T21:56:56Z'
