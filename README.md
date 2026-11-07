@@ -371,7 +371,7 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
 ```
 
 ### Testes manuais (Insomnia)
-A collection em [`docs/insomnia/`](docs/insomnia/README.md) tem 166 requisições, com casos de sucesso e de falha para todas as áreas da API. Os scripts gravam os tokens e os IDs no ambiente, e os códigos de MFA podem ser calculados a partir do segredo. Importe `docs/insomnia/onecheck-api.insomnia.json` e siga o guia.
+A collection em [`docs/insomnia/`](docs/insomnia/README.md) tem 168 requisições, com casos de sucesso e de falha para todas as áreas da API. Os scripts gravam os tokens e os IDs no ambiente, e os códigos de MFA podem ser calculados a partir do segredo. Importe `docs/insomnia/onecheck-api.insomnia.json` e siga o guia.
 
 ---
 
