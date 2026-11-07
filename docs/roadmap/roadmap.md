@@ -15,7 +15,7 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 8 | 09/09 → 22/09 | fechada (retroativa) | Product backlog da disciplina registrado | 2 |
 | 9–10 | 23/09 → 20/10 | fechadas, sem commits | — | — |
 | 11 | 21/10 → 03/11 | fechada (retroativa) | Corrigir as pendências e os 16 achados da auditoria; adotar a gestão ágil | 64 |
-| **12** | 04/11 → 17/11 | **ativa** | Release v0.1.0, produção segura e escopo da F4 fechado | 27 |
+| **12** | 04/11 → 17/11 | **ativa** | Release v0.1.0, produção segura e escopo da F4 fechado | 40 |
 | 13 | 18/11 → 01/12 | planejada | Qualidade contínua e hardening | 36 |
 | 14 | 02/12 → 11/12 (10 dias) | planejada | Conformidade, release candidata v0.9.0 e entrega final v1.0.0 | 31 |
 
@@ -29,7 +29,7 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | **F2 Arquitetura** | decidir antes de codar | 7, 11 (+ 12: ADRs) | concluída (ADRs incompletos) | `architecture-v1.md` (7), `threat-model.md` e ADR-0001/0002 (11). ADRs retroativos: DEBT-009, Sprint 12 |
 | **F3 MVP + identidade e acesso** | fluxo de valor ponta a ponta | 1, 7 → 12 | **em andamento** | testes de cenário permitido e negado ✓, threat model revisado ✓, **release v0.1.0 ✗ (DEBT-007, Sprint 12)** |
 | **F4 Funcionalidades + mitigações** | crescer com segurança | 7, 11 → 12 | quase concluída | testes de segurança e relatórios `correcao-*.md` ✓ (Sprint 11). Na Sprint 12: SPK-004, US-015 e US-017. US-016 voltou ao backlog sem sprint (entra se sobrar tempo) |
-| **F5 Qualidade e observabilidade** | confiar no que roda | 1, 11 → 12–13 | parcial | 824 testes no CI, 95% de cobertura de linhas, scanners ✓. Na Sprint 12: avaliação da suíte (SPK-005, ramos, matriz de autorização e mutação). Na Sprint 13: lint (DEBT-004), Dependabot (DEBT-005), contrato OpenAPI (DEBT-001/002/003), DEBT-008 e DEBT-010 |
+| **F5 Qualidade e observabilidade** | confiar no que roda | 1, 11 → 12–13 | parcial | 824 testes no CI, 95% de cobertura de linhas, scanners ✓. Na Sprint 12: avaliação da suíte (SPK-005) e as lacunas encontradas (SEC-032 a SEC-034, DEBT-011, DEBT-012). Na Sprint 13: lint (DEBT-004), Dependabot (DEBT-005), contrato OpenAPI (DEBT-001/002/003), DEBT-008 e DEBT-010 |
 | **F6 Hardening e release** | preparar para produção | 11 → 12–14 | a iniciar | compose sem segredos ✓ (Sprint 11). Sprint 12: TK-002, TK-003 e decisões SPK-001/002/003. Sprint 13: SEC-017 a SEC-020, SEC-027, SEC-031 e backup (TK-005). Sprint 14: SEC-025, SEC-026, SEC-028 a SEC-030, auditoria completa (TK-006) e v0.9.0 (TK-015) |
 | **F7 Entrega e operação** | entregar e sustentar | 14 | a iniciar | TK-004, relatório final, roteiro de demo e v1.0.0 (TK-016) em 11/12 |
 
@@ -58,3 +58,4 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 2026-11-02 | Sprint 11 fechada com 64/64 pts; fase continua F3 (falta a v0.1.0). Retro gerou o TK-017, incluído na Sprint 12 | Fechamento da Sprint 11 |
 | 2026-11-02 | PR deixa de exigir aprovação de outra pessoa; TK-017 passa a exigir só merge por PR e CI verde | Decisão do time |
 | 2026-11-03 | SPK-005 (avaliação dos testes) entra na Sprint 12 no lugar do US-016, que volta ao backlog sem sprint | Avaliar a qualidade da suíte antes de continuar |
+| 2026-11-07 | Itens da avaliação dos testes (SEC-032 a SEC-034, DEBT-011, DEBT-012; 13 pts) entram na Sprint 12, que vai a 40 pts | Decisão do time: fechar as lacunas de testes de negação antes de seguir |

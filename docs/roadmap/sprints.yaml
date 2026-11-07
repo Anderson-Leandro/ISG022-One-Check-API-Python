@@ -241,7 +241,7 @@ sprints:
   start: '2026-11-04'
   end: '2026-11-17'
   status: active
-  capacity: 32
+  capacity: 40.0
   committed:
   - TK-002
   - TK-003
@@ -256,7 +256,12 @@ sprints:
   - US-015
   - US-017
   - SPK-005
-  committed_points: 27.0
+  - SEC-032
+  - SEC-033
+  - SEC-034
+  - DEBT-011
+  - DEBT-012
+  committed_points: 40.0
   completed_points: null
   completed: []
   carried_over: []
