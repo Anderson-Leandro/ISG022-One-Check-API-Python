@@ -3344,8 +3344,8 @@ items:
     status: backlog
   sync:
     github:
-      hash: 7319fa6566b5940f
-      remote_at: '2026-11-03T00:34:31Z'
+      hash: 0c566a95f2b316f5
+      remote_at: '2026-11-07T16:15:06Z'
 - id: TK-006
   type: task
   title: Auditoria de segurança completa antes da release candidata
@@ -3885,8 +3885,8 @@ items:
     status: in_progress
   sync:
     github:
-      hash: db0308b7b5e6dc66
-      remote_at: '2026-11-03T01:46:57Z'
+      hash: 011b1481f2203b56
+      remote_at: '2026-11-07T16:15:07Z'
 - id: SEC-032
   type: security
   title: Testes de negação de acesso aos checklists por quem não é dono
@@ -3925,7 +3925,7 @@ items:
     file: docs/quality/avaliacao-testes-2026-11-02.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 104
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -3935,6 +3935,10 @@ items:
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  sync:
+    github:
+      hash: d1005c1a1e08774c
+      remote_at: '2026-11-07T16:15:08Z'
 - id: SEC-033
   type: security
   title: Testes das travas do checklist depois do envio para aceite
@@ -3967,7 +3971,7 @@ items:
     file: docs/quality/avaliacao-testes-2026-11-02.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 105
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -3977,6 +3981,10 @@ items:
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  sync:
+    github:
+      hash: 9e332232d04d9e36
+      remote_at: '2026-11-07T16:15:09Z'
 - id: SEC-034
   type: security
   title: Testes de sessão revogada no setup de MFA e do teto de chaves do limitador
@@ -4008,7 +4016,7 @@ items:
     file: docs/quality/avaliacao-testes-2026-11-02.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 106
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -4018,6 +4026,10 @@ items:
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  sync:
+    github:
+      hash: 353f3175c82570e9
+      remote_at: '2026-11-07T16:15:10Z'
 - id: DEBT-011
   type: debt
   title: Testes de negação por perfil em todas as rotas restritas
@@ -4052,7 +4064,7 @@ items:
     file: docs/quality/avaliacao-testes-2026-11-02.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 107
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -4062,6 +4074,10 @@ items:
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  sync:
+    github:
+      hash: 7913b8d13cd50d76
+      remote_at: '2026-11-07T16:15:11Z'
 - id: DEBT-012
   type: debt
   title: Testes de negação em escrita conferem o estado e o status exato
@@ -4092,7 +4108,7 @@ items:
     file: docs/quality/avaliacao-testes-2026-11-02.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 108
     prs: []
   evidence: []
   created: '2026-11-02'
@@ -4102,3 +4118,7 @@ items:
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  sync:
+    github:
+      hash: 05a3b418344d351f
+      remote_at: '2026-11-07T16:15:12Z'
