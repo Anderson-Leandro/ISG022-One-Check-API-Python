@@ -6,8 +6,8 @@
 > investigar um bug.
 
 - **Arquivo para importar:** [`onecheck-api.insomnia.json`](onecheck-api.insomnia.json), no formato de exportação v4.
-- **Testado com:** Insomnia 12.5. As 166 requisições também foram rodadas contra a API local por um executor que reproduz os scripts, com todos os testes passando.
-- **Conteúdo:** 166 requisições em 11 pastas, sendo 86 casos de sucesso (✅), 79 de falha (❌) e 1 de comportamento a revisar (⚠️).
+- **Testado com:** Insomnia 12.5. As 168 requisições também foram rodadas contra a API local por um executor que reproduz os scripts, com todos os testes passando.
+- **Conteúdo:** 168 requisições em 11 pastas, sendo 86 casos de sucesso (✅), 81 de falha (❌) e 1 de comportamento a revisar (⚠️).
 
 ## Como importar
 1. No Insomnia: **Create → Import** (ou arraste o arquivo para a janela).
@@ -41,8 +41,8 @@ Rode as pastas **na ordem**, porque cada uma prepara o que a próxima usa: token
 | Pasta | O que faz | Grava no ambiente |
 |---|---|---|
 | 00 Saúde e autenticação básica | health, 404, rota protegida sem token, token malformado, login inválido | — |
-| 00a Primeiro acesso (só quando o login pedir) | configura o MFA de admin, gestor e vistoriador | `mfa_secret_<conta>`, tokens |
-| 01 Login com MFA | login em duas etapas, refresh rotativo, reuso de refresh, MFA obrigatório | `token_admin`, `token_gestor`, `token_vistoriador`, IDs |
+| 00a Primeiro acesso (só quando o login pedir) | configura o MFA de admin, gestor e vistoriador; recusa reusar o token de setup (409) | `mfa_secret_<conta>`, tokens |
+| 01 Login com MFA | login em duas etapas, token de verificação recusado no setup (401), refresh rotativo, reuso de refresh, MFA obrigatório | `token_admin`, `token_gestor`, `token_vistoriador`, IDs |
 | 02 Usuários | cria locatário A, locatário B e visualizador (e-mail único por execução); perfil, listagem, escalada de privilégio | tokens e IDs dos três |
 | 03 Imóveis | imóvel com endereço e coordenadas (sem geocoding), cômodos; acesso por perfil e por vínculo | `imovel_id`, `comodo_id` |
 | 04 Contratos e agendamentos | contrato do locatário A, regras de datas e de imóvel locado, isolamento entre locatários | `contrato_id`, `agendamento_id` |

@@ -261,6 +261,10 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
              sucesso=True, salvar={"mfa_secret_vistoriador": "b.dados.secret"}),
         Caso("✅ vistoriador: ativar o MFA com o primeiro código", "POST", "/auth/mfa/activate-login", corpo={"temp_token": "{{ _.temp_token }}", "codigo": "{{ _.mfa_codigo_atual }}"},
              antes=totp_js("vistoriador"), sucesso=True, salvar={"token_vistoriador": "b.dados.access_token", "vistoriador_id": "b.dados.usuario.id"}),
+        Caso("❌ Reusar o token de setup depois de ativar → 409", "GET", "/auth/mfa/setup-login", query={"temp_token": "{{ _.temp_token }}"},
+             status=409, erro="MFA já configurado",
+             descricao="Usa o token de primeiro acesso do vistoriador, que ainda está dentro da validade de 10 minutos. Como a conta já ativou o MFA, "
+                       "a rota recusa gerar um segredo novo e o autenticador configurado continua valendo."),
         Caso("❌ Gerar segredo com token temporário inválido → 401", "GET", "/auth/mfa/setup-login", query={"temp_token": "token-invalido"}, status=401),
     ]),
     ("01 Login com MFA (admin, gestor, vistoriador)", "Contas do seed. Preencha senha_* e mfa_secret (ou mfa_codigo) no ambiente. Grava token_admin, token_gestor e token_vistoriador.", [
@@ -280,6 +284,11 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
              antes=totp_js("gestor"), sucesso=True, salvar={"token_gestor": "b.dados.access_token", "gestor_id": "b.dados.usuario.id"}),
         Caso("✅ Login vistoriador (etapa 1: senha)", "POST", "/auth/login", corpo={"email": "{{ _.email_vistoriador }}", "senha": "{{ _.senha_vistoriador }}"},
              sucesso=True, salvar={"temp_token": "b.dados.temp_token"}),
+        Caso("❌ Token de verificação não serve no setup-login → 401", "GET", "/auth/mfa/setup-login", query={"temp_token": "{{ _.temp_token }}"},
+             status=401, erro="Token MFA inválido",
+             descricao="O login de quem já tem autenticador emite um token do tipo mfa, que só vale no /auth/mfa/verify. "
+                       "Aceitá-lo aqui permitiria trocar o segredo só com a senha (falha N1, SEC-021). "
+                       "A requisição seguinte confirma que o segredo antigo continua valendo."),
         Caso("✅ Login vistoriador (etapa 2: código MFA)", "POST", "/auth/mfa/verify", corpo={"temp_token": "{{ _.temp_token }}", "codigo": "{{ _.mfa_codigo_atual }}"},
              antes=totp_js("vistoriador"), sucesso=True, salvar={"token_vistoriador": "b.dados.access_token", "vistoriador_id": "b.dados.usuario.id"}),
         Caso("❌ MFA com token temporário inválido", "POST", "/auth/mfa/verify", corpo={"temp_token": "token-invalido", "codigo": "123456"},
