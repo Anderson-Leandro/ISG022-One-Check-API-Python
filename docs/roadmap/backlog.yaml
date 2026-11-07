@@ -3313,10 +3313,13 @@ items:
   title: Cobrir os ramos não testados de agendamentos, geocoding e database
   epic: EP-007
   story: ''
-  description: 'Cobertura atual: agendamentos 84%, geocoding 82%, database 70%.'
+  description: 'Refinado pela avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md): o que é de segurança
+    saiu para SEC-032, SEC-033 e SEC-034. Ficam os ramos de ''não encontrado'' e validação dos routers, mais database.py
+    (PostgreSQL) e main.py (inicialização).'
   acceptance_criteria:
-  - app/routers/agendamentos.py e app/geocoding.py com ≥ 90% de cobertura, incluindo cenários negados.
-  - ensure_schema_updates testado com um banco antigo.
+  - Cobertura de ramos (pytest --cov-branch) de agendamentos, imoveis, problemas e contratos em pelo menos 90%.
+  - Os ramos de 'não encontrado' listados no relatório têm teste que confere a resposta.
+  - A cobertura de ramos total sobe de 83,7% para pelo menos 90%.
   priority: could
   rank: 310
   estimate: 3
@@ -3341,8 +3344,8 @@ items:
     status: backlog
   sync:
     github:
-      hash: 7319fa6566b5940f
-      remote_at: '2026-11-03T00:34:31Z'
+      hash: 0c566a95f2b316f5
+      remote_at: '2026-11-07T16:15:06Z'
 - id: TK-006
   type: task
   title: Auditoria de segurança completa antes da release candidata
@@ -3852,7 +3855,7 @@ items:
   priority: must
   rank: 35
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F5
   depends_on: []
@@ -3869,7 +3872,8 @@ items:
     trello_card: null
     gh_issue: 102
     prs: []
-  evidence: []
+  evidence:
+  - docs/quality/avaliacao-testes-2026-11-02.md
   created: '2026-11-02'
   updated: '2026-11-02'
   history:
@@ -3877,7 +3881,244 @@ items:
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-02'
+    status: in_progress
   sync:
     github:
-      hash: db0308b7b5e6dc66
-      remote_at: '2026-11-03T01:46:57Z'
+      hash: 011b1481f2203b56
+      remote_at: '2026-11-07T16:15:07Z'
+- id: SEC-032
+  type: security
+  title: Testes de negação de acesso aos checklists por quem não é dono
+  epic: EP-004
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seções 1 a 3): a negação em _assert_pode_ver_checklist
+    (app/routers/checklists.py:89-93) e em _assert_pode_aceitar (:73-75) nunca é executada; trocar ''and'' por ''or''
+    na checagem do locatário não faz nenhum teste falhar. Só testes; o código atual está correto.'
+  acceptance_criteria:
+  - Dado um locatário de outro contrato, quando ele chama GET /checklists/{id}, então recebe 403 e o corpo não traz
+    dados do checklist.
+  - Dado um segundo vistoriador, quando ele chama GET /checklists/{id}, PUT itens, POST e DELETE fotos ou PATCH
+    submeter num checklist que não é seu, então recebe 403 e o checklist fica inalterado no banco.
+  - Dado um locatário de outro contrato, quando ele chama PATCH aceitar ou rejeitar, então recebe 403 e o status
+    do checklist não muda.
+  - Dado o gestor, quando ele chama GET /checklists/{id}, então recebe 200 (caso permitido).
+  - Dado um vistoriador, quando ele lista GET /contratos/{id}/checklists, então só vê os checklists em que é o vistoriador.
+  - GET /checklists/{id}/pdf e /download-pdf têm o caso do dono (200) e o de quem não é dono (403).
+  - Com 'and' trocado por 'or' em _assert_pode_ver_checklist, pelo menos um teste falha (mutação conferida à mão
+    e registrada no item).
+  priority: must
+  rank: 36
+  estimate: 3
+  status: in_sprint
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP API1:2023
+    - CWE-639
+    risk_id: R-001
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 104
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  sync:
+    github:
+      hash: d1005c1a1e08774c
+      remote_at: '2026-11-07T16:15:08Z'
+- id: SEC-033
+  type: security
+  title: Testes das travas do checklist depois do envio para aceite
+  epic: EP-004
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seção 1): os ramos que recusam upload
+    e exclusão de foto (checklists.py:241, :301) e o envio para aceite (:366) quando o checklist já saiu de em_preenchimento
+    nunca são executados.'
+  acceptance_criteria:
+  - Dado um checklist pendente_aceite ou aceito, quando o vistoriador envia ou exclui uma foto, então a operação
+    é recusada e a foto no banco e no disco fica igual.
+  - Dado um checklist fora de em_preenchimento, quando chamar PATCH enviar-para-aceite, então é recusado e o status
+    não muda.
+  - Dado um contrato não ativo, quando cancelar ou agendar vistoria, então é recusado (contratos.py:169, :231).
+  priority: should
+  rank: 37
+  estimate: 2
+  status: in_sprint
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - STRIDE:T
+    - CWE-841
+    risk_id: R-003
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 105
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  sync:
+    github:
+      hash: 9e332232d04d9e36
+      remote_at: '2026-11-07T16:15:09Z'
+- id: SEC-034
+  type: security
+  title: Testes de sessão revogada no setup de MFA e do teto de chaves do limitador
+  epic: EP-001
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seção 1): auth_router.py:128-131
+    e :151-154 (sessao_vigente falso em setup-login e activate-login) e rate_limit.py:48-51 (descarte de chaves
+    acima de 10.000) não têm teste.'
+  acceptance_criteria:
+  - Dado um token mfa_setup emitido antes da troca de senha, quando usado em GET /auth/mfa/setup-login ou POST /auth/mfa/activate-login,
+    então é recusado e nenhum segredo pendente é gravado.
+  - Dado o limitador com mais de 10.000 chaves, quando registrar uma nova falha, então as chaves expiradas são descartadas
+    e a nova é contada (teste unitário com relógio controlado).
+  priority: could
+  rank: 195
+  estimate: 2
+  status: in_sprint
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API2:2023
+    - OWASP API4:2023
+    risk_id: null
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 106
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  sync:
+    github:
+      hash: 353f3175c82570e9
+      remote_at: '2026-11-07T16:15:10Z'
+- id: DEBT-011
+  type: debt
+  title: Testes de negação por perfil em todas as rotas restritas
+  epic: EP-007
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seção 2): 77 de 97 combinações perfil
+    proibido × rota restrita não têm teste de negação (visualizador 30, vistoriador 25, locatário 21); 18 de 32
+    rotas restritas não têm nenhum; 6 rotas não têm teste algum.'
+  acceptance_criteria:
+  - Existe um teste parametrizado que, para cada rota com require_roles, confere 403 para cada perfil fora da lista
+    (sem gravar nada).
+  - Existe teste para PATCH /imoveis/{id}/endereco, POST /contratos/{id}/encerrar e POST /contratos/{id}/cancelar,
+    ou essas rotas duplicadas são removidas com ADR.
+  - Existe teste de GET /logs com o gestor, alinhado à decisão do SEC-018.
+  - A matriz de autorização refeita (método do relatório) não mostra combinação perfil proibido sem 'N' nas rotas
+    restritas.
+  priority: should
+  rank: 145
+  estimate: 3
+  status: in_sprint
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API5:2023
+    - CWE-285
+    risk_id: null
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 107
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  sync:
+    github:
+      hash: 7913b8d13cd50d76
+      remote_at: '2026-11-07T16:15:11Z'
+- id: DEBT-012
+  type: debt
+  title: Testes de negação em escrita conferem o estado e o status exato
+  epic: EP-007
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seções 3 e 4): 54 de 76 testes de
+    negação em escrita não conferem se o recurso ficou intacto; mutantes que trocam 403 por 404 ou removem a mensagem
+    sobrevivem; test_outro_vistoriador_nao_pode_submeter usa o token do gestor.'
+  acceptance_criteria:
+  - Os testes de negação em escrita listados no relatório releem o recurso no banco e conferem que nada mudou.
+  - Os testes de negação de checklists e contratos conferem o status exato (403) e a mensagem.
+  - test_outro_vistoriador_nao_pode_submeter é renomeado (é o gestor) e o caso de um segundo vistoriador ganha teste
+    próprio.
+  priority: should
+  rank: 146
+  estimate: 3
+  status: in_sprint
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-284
+    risk_id: null
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 108
+    prs: []
+  evidence: []
+  created: '2026-11-02'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  sync:
+    github:
+      hash: 05a3b418344d351f
+      remote_at: '2026-11-07T16:15:12Z'
