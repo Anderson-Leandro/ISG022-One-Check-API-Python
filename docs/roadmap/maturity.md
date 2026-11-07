@@ -11,7 +11,7 @@
   - nenhuma tag;
   - 46% dos commits em Conventional Commits.
 - **CI:** `.github/workflows/tests.yml` roda os testes em PostgreSQL, com `pip-audit`, `permissions: contents: read` e actions fixadas por SHA.
-- **Testes:** 824, com 95% de cobertura; cada correção de segurança tem testes de cenário negado.
+- **Testes:** 824, com 94,7% de cobertura de linhas e 83,7% de ramos; mutação de 96,6% em `auth`, `deps`, `rate_limit` e checklists. A avaliação de 2026-11-02 ([avaliacao-testes-2026-11-02.md](../quality/avaliacao-testes-2026-11-02.md)) achou lacunas nos testes de negação (SEC-032 a SEC-034, DEBT-011, DEBT-012).
 - **Documentação:**
   - README completo;
   - arquitetura e threat model;
