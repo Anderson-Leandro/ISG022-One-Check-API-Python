@@ -4178,3 +4178,58 @@ items:
     github:
       hash: 6e24c2c6cd5e7829
       remote_at: '2026-11-07T21:56:56Z'
+- id: DEBT-014
+  type: debt
+  title: Erros de negócio respondem com o status HTTP adequado em vez de 200
+  epic: EP-006
+  story: ''
+  description: Implementa o ADR-0003 (docs/adr/0003-status-http-dos-erros.md). Hoje fail() (app/schemas.py:37) não
+    define status e 46 handlers respondem 200 com sucesso=false, inclusive a negação de GET /contratos/{id}/checklists.
+    Isso esconde login falho, MFA errado e acesso negado nos logs e no monitoramento (A09:2021, CWE-393). O envelope
+    continua igual; o front já trata !response.ok || !sucesso como erro (front-react/src/api/client.ts:128). Fazer
+    antes do DEBT-012, que confere o status exato nos testes de negação.
+  acceptance_criteria:
+  - Dado qualquer erro devolvido por fail(), quando a resposta sai da API, então o status é >= 400 conforme a tabela
+    do ADR-0003, e sem status explícito o padrão é 400 (nunca 200).
+  - Dada a suíte de testes, quando qualquer requisição do TestClient recebe sucesso=false, então um teste (fixture
+    em tests/conftest.py) falha se o status for 2xx.
+  - Dado um locatário que não é dono do contrato, quando chamar GET /contratos/{id}/checklists, então recebe 403
+    e nenhum checklist.
+  - Dada uma senha atual errada numa rota autenticada (desligar MFA, trocar senha), quando a API recusa, então responde
+    403 e não 401; login, MFA do login e refresh recusados respondem 401 com mensagem genérica.
+  - O corpo continua {sucesso:false, erro, erros?}; os testes existentes são ajustados ao novo status, a collection
+    do Insomnia é gerada de novo e passa contra a API local, e o README descreve a tabela de status.
+  - A tabela de status para o front é atualizada, incluindo o ajuste do interceptador de 401 para ignorar /auth/login
+    e /auth/mfa/*.
+  priority: must
+  rank: 15
+  estimate: 5
+  status: in_sprint
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A09:2021
+    - CWE-393
+    - fail secure
+    risk_id: null
+  source:
+    kind: manual-test
+    file: docs/insomnia/README.md
+    ref: HTTP 200 com sucesso:false
+  links:
+    trello_card: null
+    gh_issue: 114
+    prs: []
+  evidence: []
+  created: '2026-11-07'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-07'
+    status: in_sprint
+  sync:
+    github:
+      hash: f3420e59ecd1c9df
+      remote_at: '2026-11-07T22:33:03Z'
