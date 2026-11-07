@@ -3873,6 +3873,7 @@ items:
     gh_issue: 102
     prs:
     - 109
+    - '#113'
   evidence:
   - docs/quality/avaliacao-testes-2026-11-02.md
   - 'PR #109 (merge 70a31fc)'
@@ -4204,7 +4205,7 @@ items:
   priority: must
   rank: 15
   estimate: 5
-  status: in_sprint
+  status: done
   sprint: 12
   phase: F5
   depends_on: []
@@ -4222,14 +4223,23 @@ items:
   links:
     trello_card: null
     gh_issue: 114
-    prs: []
-  evidence: []
+    prs:
+    - '#115'
+    - '#116'
+  evidence:
+  - 'ADR-0003 (docs/adr/0003-status-http-dos-erros.md, PR #115)'
+  - 'PR #116 (merge 1f602f1): fail() com status de erro, 122 chamadas classificadas'
+  - tests/integration/test_status_http_erros.py e guarda em tests/conftest.py; 836 testes, cobertura 95%
+  - 'collection do Insomnia regenerada: 157/157 e 00a 11/11'
+  - MUDANCAS_API_PARA_FRONT.md item 30 (ajuste do interceptor de 401 no front)
   created: '2026-11-07'
   updated: '2026-11-07'
   history:
   - date: '2026-11-07'
     status: in_sprint
+  - date: '2026-11-07'
+    status: done
   sync:
     github:
-      hash: f3420e59ecd1c9df
-      remote_at: '2026-11-07T22:33:03Z'
+      hash: 725aaa9d4fa60313
+      remote_at: '2026-11-07T23:32:27Z'
