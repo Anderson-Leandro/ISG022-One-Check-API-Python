@@ -98,18 +98,22 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 ## 📐 Convenções da API
 
 ### Respostas
-- Sucesso e erros de regra de negócio usam o envelope `{"sucesso": bool, "dados": ..., "erro": "mensagem" | null}`. Erros de negócio respondem `200` (alguns de validação, `422`, com `erros: {campo: mensagem}`).
-- Falhas de acesso e de protocolo usam `{"detail": "mensagem"}`:
+- Sucesso e erros de regra de negócio usam o envelope `{"sucesso": bool, "dados": ..., "erro": "mensagem" | null}`. Nos erros de validação de campo vem também `erros: {campo: mensagem}`.
+- **O status HTTP acompanha o resultado** ([ADR-0003](docs/adr/0003-status-http-dos-erros.md)): um erro nunca responde `2xx`. O cliente pode confiar no status e ler a mensagem em `erro`.
+- Falhas de acesso e de protocolo levantadas pelo framework usam `{"detail": "mensagem"}`.
 
 | Status | Quando |
 |---|---|
-| `400` | `Content-Length` inválido; mais de um arquivo no upload |
-| `401` | Token ausente, inválido ou expirado; sessão encerrada por troca de credencial (`"Sessão encerrada; faça login novamente"`) |
-| `403` | Perfil sem permissão ou recurso fora do escopo do usuário |
-| `404` | Rota ou arquivo inexistente; `/admin/*` sem `SEED_SECRET` |
-| `409` | Setup de MFA de primeiro acesso para quem já tem MFA |
-| `413` | Corpo acima do limite (`MAX_UPLOAD_MB` + 1 MB para multipart, `MAX_BODY_KB` para o resto) |
+| `400` | Regra de negócio violada que não é conflito nem campo inválido (datas incoerentes, checklist sem itens); `Content-Length` inválido; mais de um arquivo no upload |
+| `401` | Sem sessão válida: token ausente, inválido ou expirado; sessão encerrada por troca de credencial; **login, MFA do login e refresh recusados** (mensagem genérica) |
+| `403` | Perfil sem permissão ou recurso fora do escopo do usuário; senha ou código atual errados numa rota autenticada (reautenticação) |
+| `404` | Recurso inexistente ou fora do alcance de quem pede; rota ou arquivo inexistente; `/admin/*` sem `SEED_SECRET` |
+| `409` | Conflito com o estado atual: e-mail já cadastrado, imóvel já locado, checklist já enviado (travas), contrato já encerrado, MFA já configurado |
+| `413` | Corpo ou arquivo acima do limite (`MAX_UPLOAD_MB` + 1 MB para multipart, `MAX_BODY_KB` para o resto) |
+| `422` | Campo inválido, com `erros: {campo: mensagem}` |
 | `429` | Muitas tentativas falhas; o header `Retry-After` traz a espera em segundos |
+
+> O `401` fica só para quem está sem sessão válida porque o front, ao recebê-lo, renova o token e repete a requisição. Senha atual errada numa rota autenticada responde `403`, para não repetir a tentativa.
 
 ### Sessão e tokens
 - `Authorization: Bearer <access_token>` em todas as rotas autenticadas. A API não usa cookies; o front não deve enviar credenciais de navegador (`credentials: "include"` / `withCredentials`).

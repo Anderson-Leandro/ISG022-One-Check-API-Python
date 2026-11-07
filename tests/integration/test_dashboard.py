@@ -220,8 +220,8 @@ class TestAdminSeed:
         r = client.post("/api/v1/admin/seed",
                         json={"mode": "refresh_data"},
                         headers=SEED_HEADER)
-        assert r.status_code == 200
-        assert "sucesso" in r.json()
+        # Sem os usuários mínimos, o refresh é recusado com 409 (ADR-0003)
+        assert r.status_code == (200 if r.json()["sucesso"] else 409)
 
 
 # ── POST /admin/refresh-data ──────────────────────────────────────────────────────
@@ -239,10 +239,9 @@ class TestAdminRefreshData:
 
     def test_refresh_retorna_resposta_json(self, client, db):
         r = client.post("/api/v1/admin/refresh-data", headers=SEED_HEADER)
-        assert r.status_code == 200
-        assert "sucesso" in r.json()
+        assert r.status_code == (200 if r.json()["sucesso"] else 409)
 
     def test_put_e_patch_tambem_funcionam(self, client, db):
         for method in (client.put, client.patch):
             r = method("/api/v1/admin/refresh-data", headers=SEED_HEADER)
-            assert r.status_code == 200
+            assert r.status_code == (200 if r.json()["sucesso"] else 409)

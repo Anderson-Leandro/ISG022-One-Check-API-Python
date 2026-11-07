@@ -400,7 +400,7 @@
       "_type": "request",
       "parentId": "fld_9c5157b1a306b8cceecff186",
       "name": "❌ Login de e-mail inexistente → falha genérica",
-      "description": "A API responde HTTP 200 com sucesso=false (padrão de envelope) e a mesma mensagem de senha errada, para não revelar quais e-mails existem.",
+      "description": "A API responde 401 com a mesma mensagem de senha errada, para não revelar quais e-mails existem.",
       "method": "POST",
       "url": "{{ _.base_url }}/auth/login",
       "parameters": [],
@@ -416,7 +416,7 @@
       },
       "authentication": {},
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Credenciais inválidas\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Credenciais inválidas\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Credenciais inválidas\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Credenciais inválidas\"));",
       "metaSortKey": 1006,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -891,7 +891,7 @@
       },
       "authentication": {},
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Código MFA inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Código MFA inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Código MFA inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Código MFA inválido\"));",
       "metaSortKey": 3004,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1044,7 +1044,7 @@
       },
       "authentication": {},
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Token MFA inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Token MFA inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Token MFA inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Token MFA inválido\"));",
       "metaSortKey": 3009,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1106,7 +1106,7 @@
       },
       "authentication": {},
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Refresh token inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Refresh token inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Refresh token inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Refresh token inválido\"));",
       "metaSortKey": 3011,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1420,7 +1420,7 @@
       },
       "authentication": {},
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Credenciais inválidas\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Credenciais inválidas\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Credenciais inválidas\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Credenciais inválidas\"));",
       "metaSortKey": 4007,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1520,7 +1520,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Informe a senha atual\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Informe a senha atual\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Informe a senha atual\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Informe a senha atual\"));",
       "metaSortKey": 4010,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1682,7 +1682,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: E-mail já cadastrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"E-mail já cadastrado\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: E-mail já cadastrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"E-mail já cadastrado\"));",
       "metaSortKey": 4015,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1718,7 +1718,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Perfil inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Perfil inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Perfil inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Perfil inválido\"));",
       "metaSortKey": 4016,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1946,7 +1946,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Usuário não encontrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Usuário não encontrado\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 404', () => insomnia.expect(r.code).to.equal(404));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Usuário não encontrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Usuário não encontrado\"));",
       "metaSortKey": 4023,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -1974,7 +1974,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: própria conta\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"própria conta\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 403', () => insomnia.expect(r.code).to.equal(403));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: própria conta\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"própria conta\"));",
       "metaSortKey": 4024,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -2568,7 +2568,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Imóvel não encontrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Imóvel não encontrado\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 404', () => insomnia.expect(r.code).to.equal(404));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Imóvel não encontrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Imóvel não encontrado\"));",
       "metaSortKey": 5017,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -2650,7 +2650,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: já\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"já\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: já\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"já\"));",
       "metaSortKey": 6002,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -2686,7 +2686,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: data de fim\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"data de fim\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 400', () => insomnia.expect(r.code).to.equal(400));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: data de fim\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"data de fim\"));",
       "metaSortKey": 6003,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -2934,7 +2934,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: data futura\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"data futura\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: data futura\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"data futura\"));",
       "metaSortKey": 6011,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -2970,7 +2970,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Tipo inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Tipo inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Tipo inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Tipo inválido\"));",
       "metaSortKey": 6012,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3244,7 +3244,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: vistoria inicial\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"vistoria inicial\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: vistoria inicial\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"vistoria inicial\"));",
       "metaSortKey": 7003,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3416,7 +3416,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Estado inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Estado inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Estado inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Estado inválido\"));",
       "metaSortKey": 7008,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3576,7 +3576,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Envie uma imagem\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Envie uma imagem\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Envie uma imagem\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Envie uma imagem\"));",
       "metaSortKey": 7012,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3617,7 +3617,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: campo 'foto'\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"campo 'foto'\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: campo 'foto'\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"campo 'foto'\"));",
       "metaSortKey": 7013,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3812,11 +3812,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_b05a5d45af98a9c5e3488482",
+      "_id": "req_5d9f6bd9e500ffc99c3a5f55",
       "_type": "request",
       "parentId": "fld_4191c5cd961739430dfab585",
-      "name": "❌ Locatário B não lista as vistorias do A (HTTP 200 com sucesso=false)",
-      "description": "Única negação de acesso que responde HTTP 200 com sucesso=false em vez de 403.",
+      "name": "❌ Locatário B não lista as vistorias do A → 403",
+      "description": "Respondia HTTP 200 com sucesso=false até o DEBT-014 (ADR-0003); agora é 403 como as outras negações.",
       "method": "GET",
       "url": "{{ _.base_url }}/contratos/{{ _.contrato_id }}/checklists",
       "parameters": [],
@@ -3829,7 +3829,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Sem permissão\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Sem permissão\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 403', () => insomnia.expect(r.code).to.equal(403));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Sem permissão\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Sem permissão\"));",
       "metaSortKey": 7020,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3929,7 +3929,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível adicionar fotos\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível adicionar fotos\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível adicionar fotos\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível adicionar fotos\"));",
       "metaSortKey": 7023,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3965,7 +3965,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível editar itens\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível editar itens\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível editar itens\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível editar itens\"));",
       "metaSortKey": 7024,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -3993,7 +3993,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível enviar para aceite\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível enviar para aceite\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível enviar para aceite\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível enviar para aceite\"));",
       "metaSortKey": 7025,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -4105,7 +4105,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: não está pendente\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"não está pendente\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: não está pendente\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"não está pendente\"));",
       "metaSortKey": 7029,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -4225,7 +4225,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: ao menos um item\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"ao menos um item\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 400', () => insomnia.expect(r.code).to.equal(400));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: ao menos um item\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"ao menos um item\"));",
       "metaSortKey": 7033,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -5306,7 +5306,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: contrato ativo\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"contrato ativo\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: contrato ativo\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"contrato ativo\"));",
       "metaSortKey": 11001,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -5334,7 +5334,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível excluir fotos\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível excluir fotos\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível excluir fotos\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível excluir fotos\"));",
       "metaSortKey": 11002,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -5418,7 +5418,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível encerrar\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível encerrar\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível encerrar\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível encerrar\"));",
       "metaSortKey": 11005,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -5446,7 +5446,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível cancelar\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível cancelar\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 409', () => insomnia.expect(r.code).to.equal(409));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Não é possível cancelar\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Não é possível cancelar\"));",
       "metaSortKey": 11006,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -5502,7 +5502,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Agendamento não encontrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Agendamento não encontrado\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 404', () => insomnia.expect(r.code).to.equal(404));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Agendamento não encontrado\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Agendamento não encontrado\"));",
       "metaSortKey": 11008,
       "isPrivate": false,
       "settingStoreCookies": false,
@@ -5569,7 +5569,7 @@
       },
       "authentication": {},
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Refresh token inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Refresh token inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));\ninsomnia.test(\"mensagem contém: Refresh token inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Refresh token inválido\"));",
       "metaSortKey": 11010,
       "isPrivate": false,
       "settingStoreCookies": false,

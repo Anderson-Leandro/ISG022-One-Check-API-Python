@@ -38,7 +38,7 @@ def _login(client, email, senha):
 
 def _esgota_conta(client, email):
     for _ in range(RATE_LIMIT_FALHAS_CONTA):
-        assert _login(client, email, "senha-errada").status_code == 200
+        assert _login(client, email, "senha-errada").status_code == 401
 
 
 # ── Login por conta ──────────────────────────────────────────────────────────────

@@ -180,9 +180,10 @@ class TestCriarProblema:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_contrato_encerrado_retorna_422(
+    def test_contrato_encerrado_retorna_409(
         self, client, db, contrato, comodo_contrato, token_admin
     ):
+        # Conflito com o estado do contrato, como agendamentos e vistorias (ADR-0003)
         contrato.status = "encerrado"
         db.commit()
         r = client.post(
@@ -194,7 +195,9 @@ class TestCriarProblema:
             },
             headers=auth(token_admin),
         )
-        assert r.status_code == 422
+        assert r.status_code == 409
+        assert r.json()["erro"] == "Problemas só podem ser registrados em contratos ativos"
+        assert db.query(Problema).filter(Problema.contrato_id == contrato.id).count() == 0
         data = r.json()
         assert data["sucesso"] is False
         assert "ativos" in data["erro"].lower()

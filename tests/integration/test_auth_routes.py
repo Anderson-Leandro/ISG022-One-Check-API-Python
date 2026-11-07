@@ -74,13 +74,14 @@ class TestLogin:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_login_resposta_http_200_mesmo_em_falha(self, client):
-        # A API usa padrão de envelope JSON — sempre retorna 200
+    def test_login_falho_responde_401_com_envelope(self, client):
+        # ADR-0003: o erro mantém o envelope e o status acompanha o resultado
         r = client.post("/api/v1/auth/login", json={
             "email": "x@x.com",
             "senha": "errado",
         })
-        assert r.status_code == 200
+        assert r.status_code == 401
+        assert r.json() == {"sucesso": False, "erro": "Credenciais inválidas"}
 
     def test_login_role_gestor_com_mfa(self, client, user_gestor):
         r = client.post("/api/v1/auth/login", json={

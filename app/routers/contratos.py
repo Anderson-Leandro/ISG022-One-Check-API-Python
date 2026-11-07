@@ -72,21 +72,21 @@ def create_contrato(
     user: Usuario = Depends(require_roles("admin", "gestor")),
 ):
     if body.data_fim <= body.data_inicio:
-        return fail("A data de fim deve ser posterior à data de início.")
+        return fail("A data de fim deve ser posterior à data de início.", status_code=400)
 
     imovel = db.query(Imovel).filter(Imovel.id == body.imovel_id, Imovel.ativo == True).first()
     if not imovel:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
     if imovel.status == "locado":
-        return fail("Imóvel já está locado")
+        return fail("Imóvel já está locado", status_code=409)
     if db.query(Contrato).filter(Contrato.imovel_id == body.imovel_id, Contrato.status == "ativo").first():
-        return fail("Este imóvel já possui um contrato ativo")
+        return fail("Este imóvel já possui um contrato ativo", status_code=409)
 
     locatario = db.query(Usuario).filter(Usuario.id == body.locatario_id, Usuario.ativo == True).first()
     if not locatario:
-        return fail("Locatário não encontrado")
+        return fail("Locatário não encontrado", status_code=404)
     if locatario.role != "locatario":
-        return fail("O usuário informado não possui a role de locatário")
+        return fail("O usuário informado não possui a role de locatário", status_code=400)
 
     ct = Contrato(
         imovel_id=body.imovel_id,
@@ -124,7 +124,7 @@ def get_contrato(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return fail("Contrato não encontrado", status_code=404)
 
     assert_acesso_contrato(db, ct, user)
     return ok(serialize_contrato(ct))
@@ -139,10 +139,10 @@ def encerrar_contrato(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return fail("Contrato não encontrado", status_code=404)
 
     if ct.status != "ativo":
-        return fail(f"Não é possível encerrar um contrato com status '{ct.status}'")
+        return fail(f"Não é possível encerrar um contrato com status '{ct.status}'", status_code=409)
 
     ct.status = "encerrado"
     imovel = db.query(Imovel).filter(Imovel.id == ct.imovel_id).first()
@@ -164,10 +164,10 @@ def cancelar_contrato(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return fail("Contrato não encontrado", status_code=404)
 
     if ct.status != "ativo":
-        return fail(f"Não é possível cancelar um contrato com status '{ct.status}'")
+        return fail(f"Não é possível cancelar um contrato com status '{ct.status}'", status_code=409)
 
     ct.status = "cancelado"
     imovel = db.query(Imovel).filter(Imovel.id == ct.imovel_id).first()
@@ -202,7 +202,7 @@ def list_agendamentos(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return fail("Contrato não encontrado", status_code=404)
 
     if user.role == "locatario":
         raise HTTPException(status_code=403, detail="Você não tem acesso aos agendamentos deste contrato")
@@ -226,22 +226,22 @@ def create_agendamento(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return fail("Contrato não encontrado", status_code=404)
 
     if ct.status != "ativo":
-        return fail("Agendamentos só podem ser criados em contratos ativos")
+        return fail("Agendamentos só podem ser criados em contratos ativos", status_code=409)
 
     if body.tipo not in ("inicial", "encerramento"):
-        return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'")
+        return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"}, status_code=422)
 
     try:
         parsed_dt = _parse_datetime(body.data_agendada)
     except Exception:
-        return fail("Formato de data_agendada inválido")
+        return fail("Formato de data_agendada inválido", erros={"data_agendada": "Formato de data_agendada inválido"}, status_code=422)
 
     now = datetime.now() if parsed_dt.tzinfo is None else datetime.now(timezone.utc)
     if parsed_dt <= now:
-        return fail("A data agendada deve ser uma data futura")
+        return fail("A data agendada deve ser uma data futura", erros={"data_agendada": "A data agendada deve ser uma data futura"}, status_code=422)
 
     ag = AgendamentoVistoria(
         contrato_id=contrato_id,
@@ -264,9 +264,9 @@ def list_checklists(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return fail("Contrato não encontrado", status_code=404)
     if user.role == "locatario" and ct.locatario_id != user.id:
-        return fail("Sem permissão para ver vistorias deste contrato")
+        return fail("Sem permissão para ver vistorias deste contrato", status_code=403)
 
     q = db.query(Checklist).filter(Checklist.contrato_id == contrato_id)
     if user.role == "vistoriador":
@@ -284,13 +284,13 @@ def create_checklist(
 ):
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
-        return fail("Contrato não encontrado")
+        return fail("Contrato não encontrado", status_code=404)
 
     if ct.status != "ativo":
-        return fail("Vistorias só podem ser criadas em contratos ativos")
+        return fail("Vistorias só podem ser criadas em contratos ativos", status_code=409)
 
     if body.tipo not in ("inicial", "encerramento"):
-        return fail("Tipo deve ser 'inicial' ou 'encerramento'")
+        return fail("Tipo deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo deve ser 'inicial' ou 'encerramento'"}, status_code=422)
 
     vistoriador = (
         db.query(Usuario)
@@ -298,7 +298,7 @@ def create_checklist(
         .first()
     )
     if not vistoriador:
-        return fail("Vistoriador não encontrado")
+        return fail("Vistoriador não encontrado", status_code=404)
 
     existing = (
         db.query(Checklist)
@@ -306,7 +306,7 @@ def create_checklist(
         .first()
     )
     if existing and body.tipo == "inicial":
-        return fail("Este contrato já possui vistoria inicial")
+        return fail("Este contrato já possui vistoria inicial", status_code=409)
 
     ck = Checklist(
         contrato_id=contrato_id,
@@ -343,10 +343,7 @@ async def create_problema(
         return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Contrato não encontrado"})
     
     if ct.status != "ativo":
-        return JSONResponse(
-            status_code=422,
-            content={"sucesso": False, "erro": "Problemas só podem ser registrados em contratos ativos"},
-        )
+        return fail("Problemas só podem ser registrados em contratos ativos", status_code=409)
 
     try:
         assert_acesso_problemas(ct, user)

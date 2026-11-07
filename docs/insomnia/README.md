@@ -67,7 +67,7 @@ O Insomnia guarda o caminho absoluto da sua máquina, e por isso o arquivo versi
   - o status HTTP;
   - o campo `sucesso` do envelope;
   - quando faz sentido, um trecho da mensagem de erro e o efeito esperado (status do checklist, dono do recurso).
-- **HTTP 200 com `"sucesso": false`:** é o padrão da API para erros de regra de negócio (README, "Erros de negócio respondem 200"). Os testes conferem os dois campos. Negações de acesso respondem 403, com uma exceção marcada na pasta 05: "Locatário B não lista as vistorias do A".
+- **Status dos erros:** todo erro responde com status de erro e o envelope `{"sucesso": false, "erro": ...}` ([ADR-0003](../adr/0003-status-http-dos-erros.md)). Os testes conferem os dois: o status exato e o campo `sucesso`.
 - **Casos que a suíte automatizada ainda não cobre** estão marcados na descrição: SEC-032 (checklist de outro locatário) e SEC-033 (travas depois do envio). Ver [`docs/quality/avaliacao-testes-2026-11-02.md`](../quality/avaliacao-testes-2026-11-02.md).
 - **⚠️** marca um comportamento atual que já está no backlog para mudar (SEC-020: filtro de data inválido ignorado).
 

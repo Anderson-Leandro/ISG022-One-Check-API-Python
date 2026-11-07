@@ -164,6 +164,7 @@ class TestListChecklists:
     def test_contrato_inexistente_retorna_falha(self, client, token_admin):
         r = client.get(f"{BASE}/id-invalido/checklists", headers=auth(token_admin))
         data = r.json()
+        assert r.status_code == 404
         assert data["sucesso"] is False
 
     def test_locatario_ve_checklists_do_seu_contrato(self, client, checklist, contrato, token_locatario):
@@ -188,8 +189,10 @@ class TestListChecklists:
 
         r = client.get(f"{BASE}/{outro_ct.id}/checklists", headers=auth(token_locatario))
         data = r.json()
+        assert r.status_code == 403
         assert data["sucesso"] is False
         assert "permissão" in data["erro"].lower()
+        assert "dados" not in data
 
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/checklists")

@@ -121,10 +121,29 @@ def db(setup_database):
             conn.execute(table.delete())
 
 
+class ClienteComContratoDeErro(TestClient):
+    """TestClient que barra erro com status de sucesso (ADR-0003).
+
+    Toda resposta JSON com "sucesso": false precisa ter status >= 400. Assim, uma rota nova que
+    volte ao padrão antigo (200 com sucesso=false) quebra a suíte em qualquer teste que a chame.
+    """
+
+    def request(self, *args, **kwargs):
+        r = super().request(*args, **kwargs)
+        if r.status_code < 400 and "application/json" in r.headers.get("content-type", ""):
+            corpo = r.json()
+            if isinstance(corpo, dict) and corpo.get("sucesso") is False:
+                raise AssertionError(
+                    f"{r.request.method} {r.request.url.path} respondeu {r.status_code} com sucesso=false "
+                    f"(ADR-0003 exige status de erro): {corpo.get('erro')!r}"
+                )
+        return r
+
+
 @pytest.fixture
 def client(db):
     """TestClient do FastAPI com banco de teste já injetado."""
-    with TestClient(app) as c:
+    with ClienteComContratoDeErro(app) as c:
         yield c
 
 

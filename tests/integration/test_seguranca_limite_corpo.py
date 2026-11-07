@@ -106,7 +106,9 @@ class TestAutenticado:
 
     def test_json_normal_continua_funcionando(self, client):
         r = client.post("/api/v1/auth/login", json={"email": "ninguem@x.com", "senha": "errada"})
-        assert r.status_code == 200
+        # Passa pelo limite de corpo e chega à rota, que recusa as credenciais
+        assert r.status_code == 401
+        assert r.json()["erro"] == "Credenciais inválidas"
 
     def test_mais_de_um_arquivo_e_recusado(self, client, checklist, item_checklist, token_vistoriador):
         img = small_image_bytes()

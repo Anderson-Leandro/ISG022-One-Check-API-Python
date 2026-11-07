@@ -11,6 +11,7 @@ Grupos:
   - Modelos de Checklist (ChecklistCreate, AddChecklistItemRequest, ItemUpdateRequest)
   - Modelos de Problema (ProblemaCreate)
 """
+import json
 from datetime import date
 
 import pytest
@@ -86,34 +87,53 @@ def test_ok_paginacao_none_nao_inclui_chave():
 
 # ── fail() ────────────────────────────────────────────────────────────────────────
 
+def _corpo(r):
+    return json.loads(r.body)
+
+
 def test_fail_sucesso_false():
     r = fail("mensagem de erro")
-    assert r["sucesso"] is False
+    assert _corpo(r)["sucesso"] is False
 
 
 def test_fail_campo_erro():
     r = fail("algo deu errado")
-    assert r["erro"] == "algo deu errado"
+    assert _corpo(r)["erro"] == "algo deu errado"
 
 
 def test_fail_sem_erros_nao_inclui_chave():
     r = fail("erro")
-    assert "erros" not in r
+    assert "erros" not in _corpo(r)
 
 
 def test_fail_com_erros_lista():
     r = fail("inválido", erros=["campo obrigatório", "email inválido"])
-    assert r["erros"] == ["campo obrigatório", "email inválido"]
+    assert _corpo(r)["erros"] == ["campo obrigatório", "email inválido"]
 
 
 def test_fail_com_erros_dict():
     r = fail("inválido", erros={"email": "já cadastrado"})
-    assert r["erros"] == {"email": "já cadastrado"}
+    assert _corpo(r)["erros"] == {"email": "já cadastrado"}
 
 
 def test_fail_erros_none_explícito_nao_inclui_chave():
     r = fail("erro", erros=None)
-    assert "erros" not in r
+    assert "erros" not in _corpo(r)
+
+
+def test_fail_sem_status_responde_400():
+    # ADR-0003: um erro nunca sai como 2xx; sem status explícito, o padrão é 400
+    assert fail("erro").status_code == 400
+
+
+def test_fail_usa_o_status_informado():
+    assert fail("não encontrado", status_code=404).status_code == 404
+
+
+@pytest.mark.parametrize("status", [200, 201, 204, 302, 399])
+def test_fail_recusa_status_que_nao_e_de_erro(status):
+    with pytest.raises(ValueError):
+        fail("erro", status_code=status)
 
 
 # ── Paginacao ─────────────────────────────────────────────────────────────────────
