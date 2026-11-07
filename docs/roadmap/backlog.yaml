@@ -3920,7 +3920,7 @@ items:
     ref: 01 / Token de verificação não serve no setup-login
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 112
     prs: []
   evidence: []
   created: '2026-11-07'
@@ -3928,3 +3928,7 @@ items:
   history:
   - date: '2026-11-07'
     status: backlog
+  sync:
+    github:
+      hash: 6e24c2c6cd5e7829
+      remote_at: '2026-11-07T21:56:56Z'
