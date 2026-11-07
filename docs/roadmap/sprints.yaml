@@ -261,7 +261,8 @@ sprints:
   - SEC-034
   - DEBT-011
   - DEBT-012
-  committed_points: 40.0
+  - DEBT-014
+  committed_points: 45.0
   completed_points: null
   completed: []
   carried_over: []
