@@ -129,5 +129,11 @@ Proposta a partir dos dados da sprint e confirmada pelo usuário, que escolheu a
 - **PR para a `main` a cada item ou grupo de itens:** **não feita.** A integração passou a ser na `dev` a cada item, mas a `main` só recebeu tudo no fim, num PR de 131 commits (#172).
 
 ## Métricas
-- Velocity: — pts (comprometido 32)
-- Itens que voltaram ao backlog:
+- **Velocity:** 52 pts entregues de 52 comprometidos (23 itens).
+- **Variação de escopo:**
+  - o plano inicial era 32 pts;
+  - entraram o SPK-005 (+3 pts, no lugar do US-016, de 8 pts), os itens da avaliação dos testes (+13), o DEBT-014 (+5) e os itens dos spikes (+9);
+  - TK-002 e TK-003 (−2) foram para a Sprint 13.
+- **Itens que voltaram ao backlog:** nenhum ao fechar. Durante a sprint, o US-016 voltou ao backlog sem sprint (2026-11-03), e o TK-002 e o TK-003 foram para a Sprint 13 (2026-11-08).
+- **Testes:** de 836 para 1076, com cobertura de 96%.
+- **PRs mesclados na `dev`:** 50 até a Sprint Review, mais a release `dev → main` (#172).

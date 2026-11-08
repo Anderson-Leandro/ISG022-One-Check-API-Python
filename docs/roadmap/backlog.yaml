@@ -4315,8 +4315,8 @@ items:
     status: backlog
   sync:
     github:
-      hash: 6e24c2c6cd5e7829
-      remote_at: '2026-11-07T21:56:56Z'
+      hash: 99c7fe683048f68c
+      remote_at: '2026-11-08T18:59:55Z'
 - id: DEBT-014
   type: debt
   title: Erros de negócio respondem com o status HTTP adequado em vez de 200
@@ -4379,8 +4379,8 @@ items:
     status: done
   sync:
     github:
-      hash: 725aaa9d4fa60313
-      remote_at: '2026-11-07T23:32:27Z'
+      hash: 6c4131cec704cf6e
+      remote_at: '2026-11-08T18:59:57Z'
 - id: SEC-035
   type: security
   title: QR do setup de MFA gerado por serviço externo recebe o segredo TOTP
