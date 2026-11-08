@@ -3806,7 +3806,7 @@ items:
   priority: must
   rank: 15
   estimate: 1
-  status: in_progress
+  status: review
   sprint: 12
   phase: F0
   depends_on: []
@@ -3821,7 +3821,8 @@ items:
   links:
     trello_card: null
     gh_issue: 98
-    prs: []
+    prs:
+    - '#123'
   evidence: []
   created: '2026-11-02'
   updated: '2026-11-07'
@@ -3832,10 +3833,12 @@ items:
     status: in_sprint
   - date: '2026-11-07'
     status: in_progress
+  - date: '2026-11-07'
+    status: review
   sync:
     github:
-      hash: f486b6361d5f2c6e
-      remote_at: '2026-11-08T01:16:04Z'
+      hash: f50e34231332f48b
+      remote_at: '2026-11-08T01:24:35Z'
 - id: SPK-005
   type: spike
   title: Avaliar a qualidade e a cobertura real da suíte de testes
