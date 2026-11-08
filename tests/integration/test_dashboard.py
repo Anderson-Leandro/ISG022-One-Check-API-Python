@@ -18,7 +18,7 @@ import app.routers.admin as admin_router
 from app.config import UPLOAD_DIR
 from app.auth import create_access_token
 from app.models import Usuario
-from tests.conftest import auth, small_image_bytes
+from tests.conftest import auth, small_image_bytes, foto_do_banco
 
 # Os testes de /admin rodam com banco vazio (bootstrap), em que basta o segredo.
 # Regras de token admin e de operações destrutivas: tests/integration/test_seguranca_admin_seed.py
@@ -207,14 +207,18 @@ class TestAdminDataStatus:
 
 @pytest.mark.usefixtures("seed_configurado")
 class TestAdminSeed:
-    def test_sem_secret_retorna_403(self, client):
+    def test_sem_secret_retorna_403(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post("/api/v1/admin/seed")
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
-    def test_secret_errado_retorna_403(self, client):
+    def test_secret_errado_retorna_403(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post("/api/v1/admin/seed",
                         headers={"X-Seed-Secret": "errado"})
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_seed_retorna_resposta_json(self, client, db):
         r = client.post("/api/v1/admin/seed", headers=SEED_HEADER)
@@ -254,14 +258,18 @@ class TestAdminSeed:
 
 @pytest.mark.usefixtures("seed_configurado")
 class TestAdminRefreshData:
-    def test_sem_secret_retorna_403(self, client):
+    def test_sem_secret_retorna_403(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post("/api/v1/admin/refresh-data")
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
-    def test_secret_errado_retorna_403(self, client):
+    def test_secret_errado_retorna_403(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post("/api/v1/admin/refresh-data",
                         headers={"X-Seed-Secret": "errado"})
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_refresh_sem_usuarios_minimos_responde_409(self, client, db):
         r = client.post("/api/v1/admin/refresh-data", headers=SEED_HEADER)

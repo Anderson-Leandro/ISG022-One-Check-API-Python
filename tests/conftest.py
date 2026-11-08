@@ -64,6 +64,18 @@ def auth(token: str) -> dict:
     return {"Authorization": f"Bearer {token}"}
 
 
+def foto_do_banco(db: Session) -> dict:
+    """Todas as linhas de todas as tabelas, para conferir que uma requisição negada não gravou nada.
+
+    Uso: banco_antes = foto_do_banco(db); <requisição negada>; assert foto_do_banco(db) == banco_antes
+    """
+    db.expire_all()
+    return {
+        tabela.name: sorted(map(repr, db.execute(tabela.select()).all()))
+        for tabela in Base.metadata.sorted_tables
+    }
+
+
 def totp_now() -> str:
     """Retorna o código TOTP atual gerado com o secret fixo de teste."""
     return pyotp.TOTP(MFA_TEST_SECRET).now()

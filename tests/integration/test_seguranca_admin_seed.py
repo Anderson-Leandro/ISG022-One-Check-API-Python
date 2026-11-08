@@ -18,7 +18,7 @@ import pytest
 import app.config as config
 import app.routers.admin as admin_router
 from app.models import Usuario
-from tests.conftest import auth
+from tests.conftest import auth, foto_do_banco
 
 SEGREDO_PUBLICO_ANTIGO = "onecheck-seed-dev"
 SEGREDO_TESTE = "segredo-de-teste-com-tamanho-ok"
@@ -119,8 +119,10 @@ class TestSeedSemAutenticacao:
         assert _usuarios(db) == 2
 
     def test_refresh_data_sem_token_admin_e_negado(self, client, db, user_admin, seed_secret):
+        banco_antes = foto_do_banco(db)
         r = client.post("/api/v1/admin/refresh-data", headers={"X-Seed-Secret": seed_secret})
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_data_status_sem_token_admin_e_negado(self, client, db, user_admin, seed_secret):
         r = client.get("/api/v1/admin/data/status", headers={"X-Seed-Secret": seed_secret})
@@ -139,20 +141,24 @@ class TestSeedDestrutivo:
         assert r.status_code == 403
         assert db.query(Usuario).filter(Usuario.id == user_admin.id).first() is not None
 
-    def test_refresh_data_bloqueado_sem_flag_mesmo_com_admin(self, client, user_admin, token_admin, seed_secret):
+    def test_refresh_data_bloqueado_sem_flag_mesmo_com_admin(self, client, db, user_admin, token_admin, seed_secret):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             "/api/v1/admin/refresh-data",
             headers={"X-Seed-Secret": seed_secret, **auth(token_admin)},
         )
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
-    def test_mode_refresh_data_no_seed_tambem_bloqueado(self, client, user_admin, token_admin, seed_secret):
+    def test_mode_refresh_data_no_seed_tambem_bloqueado(self, client, db, user_admin, token_admin, seed_secret):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             "/api/v1/admin/seed",
             json={"mode": "refresh_data"},
             headers={"X-Seed-Secret": seed_secret, **auth(token_admin)},
         )
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_force_permitido_com_flag_e_admin(self, client, db, user_admin, token_admin, seed_secret, monkeypatch):
         monkeypatch.setattr(admin_router, "SEED_ALLOW_DESTRUCTIVE", True)

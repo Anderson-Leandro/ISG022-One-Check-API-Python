@@ -12,7 +12,7 @@ Rotas cobertas:
 """
 from datetime import date
 
-from tests.conftest import auth
+from tests.conftest import auth, foto_do_banco
 
 BASE = "/api/v1/contratos"
 
@@ -53,6 +53,7 @@ class TestListContratos:
     def test_sem_autenticacao_retorna_401(self, client):
         r = client.get(BASE)
         assert r.status_code == 401
+        assert r.json()["detail"] == "Token ausente"
 
 
 # ── POST /contratos ───────────────────────────────────────────────────────────────
@@ -118,7 +119,8 @@ class TestCreateContrato:
         assert data["sucesso"] is False
         assert "locado" in data["erro"].lower()
 
-    def test_sem_autenticacao_retorna_401(self, client, imovel, user_locatario):
+    def test_sem_autenticacao_retorna_401(self, client, db, imovel, user_locatario):
+        banco_antes = foto_do_banco(db)
         r = client.post(BASE, json={
             "imovel_id": imovel.id,
             "locatario_id": user_locatario.id,
@@ -126,6 +128,8 @@ class TestCreateContrato:
             "data_fim": "2025-12-31",
         })
         assert r.status_code == 401
+        assert r.json()["detail"] == "Token ausente"
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── GET /contratos/{id}/agendamentos ─────────────────────────────────────────────
@@ -150,6 +154,7 @@ class TestListAgendamentos:
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/agendamentos")
         assert r.status_code == 401
+        assert r.json()["detail"] == "Token ausente"
 
 
 # ── GET /contratos/{id}/checklists ────────────────────────────────────────────────
@@ -197,6 +202,7 @@ class TestListChecklists:
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/checklists")
         assert r.status_code == 401
+        assert r.json()["detail"] == "Token ausente"
 
 
 # ── POST /contratos/{id}/checklists ───────────────────────────────────────────────
@@ -249,12 +255,15 @@ class TestCreateChecklist:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_sem_autenticacao_retorna_401(self, client, contrato, user_vistoriador):
+    def test_sem_autenticacao_retorna_401(self, client, db, contrato, user_vistoriador):
+        banco_antes = foto_do_banco(db)
         r = client.post(f"{BASE}/{contrato.id}/checklists", json={
             "tipo": "inicial",
             "vistoriador_id": user_vistoriador.id,
         })
         assert r.status_code == 401
+        assert r.json()["detail"] == "Token ausente"
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── POST /contratos/{id}/problemas ────────────────────────────────────────────────
@@ -293,9 +302,12 @@ class TestCreateProblema:
         db.add(outro_ct)
         db.flush()
 
+        banco_antes = foto_do_banco(db)
         r = client.post(f"{BASE}/{outro_ct.id}/problemas", json={"titulo": "X"},
                        headers=auth(token_locatario))
         assert r.status_code == 403
+        assert r.json()["erro"] == "Você não tem acesso aos problemas deste contrato"
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_prioridade_invalida_retorna_falha(self, client, contrato, token_admin):
         r = client.post(f"{BASE}/{contrato.id}/problemas", json={
@@ -312,9 +324,12 @@ class TestCreateProblema:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_sem_autenticacao_retorna_401(self, client, contrato):
+    def test_sem_autenticacao_retorna_401(self, client, db, contrato):
+        banco_antes = foto_do_banco(db)
         r = client.post(f"{BASE}/{contrato.id}/problemas", json={"titulo": "X"})
         assert r.status_code == 401
+        assert r.json()["detail"] == "Token ausente"
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── GET /contratos/{id}/problemas ─────────────────────────────────────────────────
@@ -347,6 +362,7 @@ class TestListProblemas:
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/problemas")
         assert r.status_code == 401
+        assert r.json()["detail"] == "Token ausente"
 
 
 # ── GET /contratos/{id} ───────────────────────────────────────────────────────────
@@ -376,6 +392,7 @@ class TestGetContrato:
 
         r = client.get(f"{BASE}/{contrato.id}", headers=auth(token2))
         assert r.status_code == 403
+        assert r.json()["detail"] == "Você não tem acesso a este contrato"
 
     def test_contrato_inexistente_retorna_falha(self, client, token_admin):
         r = client.get(f"{BASE}/00000000-0000-0000-0000-000000000000", headers=auth(token_admin))
@@ -432,9 +449,12 @@ class TestCicloVidaContrato:
         assert data["sucesso"] is False
         assert "encerrado" in data["erro"].lower()
 
-    def test_locatario_nao_pode_encerrar_contrato(self, client, contrato, token_locatario):
+    def test_locatario_nao_pode_encerrar_contrato(self, client, db, contrato, token_locatario):
+        banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{contrato.id}/encerrar", headers=auth(token_locatario))
         assert r.status_code == 403
+        assert r.json()["detail"] == "Permissão negada"
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── Validações de Regra de Negócio na Criação ────────────────────────────────────

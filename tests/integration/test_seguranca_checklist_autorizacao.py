@@ -16,7 +16,7 @@ from datetime import date
 import pytest
 
 from app.models import Checklist, Contrato, Imovel, Usuario
-from tests.conftest import _SENHA_HASH, auth
+from tests.conftest import _SENHA_HASH, auth, foto_do_banco
 
 BASE = "/api/v1/contratos"
 
@@ -134,8 +134,10 @@ class TestSeparacaoDeDeveresNoAceite:
         assert checklist_do_gestor.status == "pendente_aceite"
 
     def test_quem_vistoriou_nao_rejeita(self, client, db, checklist_do_gestor, token_gestor):
+        banco_antes = foto_do_banco(db)
         r = client.patch(f"/api/v1/checklists/{checklist_do_gestor.id}/rejeitar", headers=auth(token_gestor))
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_outro_aprovador_aceita(self, client, checklist_do_gestor, token_admin):
         r = client.patch(f"/api/v1/checklists/{checklist_do_gestor.id}/aceitar", headers=auth(token_admin))

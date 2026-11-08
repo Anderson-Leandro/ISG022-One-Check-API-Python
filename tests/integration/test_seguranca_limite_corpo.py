@@ -18,7 +18,7 @@ from starlette.formparsers import MultiPartParser
 
 from app.config import MAX_BODY_KB, MAX_UPLOAD_MB
 from app.models import ChecklistItem, ImovelComodo, ItemVistoria
-from tests.conftest import auth, small_image_bytes
+from tests.conftest import auth, small_image_bytes, foto_do_banco
 
 MB = 1024 * 1024
 
@@ -54,10 +54,12 @@ def _url_foto(checklist, item):
 
 
 class TestAnonimo:
-    def test_multipart_anonimo_nao_e_interpretado(self, client, checklist, item_checklist, parses):
+    def test_multipart_anonimo_nao_e_interpretado(self, client, db, checklist, item_checklist, parses):
+        banco_antes = foto_do_banco(db)
         r = client.post(_url_foto(checklist, item_checklist), files={"foto": ("a.png", b"x" * (5 * MB), "image/png")})
         assert r.status_code == 401
         assert parses == []
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_upload_acima_do_limite_recebe_413(self, client, checklist, item_checklist, parses):
         corpo = b"x" * ((MAX_UPLOAD_MB + 2) * MB)

@@ -11,7 +11,7 @@ import pytest
 
 from app.auth import create_mfa_setup_token, create_refresh_token, create_temp_token
 from app.models import Usuario
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now
+from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now, foto_do_banco
 
 
 # ── POST /auth/login ──────────────────────────────────────────────────────────────
@@ -222,9 +222,11 @@ class TestLogout:
         data = r.json()
         assert data["sucesso"] is True
 
-    def test_logout_sem_autenticacao_retorna_401(self, client):
+    def test_logout_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post("/api/v1/auth/logout")
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_logout_revoga_refresh_token(self, client, db, user_locatario, token_locatario):
         raw_token = create_refresh_token(db, user_locatario.id)
@@ -238,12 +240,14 @@ class TestLogout:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_logout_token_invalido_retorna_401(self, client):
+    def test_logout_token_invalido_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             "/api/v1/auth/logout",
             headers=auth("token.invalido.aqui"),
         )
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── MFA Extended Endpoints (Fase 2) ────────────────────────────────────────────────

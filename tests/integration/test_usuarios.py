@@ -16,7 +16,7 @@ Rotas cobertas:
 """
 import pytest
 
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, auth, totp_now
+from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, auth, totp_now, foto_do_banco
 
 BASE = "/api/v1/usuarios"
 
@@ -94,9 +94,11 @@ class TestUpdateMe:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_sem_autenticacao_retorna_401(self, client):
+    def test_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/me", json={"nome": "X"})
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── POST /me/mfa/setup ────────────────────────────────────────────────────────────
@@ -110,9 +112,11 @@ class TestMfaSetupMe:
         assert "provisioning_uri" in data["dados"]
         assert "qr_url" in data["dados"]
 
-    def test_sem_autenticacao_retorna_401(self, client):
+    def test_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post(f"{BASE}/me/mfa/setup")
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── POST /me/mfa/enable ───────────────────────────────────────────────────────────
@@ -141,9 +145,11 @@ class TestMfaEnableMe:
         assert data["sucesso"] is False
         assert "inválido" in data["erro"].lower()
 
-    def test_sem_autenticacao_retorna_401(self, client):
+    def test_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post(f"{BASE}/me/mfa/enable", json={"secret": MFA_TEST_SECRET, "codigo": "000000"})
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── DELETE /me/mfa ────────────────────────────────────────────────────────────────
@@ -164,9 +170,11 @@ class TestMfaDisableMe:
         assert data["dados"]["mfa_ativo"] is False
         assert data["dados"]["mfa_configurado"] is False
 
-    def test_sem_autenticacao_retorna_401(self, client):
+    def test_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.delete(f"{BASE}/me/mfa")
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── GET /usuarios (listagem) ──────────────────────────────────────────────────────
@@ -264,13 +272,15 @@ class TestUpdateUsuario:
         assert data["sucesso"] is True
         assert data["dados"]["mfa_ativo"] is False
 
-    def test_vistoriador_nao_pode_atualizar(self, client, user_locatario, token_vistoriador):
+    def test_vistoriador_nao_pode_atualizar(self, client, db, user_locatario, token_vistoriador):
+        banco_antes = foto_do_banco(db)
         r = client.put(
             f"{BASE}/{user_locatario.id}",
             json={"nome": "X"},
             headers=auth(token_vistoriador),
         )
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_id_inexistente_retorna_falha(self, client, token_admin):
         r = client.put(
@@ -335,20 +345,24 @@ class TestCreateUsuario:
         assert data["sucesso"] is True
         assert data["dados"]["mfa_enabled"] is False
 
-    def test_locatario_nao_pode_criar_usuario(self, client, token_locatario):
+    def test_locatario_nao_pode_criar_usuario(self, client, db, token_locatario):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             BASE,
             json={"nome": "X", "email": "x@x.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
             headers=auth(token_locatario),
         )
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
-    def test_sem_autenticacao_retorna_401(self, client):
+    def test_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             BASE,
             json={"nome": "X", "email": "x@x.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
         )
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── POST /usuarios/{id}/mfa/enable e DELETE /mfa ─────────────────────────────────
@@ -374,9 +388,11 @@ class TestMfaAdminRoutes:
         assert data["sucesso"] is True
         assert data["dados"]["mfa_ativo"] is False
 
-    def test_locatario_nao_pode_resetar_mfa_de_outro(self, client, user_admin, token_locatario):
+    def test_locatario_nao_pode_resetar_mfa_de_outro(self, client, db, user_admin, token_locatario):
+        banco_antes = foto_do_banco(db)
         r = client.delete(f"{BASE}/{user_admin.id}/mfa", headers=auth(token_locatario))
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_admin_habilita_e_desabilita_mfa_rotas_alternativas(self, client, user_locatario, token_admin):
         r_hab = client.post(f"{BASE}/{user_locatario.id}/mfa/habilitar", headers=auth(token_admin))
@@ -445,9 +461,11 @@ class TestDeleteUsuario:
         r = client.delete(f"{BASE}/00000000-0000-0000-0000-000000000000", headers=auth(token_admin))
         assert r.json()["sucesso"] is False
 
-    def test_locatario_nao_pode_desativar_usuario(self, client, user_admin, token_locatario):
+    def test_locatario_nao_pode_desativar_usuario(self, client, db, user_admin, token_locatario):
+        banco_antes = foto_do_banco(db)
         r = client.delete(f"{BASE}/{user_admin.id}", headers=auth(token_locatario))
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── Validação de duplicidade de email no PUT ──────────────────────────────────────

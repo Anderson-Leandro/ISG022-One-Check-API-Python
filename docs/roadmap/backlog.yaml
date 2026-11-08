@@ -4138,7 +4138,7 @@ items:
   priority: should
   rank: 146
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F5
   depends_on: []
@@ -4156,16 +4156,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-07'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 05a3b418344d351f
-      remote_at: '2026-11-07T16:15:12Z'
+      hash: 92ac1fc15f46c6a4
+      remote_at: '2026-11-08T04:12:52Z'
 - id: DEBT-013
   type: debt
   title: Mensagem de erro específica para token de verificação usado no setup-login e no activate-login
