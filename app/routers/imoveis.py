@@ -1,13 +1,15 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.auditoria import campos_alterados
 from app.database import get_db
 from app.deps import assert_acesso_imovel, assert_acesso_problemas, get_current_user, require_roles
 from app.geocoding import buscar_coordenadas
-from app.models import Checklist, Contrato, Endereco, Imovel, ImovelComodo, Problema, Usuario
+from app.models import Checklist, ChecklistItem, Contrato, Endereco, Imovel, ImovelComodo, Problema, Usuario
 from app.schemas import (
     ComodoCreate,
     ComodoUpdate,
@@ -30,6 +32,23 @@ from app.serializers import (
 )
 
 router = APIRouter(prefix="/imoveis", tags=["imoveis"])
+
+
+_COMODO_EM_USO = "Este cômodo é usado em vistorias ou problemas e não pode ser excluído"
+
+
+def _comodo_em_uso(db: Session, comodo_id: str) -> bool:
+    """Referências ao cômodo em itens de checklist ou problemas, inclusive em registros excluídos (ADR-0008).
+
+    Lê as tabelas do Core, por fora do filtro de exclusão lógica do ORM: a chave estrangeira vale também para
+    o registro excluído, que continua no banco (BUG-001).
+    """
+    itens, problemas = ChecklistItem.__table__, Problema.__table__
+    conn = db.connection()
+    return any(
+        conn.execute(select(t.c.id).where(t.c.comodo_id == comodo_id).limit(1)).first() is not None
+        for t in (itens, problemas)
+    )
 
 
 def _apply_endereco(end: Endereco, body: EnderecoCreate, *, is_new: bool) -> None:
@@ -404,8 +423,16 @@ def delete_comodo(
     if not comodo:
         return fail("Cômodo não encontrado", status_code=404)
 
+    if _comodo_em_uso(db, comodo.id):
+        return fail(_COMODO_EM_USO, status_code=409)
+
     db.delete(comodo)
-    db.commit()
-    log_operacao(db, user.id, "delete", "comodo", comodo.id)
+    try:
+        db.commit()
+    except IntegrityError:
+        # Rede de segurança: referência criada entre a checagem e o commit, ou tabela nova com FK para o cômodo
+        db.rollback()
+        return fail(_COMODO_EM_USO, status_code=409)
+    log_operacao(db, user.id, "delete", "comodo", comodo_id)
     return ok(None)
 
