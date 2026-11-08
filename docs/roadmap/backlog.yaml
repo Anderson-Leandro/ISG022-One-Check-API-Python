@@ -3208,7 +3208,7 @@ items:
   priority: should
   rank: 180
   estimate: 1
-  status: in_progress
+  status: review
   sprint: 12
   phase: F0
   depends_on: []
@@ -3222,7 +3222,8 @@ items:
   links:
     trello_card: null
     gh_issue: 82
-    prs: []
+    prs:
+    - '#168'
   evidence: []
   created: '2026-11-02'
   updated: '2026-11-08'
@@ -3233,10 +3234,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: review
   sync:
     github:
-      hash: d3a183f29d93b94b
-      remote_at: '2026-11-08T17:33:01Z'
+      hash: cca0a03e2660bbb4
+      remote_at: '2026-11-08T17:33:57Z'
 - id: DEBT-007
   type: debt
   title: CHANGELOG e release v0.1.0

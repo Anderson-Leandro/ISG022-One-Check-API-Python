@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 12 · **Issue:** #82 · **Branch:** `chore/DEBT-006-licenca-mit` · **PR:** #<n>
+- **Sprint:** 12 · **Issue:** #82 · **Branch:** `chore/DEBT-006-licenca-mit` · **PR:** #168
 
 ## Entrega
 Decisão do usuário em 2026-11-08: licença **MIT**, com o titular **Equipe One Check**.
