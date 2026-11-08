@@ -362,15 +362,16 @@ class TestAtualizacoesProblema:
         )
         assert r.status_code == 422
 
-    def test_locatario_nao_pode_adicionar_atualizacao(self, client, db, problema_criado, token_locatario):
-        banco_antes = foto_do_banco(db)
+    def test_locatario_dono_adiciona_atualizacao(self, client, db, problema_criado, user_locatario, token_locatario):
+        # Liberado ao locatário dono enquanto o problema não estiver resolvido (ADR-0012); as negações
+        # (problema resolvido, outro contrato) estão em test_problema_comentario_locatario.py
         r = client.post(
             f"{BASE_PROBLEMAS}/{problema_criado['id']}/atualizacoes",
-            json={"descricao": "Tentativa de atualização pelo locatário."},
+            json={"descricao": "Atualização pelo próprio locatário."},
             headers=auth(token_locatario),
         )
-        assert r.status_code == 403
-        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
+        assert r.status_code == 201
+        assert r.json()["dados"]["autor_id"] == user_locatario.id
 
     def test_vistoriador_nao_pode_adicionar_atualizacao(self, client, db, problema_criado, token_vistoriador):
         banco_antes = foto_do_banco(db)

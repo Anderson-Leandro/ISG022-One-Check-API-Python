@@ -4675,10 +4675,46 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_71eb93f7b800150a9e4ca907",
+      "_id": "req_1cea3b5a248ffbeaf46495eb",
       "_type": "request",
       "parentId": "fld_6a605c2eed5f49a4aad4fa90",
-      "name": "❌ Locatário não registra atualização → 403",
+      "name": "✅ Locatário A comenta no próprio problema",
+      "description": "US-019 (ADR-0012): o locatário dono comenta enquanto o problema não estiver resolvido.",
+      "method": "POST",
+      "url": "{{ _.base_url }}/problemas/{{ _.problema_id }}/atualizacoes",
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"descricao\": \"A infiltração voltou depois da chuva.\"\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.token_locatario_a }}",
+        "prefix": "",
+        "disabled": false
+      },
+      "preRequestScript": "",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 201', () => insomnia.expect(r.code).to.equal(201));\ninsomnia.test('sucesso = true', () => insomnia.expect(b.sucesso).to.equal(true));",
+      "metaSortKey": 8013,
+      "isPrivate": false,
+      "settingStoreCookies": false,
+      "settingSendCookies": false,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_f9f50adec442da60683671b6",
+      "_type": "request",
+      "parentId": "fld_6a605c2eed5f49a4aad4fa90",
+      "name": "❌ Locatário B não comenta no problema do A → 403",
       "description": "",
       "method": "POST",
       "url": "{{ _.base_url }}/problemas/{{ _.problema_id }}/atualizacoes",
@@ -4691,17 +4727,17 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"descricao\": \"Tentando atualizar\"\n}"
+        "text": "{\n  \"descricao\": \"Tentando comentar\"\n}"
       },
       "authentication": {
         "type": "bearer",
-        "token": "{{ _.token_locatario_a }}",
+        "token": "{{ _.token_locatario_b }}",
         "prefix": "",
         "disabled": false
       },
       "preRequestScript": "",
       "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 403', () => insomnia.expect(r.code).to.equal(403));",
-      "metaSortKey": 8013,
+      "metaSortKey": 8014,
       "isPrivate": false,
       "settingStoreCookies": false,
       "settingSendCookies": false,
@@ -4729,7 +4765,7 @@
       },
       "preRequestScript": "",
       "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = true', () => insomnia.expect(b.sucesso).to.equal(true));",
-      "metaSortKey": 8014,
+      "metaSortKey": 8015,
       "isPrivate": false,
       "settingStoreCookies": false,
       "settingSendCookies": false,
@@ -4757,7 +4793,7 @@
       },
       "preRequestScript": "",
       "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 404', () => insomnia.expect(r.code).to.equal(404));\ninsomnia.test('sucesso = false', () => insomnia.expect(b.sucesso).to.equal(false));",
-      "metaSortKey": 8015,
+      "metaSortKey": 8016,
       "isPrivate": false,
       "settingStoreCookies": false,
       "settingSendCookies": false,

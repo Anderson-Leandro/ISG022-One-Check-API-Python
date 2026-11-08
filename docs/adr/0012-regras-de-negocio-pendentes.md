@@ -20,7 +20,7 @@ Quatro regras ficaram em aberto desde a conversão da API em PHP (itens 5, 7, 8 
 ### 2. O locatário comenta no próprio problema (item 7, US-019)
 - **Antes:** só admin e gestor criavam atualizações.
 - **Opções:** liberar ao locatário dono, com ou sem limite, ou manter.
-- **Decisão:** o **locatário dono** do contrato cria atualizações **enquanto o problema não estiver `resolvido`** (depois, 409). Mudar o status continua com admin e gestor. Uma atualização também impede a exclusão do problema (ADR-0008).
+- **Decisão:** o **locatário dono** do contrato cria atualizações **enquanto o problema não estiver `resolvido` nem `fechado`** (depois, 409; `fechado` entrou na revisão de código do US-019, por também ser status final). Mudar o status continua com admin e gestor. Uma atualização também impede a exclusão do problema (ADR-0008).
 
 ### 3. Depois de uma rejeição, nova vistoria (item 8, US-020)
 - **Antes:**
