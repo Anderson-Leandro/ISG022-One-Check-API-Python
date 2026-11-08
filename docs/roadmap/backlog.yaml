@@ -4144,7 +4144,7 @@ items:
   priority: should
   rank: 146
   estimate: 3
-  status: review
+  status: done
   sprint: 12
   phase: F5
   depends_on: []
@@ -4161,7 +4161,12 @@ items:
     gh_issue: 108
     prs:
     - '#131'
-  evidence: []
+  evidence:
+  - 'PR #131 (merge 101b404): foto_do_banco(db) em tests/conftest.py; 54 testes de negação passam a conferir o banco
+    (45) e a mensagem exata (25)'
+  - 'mutação: rota que grava antes de negar passa nos testes antigos e derruba os novos (docs/roadmap/execucao/DEBT-012.md)'
+  - testes existentes alterados aprovados pelo usuário em 2026-11-08
+  - 'security-audit diff dev (2026-11-08): nenhum achado novo'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -4173,10 +4178,12 @@ items:
     status: in_progress
   - date: '2026-11-08'
     status: review
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 5a944c2d86c27b4d
-      remote_at: '2026-11-08T04:45:40Z'
+      hash: 96669914567b23c7
+      remote_at: '2026-11-08T11:51:26Z'
 - id: DEBT-013
   type: debt
   title: Mensagem de erro específica para token de verificação usado no setup-login e no activate-login
