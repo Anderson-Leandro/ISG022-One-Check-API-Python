@@ -55,6 +55,7 @@
 | 2026-11-08 | SEC-027 concluído (#184): reuso de refresh trocado encerra todas as sessões; rotação atômica (1090 testes, cobertura 96%) | — | R-011 mitigado; contrapartida (refresh repetido pelo próprio cliente) no ADR-0004 |
 | 2026-11-08 | BUG-001 concluído (#186): cômodo em uso responde 409 em vez de 500, inclusive com referência em registro excluído (1096 testes, cobertura 96%) | — | rede de segurança do IntegrityError (achado da revisão) |
 | 2026-11-08 | DEBT-017 concluído (#188): regras de acesso negam por padrão perfis fora de ROLES (1117 testes, cobertura 96%) | — | segunda camada além do get_current_user |
+| 2026-11-08 | TK-019 concluído (#190): checklist de autorização e exposição no registro, preenchida antes da revisão de código e conferida pelo dod_check | — | ação da retro 12; registros antigos sem a seção não são cobrados |
 
 ## Sprint Review
 - **Incremento demonstrável:**
