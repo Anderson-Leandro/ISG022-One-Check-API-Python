@@ -3208,7 +3208,7 @@ items:
   priority: should
   rank: 180
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F0
   depends_on: []
@@ -3225,16 +3225,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 51774f0b184c05b1
-      remote_at: '2026-11-03T01:16:36Z'
+      hash: d3a183f29d93b94b
+      remote_at: '2026-11-08T17:33:01Z'
 - id: DEBT-007
   type: debt
   title: CHANGELOG e release v0.1.0
