@@ -27,7 +27,6 @@ from app.schemas import (
     fail,
     ok,
 )
-from app.uploads import UploadInvalido, salvar_imagem
 from app.serializers import (
     foto_url,
     get_comodos_for_checklist,
@@ -36,11 +35,11 @@ from app.serializers import (
     serialize_checklist,
     serialize_contrato,
     serialize_endereco,
-    serialize_foto,
     serialize_imovel,
     serialize_item,
     serialize_usuario,
 )
+from app.uploads import UploadInvalido, salvar_imagem
 
 router = APIRouter(tags=["checklists"])
 
@@ -129,10 +128,14 @@ def add_item(
     # Validar que comodo existe
     contrato = db.query(Contrato).filter(Contrato.id == ck.contrato_id).first()
     if contrato:
-        comodo = db.query(ImovelComodo).filter(
-            ImovelComodo.id == body.comodo_id,
-            ImovelComodo.imovel_id == contrato.imovel_id,
-        ).first()
+        comodo = (
+            db.query(ImovelComodo)
+            .filter(
+                ImovelComodo.id == body.comodo_id,
+                ImovelComodo.imovel_id == contrato.imovel_id,
+            )
+            .first()
+        )
         if not comodo:
             return fail("Cômodo não encontrado", status_code=404)
 
@@ -187,12 +190,7 @@ def update_item(
     if ck.status != "em_preenchimento":
         return fail(f"Não é possível editar itens de um checklist com status '{ck.status}'", status_code=409)
 
-    item = (
-        db.query(ChecklistItem)
-        .options(joinedload(ChecklistItem.fotos))
-        .filter(ChecklistItem.id == item_id)
-        .first()
-    )
+    item = db.query(ChecklistItem).options(joinedload(ChecklistItem.fotos)).filter(ChecklistItem.id == item_id).first()
     if not item:
         return fail("Item não encontrado", status_code=404)
 
@@ -217,11 +215,15 @@ def update_item(
 _FOTO_OPENAPI = {
     "requestBody": {
         "required": True,
-        "content": {"multipart/form-data": {"schema": {
-            "type": "object",
-            "required": ["foto"],
-            "properties": {"foto": {"type": "string", "format": "binary"}},
-        }}},
+        "content": {
+            "multipart/form-data": {
+                "schema": {
+                    "type": "object",
+                    "required": ["foto"],
+                    "properties": {"foto": {"type": "string", "format": "binary"}},
+                }
+            }
+        },
     }
 }
 
@@ -242,12 +244,7 @@ async def upload_foto(
     if ck.status != "em_preenchimento":
         return fail(f"Não é possível adicionar fotos a um checklist com status '{ck.status}'", status_code=409)
 
-    item = (
-        db.query(ChecklistItem)
-        .options(joinedload(ChecklistItem.fotos))
-        .filter(ChecklistItem.id == item_id)
-        .first()
-    )
+    item = db.query(ChecklistItem).options(joinedload(ChecklistItem.fotos)).filter(ChecklistItem.id == item_id).first()
     if not item:
         return fail("Item não encontrado", status_code=404)
 
@@ -260,7 +257,9 @@ async def upload_foto(
     form = await request.form(max_files=1, max_fields=5)
     foto = form.get("foto")
     if not hasattr(foto, "read"):
-        return fail("Envie o arquivo no campo 'foto'", erros={"foto": "Envie o arquivo no campo 'foto'"}, status_code=422)
+        return fail(
+            "Envie o arquivo no campo 'foto'", erros={"foto": "Envie o arquivo no campo 'foto'"}, status_code=422
+        )
     content = await foto.read()
     max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     if len(content) > max_bytes:
@@ -392,7 +391,9 @@ def enviar_para_aceite(
         .count()
     )
     if filled == 0:
-        return fail("O checklist deve ter ao menos um item preenchido antes de ser enviado para aceite", status_code=400)
+        return fail(
+            "O checklist deve ter ao menos um item preenchido antes de ser enviado para aceite", status_code=400
+        )
 
     ck.status = "pendente_aceite"
     db.commit()
@@ -449,7 +450,9 @@ def rejeitar_checklist(
     loc_id = contrato.locatario_id if contrato else user.id
     aceite = db.query(AceiteChecklist).filter(AceiteChecklist.checklist_id == checklist_id).first()
     if not aceite:
-        aceite = AceiteChecklist(checklist_id=checklist_id, locatario_id=loc_id, status="rejeitado", motivo_rejeicao=motivo or None)
+        aceite = AceiteChecklist(
+            checklist_id=checklist_id, locatario_id=loc_id, status="rejeitado", motivo_rejeicao=motivo or None
+        )
         db.add(aceite)
     else:
         aceite.status = "rejeitado"

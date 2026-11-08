@@ -30,6 +30,9 @@ updates:
       # minor e patch num PR só: um lock para regenerar por semana, não um por pacote
       pip-minor-patch:
         update-types: ["minor", "patch"]
+        # o ruff 0.x muda regras e o estilo do formatador nas versões minor: PR próprio, fora do grupo,
+        # para não travar as outras atualizações enquanto a base é reformatada
+        exclude-patterns: ["ruff"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

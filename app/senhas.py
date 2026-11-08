@@ -4,6 +4,7 @@ O login continua aceitando a senha já cadastrada, mesmo fora da política: ela 
 vale para senhas novas. A lista não substitui uma base de senhas vazadas, mas
 recusa os padrões mais usados em credential stuffing.
 """
+
 import re
 
 SENHA_MIN = 10
@@ -11,15 +12,70 @@ SENHA_MIN = 10
 SENHA_MAX_BYTES = 72
 
 # Comparadas depois de tirar números e símbolos: "Senha@2024" vira "senha"
-_PALAVRAS_COMUNS = frozenset({
-    "senha", "password", "passw", "pass", "qwerty", "qwertyuiop", "asdfgh", "asdfghjkl", "zxcvbnm",
-    "admin", "administrador", "root", "user", "usuario", "teste", "test", "abc", "abcdef", "abcdefghij",
-    "mudar", "mudarsenha", "trocar", "acesso", "login", "welcome", "bemvindo", "iloveyou", "teamo",
-    "brasil", "onecheck", "vistoria", "imobiliaria", "aluguel", "contrato", "locatario", "vistoriador",
-    "gestor", "segredo", "secret", "default", "master", "dragon", "monkey", "football", "futebol",
-    "flamengo", "corinthians", "palmeiras", "saopaulo", "gremio", "cruzeiro", "vasco",
-    "qazwsx", "qweasd", "qwe", "qwer", "asd", "asdf", "zxc", "zxcv",
-})
+_PALAVRAS_COMUNS = frozenset(
+    {
+        "senha",
+        "password",
+        "passw",
+        "pass",
+        "qwerty",
+        "qwertyuiop",
+        "asdfgh",
+        "asdfghjkl",
+        "zxcvbnm",
+        "admin",
+        "administrador",
+        "root",
+        "user",
+        "usuario",
+        "teste",
+        "test",
+        "abc",
+        "abcdef",
+        "abcdefghij",
+        "mudar",
+        "mudarsenha",
+        "trocar",
+        "acesso",
+        "login",
+        "welcome",
+        "bemvindo",
+        "iloveyou",
+        "teamo",
+        "brasil",
+        "onecheck",
+        "vistoria",
+        "imobiliaria",
+        "aluguel",
+        "contrato",
+        "locatario",
+        "vistoriador",
+        "gestor",
+        "segredo",
+        "secret",
+        "default",
+        "master",
+        "dragon",
+        "monkey",
+        "football",
+        "futebol",
+        "flamengo",
+        "corinthians",
+        "palmeiras",
+        "saopaulo",
+        "gremio",
+        "cruzeiro",
+        "vasco",
+        "qazwsx",
+        "qweasd",
+        "qwe",
+        "qwer",
+        "asd",
+        "asdf",
+        "zxc",
+        "zxcv",
+    }
+)
 
 
 def validar_senha(senha: str) -> str:

@@ -12,6 +12,7 @@ Em desenvolvimento, sem JWT_SECRET a API gera um valor aleatório por processo.
 
 Cada caso roda num processo novo porque app.config é lido na importação.
 """
+
 import os
 import subprocess
 import sys
@@ -31,7 +32,11 @@ def _importa_config(**env) -> subprocess.CompletedProcess:
     base.update(env)
     return subprocess.run(
         [sys.executable, "-c", "from app import config; print(config.JWT_SECRET)"],
-        cwd=RAIZ, env=base, capture_output=True, text=True, timeout=60,
+        cwd=RAIZ,
+        env=base,
+        capture_output=True,
+        text=True,
+        timeout=60,
     )
 
 

@@ -11,7 +11,6 @@ from app.auth import (
     decode_token,
     encerrar_sessoes,
     generate_mfa_secret,
-    hash_password,
     mfa_provisioning_data,
     mfa_self_disable_error,
     mfa_setup_required,
@@ -21,8 +20,8 @@ from app.auth import (
     reset_mfa,
     revoke_refresh_token,
     sessao_vigente,
-    usuario_to_dict,
     trocar_refresh_token,
+    usuario_to_dict,
     verify_totp,
     verify_totp_code,
 )
@@ -61,28 +60,34 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
 
     if needs_mfa(user):
         temp = create_temp_token(user.id, user.token_version)
-        return ok({
-            "mfa_required": True,
-            "temp_token": temp,
-            "mfa_token": temp,
-        })
+        return ok(
+            {
+                "mfa_required": True,
+                "temp_token": temp,
+                "mfa_token": temp,
+            }
+        )
 
     if mfa_setup_required(user):
         temp = create_mfa_setup_token(user.id, user.token_version)
-        return ok({
-            "mfa_setup_required": True,
-            "temp_token": temp,
-            "mfa_token": temp,
-        })
+        return ok(
+            {
+                "mfa_setup_required": True,
+                "temp_token": temp,
+                "mfa_token": temp,
+            }
+        )
 
     access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
     log_operacao(db, user.id, "login", "usuario", user.id, f"email: {user.email}")
-    return ok({
-        "access_token": access,
-        "refresh_token": refresh,
-        "usuario": usuario_to_dict(user),
-    })
+    return ok(
+        {
+            "access_token": access,
+            "refresh_token": refresh,
+            "usuario": usuario_to_dict(user),
+        }
+    )
 
 
 @router.post("/mfa/verify")
@@ -109,11 +114,13 @@ def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(g
     access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
     log_operacao(db, user.id, "mfa_verify", "usuario", user.id, "via: mfa")
-    return ok({
-        "access_token": access,
-        "refresh_token": refresh,
-        "usuario": usuario_to_dict(user),
-    })
+    return ok(
+        {
+            "access_token": access,
+            "refresh_token": refresh,
+            "usuario": usuario_to_dict(user),
+        }
+    )
 
 
 @router.get("/mfa/setup-login")
@@ -173,11 +180,13 @@ def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session 
     access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
     log_operacao(db, user.id, "login", "usuario", user.id, "via: mfa_setup")
-    return ok({
-        "access_token": access,
-        "refresh_token": refresh,
-        "usuario": usuario_to_dict(user),
-    })
+    return ok(
+        {
+            "access_token": access,
+            "refresh_token": refresh,
+            "usuario": usuario_to_dict(user),
+        }
+    )
 
 
 @router.post("/mfa/setup")

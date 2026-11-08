@@ -11,6 +11,7 @@ Regras verificadas (as mesmas das listagens):
   - locatário: só o próprio contrato; imóvel só com contrato ativo
   - admin e gestor mantêm a leitura (o perfil visualizador foi removido, ADR-0009)
 """
+
 from datetime import date
 
 import pytest
@@ -30,7 +31,16 @@ def _rotas_imovel(im):
 
 @pytest.fixture
 def endereco(db, imovel):
-    end = Endereco(imovel_id=imovel.id, rua="Rua A", numero="1", bairro="Centro", cidade="São Paulo", estado="SP", cep="01001000", ativo=True)
+    end = Endereco(
+        imovel_id=imovel.id,
+        rua="Rua A",
+        numero="1",
+        bairro="Centro",
+        cidade="São Paulo",
+        estado="SP",
+        cep="01001000",
+        ativo=True,
+    )
     db.add(end)
     db.flush()
     return end
@@ -38,8 +48,14 @@ def endereco(db, imovel):
 
 @pytest.fixture
 def outro_vistoriador(db):
-    u = Usuario(nome="Outro Vistoriador", email="outro.vist@test.com", senha_hash=_SENHA_HASH,
-                role="vistoriador", mfa_enabled=True, mfa_secret=MFA_TEST_SECRET)
+    u = Usuario(
+        nome="Outro Vistoriador",
+        email="outro.vist@test.com",
+        senha_hash=_SENHA_HASH,
+        role="vistoriador",
+        mfa_enabled=True,
+        mfa_secret=MFA_TEST_SECRET,
+    )
     db.add(u)
     db.flush()
     return u
@@ -54,8 +70,16 @@ def outro_imovel(db):
     dono = Usuario(nome="Outro Locatario", email="outro.loc@test.com", senha_hash=_SENHA_HASH, role="locatario")
     db.add(dono)
     db.flush()
-    db.add(Contrato(imovel_id=im.id, locatario_id=dono.id, data_inicio=date(2025, 1, 1),
-                    data_fim=date(2025, 12, 31), valor_mensal=9000, status="ativo"))
+    db.add(
+        Contrato(
+            imovel_id=im.id,
+            locatario_id=dono.id,
+            data_inicio=date(2025, 1, 1),
+            data_fim=date(2025, 12, 31),
+            valor_mensal=9000,
+            status="ativo",
+        )
+    )
     db.flush()
     return im
 
@@ -72,7 +96,11 @@ class TestVistoriadorSemVinculo:
     def test_vistoria_de_outro_vistoriador_nao_da_acesso(
         self, client, db, contrato, imovel, endereco, outro_vistoriador, token_vistoriador
     ):
-        db.add(Checklist(contrato_id=contrato.id, vistoriador_id=outro_vistoriador.id, tipo="inicial", status="em_preenchimento"))
+        db.add(
+            Checklist(
+                contrato_id=contrato.id, vistoriador_id=outro_vistoriador.id, tipo="inicial", status="em_preenchimento"
+            )
+        )
         db.flush()
         for url in _rotas_contrato(contrato) + _rotas_imovel(imovel):
             assert client.get(url, headers=auth(token_vistoriador)).status_code == 403, url
@@ -83,7 +111,9 @@ class TestVistoriadorSemVinculo:
 
 
 class TestVistoriadorComVinculo:
-    def test_le_contrato_e_imovel_da_propria_vistoria(self, client, checklist, contrato, imovel, endereco, token_vistoriador):
+    def test_le_contrato_e_imovel_da_propria_vistoria(
+        self, client, checklist, contrato, imovel, endereco, token_vistoriador
+    ):
         for url in _rotas_contrato(contrato) + _rotas_imovel(imovel):
             r = client.get(url, headers=auth(token_vistoriador))
             assert r.status_code == 200 and r.json()["sucesso"] is True, url

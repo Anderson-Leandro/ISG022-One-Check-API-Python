@@ -6,12 +6,13 @@ get_current_user, o login e o refresh recusam perfis fora de ROLES (ADR-0009), m
 o usuário sem passar por eles (job, dependência nova) trataria um perfil desconhecido como admin. Estes
 testes contornam o get_current_user de propósito e conferem que cada regra nega o perfil desconhecido.
 """
+
 import pytest
 from fastapi import HTTPException
 
 from app import deps
 from app.main import app
-from app.models import Checklist, Usuario
+from app.models import Usuario
 from app.routers import dashboard
 from tests.conftest import _SENHA_HASH, auth
 
@@ -20,8 +21,9 @@ API = "/api/v1"
 
 @pytest.fixture
 def perfil_desconhecido(db):
-    u = Usuario(nome="Perfil Fora da Lista", email="fora.da.lista@test.com", senha_hash=_SENHA_HASH,
-                role="auditor", ativo=True)
+    u = Usuario(
+        nome="Perfil Fora da Lista", email="fora.da.lista@test.com", senha_hash=_SENHA_HASH, role="auditor", ativo=True
+    )
     db.add(u)
     db.flush()
     return u
@@ -64,11 +66,21 @@ class TestRegrasChamadasDiretamente:
         assert dashboard._contratos_visiveis(db, u) is None
 
 
-@pytest.mark.parametrize("rota", [
-    "/contratos", "/contratos/{contrato}", "/contratos/{contrato}/checklists", "/contratos/{contrato}/agendamentos",
-    "/imoveis", "/imoveis/{imovel}", "/imoveis/{imovel}/historico", "/checklists/{checklist}",
-    "/checklists/{checklist}/pdf", "/dashboard",
-])
+@pytest.mark.parametrize(
+    "rota",
+    [
+        "/contratos",
+        "/contratos/{contrato}",
+        "/contratos/{contrato}/checklists",
+        "/contratos/{contrato}/agendamentos",
+        "/imoveis",
+        "/imoveis/{imovel}",
+        "/imoveis/{imovel}/historico",
+        "/checklists/{checklist}",
+        "/checklists/{checklist}/pdf",
+        "/dashboard",
+    ],
+)
 def test_rota_de_leitura_nega_perfil_desconhecido(client, contrato, imovel, checklist, sem_o_portao, rota):
     caminho = rota.format(contrato=contrato.id, imovel=imovel.id, checklist=checklist.id)
     r = client.get(f"{API}{caminho}", headers=auth("qualquer"))
@@ -76,8 +88,16 @@ def test_rota_de_leitura_nega_perfil_desconhecido(client, contrato, imovel, chec
     assert "dados" not in r.json()
 
 
-@pytest.mark.parametrize("rota", ["/contratos/{id}", "/contratos/{id}/checklists", "/imoveis/{id}",
-                                  "/imoveis/{id}/historico", "/checklists/{id}/pdf"])
+@pytest.mark.parametrize(
+    "rota",
+    [
+        "/contratos/{id}",
+        "/contratos/{id}/checklists",
+        "/imoveis/{id}",
+        "/imoveis/{id}/historico",
+        "/checklists/{id}/pdf",
+    ],
+)
 def test_id_inexistente_tambem_da_403(client, sem_o_portao, rota):
     """A checagem vem antes da busca: um perfil desconhecido não descobre quais IDs existem (404 contra 403)."""
     r = client.get(f"{API}{rota.format(id='00000000-0000-0000-0000-000000000000')}", headers=auth("qualquer"))

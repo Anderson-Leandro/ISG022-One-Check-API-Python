@@ -8,18 +8,19 @@ Estratégia de isolamento:
   - Ao final de cada teste, a transação externa é revertida, apagando todos os
     dados criados durante o teste sem custo de recriação de schema.
 """
+
 import io
 import os
 import shutil
 import tempfile
+from datetime import date
 
 import bcrypt
 import pyotp
 import pytest
-from datetime import date
+from fastapi.testclient import TestClient
 from PIL import Image
 from sqlalchemy.orm import Session
-from fastapi.testclient import TestClient
 
 # DATABASE_URL deve ser definida ANTES de qualquer importação da app.
 # Em CI: variável TEST_DATABASE_URL aponta para o PostgreSQL do service.
@@ -33,9 +34,11 @@ os.environ.setdefault("APP_ENV", "test")
 os.environ["UPLOAD_DIR"] = tempfile.mkdtemp(prefix="onecheck-test-uploads-")
 
 # Importações da app somente após definir DATABASE_URL
-from app.main import app  # noqa: E402
+from app.auth import create_access_token  # noqa: E402
 from app.config import UPLOAD_DIR  # noqa: E402
-from app.database import Base, engine as test_engine, get_db  # noqa: E402
+from app.database import Base, get_db  # noqa: E402
+from app.database import engine as test_engine  # noqa: E402
+from app.main import app  # noqa: E402
 from app.models import (  # noqa: E402
     AgendamentoVistoria,
     Checklist,
@@ -45,7 +48,6 @@ from app.models import (  # noqa: E402
     ItemVistoria,
     Usuario,
 )
-from app.auth import create_access_token  # noqa: E402
 
 # ── Constantes de teste ─────────────────────────────────────────────────────────
 
@@ -59,6 +61,7 @@ _SENHA_HASH = bcrypt.hashpw(TEST_SENHA.encode(), bcrypt.gensalt(rounds=4)).decod
 
 # ── Helpers exportados para uso nos módulos de teste ────────────────────────────
 
+
 def auth(token: str) -> dict:
     """Monta o header Authorization Bearer para requisições de teste."""
     return {"Authorization": f"Bearer {token}"}
@@ -70,10 +73,7 @@ def foto_do_banco(db: Session) -> dict:
     Uso: banco_antes = foto_do_banco(db); <requisição negada>; assert foto_do_banco(db) == banco_antes
     """
     db.expire_all()
-    return {
-        tabela.name: sorted(map(repr, db.execute(tabela.select()).all()))
-        for tabela in Base.metadata.sorted_tables
-    }
+    return {tabela.name: sorted(map(repr, db.execute(tabela.select()).all())) for tabela in Base.metadata.sorted_tables}
 
 
 def totp_now() -> str:
@@ -94,6 +94,7 @@ def small_image_bytes() -> bytes:
 
 # ── Banco de dados ──────────────────────────────────────────────────────────────
 
+
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
     """Cria todas as tabelas antes da sessão e as dropa ao final."""
@@ -108,6 +109,7 @@ def setup_database():
 def limpar_rate_limit():
     """Cada teste começa sem tentativas falhas acumuladas (o limitador vive na memória do processo)."""
     from app.rate_limit import limitador
+
     limitador.reset()
     yield
     limitador.reset()
@@ -160,6 +162,7 @@ def client(db):
 
 
 # ── Fixtures de usuários ────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def user_admin(db):
@@ -244,6 +247,7 @@ def user_locatario_2(db):
 # Tokens gerados diretamente (sem passar por login) para evitar dependência
 # do fluxo de autenticação nos testes que não são de auth.
 
+
 @pytest.fixture
 def token_admin(user_admin):
     return create_access_token(user_admin.id, user_admin.role)
@@ -265,6 +269,7 @@ def token_locatario(user_locatario):
 
 
 # ── Fixtures de dados base ──────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def imovel(db):

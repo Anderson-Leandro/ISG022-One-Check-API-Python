@@ -6,6 +6,7 @@ rota respondia 500; no SQLite dos testes, a FK não é aplicada e sobrava refer�
 lógica (ADR-0008), a referência pode estar num checklist ou problema excluído, invisível para quem chama.
 Agora: cômodo em uso → 409 e nada é apagado.
 """
+
 import pytest
 
 from app.exclusao import marcar_excluido
@@ -33,7 +34,9 @@ def _usar_em_checklist(db, checklist, comodo):
 
 
 @pytest.mark.parametrize("excluido", [False, True], ids=["checklist_ativo", "checklist_excluido"])
-def test_comodo_usado_em_checklist_responde_409(client, db, imovel, comodo, checklist, user_admin, token_admin, excluido):
+def test_comodo_usado_em_checklist_responde_409(
+    client, db, imovel, comodo, checklist, user_admin, token_admin, excluido
+):
     _usar_em_checklist(db, checklist, comodo)
     if excluido:
         marcar_excluido(checklist, user_admin)
@@ -48,7 +51,9 @@ def test_comodo_usado_em_checklist_responde_409(client, db, imovel, comodo, chec
 
 
 @pytest.mark.parametrize("excluido", [False, True], ids=["problema_ativo", "problema_excluido"])
-def test_comodo_usado_em_problema_responde_409(client, db, imovel, comodo, contrato, user_admin, token_gestor, excluido):
+def test_comodo_usado_em_problema_responde_409(
+    client, db, imovel, comodo, contrato, user_admin, token_gestor, excluido
+):
     pb = Problema(contrato_id=contrato.id, comodo_id=comodo.id, titulo="Infiltração")
     db.add(pb)
     db.flush()
@@ -67,7 +72,9 @@ def test_comodo_usado_em_problema_responde_409(client, db, imovel, comodo, contr
 def test_fk_recusada_no_commit_vira_409(client, db, imovel, comodo, token_admin, monkeypatch):
     """Rede de segurança: se o banco recusar o delete (corrida ou FK nova), a resposta é 409, não 500."""
     from sqlalchemy.exc import IntegrityError
+
     from app.routers import imoveis as rota
+
     monkeypatch.setattr(rota, "_comodo_em_uso", lambda db, cid: False)
     original = db.commit
 

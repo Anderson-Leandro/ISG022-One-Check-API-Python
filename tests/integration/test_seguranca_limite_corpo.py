@@ -13,12 +13,13 @@ Regras verificadas:
   - multipart anônimo recebe 401 sem que o formulário seja interpretado
   - o formulário aceita um único arquivo
 """
+
 import pytest
 from starlette.formparsers import MultiPartParser
 
 from app.config import MAX_BODY_KB, MAX_UPLOAD_MB
 from app.models import ChecklistItem, ImovelComodo, ItemVistoria
-from tests.conftest import auth, small_image_bytes, foto_do_banco
+from tests.conftest import auth, foto_do_banco, small_image_bytes
 
 MB = 1024 * 1024
 
@@ -81,7 +82,9 @@ class TestAnonimo:
         assert r.status_code == 413
 
     def test_content_length_invalido_recebe_400(self, client):
-        r = client.post("/api/v1/auth/login", content=b"{}", headers={"Content-Type": "application/json", "Content-Length": "abc"})
+        r = client.post(
+            "/api/v1/auth/login", content=b"{}", headers={"Content-Type": "application/json", "Content-Length": "abc"}
+        )
         assert r.status_code == 400
 
 

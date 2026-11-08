@@ -381,6 +381,13 @@ A suíte cobre os fluxos de negócio e as correções de segurança com **824 te
 TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/bin/pytest
 ```
 
+### Lint e formatação (ruff)
+O CI reprova o PR com qualquer aviso do lint ou arquivo fora do formato. As regras ficam em `ruff.toml`. O `ruff` vem do `requirements-test.txt` (`pip install -r requirements-test.txt`).
+```bash
+.venv/bin/ruff check .            # lint (use --fix para as correções automáticas)
+.venv/bin/ruff format .           # formata; o CI roda ruff format --check .
+```
+
 ### Testes manuais (Insomnia)
 A collection em [`docs/insomnia/`](docs/insomnia/README.md) tem 168 requisições, com casos de sucesso e de falha para todas as áreas da API. Os scripts gravam os tokens e os IDs no ambiente, e os códigos de MFA podem ser calculados a partir do segredo. Importe `docs/insomnia/onecheck-api.insomnia.json` e siga o guia.
 

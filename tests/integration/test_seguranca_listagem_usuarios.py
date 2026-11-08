@@ -7,6 +7,7 @@ os usuários ativos; com ?role=admin, a lista exata das contas mais valiosas.
 
 Regra verificada: a listagem segue as demais rotas do recurso (admin e gestor).
 """
+
 import pytest
 
 from tests.conftest import auth

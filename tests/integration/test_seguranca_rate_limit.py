@@ -13,20 +13,23 @@ Regras verificadas:
   - sucesso zera o contador da conta; a janela expira sozinha
   - falhas de MFA ficam registradas no log de operações
 """
+
 import pytest
 
 from app.auth import create_temp_token
 from app.config import RATE_LIMIT_FALHAS_CONTA, RATE_LIMIT_FALHAS_IP, RATE_LIMIT_JANELA_MIN
 from app.models import LogOperacao, Usuario
 from app.rate_limit import limitador
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now
+from tests.conftest import _SENHA_HASH, MFA_TEST_SECRET, TEST_SENHA, auth, totp_now
 
 AUTH = "/api/v1/auth"
 
 
 def _codigo_errado() -> str:
     import time
+
     import pyotp
+
     totp = pyotp.TOTP(MFA_TEST_SECRET)
     validos = {totp.at(time.time() + d) for d in (-30, 0, 30)}
     return next(c for c in ("000000", "111111", "222222", "333333") if c not in validos)
@@ -42,6 +45,7 @@ def _esgota_conta(client, email):
 
 
 # ── Login por conta ──────────────────────────────────────────────────────────────
+
 
 class TestLoginPorConta:
     def test_bloqueia_apos_limite_mesmo_com_senha_correta(self, client, user_locatario):
@@ -79,6 +83,7 @@ class TestLoginPorConta:
 
 # ── Login por IP ─────────────────────────────────────────────────────────────────
 
+
 class TestLoginPorIp:
     def test_varredura_de_contas_bloqueia_o_ip(self, client, user_locatario):
         # cada e-mail falha menos que o limite por conta: só o limite por IP pega
@@ -89,6 +94,7 @@ class TestLoginPorIp:
 
 
 # ── MFA ──────────────────────────────────────────────────────────────────────────
+
 
 class TestMfaVerify:
     def test_bloqueia_apos_limite_mesmo_com_codigo_correto(self, client, user_admin):
@@ -102,19 +108,38 @@ class TestMfaVerify:
 
     def test_novo_temp_token_nao_zera_o_limite(self, client, user_admin):
         for _ in range(RATE_LIMIT_FALHAS_CONTA):
-            client.post(f"{AUTH}/mfa/verify", json={"temp_token": create_temp_token(user_admin.id), "codigo": _codigo_errado()})
-        r = client.post(f"{AUTH}/mfa/verify", json={"temp_token": create_temp_token(user_admin.id), "codigo": totp_now()})
+            client.post(
+                f"{AUTH}/mfa/verify", json={"temp_token": create_temp_token(user_admin.id), "codigo": _codigo_errado()}
+            )
+        r = client.post(
+            f"{AUTH}/mfa/verify", json={"temp_token": create_temp_token(user_admin.id), "codigo": totp_now()}
+        )
         assert r.status_code == 429
 
     def test_falha_de_mfa_e_registrada_no_log(self, client, db, user_admin):
-        client.post(f"{AUTH}/mfa/verify", json={"temp_token": create_temp_token(user_admin.id), "codigo": _codigo_errado()})
+        client.post(
+            f"{AUTH}/mfa/verify", json={"temp_token": create_temp_token(user_admin.id), "codigo": _codigo_errado()}
+        )
         db.expire_all()
-        assert db.query(LogOperacao).filter(LogOperacao.acao == "mfa_falho", LogOperacao.usuario_id == user_admin.id).count() == 1
+        assert (
+            db.query(LogOperacao)
+            .filter(LogOperacao.acao == "mfa_falho", LogOperacao.usuario_id == user_admin.id)
+            .count()
+            == 1
+        )
 
     def test_ativacao_no_primeiro_acesso_tambem_e_limitada(self, client, db):
         from app.auth import create_mfa_setup_token
-        u = Usuario(nome="Novo", email="novo_rl@test.com", senha_hash=_SENHA_HASH, role="vistoriador",
-                    mfa_enabled=True, mfa_secret=None, ativo=True)
+
+        u = Usuario(
+            nome="Novo",
+            email="novo_rl@test.com",
+            senha_hash=_SENHA_HASH,
+            role="vistoriador",
+            mfa_enabled=True,
+            mfa_secret=None,
+            ativo=True,
+        )
         db.add(u)
         db.flush()
         temp = create_mfa_setup_token(u.id)
@@ -127,11 +152,15 @@ class TestMfaVerify:
 
 # ── Reautenticação ───────────────────────────────────────────────────────────────
 
+
 class TestReautenticacao:
-    @pytest.mark.parametrize("metodo,url", [
-        ("post", f"{AUTH}/mfa/desabilitar"),
-        ("delete", "/api/v1/usuarios/me/mfa"),
-    ])
+    @pytest.mark.parametrize(
+        "metodo,url",
+        [
+            ("post", f"{AUTH}/mfa/desabilitar"),
+            ("delete", "/api/v1/usuarios/me/mfa"),
+        ],
+    )
     def test_desativar_mfa_limita_tentativas_de_senha(self, client, token_locatario, metodo, url):
         for _ in range(RATE_LIMIT_FALHAS_CONTA):
             r = client.request(metodo.upper(), url, json={"senha": "senha-errada"}, headers=auth(token_locatario))
@@ -142,12 +171,17 @@ class TestReautenticacao:
     def test_troca_de_senha_limita_tentativas(self, client, token_locatario):
         url = "/api/v1/usuarios/me/senha"
         for _ in range(RATE_LIMIT_FALHAS_CONTA):
-            client.put(url, json={"senha_atual": "senha-errada", "nova_senha": "nova-senha-123"}, headers=auth(token_locatario))
-        r = client.put(url, json={"senha_atual": TEST_SENHA, "nova_senha": "nova-senha-123"}, headers=auth(token_locatario))
+            client.put(
+                url, json={"senha_atual": "senha-errada", "nova_senha": "nova-senha-123"}, headers=auth(token_locatario)
+            )
+        r = client.put(
+            url, json={"senha_atual": TEST_SENHA, "nova_senha": "nova-senha-123"}, headers=auth(token_locatario)
+        )
         assert r.status_code == 429
 
     def test_troca_de_autenticador_limita_codigo_atual(self, client, token_admin):
         import pyotp
+
         novo = client.post(f"{AUTH}/mfa/setup", headers=auth(token_admin)).json()["dados"]["secret"]
         for _ in range(RATE_LIMIT_FALHAS_CONTA):
             r = client.post(

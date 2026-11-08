@@ -11,6 +11,7 @@ Rotas cobertas:
   PATCH /checklists/{id}/aceitar
   PATCH /checklists/{id}/rejeitar
 """
+
 from datetime import date
 
 import pytest
@@ -41,8 +42,12 @@ def contrato_alheio(db, user_vistoriador):
     db.add_all([outro, im])
     db.flush()
     ct = Contrato(
-        imovel_id=im.id, locatario_id=outro.id, data_inicio=date(2025, 1, 1),
-        data_fim=date(2025, 12, 31), valor_mensal=1000, status="ativo",
+        imovel_id=im.id,
+        locatario_id=outro.id,
+        data_inicio=date(2025, 1, 1),
+        data_fim=date(2025, 12, 31),
+        valor_mensal=1000,
+        status="ativo",
     )
     db.add(ct)
     db.flush()
@@ -50,6 +55,7 @@ def contrato_alheio(db, user_vistoriador):
 
 
 # ── Ataque: quem pode criar ─────────────────────────────────────────────────────
+
 
 class TestQuemPodeCriarChecklist:
     def test_locatario_nao_cria_checklist_se_nomeando_vistoriador(
@@ -77,6 +83,7 @@ class TestQuemPodeCriarChecklist:
 
 
 # ── Validação do vistoriador e do contrato ──────────────────────────────────────
+
 
 class TestValidacaoCriacaoChecklist:
     def test_vistoriador_inexistente_nao_gera_500(self, client, db, contrato, token_admin):
@@ -111,13 +118,17 @@ class TestValidacaoCriacaoChecklist:
 
 # ── Separação de deveres no aceite ──────────────────────────────────────────────
 
+
 class TestSeparacaoDeDeveresNoAceite:
     @pytest.fixture
     def checklist_do_gestor(self, db, contrato, user_gestor):
         """Checklist legado em que o vistoriador é o próprio gestor (ex.: perfil alterado depois)."""
         ck = Checklist(
-            contrato_id=contrato.id, vistoriador_id=user_gestor.id, tipo="inicial",
-            status="pendente_aceite", data_vistoria=date.today(),
+            contrato_id=contrato.id,
+            vistoriador_id=user_gestor.id,
+            tipo="inicial",
+            status="pendente_aceite",
+            data_vistoria=date.today(),
         )
         db.add(ck)
         db.flush()

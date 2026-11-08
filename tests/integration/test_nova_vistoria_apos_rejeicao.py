@@ -5,6 +5,7 @@ A vistoria rejeitada é evidência e não muda (R-003). Antes, uma vistoria inic
 contrato: criar outra inicial dava 409, e a exclusão (ADR-0008) não aceita vistoria rejeitada. Agora uma
 nova inicial pode ser criada quando todas as anteriores foram rejeitadas.
 """
+
 import pytest
 
 from app.models import Checklist
@@ -14,8 +15,11 @@ API = "/api/v1"
 
 
 def _criar_inicial(client, contrato_id, vistoriador_id, token):
-    return client.post(f"{API}/contratos/{contrato_id}/checklists", headers=auth(token),
-                       json={"tipo": "inicial", "vistoriador_id": vistoriador_id})
+    return client.post(
+        f"{API}/contratos/{contrato_id}/checklists",
+        headers=auth(token),
+        json={"tipo": "inicial", "vistoriador_id": vistoriador_id},
+    )
 
 
 def test_nova_inicial_depois_de_rejeitada(client, db, contrato, checklist, user_vistoriador, token_gestor):
@@ -35,8 +39,9 @@ def test_nova_inicial_depois_de_rejeitada(client, db, contrato, checklist, user_
 
 
 @pytest.mark.parametrize("status", ["em_preenchimento", "pendente_aceite", "aceito"])
-def test_inicial_que_nao_foi_rejeitada_continua_bloqueando(client, db, contrato, checklist, user_vistoriador,
-                                                          token_gestor, status):
+def test_inicial_que_nao_foi_rejeitada_continua_bloqueando(
+    client, db, contrato, checklist, user_vistoriador, token_gestor, status
+):
     checklist.status = status
     db.flush()
     antes = foto_do_banco(db)
@@ -58,15 +63,21 @@ def test_rejeitada_mais_uma_em_andamento_bloqueia(client, db, contrato, checklis
 
 def test_pendente_revisao_saiu_do_dominio(db, checklist):
     from app.data_status import get_data_status
+
     assert get_data_status(db)["checklists_por_status"] == {
-        "em_preenchimento": 1, "pendente_aceite": 0, "aceito": 0, "rejeitado": 0,
+        "em_preenchimento": 1,
+        "pendente_aceite": 0,
+        "aceito": 0,
+        "rejeitado": 0,
     }
 
 
-def test_status_antigo_aparece_na_contagem_e_nao_trava_o_contrato(client, db, contrato, checklist, user_vistoriador,
-                                                                  token_gestor):
+def test_status_antigo_aparece_na_contagem_e_nao_trava_o_contrato(
+    client, db, contrato, checklist, user_vistoriador, token_gestor
+):
     """Um valor antigo gravado direto no banco não some da contagem nem bloqueia uma nova vistoria inicial."""
     from app.data_status import get_data_status
+
     checklist.status = "pendente_revisao"
     db.flush()
     assert get_data_status(db)["checklists_por_status"]["pendente_revisao"] == 1

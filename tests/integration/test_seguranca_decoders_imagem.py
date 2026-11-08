@@ -13,6 +13,7 @@ Regras verificadas:
   - imagens válidas de outros formatos são recusadas sem chegar ao Pillow
   - imagens acima de 50 megapixels são recusadas (decompression bomb)
 """
+
 import io
 
 import pytest
@@ -94,7 +95,9 @@ class TestRota:
         db.flush()
         return item
 
-    def test_tiff_enviado_como_jpg_e_recusado(self, client, checklist, item_checklist, token_vistoriador, chamadas_open):
+    def test_tiff_enviado_como_jpg_e_recusado(
+        self, client, checklist, item_checklist, token_vistoriador, chamadas_open
+    ):
         r = client.post(
             f"/api/v1/checklists/{checklist.id}/itens/{item_checklist.id}/fotos",
             files={"foto": ("foto.jpg", _imagem("TIFF"), "image/jpeg")},

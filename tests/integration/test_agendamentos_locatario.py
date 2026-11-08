@@ -5,6 +5,7 @@ GET /contratos/{id}/agendamentos passa a seguir assert_acesso_contrato: o locat√
 contrato e recebe 403 nos dos outros. Criar, alterar e excluir continuam s√≥ com admin e gestor. O dashboard
 conta os agendamentos com o mesmo recorte.
 """
+
 from datetime import date
 
 import pytest
@@ -20,8 +21,13 @@ def contrato_alheio(db, user_locatario_2):
     im = Imovel(tipo="casa", status="locado", garagem=False, garagem_vagas=0)
     db.add(im)
     db.flush()
-    ct = Contrato(imovel_id=im.id, locatario_id=user_locatario_2.id, data_inicio=date(2025, 1, 1),
-                  data_fim=date(2025, 12, 31), status="ativo")
+    ct = Contrato(
+        imovel_id=im.id,
+        locatario_id=user_locatario_2.id,
+        data_inicio=date(2025, 1, 1),
+        data_fim=date(2025, 12, 31),
+        status="ativo",
+    )
     db.add(ct)
     db.flush()
     db.add(AgendamentoVistoria(contrato_id=ct.id, tipo="inicial", data_agendada=date(2025, 1, 1)))
@@ -44,7 +50,9 @@ def test_locatario_nao_ve_a_observacao_interna(client, db, contrato, token_locat
     ag.observacao = "Nota interna da equipe"
     db.flush()
 
-    do_locatario = client.get(f"{API}/contratos/{contrato.id}/agendamentos", headers=auth(token_locatario)).json()["dados"]
+    do_locatario = client.get(f"{API}/contratos/{contrato.id}/agendamentos", headers=auth(token_locatario)).json()[
+        "dados"
+    ]
     do_gestor = client.get(f"{API}/contratos/{contrato.id}/agendamentos", headers=auth(token_gestor)).json()["dados"]
 
     assert all("observacao" not in a for a in do_locatario)
@@ -65,8 +73,11 @@ def test_locatario_continua_sem_escrita(client, db, contrato, token_locatario, a
     ag = db.query(AgendamentoVistoria).filter(AgendamentoVistoria.contrato_id == contrato.id).first()
     antes = foto_do_banco(db)
     if acao == "criar":
-        r = client.post(f"{API}/contratos/{contrato.id}/agendamentos", headers=auth(token_locatario),
-                        json={"tipo": "encerramento", "data_agendada": "2099-01-01T10:00:00"})
+        r = client.post(
+            f"{API}/contratos/{contrato.id}/agendamentos",
+            headers=auth(token_locatario),
+            json={"tipo": "encerramento", "data_agendada": "2099-01-01T10:00:00"},
+        )
     elif acao == "alterar":
         r = client.put(f"{API}/agendamentos/{ag.id}", headers=auth(token_locatario), json={"observacao": "x"})
     else:

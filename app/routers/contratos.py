@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
@@ -24,13 +24,11 @@ from app.models import (
     Usuario,
 )
 from app.notification_service import notificar_admins
-from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 from app.schemas import (
     TIPOS_AGENDAMENTO,
     AgendamentoCreate,
     ChecklistCreate,
     ContratoCreate,
-    ProblemaCreate,
     fail,
     ok,
 )
@@ -42,6 +40,7 @@ from app.serializers import (
     serialize_contrato,
     serialize_problema,
 )
+from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 
 router = APIRouter(prefix="/contratos", tags=["contratos"])
 
@@ -225,7 +224,7 @@ def _parse_datetime(dt_val) -> datetime:
         try:
             return datetime.fromisoformat(dt_val)
         except Exception:
-            raise ValueError("Formato de data inválido")
+            raise ValueError("Formato de data inválido") from None
     raise ValueError("Formato de data inválido")
 
 
@@ -272,16 +271,28 @@ def create_agendamento(
         return fail("Agendamentos só podem ser criados em contratos ativos", status_code=409)
 
     if body.tipo not in TIPOS_AGENDAMENTO:
-        return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"}, status_code=422)
+        return fail(
+            "Tipo inválido. Deve ser 'inicial' ou 'encerramento'",
+            erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"},
+            status_code=422,
+        )
 
     try:
         parsed_dt = _parse_datetime(body.data_agendada)
     except Exception:
-        return fail("Formato de data_agendada inválido", erros={"data_agendada": "Formato de data_agendada inválido"}, status_code=422)
+        return fail(
+            "Formato de data_agendada inválido",
+            erros={"data_agendada": "Formato de data_agendada inválido"},
+            status_code=422,
+        )
 
-    now = datetime.now() if parsed_dt.tzinfo is None else datetime.now(timezone.utc)
+    now = datetime.now() if parsed_dt.tzinfo is None else datetime.now(UTC)
     if parsed_dt <= now:
-        return fail("A data agendada deve ser uma data futura", erros={"data_agendada": "A data agendada deve ser uma data futura"}, status_code=422)
+        return fail(
+            "A data agendada deve ser uma data futura",
+            erros={"data_agendada": "A data agendada deve ser uma data futura"},
+            status_code=422,
+        )
 
     ag = AgendamentoVistoria(
         contrato_id=contrato_id,
@@ -331,7 +342,11 @@ def create_checklist(
         return fail("Vistorias só podem ser criadas em contratos ativos", status_code=409)
 
     if body.tipo not in ("inicial", "encerramento"):
-        return fail("Tipo deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo deve ser 'inicial' ou 'encerramento'"}, status_code=422)
+        return fail(
+            "Tipo deve ser 'inicial' ou 'encerramento'",
+            erros={"tipo": "Tipo deve ser 'inicial' ou 'encerramento'"},
+            status_code=422,
+        )
 
     vistoriador = (
         db.query(Usuario)
@@ -388,7 +403,7 @@ async def create_problema(
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
         return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Contrato não encontrado"})
-    
+
     if ct.status != "ativo":
         return fail("Problemas só podem ser registrados em contratos ativos", status_code=409)
 
@@ -418,19 +433,25 @@ async def create_problema(
             prioridade = str(form.get("prioridade")).strip()
         if form.get("status"):
             status_val = str(form.get("status")).strip()
-        
+
         foto = form.get("foto")
         if foto and hasattr(foto, "read"):
             content = await foto.read()
             if len(content) > MAX_UPLOAD_MB * 1024 * 1024:
                 return JSONResponse(
                     status_code=422,
-                    content={"sucesso": False, "erro": f"A foto não pode exceder {MAX_UPLOAD_MB} MB", "erros": {"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"}},
+                    content={
+                        "sucesso": False,
+                        "erro": f"A foto não pode exceder {MAX_UPLOAD_MB} MB",
+                        "erros": {"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"},
+                    },
                 )
             try:
                 foto_chave = salvar_imagem(content)
             except UploadInvalido as e:
-                return JSONResponse(status_code=422, content={"sucesso": False, "erro": str(e), "erros": {"foto": str(e)}})
+                return JSONResponse(
+                    status_code=422, content={"sucesso": False, "erro": str(e), "erros": {"foto": str(e)}}
+                )
     else:
         try:
             body = await request.json()
@@ -450,7 +471,11 @@ async def create_problema(
             if not foto_chave:
                 return JSONResponse(
                     status_code=422,
-                    content={"sucesso": False, "erro": "Foto inválida", "erros": {"foto_url": "Envie a foto pelo upload da API"}},
+                    content={
+                        "sucesso": False,
+                        "erro": "Foto inválida",
+                        "erros": {"foto_url": "Envie a foto pelo upload da API"},
+                    },
                 )
 
     erros = {}
@@ -459,15 +484,16 @@ async def create_problema(
 
     if comodo_id:
         comodo = (
-            db.query(ImovelComodo)
-            .filter(ImovelComodo.id == comodo_id, ImovelComodo.imovel_id == ct.imovel_id)
-            .first()
+            db.query(ImovelComodo).filter(ImovelComodo.id == comodo_id, ImovelComodo.imovel_id == ct.imovel_id).first()
         )
         if not comodo:
             return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Cômodo não encontrado"})
 
     if prioridade not in ("normal", "alta", "urgente"):
-        return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Prioridade inválida", "erros": {"prioridade": "Prioridade inválida"}})
+        return JSONResponse(
+            status_code=422,
+            content={"sucesso": False, "erro": "Prioridade inválida", "erros": {"prioridade": "Prioridade inválida"}},
+        )
 
     # O problema nasce aberto: o andamento só muda por PATCH /problemas/{id}/status (admin/gestor)
     if status_val != "aberto":
@@ -522,10 +548,5 @@ def list_problemas(
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"sucesso": False, "erro": e.detail})
 
-    rows = (
-        db.query(Problema)
-        .filter(Problema.contrato_id == contrato_id)
-        .order_by(Problema.created_at.desc())
-        .all()
-    )
+    rows = db.query(Problema).filter(Problema.contrato_id == contrato_id).order_by(Problema.created_at.desc()).all()
     return ok([serialize_problema(p) for p in rows])

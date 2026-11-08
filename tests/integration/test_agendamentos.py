@@ -7,6 +7,7 @@ Rotas cobertas:
   PUT    /api/v1/agendamentos/{id}
   DELETE /api/v1/agendamentos/{id}
 """
+
 from datetime import datetime, timedelta
 
 from tests.conftest import auth, foto_do_banco
@@ -92,7 +93,9 @@ class TestCriarAgendamento:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_vistoriador_e_locatario_nao_podem_criar_agendamento(self, client, contrato, token_vistoriador, token_locatario):
+    def test_vistoriador_e_locatario_nao_podem_criar_agendamento(
+        self, client, contrato, token_vistoriador, token_locatario
+    ):
         r_vist = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/agendamentos",
             json={"tipo": "inicial", "data_agendada": _data_futura(10)},
@@ -135,6 +138,7 @@ class TestListarAgendamentos:
 class TestAtualizarEExcluirAgendamento:
     def test_admin_atualiza_agendamento(self, client, db, contrato, token_admin):
         from app.models import AgendamentoVistoria
+
         ag = AgendamentoVistoria(
             contrato_id=contrato.id,
             tipo="inicial",
@@ -160,6 +164,7 @@ class TestAtualizarEExcluirAgendamento:
 
     def test_atualizar_com_data_passada_retorna_falha(self, client, db, contrato, token_admin):
         from app.models import AgendamentoVistoria
+
         ag = AgendamentoVistoria(
             contrato_id=contrato.id,
             tipo="inicial",
@@ -179,6 +184,7 @@ class TestAtualizarEExcluirAgendamento:
 
     def test_admin_exclui_agendamento(self, client, db, contrato, token_admin):
         from app.models import AgendamentoVistoria
+
         ag = AgendamentoVistoria(
             contrato_id=contrato.id,
             tipo="inicial",
@@ -200,6 +206,7 @@ class TestAtualizarEExcluirAgendamento:
 
     def test_vistoriador_nao_pode_excluir_nem_atualizar(self, client, db, contrato, token_vistoriador):
         from app.models import AgendamentoVistoria
+
         ag = AgendamentoVistoria(
             contrato_id=contrato.id,
             tipo="inicial",

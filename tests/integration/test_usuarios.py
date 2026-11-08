@@ -14,14 +14,16 @@ Rotas cobertas:
   DELETE /api/v1/usuarios/{id}/mfa
   POST   /api/v1/usuarios
 """
+
 import pytest
 
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, auth, totp_now, foto_do_banco
+from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, auth, foto_do_banco, totp_now
 
 BASE = "/api/v1/usuarios"
 
 
 # ── GET /me ───────────────────────────────────────────────────────────────────────
+
 
 class TestMe:
     def test_me_retorna_dados_do_usuario(self, client, user_locatario, token_locatario):
@@ -44,6 +46,7 @@ class TestMe:
 
 
 # ── PATCH /me ─────────────────────────────────────────────────────────────────────
+
 
 class TestUpdateMe:
     def test_atualiza_nome(self, client, db, user_locatario, token_locatario):
@@ -103,6 +106,7 @@ class TestUpdateMe:
 
 # ── POST /me/mfa/setup ────────────────────────────────────────────────────────────
 
+
 class TestMfaSetupMe:
     def test_setup_retorna_secret_e_uri(self, client, token_locatario):
         r = client.post(f"{BASE}/me/mfa/setup", headers=auth(token_locatario))
@@ -120,6 +124,7 @@ class TestMfaSetupMe:
 
 
 # ── POST /me/mfa/enable ───────────────────────────────────────────────────────────
+
 
 class TestMfaEnableMe:
     def test_enable_com_codigo_valido(self, client, db, user_locatario, token_locatario):
@@ -154,6 +159,7 @@ class TestMfaEnableMe:
 
 # ── DELETE /me/mfa ────────────────────────────────────────────────────────────────
 
+
 class TestMfaDisableMe:
     def test_disable_remove_mfa(self, client, db, user_locatario, token_locatario):
         # Perfil com MFA opcional e reautenticação; perfis obrigatórios: test_seguranca_mfa_desativacao.py
@@ -161,7 +167,8 @@ class TestMfaDisableMe:
         user_locatario.mfa_secret = MFA_TEST_SECRET
         db.flush()
         r = client.request(
-            "DELETE", f"{BASE}/me/mfa",
+            "DELETE",
+            f"{BASE}/me/mfa",
             json={"senha": TEST_SENHA, "codigo": totp_now()},
             headers=auth(token_locatario),
         )
@@ -178,6 +185,7 @@ class TestMfaDisableMe:
 
 
 # ── GET /usuarios (listagem) ──────────────────────────────────────────────────────
+
 
 class TestListUsuarios:
     def test_lista_usuarios_gestor(self, client, user_locatario, token_gestor):
@@ -208,6 +216,7 @@ class TestListUsuarios:
 
 # ── GET /usuarios/{id} ────────────────────────────────────────────────────────────
 
+
 class TestGetUsuario:
     def test_admin_busca_usuario_por_id(self, client, user_locatario, token_admin):
         r = client.get(f"{BASE}/{user_locatario.id}", headers=auth(token_admin))
@@ -236,6 +245,7 @@ class TestGetUsuario:
 
 
 # ── PUT /usuarios/{id} ────────────────────────────────────────────────────────────
+
 
 class TestUpdateUsuario:
     def test_admin_atualiza_nome(self, client, user_locatario, token_admin):
@@ -294,6 +304,7 @@ class TestUpdateUsuario:
 
 # ── POST /usuarios (criar) ────────────────────────────────────────────────────────
 
+
 class TestCreateUsuario:
     def test_admin_cria_usuario(self, client, token_admin):
         r = client.post(
@@ -309,7 +320,12 @@ class TestCreateUsuario:
     def test_gestor_cria_usuario(self, client, token_gestor):
         r = client.post(
             BASE,
-            json={"nome": "User Gestor", "email": "usergestor@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
+            json={
+                "nome": "User Gestor",
+                "email": "usergestor@test.com",
+                "senha": "Vistoria-Casa-42",
+                "role": "locatario",
+            },
             headers=auth(token_gestor),
         )
         data = r.json()
@@ -338,7 +354,12 @@ class TestCreateUsuario:
     def test_role_locatario_nao_ativa_mfa(self, client, token_admin):
         r = client.post(
             BASE,
-            json={"nome": "Loc Sem Mfa", "email": "locsemmfa@test.com", "senha": "Vistoria-Casa-42", "role": "locatario"},
+            json={
+                "nome": "Loc Sem Mfa",
+                "email": "locsemmfa@test.com",
+                "senha": "Vistoria-Casa-42",
+                "role": "locatario",
+            },
             headers=auth(token_admin),
         )
         data = r.json()
@@ -366,6 +387,7 @@ class TestCreateUsuario:
 
 
 # ── POST /usuarios/{id}/mfa/enable e DELETE /mfa ─────────────────────────────────
+
 
 class TestMfaAdminRoutes:
     def test_enable_usuario_inexistente(self, client, token_admin):
@@ -406,6 +428,7 @@ class TestMfaAdminRoutes:
 
 # ── PUT /me/senha ─────────────────────────────────────────────────────────────────
 
+
 class TestAlterarSenhaDedicada:
     def test_alterar_senha_sucesso(self, client, user_locatario, token_locatario):
         r = client.put(
@@ -430,10 +453,12 @@ class TestAlterarSenhaDedicada:
 
 # ── DELETE /usuarios/{id} (Soft Delete) ───────────────────────────────────────────
 
+
 class TestDeleteUsuario:
     def test_admin_desativa_usuario(self, client, db, token_admin):
         from app.models import Usuario
         from tests.conftest import _SENHA_HASH
+
         u = Usuario(
             nome="Para Desativar",
             email="desativar@test.com",
@@ -469,6 +494,7 @@ class TestDeleteUsuario:
 
 
 # ── Validação de duplicidade de email no PUT ──────────────────────────────────────
+
 
 class TestUpdateUsuarioEmail:
     def test_update_email_duplicado_retorna_erro(self, client, user_locatario, user_gestor, token_admin):

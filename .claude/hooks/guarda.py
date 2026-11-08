@@ -9,6 +9,7 @@ O comando é analisado como shell: o corpo dos heredocs (mensagens de commit, te
 ignorado, e cada comando simples é checado pelo subcomando git de fato, não por palavras soltas.
 Saída 2 bloqueia a ferramenta e devolve a mensagem de stderr ao Claude.
 """
+
 import json
 import re
 import shlex
@@ -62,7 +63,7 @@ def subcomando_git(tks: list[str]) -> tuple[str, list[str]] | None:
         i += 2 if tks[i] in OPCOES_COM_VALOR else 1
     if i >= len(tks):
         return None
-    return tks[i], tks[i + 1:]
+    return tks[i], tks[i + 1 :]
 
 
 def destino(refspec: str) -> str:

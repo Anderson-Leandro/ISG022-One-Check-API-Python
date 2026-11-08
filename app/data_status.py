@@ -1,4 +1,5 @@
 """Totais atuais do banco (somente leitura)."""
+
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -16,9 +17,7 @@ from app.models import (
 
 def get_data_status(db: Session) -> dict:
     enderecos_com_coords = (
-        db.query(Endereco)
-        .filter(Endereco.latitude.isnot(None), Endereco.longitude.isnot(None))
-        .count()
+        db.query(Endereco).filter(Endereco.latitude.isnot(None), Endereco.longitude.isnot(None)).count()
     )
     return {
         "usuarios": db.query(Usuario).count(),

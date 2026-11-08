@@ -2,6 +2,7 @@
 Gerador de laudos de vistoria em formato PDF (OneCheck).
 Produz documentos PDF 1.4 válidos e leves sem dependências externas.
 """
+
 from datetime import datetime
 
 
@@ -120,7 +121,9 @@ def gerar_pdf_checklist(
     canvas.y -= 2
     canvas.add_text("ONECHECK - LAUDO DE VISTORIA IMOBILIARIA", "Helvetica-Bold", 14, 50, color=(1, 1, 1))
     canvas.y -= 14
-    canvas.add_text(f"Emissao: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", "Helvetica", 9, 50, color=(0.85, 0.85, 0.85))
+    canvas.add_text(
+        f"Emissao: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", "Helvetica", 9, 50, color=(0.85, 0.85, 0.85)
+    )
     canvas.y -= 30
 
     # Imóvel
@@ -132,7 +135,12 @@ def gerar_pdf_checklist(
     if endereco:
         end_str = f"{endereco.get('rua', '')}, {endereco.get('numero', '') or 'S/N'} - {endereco.get('bairro', '')} - {endereco.get('cidade', '')}/{endereco.get('estado', '')} (CEP: {endereco.get('cep', '')})"
 
-    canvas.add_text(f"Tipo: {imovel.get('tipo', 'N/A')}  |  Tamanho: {imovel.get('tamanho', 'N/A')}  |  Garagem: {imovel.get('garagem_vagas', 0)} vaga(s)", "Helvetica", 9, 50)
+    canvas.add_text(
+        f"Tipo: {imovel.get('tipo', 'N/A')}  |  Tamanho: {imovel.get('tamanho', 'N/A')}  |  Garagem: {imovel.get('garagem_vagas', 0)} vaga(s)",
+        "Helvetica",
+        9,
+        50,
+    )
     canvas.y -= 12
     canvas.add_text(f"Endereco: {end_str}", "Helvetica", 9, 50)
     canvas.y -= 20
@@ -141,13 +149,19 @@ def gerar_pdf_checklist(
     canvas.draw_rect(40, canvas.y - 2, 515, 18, fill_color=(0.93, 0.94, 0.96))
     canvas.add_text("2. DADOS DO CONTRATO E PARTES", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
     canvas.y -= 16
-    canvas.add_text(f"Contrato ID: {contrato.get('id', 'N/A')}  |  Status: {contrato.get('status', 'N/A')}", "Helvetica", 9, 50)
+    canvas.add_text(
+        f"Contrato ID: {contrato.get('id', 'N/A')}  |  Status: {contrato.get('status', 'N/A')}", "Helvetica", 9, 50
+    )
     canvas.y -= 12
-    canvas.add_text(f"Periodo: {contrato.get('data_inicio', '')} ate {contrato.get('data_fim', '')}", "Helvetica", 9, 50)
+    canvas.add_text(
+        f"Periodo: {contrato.get('data_inicio', '')} ate {contrato.get('data_fim', '')}", "Helvetica", 9, 50
+    )
     canvas.y -= 12
     canvas.add_text(f"Locatario: {locatario.get('nome', 'N/A')} ({locatario.get('email', 'N/A')})", "Helvetica", 9, 50)
     canvas.y -= 12
-    canvas.add_text(f"Vistoriador: {vistoriador.get('nome', 'N/A')} ({vistoriador.get('email', 'N/A')})", "Helvetica", 9, 50)
+    canvas.add_text(
+        f"Vistoriador: {vistoriador.get('nome', 'N/A')} ({vistoriador.get('email', 'N/A')})", "Helvetica", 9, 50
+    )
     canvas.y -= 20
 
     # Vistoria
@@ -155,7 +169,12 @@ def gerar_pdf_checklist(
     tipo_str = "Inicial" if checklist.get("tipo") == "inicial" else "Encerramento"
     canvas.add_text(f"3. DADOS DA VISTORIA ({tipo_str.upper()})", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
     canvas.y -= 16
-    canvas.add_text(f"Checklist ID: {checklist.get('id', 'N/A')}  |  Status: {checklist.get('status', 'N/A')}  |  Data: {checklist.get('data_vistoria', 'N/A')}", "Helvetica", 9, 50)
+    canvas.add_text(
+        f"Checklist ID: {checklist.get('id', 'N/A')}  |  Status: {checklist.get('status', 'N/A')}  |  Data: {checklist.get('data_vistoria', 'N/A')}",
+        "Helvetica",
+        9,
+        50,
+    )
     canvas.y -= 20
 
     # Itens
@@ -172,7 +191,12 @@ def gerar_pdf_checklist(
             canvas.check_page_break(35)
             estado = (item.get("estado") or "N/A").upper()
             obs = item.get("observacao") or "Sem observacoes"
-            canvas.add_text(f"{idx}. Item ID: {item.get('item_vistoria_id', 'N/A')}  |  Comodo: {item.get('comodo_id', 'N/A')}", "Helvetica-Bold", 9, 50)
+            canvas.add_text(
+                f"{idx}. Item ID: {item.get('item_vistoria_id', 'N/A')}  |  Comodo: {item.get('comodo_id', 'N/A')}",
+                "Helvetica-Bold",
+                9,
+                50,
+            )
             canvas.y -= 11
             canvas.add_text(f"   Estado: {estado}  |  Observacao: {obs}", "Helvetica", 9, 50)
             canvas.y -= 14
@@ -191,13 +215,23 @@ def gerar_pdf_checklist(
         motivo = f" | Motivo: {aceite.get('motivo_rejeicao')}" if aceite.get("motivo_rejeicao") else ""
         canvas.add_text(f"Status do Aceite: {status_ac} em {dt_ac}{motivo}", "Helvetica-Bold", 9, 50)
         canvas.y -= 12
-        canvas.add_text(f"Assinado digitalmente por: {locatario.get('nome', 'N/A')} (Locatario Titular)", "Helvetica", 9, 50)
+        canvas.add_text(
+            f"Assinado digitalmente por: {locatario.get('nome', 'N/A')} (Locatario Titular)", "Helvetica", 9, 50
+        )
     else:
-        canvas.add_text("Status do Aceite: PENDENTE DE ASSINATURA PELO LOCATARIO", "Helvetica", 9, 50, color=(0.6, 0.3, 0.1))
+        canvas.add_text(
+            "Status do Aceite: PENDENTE DE ASSINATURA PELO LOCATARIO", "Helvetica", 9, 50, color=(0.6, 0.3, 0.1)
+        )
 
     canvas.y -= 25
     canvas.draw_line(50, canvas.y, 545, canvas.y, width=0.5, color=(0.8, 0.8, 0.8))
     canvas.y -= 12
-    canvas.add_text("Documento gerado eletronicamente pela Plataforma OneCheck. Autenticidade garantida por chave digital e logs de auditoria.", "Helvetica", 7, 50, color=(0.5, 0.5, 0.5))
+    canvas.add_text(
+        "Documento gerado eletronicamente pela Plataforma OneCheck. Autenticidade garantida por chave digital e logs de auditoria.",
+        "Helvetica",
+        7,
+        50,
+        color=(0.5, 0.5, 0.5),
+    )
 
     return canvas.render()

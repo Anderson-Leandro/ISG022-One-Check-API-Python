@@ -10,6 +10,7 @@ executava as recusas de:
     create_agendamento).
 Cada teste confere a recusa (409 e a mensagem) e que nada mudou no banco nem no disco.
 """
+
 import pytest
 
 from app.config import UPLOAD_DIR
@@ -31,6 +32,7 @@ ESTADOS_TRAVADOS = ["pendente_aceite", "aceito", "rejeitado"]
 
 
 # ── Fixtures ────────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def item(db, checklist, imovel):
@@ -80,15 +82,20 @@ def _fotos_do_item(db, item_id):
 
 # ── Fotos depois do envio ───────────────────────────────────────────────────────
 
+
 @pytest.mark.parametrize("status", ESTADOS_TRAVADOS)
 class TestFotoEmChecklistTravado:
-    def test_upload_recusado_e_foto_antiga_preservada(self, client, db, checklist, item, foto, token_vistoriador, status):
+    def test_upload_recusado_e_foto_antiga_preservada(
+        self, client, db, checklist, item, foto, token_vistoriador, status
+    ):
         _travar(db, checklist, status)
         antes_disco = _arquivos_no_disco()
 
-        r = client.post(f"{API}/checklists/{checklist.id}/itens/{item.id}/fotos",
-                        files={"foto": ("nova.png", small_image_bytes(), "image/png")},
-                        headers=auth(token_vistoriador))
+        r = client.post(
+            f"{API}/checklists/{checklist.id}/itens/{item.id}/fotos",
+            files={"foto": ("nova.png", small_image_bytes(), "image/png")},
+            headers=auth(token_vistoriador),
+        )
 
         _recusado(r, f"Não é possível adicionar fotos a um checklist com status '{status}'")
         # o upload troca a foto antiga: recusado, a antiga continua no banco e no disco, e nada novo é gravado
@@ -99,8 +106,9 @@ class TestFotoEmChecklistTravado:
     def test_exclusao_recusada_e_foto_preservada(self, client, db, checklist, item, foto, token_vistoriador, status):
         _travar(db, checklist, status)
 
-        r = client.delete(f"{API}/checklists/{checklist.id}/itens/{item.id}/fotos/{foto.id}",
-                          headers=auth(token_vistoriador))
+        r = client.delete(
+            f"{API}/checklists/{checklist.id}/itens/{item.id}/fotos/{foto.id}", headers=auth(token_vistoriador)
+        )
 
         _recusado(r, f"Não é possível excluir fotos de um checklist com status '{status}'")
         assert _fotos_do_item(db, item.id) == [(foto.id, foto.arquivo)]
@@ -109,14 +117,16 @@ class TestFotoEmChecklistTravado:
 
 def test_em_preenchimento_a_exclusao_e_permitida(client, db, checklist, item, foto, token_vistoriador):
     """Controle positivo: a mesma exclusão passa enquanto o checklist está em preenchimento."""
-    r = client.delete(f"{API}/checklists/{checklist.id}/itens/{item.id}/fotos/{foto.id}",
-                      headers=auth(token_vistoriador))
+    r = client.delete(
+        f"{API}/checklists/{checklist.id}/itens/{item.id}/fotos/{foto.id}", headers=auth(token_vistoriador)
+    )
     assert r.status_code == 200, r.text
     assert _fotos_do_item(db, item.id) == []
     assert not (UPLOAD_DIR / foto.arquivo).exists()
 
 
 # ── Envio para aceite ───────────────────────────────────────────────────────────
+
 
 class TestEnviarParaAceiteForaDePreenchimento:
     @pytest.mark.parametrize("status", ESTADOS_TRAVADOS)
@@ -142,6 +152,7 @@ class TestEnviarParaAceiteForaDePreenchimento:
 
 # ── Contrato que não está ativo ─────────────────────────────────────────────────
 
+
 @pytest.mark.parametrize("status", ["encerrado", "cancelado"])
 class TestContratoNaoAtivo:
     def _inativar(self, db, contrato, imovel, status):
@@ -163,9 +174,11 @@ class TestContratoNaoAtivo:
         self._inativar(db, contrato, imovel, status)
         antes = db.query(AgendamentoVistoria).filter(AgendamentoVistoria.contrato_id == contrato.id).count()
 
-        r = client.post(f"{API}/contratos/{contrato.id}/agendamentos",
-                        json={"tipo": "encerramento", "data_agendada": "2099-01-01T10:00:00"},
-                        headers=auth(token_admin))
+        r = client.post(
+            f"{API}/contratos/{contrato.id}/agendamentos",
+            json={"tipo": "encerramento", "data_agendada": "2099-01-01T10:00:00"},
+            headers=auth(token_admin),
+        )
 
         _recusado(r, "Agendamentos só podem ser criados em contratos ativos")
         db.expire_all()

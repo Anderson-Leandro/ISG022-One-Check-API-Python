@@ -7,21 +7,25 @@ Rotas cobertas:
   POST /auth/refresh
   POST /auth/logout
 """
+
 import pytest
 
 from app.auth import create_mfa_setup_token, create_refresh_token, create_temp_token
 from app.models import Usuario
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now, foto_do_banco
-
+from tests.conftest import _SENHA_HASH, TEST_SENHA, auth, foto_do_banco, totp_now
 
 # ── POST /auth/login ──────────────────────────────────────────────────────────────
 
+
 class TestLogin:
     def test_login_sem_mfa_retorna_tokens(self, client, user_locatario):
-        r = client.post("/api/v1/auth/login", json={
-            "email": user_locatario.email,
-            "senha": TEST_SENHA,
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": user_locatario.email,
+                "senha": TEST_SENHA,
+            },
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert "access_token" in data["dados"]
@@ -29,29 +33,38 @@ class TestLogin:
         assert data["dados"]["usuario"]["email"] == user_locatario.email
 
     def test_login_com_mfa_retorna_temp_token(self, client, user_admin):
-        r = client.post("/api/v1/auth/login", json={
-            "email": user_admin.email,
-            "senha": TEST_SENHA,
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": user_admin.email,
+                "senha": TEST_SENHA,
+            },
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["mfa_required"] is True
         assert "temp_token" in data["dados"]
 
     def test_login_email_invalido(self, client):
-        r = client.post("/api/v1/auth/login", json={
-            "email": "naoexiste@test.com",
-            "senha": TEST_SENHA,
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "naoexiste@test.com",
+                "senha": TEST_SENHA,
+            },
+        )
         data = r.json()
         assert data["sucesso"] is False
         assert "inválidas" in data["erro"].lower()
 
     def test_login_senha_incorreta(self, client, user_locatario):
-        r = client.post("/api/v1/auth/login", json={
-            "email": user_locatario.email,
-            "senha": "senhaerrada",
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": user_locatario.email,
+                "senha": "senhaerrada",
+            },
+        )
         data = r.json()
         assert data["sucesso"] is False
 
@@ -67,27 +80,36 @@ class TestLogin:
         db.add(u)
         db.flush()
 
-        r = client.post("/api/v1/auth/login", json={
-            "email": "inativo@test.com",
-            "senha": TEST_SENHA,
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "inativo@test.com",
+                "senha": TEST_SENHA,
+            },
+        )
         data = r.json()
         assert data["sucesso"] is False
 
     def test_login_falho_responde_401_com_envelope(self, client):
         # ADR-0003: o erro mantém o envelope e o status acompanha o resultado
-        r = client.post("/api/v1/auth/login", json={
-            "email": "x@x.com",
-            "senha": "errado",
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "x@x.com",
+                "senha": "errado",
+            },
+        )
         assert r.status_code == 401
         assert r.json() == {"sucesso": False, "erro": "Credenciais inválidas"}
 
     def test_login_role_gestor_com_mfa(self, client, user_gestor):
-        r = client.post("/api/v1/auth/login", json={
-            "email": user_gestor.email,
-            "senha": TEST_SENHA,
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": user_gestor.email,
+                "senha": TEST_SENHA,
+            },
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["mfa_required"] is True
@@ -95,45 +117,58 @@ class TestLogin:
 
 # ── POST /auth/mfa/verify ─────────────────────────────────────────────────────────
 
+
 class TestMfaVerify:
     def test_mfa_verify_valido_retorna_tokens(self, client, user_admin):
         temp_token = create_temp_token(user_admin.id)
-        r = client.post("/api/v1/auth/mfa/verify", json={
-            "temp_token": temp_token,
-            "codigo": totp_now(),
-        })
+        r = client.post(
+            "/api/v1/auth/mfa/verify",
+            json={
+                "temp_token": temp_token,
+                "codigo": totp_now(),
+            },
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert "access_token" in data["dados"]
         assert "refresh_token" in data["dados"]
 
     def test_mfa_verify_token_invalido(self, client):
-        r = client.post("/api/v1/auth/mfa/verify", json={
-            "temp_token": "token.invalido.qualquer",
-            "codigo": "123456",
-        })
+        r = client.post(
+            "/api/v1/auth/mfa/verify",
+            json={
+                "temp_token": "token.invalido.qualquer",
+                "codigo": "123456",
+            },
+        )
         data = r.json()
         assert data["sucesso"] is False
         assert "inválido" in data["erro"].lower()
 
     def test_mfa_verify_token_tipo_errado(self, client, user_admin):
         # Envia um access token no lugar do temp_token MFA
-        access_token = create_temp_token.__module__  # não é um access token
         from app.auth import create_access_token
+
         wrong_token = create_access_token(user_admin.id, user_admin.role)
-        r = client.post("/api/v1/auth/mfa/verify", json={
-            "temp_token": wrong_token,
-            "codigo": totp_now(),
-        })
+        r = client.post(
+            "/api/v1/auth/mfa/verify",
+            json={
+                "temp_token": wrong_token,
+                "codigo": totp_now(),
+            },
+        )
         data = r.json()
         assert data["sucesso"] is False
 
     def test_mfa_verify_codigo_incorreto(self, client, user_admin):
         temp_token = create_temp_token(user_admin.id)
-        r = client.post("/api/v1/auth/mfa/verify", json={
-            "temp_token": temp_token,
-            "codigo": "000000",
-        })
+        r = client.post(
+            "/api/v1/auth/mfa/verify",
+            json={
+                "temp_token": temp_token,
+                "codigo": "000000",
+            },
+        )
         data = r.json()
         # 000000 pode acidentalmente ser o código válido; nesse caso o teste é skip
         if totp_now() == "000000":
@@ -142,20 +177,26 @@ class TestMfaVerify:
 
     def test_mfa_verify_usuario_inexistente_no_token(self, client):
         temp_token = create_temp_token("id-que-nao-existe")
-        r = client.post("/api/v1/auth/mfa/verify", json={
-            "temp_token": temp_token,
-            "codigo": totp_now(),
-        })
+        r = client.post(
+            "/api/v1/auth/mfa/verify",
+            json={
+                "temp_token": temp_token,
+                "codigo": totp_now(),
+            },
+        )
         data = r.json()
         assert data["sucesso"] is False
         assert "encontrado" in data["erro"].lower()
 
     def test_mfa_verify_retorna_dados_do_usuario(self, client, user_admin):
         temp_token = create_temp_token(user_admin.id)
-        r = client.post("/api/v1/auth/mfa/verify", json={
-            "temp_token": temp_token,
-            "codigo": totp_now(),
-        })
+        r = client.post(
+            "/api/v1/auth/mfa/verify",
+            json={
+                "temp_token": temp_token,
+                "codigo": totp_now(),
+            },
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["usuario"]["id"] == user_admin.id
@@ -163,6 +204,7 @@ class TestMfaVerify:
 
 
 # ── POST /auth/refresh ────────────────────────────────────────────────────────────
+
 
 class TestRefresh:
     def test_refresh_valido_retorna_novos_tokens(self, client, db, user_locatario):
@@ -196,6 +238,7 @@ class TestRefresh:
 
 
 # ── POST /auth/logout ─────────────────────────────────────────────────────────────
+
 
 class TestLogout:
     def test_logout_com_refresh_token(self, client, db, user_locatario, token_locatario):
@@ -243,6 +286,7 @@ class TestLogout:
 
 # ── MFA Extended Endpoints (Fase 2) ────────────────────────────────────────────────
 
+
 class TestMfaExtended:
     def test_login_com_mfa_setup_required(self, client, db):
         u = Usuario(
@@ -257,10 +301,13 @@ class TestMfaExtended:
         db.add(u)
         db.flush()
 
-        r = client.post("/api/v1/auth/login", json={
-            "email": "novo_admin@test.com",
-            "senha": TEST_SENHA,
-        })
+        r = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "novo_admin@test.com",
+                "senha": TEST_SENHA,
+            },
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["mfa_setup_required"] is True
@@ -291,13 +338,17 @@ class TestMfaExtended:
 
         # 2. POST /auth/mfa/activate-login com código válido
         import pyotp
+
         totp = pyotp.TOTP(secret)
         code = totp.now()
 
-        r_act = client.post("/api/v1/auth/mfa/activate-login", json={
-            "temp_token": temp_token,
-            "codigo": code,
-        })
+        r_act = client.post(
+            "/api/v1/auth/mfa/activate-login",
+            json={
+                "temp_token": temp_token,
+                "codigo": code,
+            },
+        )
         data_act = r_act.json()
         assert data_act["sucesso"] is True
         assert "access_token" in data_act["dados"]
@@ -312,6 +363,7 @@ class TestMfaExtended:
 
         # 2. POST /auth/mfa/activate
         import pyotp
+
         totp = pyotp.TOTP(secret)
         code = totp.now()
 

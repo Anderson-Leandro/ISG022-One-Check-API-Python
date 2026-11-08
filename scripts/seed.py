@@ -4,6 +4,7 @@ Em APP_ENV=development/test usa as credenciais fixas de demonstração. Fora dis
 gera senhas aleatórias (exibidas só aqui) e os perfis com MFA configuram o
 autenticador no primeiro login.
 """
+
 import sys
 from pathlib import Path
 

@@ -5,6 +5,7 @@ Antes, mfa_provisioning_data devolvia qr_url apontando para https://api.qrserver
 query string: quem abria o QR entregava a semente TOTP e o e-mail da conta a um serviço externo. Agora o QR
 vem como data URI (PNG) gerado pela API. O campo continua com o mesmo nome e funciona em <img src>.
 """
+
 import re
 
 import pytest
@@ -37,6 +38,7 @@ def test_qr_e_um_png_valido_do_otpauth_uri():
 
     import segno
     from PIL import Image
+
     dados = mfa_provisioning_data("usuario@test.com", "JBSWY3DPEHPK3PXP")
     png = base64.b64decode(dados["qr_url"].split(",", 1)[1])
     with Image.open(io.BytesIO(png)) as im:
@@ -47,8 +49,15 @@ def test_qr_e_um_png_valido_do_otpauth_uri():
 
 @pytest.fixture
 def novo_vistoriador(db):
-    u = Usuario(nome="Novo", email="novo.qr@test.com", senha_hash=_SENHA_HASH, role="vistoriador",
-                mfa_enabled=True, mfa_secret=None, ativo=True)
+    u = Usuario(
+        nome="Novo",
+        email="novo.qr@test.com",
+        senha_hash=_SENHA_HASH,
+        role="vistoriador",
+        mfa_enabled=True,
+        mfa_secret=None,
+        ativo=True,
+    )
     db.add(u)
     db.flush()
     return u

@@ -12,10 +12,11 @@ Regras verificadas:
   - perfis opcionais desativam com senha + código TOTP atual
   - reset por admin em perfil obrigatório força nova configuração no próximo login
 """
+
 import pytest
 
 from app.models import Usuario
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now
+from tests.conftest import _SENHA_HASH, MFA_TEST_SECRET, TEST_SENHA, auth, totp_now
 
 ROTAS_SELF = [
     ("POST", "/api/v1/auth/mfa/desabilitar"),
@@ -26,8 +27,13 @@ ROTAS_SELF = [
 @pytest.fixture
 def locatario_com_mfa(db):
     u = Usuario(
-        nome="Loc MFA", email="loc_mfa@test.com", senha_hash=_SENHA_HASH,
-        role="locatario", mfa_enabled=True, mfa_secret=MFA_TEST_SECRET, ativo=True,
+        nome="Loc MFA",
+        email="loc_mfa@test.com",
+        senha_hash=_SENHA_HASH,
+        role="locatario",
+        mfa_enabled=True,
+        mfa_secret=MFA_TEST_SECRET,
+        ativo=True,
     )
     db.add(u)
     db.flush()
@@ -37,6 +43,7 @@ def locatario_com_mfa(db):
 @pytest.fixture
 def token_locatario_com_mfa(locatario_com_mfa):
     from app.auth import create_access_token
+
     return create_access_token(locatario_com_mfa.id, locatario_com_mfa.role)
 
 
@@ -51,12 +58,11 @@ def _recarregar(db, user):
 
 # ── Perfis com MFA obrigatório ──────────────────────────────────────────────────
 
+
 class TestPerfilObrigatorio:
     @pytest.mark.parametrize("metodo,rota", ROTAS_SELF)
     @pytest.mark.parametrize("perfil", ["admin", "vistoriador", "gestor"])
-    def test_nao_desativa_o_proprio_mfa_mesmo_com_senha_e_codigo(
-        self, client, db, request, metodo, rota, perfil
-    ):
+    def test_nao_desativa_o_proprio_mfa_mesmo_com_senha_e_codigo(self, client, db, request, metodo, rota, perfil):
         user = request.getfixturevalue(f"user_{perfil}")
         token = request.getfixturevalue(f"token_{perfil}")
         r = _desativar(client, metodo, rota, token, {"senha": TEST_SENHA, "codigo": totp_now()})
@@ -67,6 +73,7 @@ class TestPerfilObrigatorio:
 
 
 # ── Perfis com MFA opcional ─────────────────────────────────────────────────────
+
 
 class TestPerfilOpcional:
     @pytest.mark.parametrize("metodo,rota", ROTAS_SELF)
@@ -115,11 +122,15 @@ class TestPerfilOpcional:
 
 # ── Reset feito por admin ───────────────────────────────────────────────────────
 
+
 class TestResetPorAdmin:
-    @pytest.mark.parametrize("metodo,rota", [
-        ("DELETE", "/api/v1/usuarios/{id}/mfa"),
-        ("POST", "/api/v1/usuarios/{id}/mfa/desabilitar"),
-    ])
+    @pytest.mark.parametrize(
+        "metodo,rota",
+        [
+            ("DELETE", "/api/v1/usuarios/{id}/mfa"),
+            ("POST", "/api/v1/usuarios/{id}/mfa/desabilitar"),
+        ],
+    )
     def test_reset_de_perfil_obrigatorio_forca_nova_configuracao(
         self, client, db, user_vistoriador, token_admin, metodo, rota
     ):
@@ -146,7 +157,9 @@ class TestResetPorAdmin:
         assert _recarregar(db, user_admin).mfa_secret == MFA_TEST_SECRET
 
     def test_put_nao_desliga_mfa_de_perfil_obrigatorio(self, client, db, user_vistoriador, token_admin):
-        r = client.put(f"/api/v1/usuarios/{user_vistoriador.id}", json={"mfa_enabled": False}, headers=auth(token_admin))
+        r = client.put(
+            f"/api/v1/usuarios/{user_vistoriador.id}", json={"mfa_enabled": False}, headers=auth(token_admin)
+        )
         assert r.json()["sucesso"] is False
         assert _recarregar(db, user_vistoriador).mfa_enabled is True
 

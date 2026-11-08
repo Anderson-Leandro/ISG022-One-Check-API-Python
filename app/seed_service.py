@@ -1,4 +1,5 @@
 """Seed completo + modo expand para enriquecer banco existente."""
+
 import secrets
 from datetime import date, timedelta
 
@@ -48,8 +49,12 @@ def _novo_usuario(nome: str, email: str, role: str, credenciais: list[dict]) -> 
     credenciais.append({"email": email, "senha": senha, "mfa": mfa})
     # Sem mfa_secret, perfis com MFA obrigatório configuram o autenticador no primeiro login
     return Usuario(
-        nome=nome, email=email, senha_hash=hash_password(senha), role=role,
-        mfa_enabled=mfa, mfa_secret=mfa_secret,
+        nome=nome,
+        email=email,
+        senha_hash=hash_password(senha),
+        role=role,
+        mfa_enabled=mfa,
+        mfa_secret=mfa_secret,
     )
 
 
@@ -216,10 +221,16 @@ def _populate_sample_data(
     loc3: Usuario | None,
 ) -> dict:
     catalog = [
-        ("Piso", "estrutura"), ("Paredes", "estrutura"), ("Teto", "estrutura"),
-        ("Portas", "acabamento"), ("Janelas", "acabamento"), ("Tomadas", "eletrica"),
-        ("Iluminação", "eletrica"), ("Pintura", "acabamento"),
-        ("Torneiras", "hidraulica"), ("Box", "banheiro"),
+        ("Piso", "estrutura"),
+        ("Paredes", "estrutura"),
+        ("Teto", "estrutura"),
+        ("Portas", "acabamento"),
+        ("Janelas", "acabamento"),
+        ("Tomadas", "eletrica"),
+        ("Iluminação", "eletrica"),
+        ("Pintura", "acabamento"),
+        ("Torneiras", "hidraulica"),
+        ("Box", "banheiro"),
     ]
     for nome, cat in catalog:
         db.add(ItemVistoria(nome=nome, categoria=cat))
@@ -230,33 +241,92 @@ def _populate_sample_data(
     loc_b = loc2 or loc1
     loc_c = loc3 or loc1
 
-    created.append(_create_imovel_com_contrato(
-        db, codigo="IM-001", titulo="Apartamento Centro", tipo="Apartamento", tamanho="65m²",
-        status_final="locado", locatario_id=loc1.id, vistoriador_id=vist1.id, valor=2500,
-        endereco={"rua": "Rua das Flores", "numero": "100", "bairro": "Centro", "cidade": "São Paulo", "estado": "SP", "cep": "01001000", "latitude": -23.5505, "longitude": -46.6333},
-        checklist_status="em_preenchimento", preencher_itens=True,
-        problemas=[{"titulo": "Torneira pingando", "descricao": "Cozinha", "prioridade": "normal", "status": "aberto"}],
-    ))
+    created.append(
+        _create_imovel_com_contrato(
+            db,
+            codigo="IM-001",
+            titulo="Apartamento Centro",
+            tipo="Apartamento",
+            tamanho="65m²",
+            status_final="locado",
+            locatario_id=loc1.id,
+            vistoriador_id=vist1.id,
+            valor=2500,
+            endereco={
+                "rua": "Rua das Flores",
+                "numero": "100",
+                "bairro": "Centro",
+                "cidade": "São Paulo",
+                "estado": "SP",
+                "cep": "01001000",
+                "latitude": -23.5505,
+                "longitude": -46.6333,
+            },
+            checklist_status="em_preenchimento",
+            preencher_itens=True,
+            problemas=[
+                {"titulo": "Torneira pingando", "descricao": "Cozinha", "prioridade": "normal", "status": "aberto"}
+            ],
+        )
+    )
 
-    created.append(_create_imovel_com_contrato(
-        db, codigo="IM-002", titulo="Casa Jardim América", tipo="Casa", tamanho="120m²",
-        status_final="locado", locatario_id=loc_b.id, vistoriador_id=vist_b.id, valor=4200,
-        offset_dias=-30,
-        endereco={"rua": "Av. Paulista", "numero": "1500", "bairro": "Bela Vista", "cidade": "São Paulo", "estado": "SP", "cep": "01310100", "latitude": -23.5614, "longitude": -46.6559},
-        checklist_status="pendente_aceite", preencher_itens=True,
-        problemas=[
-            {"titulo": "Infiltração no teto", "prioridade": "urgente", "status": "aberto"},
-            {"titulo": "Porta emperrada", "prioridade": "alta", "status": "aberto"},
-        ],
-    ))
+    created.append(
+        _create_imovel_com_contrato(
+            db,
+            codigo="IM-002",
+            titulo="Casa Jardim América",
+            tipo="Casa",
+            tamanho="120m²",
+            status_final="locado",
+            locatario_id=loc_b.id,
+            vistoriador_id=vist_b.id,
+            valor=4200,
+            offset_dias=-30,
+            endereco={
+                "rua": "Av. Paulista",
+                "numero": "1500",
+                "bairro": "Bela Vista",
+                "cidade": "São Paulo",
+                "estado": "SP",
+                "cep": "01310100",
+                "latitude": -23.5614,
+                "longitude": -46.6559,
+            },
+            checklist_status="pendente_aceite",
+            preencher_itens=True,
+            problemas=[
+                {"titulo": "Infiltração no teto", "prioridade": "urgente", "status": "aberto"},
+                {"titulo": "Porta emperrada", "prioridade": "alta", "status": "aberto"},
+            ],
+        )
+    )
 
-    created.append(_create_imovel_com_contrato(
-        db, codigo="IM-003", titulo="Studio Moema", tipo="Studio", tamanho="35m²",
-        status_final="locado", locatario_id=loc_c.id, vistoriador_id=vist1.id, valor=1800,
-        offset_dias=-60,
-        endereco={"rua": "Rua Gaivota", "numero": "200", "bairro": "Moema", "cidade": "São Paulo", "estado": "SP", "cep": "04522000", "latitude": -23.6012, "longitude": -46.6643},
-        checklist_status="aceito", preencher_itens=True,
-    ))
+    created.append(
+        _create_imovel_com_contrato(
+            db,
+            codigo="IM-003",
+            titulo="Studio Moema",
+            tipo="Studio",
+            tamanho="35m²",
+            status_final="locado",
+            locatario_id=loc_c.id,
+            vistoriador_id=vist1.id,
+            valor=1800,
+            offset_dias=-60,
+            endereco={
+                "rua": "Rua Gaivota",
+                "numero": "200",
+                "bairro": "Moema",
+                "cidade": "São Paulo",
+                "estado": "SP",
+                "cep": "04522000",
+                "latitude": -23.6012,
+                "longitude": -46.6643,
+            },
+            checklist_status="aceito",
+            preencher_itens=True,
+        )
+    )
 
     for codigo, titulo, tipo, tam in [
         ("IM-004", "Cobertura Vila Mariana", "Cobertura", "180m²"),
@@ -266,22 +336,39 @@ def _populate_sample_data(
         db.add(im)
         db.flush()
         ensure_default_comodos(db, im.id)
-        db.add(Endereco(
-            imovel_id=im.id, rua=f"Rua {codigo}", numero="50",
-            bairro="Vila Mariana", cidade="São Paulo", estado="SP", cep="04101000",
-            latitude=-23.5890 + (0.01 * int(codigo[-1])),
-            longitude=-46.6340 - (0.01 * int(codigo[-1])),
-        ))
+        db.add(
+            Endereco(
+                imovel_id=im.id,
+                rua=f"Rua {codigo}",
+                numero="50",
+                bairro="Vila Mariana",
+                cidade="São Paulo",
+                estado="SP",
+                cep="04101000",
+                latitude=-23.5890 + (0.01 * int(codigo[-1])),
+                longitude=-46.6340 - (0.01 * int(codigo[-1])),
+            )
+        )
 
-    im6 = Imovel(codigo="IM-006", titulo="Sala Comercial Pinheiros", tipo="Comercial", tamanho="90m²", status="em_vistoria")
+    im6 = Imovel(
+        codigo="IM-006", titulo="Sala Comercial Pinheiros", tipo="Comercial", tamanho="90m²", status="em_vistoria"
+    )
     db.add(im6)
     db.flush()
     ensure_default_comodos(db, im6.id)
-    db.add(Endereco(
-        imovel_id=im6.id, rua="Rua dos Pinheiros", numero="800",
-        bairro="Pinheiros", cidade="São Paulo", estado="SP", cep="05422000",
-        latitude=-23.5675, longitude=-46.7033,
-    ))
+    db.add(
+        Endereco(
+            imovel_id=im6.id,
+            rua="Rua dos Pinheiros",
+            numero="800",
+            bairro="Pinheiros",
+            cidade="São Paulo",
+            estado="SP",
+            cep="05422000",
+            latitude=-23.5675,
+            longitude=-46.7033,
+        )
+    )
 
     log_operacao(db, admin.id, "seed", "sistema", None, "Dados de exemplo recriados")
     db.commit()
@@ -398,17 +485,38 @@ def run_expand(db: Session) -> dict:
 
     created = []
     if loc2 and vist1:
-        created.append(_create_imovel_com_contrato(
-            db, codigo="IM-002", titulo="Casa Jardim América", tipo="Casa", tamanho="120m²",
-            status_final="locado", locatario_id=loc2.id, vistoriador_id=vist2.id, valor=4200,
-            offset_dias=-30,
-            endereco={"rua": "Av. Paulista", "numero": "1500", "bairro": "Bela Vista", "cidade": "São Paulo", "estado": "SP", "cep": "01310100", "latitude": -23.5614, "longitude": -46.6559},
-            checklist_status="pendente_aceite", preencher_itens=True,
-            problemas=[{"titulo": "Infiltração no teto", "prioridade": "urgente", "status": "aberto"}],
-        ))
+        created.append(
+            _create_imovel_com_contrato(
+                db,
+                codigo="IM-002",
+                titulo="Casa Jardim América",
+                tipo="Casa",
+                tamanho="120m²",
+                status_final="locado",
+                locatario_id=loc2.id,
+                vistoriador_id=vist2.id,
+                valor=4200,
+                offset_dias=-30,
+                endereco={
+                    "rua": "Av. Paulista",
+                    "numero": "1500",
+                    "bairro": "Bela Vista",
+                    "cidade": "São Paulo",
+                    "estado": "SP",
+                    "cep": "01310100",
+                    "latitude": -23.5614,
+                    "longitude": -46.6559,
+                },
+                checklist_status="pendente_aceite",
+                preencher_itens=True,
+                problemas=[{"titulo": "Infiltração no teto", "prioridade": "urgente", "status": "aberto"}],
+            )
+        )
 
     if not db.query(Imovel).filter(Imovel.codigo == "IM-004").first():
-        im = Imovel(codigo="IM-004", titulo="Cobertura Vila Mariana", tipo="Cobertura", tamanho="180m²", status="disponivel")
+        im = Imovel(
+            codigo="IM-004", titulo="Cobertura Vila Mariana", tipo="Cobertura", tamanho="180m²", status="disponivel"
+        )
         db.add(im)
         db.flush()
         ensure_default_comodos(db, im.id)

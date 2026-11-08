@@ -12,10 +12,11 @@ Regras verificadas:
   - requirements.lock fixa todas as dependências (inclusive transitivas) com hash,
     nas mesmas versões do requirements.txt
 """
+
 import base64
 import json
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import jwt
@@ -28,7 +29,7 @@ RAIZ = Path(__file__).resolve().parents[2]
 
 
 def _exp(minutos: int = 5) -> datetime:
-    return datetime.now(timezone.utc) + timedelta(minutes=minutos)
+    return datetime.now(UTC) + timedelta(minutes=minutos)
 
 
 def _b64(dados: dict) -> str:
@@ -71,7 +72,9 @@ class TestTokens:
 
     def test_assinatura_adulterada_recusada(self):
         cabecalho, _, assinatura = create_access_token("u-1", "locatario").split(".")
-        forjado = f"{cabecalho}.{_b64({'sub': 'u-1', 'type': 'access', 'role': 'admin', 'exp': 9999999999})}.{assinatura}"
+        forjado = (
+            f"{cabecalho}.{_b64({'sub': 'u-1', 'type': 'access', 'role': 'admin', 'exp': 9999999999})}.{assinatura}"
+        )
         assert decode_token(forjado) is None
 
 

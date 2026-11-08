@@ -226,13 +226,15 @@ def historico_imovel(
         + [("problema", p.created_at, p.id, serialize_problema(p)) for p in problemas]
     )
     eventos.sort(key=lambda e: (e[1] is None, e[1] or datetime.min, ordem[e[0]], e[2]))
-    return ok({
-        "imovel_id": imovel_id,
-        "eventos": [
-            {"tipo": tipo, "data": data.isoformat() if data else None, "dados": dados}
-            for tipo, data, _, dados in eventos
-        ],
-    })
+    return ok(
+        {
+            "imovel_id": imovel_id,
+            "eventos": [
+                {"tipo": tipo, "data": data.isoformat() if data else None, "dados": dados}
+                for tipo, data, _, dados in eventos
+            ],
+        }
+    )
 
 
 @router.put("/{imovel_id}")
@@ -247,7 +249,7 @@ def update_imovel(
         return fail("Imóvel não encontrado", status_code=404)
 
     data = body.model_dump(exclude_unset=True)
-    endereco_data = data.pop("endereco", None)
+    data.pop("endereco", None)
 
     for field, value in data.items():
         setattr(im, field, value)
@@ -339,6 +341,7 @@ def upsert_endereco(
 
 # ── Cômodos ───────────────────────────────────────────────────────────────────────
 
+
 @router.get("/{imovel_id}/comodos")
 def list_comodos(
     imovel_id: str,
@@ -351,12 +354,7 @@ def list_comodos(
     assert_acesso_imovel(db, imovel_id, user)
 
     ensure_default_comodos(db, imovel_id)
-    comodos = (
-        db.query(ImovelComodo)
-        .filter(ImovelComodo.imovel_id == imovel_id)
-        .order_by(ImovelComodo.tipo)
-        .all()
-    )
+    comodos = db.query(ImovelComodo).filter(ImovelComodo.imovel_id == imovel_id).order_by(ImovelComodo.tipo).all()
     return ok([serialize_comodo(c) for c in comodos])
 
 
@@ -395,10 +393,14 @@ def update_comodo(
     if not im:
         return fail("Imóvel não encontrado", status_code=404)
 
-    comodo = db.query(ImovelComodo).filter(
-        ImovelComodo.id == comodo_id,
-        ImovelComodo.imovel_id == imovel_id,
-    ).first()
+    comodo = (
+        db.query(ImovelComodo)
+        .filter(
+            ImovelComodo.id == comodo_id,
+            ImovelComodo.imovel_id == imovel_id,
+        )
+        .first()
+    )
     if not comodo:
         return fail("Cômodo não encontrado", status_code=404)
 
@@ -425,10 +427,14 @@ def delete_comodo(
     if not im:
         return fail("Imóvel não encontrado", status_code=404)
 
-    comodo = db.query(ImovelComodo).filter(
-        ImovelComodo.id == comodo_id,
-        ImovelComodo.imovel_id == imovel_id,
-    ).first()
+    comodo = (
+        db.query(ImovelComodo)
+        .filter(
+            ImovelComodo.id == comodo_id,
+            ImovelComodo.imovel_id == imovel_id,
+        )
+        .first()
+    )
     if not comodo:
         return fail("Cômodo não encontrado", status_code=404)
 
@@ -444,4 +450,3 @@ def delete_comodo(
         return fail(_COMODO_EM_USO, status_code=409)
     log_operacao(db, user.id, "delete", "comodo", comodo_id)
     return ok(None)
-

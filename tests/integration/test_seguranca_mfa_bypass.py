@@ -12,12 +12,13 @@ Rotas cobertas:
   POST /auth/mfa/activate-login
   POST /auth/mfa/verify
 """
+
 import pyotp
 import pytest
 
 from app.auth import create_mfa_setup_token, create_temp_token, decode_token
 from app.models import Usuario
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, totp_now
+from tests.conftest import _SENHA_HASH, MFA_TEST_SECRET, TEST_SENHA, totp_now
 
 
 def _login(client, email: str) -> dict:
@@ -44,6 +45,7 @@ def user_sem_autenticador(db):
 
 
 # ── Ataque: usuário com MFA ativo ───────────────────────────────────────────────
+
 
 class TestBypassMfa:
     def test_ataque_completo_nao_emite_tokens(self, client, db, user_admin):
@@ -95,6 +97,7 @@ class TestBypassMfa:
 
 # ── Tipos de token ──────────────────────────────────────────────────────────────
 
+
 class TestTiposDeTokenMfa:
     def test_login_com_mfa_ativo_emite_token_de_verificacao(self, client, user_admin):
         temp = _login(client, user_admin.email)["temp_token"]
@@ -110,15 +113,14 @@ class TestTiposDeTokenMfa:
         r = client.post("/api/v1/auth/mfa/verify", json={"temp_token": token, "codigo": "123456"})
         assert r.json()["sucesso"] is False
 
-    def test_token_de_verificacao_nao_serve_para_setup_mesmo_sem_autenticador(
-        self, client, user_sem_autenticador
-    ):
+    def test_token_de_verificacao_nao_serve_para_setup_mesmo_sem_autenticador(self, client, user_sem_autenticador):
         token = create_temp_token(user_sem_autenticador.id)
         r = client.get(f"/api/v1/auth/mfa/setup-login?temp_token={token}")
         assert r.status_code == 401
 
 
 # ── Fluxo legítimo de primeiro acesso ───────────────────────────────────────────
+
 
 class TestSetupMfaPrimeiroAcesso:
     def test_fluxo_completo_promove_segredo_pendente(self, client, db, user_sem_autenticador):

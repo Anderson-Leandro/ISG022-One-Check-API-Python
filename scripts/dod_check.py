@@ -20,6 +20,7 @@ Sem --antes-do-merge (padrão, depois do merge), confere:
 Com --antes-do-merge, confere o PR aberto da branch atual (itens 3 a 6) antes de pedir o merge.
 Sai com 1 se alguma verificação falhar.
 """
+
 import functools
 import json
 import re
@@ -64,9 +65,9 @@ def testes_alterados(pr: dict) -> list[str]:
         caminho = f["path"]
         if not caminho.startswith("tests/") or not caminho.endswith(".py"):
             continue
-        existia = subprocess.run(
-            ["git", "cat-file", "-e", f"{ref}:{caminho}"], cwd=RAIZ, capture_output=True
-        ).returncode == 0
+        existia = (
+            subprocess.run(["git", "cat-file", "-e", f"{ref}:{caminho}"], cwd=RAIZ, capture_output=True).returncode == 0
+        )
         if existia and f.get("deletions", 0) > 0:
             alterados.append(caminho)
     return alterados
@@ -77,7 +78,7 @@ def secao(registro: str, titulo: str) -> str | None:
     achado = re.search(rf"^## {re.escape(titulo)}(?:\s*[(:—–][^\n]*)?\s*$", registro, re.M)
     if not achado:
         return None
-    return registro[achado.end():].split("\n## ", 1)[0]
+    return registro[achado.end() :].split("\n## ", 1)[0]
 
 
 def cita_id(texto: str, iid: str) -> bool:
@@ -88,8 +89,9 @@ def cita_id(texto: str, iid: str) -> bool:
     if not numero.isdigit():
         return False
     intervalo = rf"\b{re.escape(prefixo)}-(\d+)\s*(?:a|até|–|—|-)\s*{re.escape(prefixo)}-(\d+)\b"
-    return any(len(a) == len(b) == len(numero) and int(a) <= int(numero) <= int(b)
-               for a, b in re.findall(intervalo, texto))
+    return any(
+        len(a) == len(b) == len(numero) and int(a) <= int(numero) <= int(b) for a, b in re.findall(intervalo, texto)
+    )
 
 
 def faltando_no_relatorio(alterados: list[str], relatorio: str, arquivos_de_teste: list[str]) -> list[str]:
@@ -101,7 +103,9 @@ def faltando_no_relatorio(alterados: list[str], relatorio: str, arquivos_de_test
         if caminho in relatorio:
             return True
         nome = Path(caminho).name
-        return nomes.count(nome) == 1 and re.search(rf"(?<![\w.\-/]){re.escape(nome)}(?![\w.\-])", relatorio) is not None
+        return (
+            nomes.count(nome) == 1 and re.search(rf"(?<![\w.\-/]){re.escape(nome)}(?![\w.\-])", relatorio) is not None
+        )
 
     return [a for a in alterados if not citado(a)]
 
@@ -138,8 +142,10 @@ def conferir_pr(iid: str, numero: str, registro: str, depois_do_merge: bool) -> 
     if pr["baseRefName"] == "main" and pr["headRefName"] == "dev":
         # PR de release (dev → main): não é PR de implementação do item; confere só o merge e o CI
         checks = pr.get("statusCheckRollup") or []
-        ok(pr["state"] == "MERGED" and checks and all(c.get("conclusion") == "SUCCESS" for c in checks),
-           f"{rotulo}: release na main mesclada com o CI verde")
+        ok(
+            pr["state"] == "MERGED" and checks and all(c.get("conclusion") == "SUCCESS" for c in checks),
+            f"{rotulo}: release na main mesclada com o CI verde",
+        )
         return False
     if depois_do_merge:
         ok(pr["state"] == "MERGED" and pr["baseRefName"] == "dev", f"{rotulo} mesclado na dev")
@@ -158,10 +164,15 @@ def conferir_pr(iid: str, numero: str, registro: str, depois_do_merge: bool) -> 
     if alterados:
         relatorio = secao(registro, "Testes existentes alterados") or ""
         faltando = faltando_no_relatorio(alterados, relatorio, arquivos_de_teste())
-        ok(not faltando, f"{rotulo}: relatório cita cada teste existente alterado"
-           + (f" (faltam: {', '.join(faltando)})" if faltando else ""))
-        ok(re.search(r"Aprovado por:\s*\S+.*\d{4}-\d{2}-\d{2}", relatorio),
-           f"{rotulo}: alteração de testes existentes aprovada pelo usuário (linha 'Aprovado por: <nome> em AAAA-MM-DD')")
+        ok(
+            not faltando,
+            f"{rotulo}: relatório cita cada teste existente alterado"
+            + (f" (faltam: {', '.join(faltando)})" if faltando else ""),
+        )
+        ok(
+            re.search(r"Aprovado por:\s*\S+.*\d{4}-\d{2}-\d{2}", relatorio),
+            f"{rotulo}: alteração de testes existentes aprovada pelo usuário (linha 'Aprovado por: <nome> em AAAA-MM-DD')",
+        )
     return True
 
 
@@ -178,7 +189,7 @@ def checklist_pendente(registro: str) -> list[str] | None:
     achado = _CHECKLIST.search(registro)
     if not achado:
         return None
-    corpo = registro[achado.end():].split("\n## ", 1)[0]
+    corpo = registro[achado.end() :].split("\n## ", 1)[0]
     caixas = [m for m in map(_CAIXA.match, corpo.splitlines()) if m]
     if not caixas:
         return ["a seção não tem as linhas da checklist"]
@@ -205,10 +216,15 @@ def main() -> int:
             ok(corpo and "<!--" not in corpo[:4], f"registro: seção '{s[3:]}' preenchida")
         pendentes = checklist_pendente(registro)
         if pendentes is not None:
-            ok(not pendentes, "registro: checklist antes da revisão respondida"
-               + (f" (sem resposta: {'; '.join(pendentes)})" if pendentes else ""))
-        ok(auditoria_rodou(secao(registro, "Segurança") or ""),
-           "registro: security-audit rodada e com resultado (sem 'não foi rodada' ou auditoria pendente)")
+            ok(
+                not pendentes,
+                "registro: checklist antes da revisão respondida"
+                + (f" (sem resposta: {'; '.join(pendentes)})" if pendentes else ""),
+            )
+        ok(
+            auditoria_rodou(secao(registro, "Segurança") or ""),
+            "registro: security-audit rodada e com resultado (sem 'não foi rodada' ou auditoria pendente)",
+        )
 
     if depois:
         prs = [str(p).lstrip("#") for p in (item.get("links", {}) or {}).get("prs", []) or []]
@@ -242,8 +258,15 @@ def main() -> int:
             ok(cita_id(acomp, iid), f"acompanhamento da Sprint {sprint} cita {iid}")
 
     validar = subprocess.run(
-        ["python3", str(Path.home() / ".claude/skills/_roadmap-shared/scripts/backlog.py"), "--root", str(RAIZ), "validate"],
-        capture_output=True, text=True,
+        [
+            "python3",
+            str(Path.home() / ".claude/skills/_roadmap-shared/scripts/backlog.py"),
+            "--root",
+            str(RAIZ),
+            "validate",
+        ],
+        capture_output=True,
+        text=True,
     )
     ok(validar.returncode == 0, "backlog valida sem erros")
     return relatorio(iid)

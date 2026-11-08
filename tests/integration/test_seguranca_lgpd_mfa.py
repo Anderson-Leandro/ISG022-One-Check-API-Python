@@ -16,7 +16,8 @@ Regras verificadas:
   - a limpeza apaga refresh tokens vencidos e logs mais antigos que a retenção
   - o admin só exige ou reseta o MFA; o segredo é gerado no login do próprio usuário
 """
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pyotp
@@ -25,7 +26,7 @@ import pytest
 from app.cpf import mascarar_cpf, validar_cpf
 from app.models import LogOperacao, RefreshToken, Usuario
 from app.retencao import limpar_dados_vencidos
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth
+from tests.conftest import _SENHA_HASH, MFA_TEST_SECRET, TEST_SENHA, auth
 
 RAIZ = Path(__file__).resolve().parents[2]
 USUARIOS = "/api/v1/usuarios"
@@ -34,10 +35,11 @@ MASCARADO = "***.982.247-**"
 
 
 def _agora() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 # ── SEC-014: validação e máscara ─────────────────────────────────────────────────
+
 
 class TestCpf:
     @pytest.mark.parametrize("valor", [CPF, "52998224725", " 529.982.247-25 "])
@@ -86,21 +88,32 @@ class TestCpfNasRespostas:
         assert r.json()["dados"]["cpf"] == MASCARADO
 
     def test_criacao_valida_e_mascara(self, client, db, token_admin):
-        body = {"nome": "N", "email": "n@test.com", "senha": "Vistoria-Casa-42", "role": "locatario",
-                "cpf": "52998224725"}
+        body = {
+            "nome": "N",
+            "email": "n@test.com",
+            "senha": "Vistoria-Casa-42",
+            "role": "locatario",
+            "cpf": "52998224725",
+        }
         r = client.post(USUARIOS, json=body, headers=auth(token_admin))
         assert r.json()["dados"]["cpf"] == MASCARADO
         assert db.query(Usuario).filter(Usuario.email == "n@test.com").one().cpf == CPF
 
     def test_criacao_recusa_cpf_invalido(self, client, db, token_admin):
-        body = {"nome": "N", "email": "n@test.com", "senha": "Vistoria-Casa-42", "role": "locatario",
-                "cpf": "111.111.111-11"}
+        body = {
+            "nome": "N",
+            "email": "n@test.com",
+            "senha": "Vistoria-Casa-42",
+            "role": "locatario",
+            "cpf": "111.111.111-11",
+        }
         r = client.post(USUARIOS, json=body, headers=auth(token_admin))
         assert r.status_code == 422
         assert db.query(Usuario).filter(Usuario.email == "n@test.com").count() == 0
 
 
 # ── SEC-014: retenção ────────────────────────────────────────────────────────────
+
 
 class TestRetencao:
     def _token(self, db, usuario, expira):
@@ -118,6 +131,7 @@ class TestRetencao:
 
     def test_apaga_logs_alem_da_retencao(self, db, monkeypatch):
         import app.retencao as retencao
+
         monkeypatch.setattr(retencao, "LOG_RETENCAO_DIAS", 200)
         self._log(db, _agora() - timedelta(days=201))
         self._log(db, _agora() - timedelta(days=199))
@@ -127,6 +141,7 @@ class TestRetencao:
 
     def test_script_de_limpeza(self, db, user_locatario, capsys):
         import importlib.util
+
         spec = importlib.util.spec_from_file_location("limpeza", RAIZ / "scripts" / "limpar_dados_vencidos.py")
         script = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(script)
@@ -140,7 +155,9 @@ class TestRetencao:
 
     def test_retencao_minima_de_seis_meses(self, monkeypatch):
         import importlib
+
         import app.config as config
+
         monkeypatch.setenv("LOG_RETENCAO_DIAS", "30")
         with pytest.raises(RuntimeError, match="180"):
             importlib.reload(config)
@@ -149,6 +166,7 @@ class TestRetencao:
 
 
 # ── SEC-015: MFA de outro usuário ────────────────────────────────────────────────
+
 
 class TestMfaPorTerceiros:
     def test_setup_de_outro_usuario_nao_existe(self, client, user_vistoriador, token_admin):
@@ -159,16 +177,20 @@ class TestMfaPorTerceiros:
     @pytest.mark.parametrize("sufixo", ["/mfa/enable", "/mfa/habilitar"])
     def test_admin_nao_define_o_segredo(self, client, db, user_locatario, token_admin, sufixo):
         segredo = pyotp.random_base32()
-        r = client.post(f"{USUARIOS}/{user_locatario.id}{sufixo}",
-                        json={"secret": segredo, "codigo": pyotp.TOTP(segredo).now()}, headers=auth(token_admin))
+        r = client.post(
+            f"{USUARIOS}/{user_locatario.id}{sufixo}",
+            json={"secret": segredo, "codigo": pyotp.TOTP(segredo).now()},
+            headers=auth(token_admin),
+        )
         assert r.status_code == 422 and "secret" in r.json()["erros"]
         db.expire_all()
         assert db.get(Usuario, user_locatario.id).mfa_secret is None
 
     def test_admin_exige_mfa_e_o_usuario_configura_no_login(self, client, db, token_admin):
         # Vistoriador sem autenticador: o próximo login pede a configuração, com segredo gerado no servidor
-        vist = Usuario(nome="V", email="v2@test.com", senha_hash=_SENHA_HASH, role="vistoriador",
-                       mfa_enabled=False, ativo=True)
+        vist = Usuario(
+            nome="V", email="v2@test.com", senha_hash=_SENHA_HASH, role="vistoriador", mfa_enabled=False, ativo=True
+        )
         db.add(vist)
         db.commit()
         r = client.post(f"{USUARIOS}/{vist.id}/mfa/enable", headers=auth(token_admin))

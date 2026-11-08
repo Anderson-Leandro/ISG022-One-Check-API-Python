@@ -33,13 +33,15 @@ def _jwt_secret() -> str:
     if IS_DEV:
         if publico:
             # Tokens deixam de valer a cada reinício; serve só para desenvolvimento
-            logging.getLogger(__name__).warning("JWT_SECRET ausente ou público: usando valor aleatório (APP_ENV=%s)", APP_ENV)
+            logging.getLogger(__name__).warning(
+                "JWT_SECRET ausente ou público: usando valor aleatório (APP_ENV=%s)", APP_ENV
+            )
             return secrets.token_urlsafe(48)
         return valor
     if publico or len(valor) < MIN_SECRET_LEN:
         raise RuntimeError(
             f"JWT_SECRET ausente, público ou com menos de {MIN_SECRET_LEN} caracteres. "
-            "Gere um com: python -c \"import secrets; print(secrets.token_urlsafe(48))\" "
+            'Gere um com: python -c "import secrets; print(secrets.token_urlsafe(48))" '
             "(ou use APP_ENV=development localmente)."
         )
     return valor
@@ -62,7 +64,9 @@ _PUBLIC_SEED_SECRETS = {"onecheck-seed-dev"}
 _seed_secret = os.getenv("SEED_SECRET", "").strip()
 SEED_SECRET = "" if _seed_secret in _PUBLIC_SEED_SECRETS else _seed_secret
 if SEED_SECRET and not IS_DEV and len(SEED_SECRET) < MIN_SECRET_LEN:
-    raise RuntimeError(f"SEED_SECRET precisa ter pelo menos {MIN_SECRET_LEN} caracteres (ou ficar vazio para desabilitar /admin/*).")
+    raise RuntimeError(
+        f"SEED_SECRET precisa ter pelo menos {MIN_SECRET_LEN} caracteres (ou ficar vazio para desabilitar /admin/*)."
+    )
 
 # force=true e refresh_data apagam dados: só com opt-in explícito
 SEED_ALLOW_DESTRUCTIVE = os.getenv("SEED_ALLOW_DESTRUCTIVE", "false").strip().lower() in ("1", "true", "yes")
@@ -86,4 +90,6 @@ RATE_LIMIT_JANELA_MIN = int(os.getenv("RATE_LIMIT_JANELA_MIN", "15"))
 LOG_RETENCAO_MIN_DIAS = 180
 LOG_RETENCAO_DIAS = int(os.getenv("LOG_RETENCAO_DIAS", "365"))
 if LOG_RETENCAO_DIAS < LOG_RETENCAO_MIN_DIAS:
-    raise RuntimeError(f"LOG_RETENCAO_DIAS precisa ser de pelo menos {LOG_RETENCAO_MIN_DIAS} dias (registros de acesso, Marco Civil art. 15).")
+    raise RuntimeError(
+        f"LOG_RETENCAO_DIAS precisa ser de pelo menos {LOG_RETENCAO_MIN_DIAS} dias (registros de acesso, Marco Civil art. 15)."
+    )

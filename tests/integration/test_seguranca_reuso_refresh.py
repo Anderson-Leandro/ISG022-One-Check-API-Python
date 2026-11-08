@@ -5,6 +5,7 @@ A rotação apagava o refresh usado: quem roubasse um refresh e o usasse antes d
 paralela, e o reuso pelo dono só falhava. Agora o refresh trocado fica marcado como usado; reenviá-lo é
 sinal de roubo, e a API nega, encerra todas as sessões do usuário e registra o evento na auditoria.
 """
+
 from app.models import LogOperacao, RefreshToken, Usuario
 from tests.conftest import TEST_SENHA, auth
 
@@ -32,10 +33,10 @@ def test_uso_legitimo_um_refresh_por_vez_continua_funcionando(client, user_locat
 
 def test_reuso_de_refresh_trocado_nega_e_encerra_todas_as_sessoes(client, db, user_locatario):
     roubado = _login(client, user_locatario.email)["refresh_token"]
-    dono = _refresh(client, roubado).json()["dados"]          # o dono troca primeiro
-    outra = _login(client, user_locatario.email)               # outra sessão do mesmo usuário
+    dono = _refresh(client, roubado).json()["dados"]  # o dono troca primeiro
+    outra = _login(client, user_locatario.email)  # outra sessão do mesmo usuário
 
-    r = _refresh(client, roubado)                              # o atacante reenvia o trocado
+    r = _refresh(client, roubado)  # o atacante reenvia o trocado
 
     assert r.status_code == 401, r.text
     assert r.json()["erro"] == "Refresh token inválido ou expirado"
@@ -76,6 +77,7 @@ def test_refresh_desconhecido_continua_401_sem_encerrar_nada(client, db, user_lo
 def test_pedidos_simultaneos_so_um_recebe_o_par_novo(client, db, user_locatario):
     """A troca é atômica: o segundo pedido com o mesmo token vê o token já marcado e cai no reuso."""
     from app.auth import trocar_refresh_token
+
     roubado = _login(client, user_locatario.email)["refresh_token"]
     primeiro, _ = trocar_refresh_token(db, roubado)
     segundo, _ = trocar_refresh_token(db, roubado)
@@ -84,10 +86,12 @@ def test_pedidos_simultaneos_so_um_recebe_o_par_novo(client, db, user_locatario)
 
 def test_refresh_trocado_e_vencido_nao_encerra_as_sessoes(client, db, user_locatario):
     from datetime import datetime, timedelta
+
     roubado = _login(client, user_locatario.email)["refresh_token"]
     atual = _refresh(client, roubado).json()["dados"]
     db.query(RefreshToken).filter(RefreshToken.usado_em.isnot(None)).update(
-        {RefreshToken.expires_at: datetime.now() - timedelta(days=1)})
+        {RefreshToken.expires_at: datetime.now() - timedelta(days=1)}
+    )
     db.flush()
 
     assert _refresh(client, roubado).status_code == 401

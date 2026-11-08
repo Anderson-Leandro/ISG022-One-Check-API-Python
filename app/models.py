@@ -2,12 +2,12 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Date,
     DateTime,
     ForeignKey,
     Integer,
-    JSON,
     Numeric,
     String,
     Text,
@@ -158,7 +158,9 @@ class Checklist(Base):
 
     contrato: Mapped[Contrato] = relationship(back_populates="checklists")
     itens: Mapped[list["ChecklistItem"]] = relationship(back_populates="checklist", cascade="all, delete-orphan")
-    aceite: Mapped["AceiteChecklist | None"] = relationship(back_populates="checklist", uselist=False, cascade="all, delete-orphan")
+    aceite: Mapped["AceiteChecklist | None"] = relationship(
+        back_populates="checklist", uselist=False, cascade="all, delete-orphan"
+    )
 
 
 class AceiteChecklist(Base):
@@ -228,7 +230,9 @@ class Problema(Base):
 
     contrato: Mapped[Contrato] = relationship(back_populates="problemas")
     comodo: Mapped["ImovelComodo | None"] = relationship()
-    atualizacoes: Mapped[list["AtualizacaoProblema"]] = relationship(back_populates="problema", cascade="all, delete-orphan")
+    atualizacoes: Mapped[list["AtualizacaoProblema"]] = relationship(
+        back_populates="problema", cascade="all, delete-orphan"
+    )
 
 
 class AtualizacaoProblema(Base):

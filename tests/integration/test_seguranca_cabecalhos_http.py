@@ -16,6 +16,7 @@ Regras verificadas:
 
 Os casos de produção rodam num processo novo, porque a configuração é lida na importação.
 """
+
 import json
 import os
 import subprocess
@@ -46,16 +47,28 @@ print(json.dumps(saida))
 
 def _em_producao(requisicoes, tmp_path, **env):
     base = {k: v for k, v in os.environ.items() if k not in ("CORS_ORIGINS", "DOCS_ENABLED")}
-    base.update({
-        "APP_ENV": "production", "JWT_SECRET": "x" * 48, "SEED_SECRET": "",
-        "DATABASE_URL": f"sqlite:///{tmp_path / 'prod.db'}", "UPLOAD_DIR": str(tmp_path / "uploads"),
-        "CORS_ORIGINS": "", "DOCS_ENABLED": "",
-    })
+    base.update(
+        {
+            "APP_ENV": "production",
+            "JWT_SECRET": "x" * 48,
+            "SEED_SECRET": "",
+            "DATABASE_URL": f"sqlite:///{tmp_path / 'prod.db'}",
+            "UPLOAD_DIR": str(tmp_path / "uploads"),
+            "CORS_ORIGINS": "",
+            "DOCS_ENABLED": "",
+        }
+    )
     base.update(env)
     # None remove a variável do ambiente (caso "não configurada")
     base = {k: v for k, v in base.items() if v is not None}
-    r = subprocess.run([sys.executable, "-c", _SCRIPT, json.dumps(requisicoes)],
-                       cwd=RAIZ, env=base, capture_output=True, text=True, timeout=60)
+    r = subprocess.run(
+        [sys.executable, "-c", _SCRIPT, json.dumps(requisicoes)],
+        cwd=RAIZ,
+        env=base,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
     assert r.returncode == 0, r.stderr
     return json.loads(r.stdout.strip().splitlines()[-1])
 
@@ -67,7 +80,9 @@ def _preflight(origem):
 class TestCorsProducao:
     @pytest.mark.parametrize("valor", [None, ""], ids=["ausente", "vazio"])
     def test_sem_cors_origins_nenhuma_origem_e_aceita(self, tmp_path, valor):
-        r, simples = _em_producao([_preflight(FRONT), ["GET", "/api/v1/health", {"Origin": ESTRANHO}]], tmp_path, CORS_ORIGINS=valor)
+        r, simples = _em_producao(
+            [_preflight(FRONT), ["GET", "/api/v1/health", {"Origin": ESTRANHO}]], tmp_path, CORS_ORIGINS=valor
+        )
         assert "access-control-allow-origin" not in r["headers"]
         assert "access-control-allow-origin" not in simples["headers"]
 
@@ -127,7 +142,11 @@ class TestCabecalhos:
         elif caso == "404":
             r = client.get("/api/v1/nao-existe")
         else:
-            r = client.post("/api/v1/auth/login", content=b"{}", headers={"Content-Type": "application/json", "Content-Length": str(10**9)})
+            r = client.post(
+                "/api/v1/auth/login",
+                content=b"{}",
+                headers={"Content-Type": "application/json", "Content-Length": str(10**9)},
+            )
         assert r.status_code == int(caso)
         self._confere(r)
 
@@ -136,6 +155,7 @@ class TestCabecalhos:
 
     def test_foto_mantem_cache_e_csp(self, client, db, checklist, imovel, token_vistoriador):
         from app.models import ChecklistItem, ImovelComodo, ItemVistoria
+
         comodo = db.query(ImovelComodo).filter(ImovelComodo.imovel_id == imovel.id).first()
         iv = ItemVistoria(nome="Piso", categoria="Acabamento")
         db.add(iv)
@@ -143,10 +163,13 @@ class TestCabecalhos:
         item = ChecklistItem(checklist_id=checklist.id, comodo_id=comodo.id, item_vistoria_id=iv.id, estado="bom")
         db.add(item)
         db.flush()
-        up = client.post(f"/api/v1/checklists/{checklist.id}/itens/{item.id}/fotos",
-                         files={"foto": ("a.png", small_image_bytes(), "image/png")}, headers=auth(token_vistoriador))
+        up = client.post(
+            f"/api/v1/checklists/{checklist.id}/itens/{item.id}/fotos",
+            files={"foto": ("a.png", small_image_bytes(), "image/png")},
+            headers=auth(token_vistoriador),
+        )
         url = up.json()["dados"]["url"]
-        r = client.get(url[url.index("/api/v1/"):])
+        r = client.get(url[url.index("/api/v1/") :])
         assert r.status_code == 200
         assert r.headers.get("cache-control") != "no-store"
         assert "sandbox" in r.headers["content-security-policy"]

@@ -8,6 +8,7 @@ Uso (aponte DATABASE_URL para o banco a corrigir):
     python scripts/rotacionar_credenciais_demo.py           # só lista as contas expostas
     python scripts/rotacionar_credenciais_demo.py --aplicar # troca as credenciais
 """
+
 import sys
 from pathlib import Path
 

@@ -1,5 +1,5 @@
-from unittest.mock import MagicMock, patch
 import json
+from unittest.mock import MagicMock, patch
 
 from app.geocoding import buscar_coordenadas, buscar_endereco_por_cep
 
@@ -11,12 +11,14 @@ def test_buscar_endereco_por_cep_invalido():
 
 def test_buscar_endereco_por_cep_sucesso():
     mock_resp = MagicMock()
-    mock_resp.read.return_value = json.dumps({
-        "logradouro": "Praça da Sé",
-        "bairro": "Sé",
-        "localidade": "São Paulo",
-        "uf": "SP",
-    }).encode("utf-8")
+    mock_resp.read.return_value = json.dumps(
+        {
+            "logradouro": "Praça da Sé",
+            "bairro": "Sé",
+            "localidade": "São Paulo",
+            "uf": "SP",
+        }
+    ).encode("utf-8")
     mock_resp.__enter__.return_value = mock_resp
 
     with patch("urllib.request.urlopen", return_value=mock_resp):
@@ -43,9 +45,7 @@ def test_buscar_coordenadas_vazio():
 
 def test_buscar_coordenadas_sucesso():
     mock_resp = MagicMock()
-    mock_resp.read.return_value = json.dumps([
-        {"lat": "-23.5505", "lon": "-46.6333"}
-    ]).encode("utf-8")
+    mock_resp.read.return_value = json.dumps([{"lat": "-23.5505", "lon": "-46.6333"}]).encode("utf-8")
     mock_resp.__enter__.return_value = mock_resp
 
     with patch("urllib.request.urlopen", return_value=mock_resp):

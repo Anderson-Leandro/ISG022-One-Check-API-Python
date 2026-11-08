@@ -14,12 +14,13 @@ Regras verificadas:
   - o log de notificações não tem e-mail nem conteúdo da mensagem
   - o login confere a senha contra um hash de mesmo custo quando a conta não existe
 """
+
 import logging
 
 import pytest
 
 import app.auth as auth_mod
-from app.models import LogOperacao, Usuario
+from app.models import LogOperacao
 from app.notification_service import notificar_admins, notificar_usuario
 from app.serializers import log_operacao
 from tests.conftest import TEST_SENHA, auth
@@ -34,6 +35,7 @@ def _ultimo(db, acao: str) -> LogOperacao:
 
 
 # ── SEC-010: IP de origem ────────────────────────────────────────────────────────
+
 
 class TestIpDeOrigem:
     def test_login_falho_grava_ip(self, client, db, user_locatario):
@@ -59,10 +61,14 @@ class TestIpDeOrigem:
 
 # ── SEC-010: campos alterados ────────────────────────────────────────────────────
 
+
 class TestCamposAlterados:
     def test_admin_edita_usuario(self, client, db, user_locatario, token_admin):
-        client.put(f"{USUARIOS}/{user_locatario.id}", json={"nome": "Outro", "senha": "senha-nova-123"},
-                   headers=auth(token_admin))
+        client.put(
+            f"{USUARIOS}/{user_locatario.id}",
+            json={"nome": "Outro", "senha": "senha-nova-123"},
+            headers=auth(token_admin),
+        )
         log = _ultimo(db, "update")
         assert log.payload == {"campos": ["nome", "senha_hash"]}
         assert "senha-nova-123" not in str(log.payload) and "Outro" not in str(log.payload)
@@ -85,6 +91,7 @@ class TestCamposAlterados:
 
 # ── SEC-010: PII no log de notificações ──────────────────────────────────────────
 
+
 class TestLogDeNotificacoes:
     def test_sem_email_nem_conteudo(self, db, user_locatario, user_admin, caplog):
         with caplog.at_level(logging.INFO, logger="onecheck.notifications"):
@@ -97,6 +104,7 @@ class TestLogDeNotificacoes:
 
 
 # ── SEC-013: tempo do login ──────────────────────────────────────────────────────
+
 
 class TestLoginSemEnumeracao:
     @pytest.fixture
