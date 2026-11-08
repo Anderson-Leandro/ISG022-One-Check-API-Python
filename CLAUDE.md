@@ -6,14 +6,15 @@ nas Issues do GitHub. Convenções da API no `README.md`; decisões em `docs/adr
 ## Modo de execução da sprint
 **Modo de execução:** confirmar cada item
 
-A execução segue `.claude/skills/sprint-executor/SKILL.md` (`/sprint-executor`). Para seguir item a item sem
-parar, o usuário troca a linha acima para `contínuo`.
+A execução segue `.claude/skills/sprint-executor/SKILL.md` (`/sprint-executor`).
+- `confirmar cada item`: um item por vez, até o PR aberto com o CI verde. **O merge é do usuário.**
+- `contínuo`: item a item sem parar, com o merge feito depois do CI verde.
 
 ## Regras permanentes
 - **Branch por mudança:** toda mudança numa branch `tipo/ID-descricao` a partir da `dev`, integrada por PR
   (sem aprovação obrigatória de outra pessoa). Nunca commit ou push direto na `dev` ou na `main`.
-- **Commit, PR e merge:** só quando o usuário pedir, ou dentro do fluxo do `sprint-executor`, que tem essa
-  autorização. Não reescrever histórico (sem `rebase` de branch publicada, `push --force` ou `reset` de commits
+- **Commit, PR e merge:** só quando o usuário pedir, ou dentro do fluxo do `sprint-executor` (merge só no modo
+  `contínuo`). Não reescrever histórico (sem `rebase` de branch publicada, `push --force` ou `reset` de commits
   publicados).
 - **Segredos:** nunca ler, imprimir ou copiar o `.env`. Ao citar um segredo, só os 4 primeiros caracteres + `****`.
 - **Produção:** nada roda contra a API ou o banco do Render. Containers e volumes do docker compose do usuário
