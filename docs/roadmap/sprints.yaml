@@ -262,7 +262,13 @@ sprints:
   - DEBT-011
   - DEBT-012
   - DEBT-014
-  committed_points: 45.0
+  - DEBT-015
+  - SEC-036
+  - US-018
+  - US-019
+  - US-020
+  - DEBT-016
+  committed_points: 54.0
   completed_points: null
   completed: []
   carried_over: []

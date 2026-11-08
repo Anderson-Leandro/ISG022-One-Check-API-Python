@@ -2243,15 +2243,18 @@ items:
       remote_at: '2026-11-03T00:33:59Z'
 - id: TK-002
   type: task
-  title: Rotacionar as credenciais de demonstração em produção
+  title: Recriar o ambiente de produção sem credenciais de demonstração
   epic: EP-008
   story: ''
-  description: 'Risco residual do SEC-001: contas criadas pelo seed antigo ainda podem ter senha e TOTP públicos.'
+  description: 'Risco residual do SEC-001. Ajustado em 2026-11-08: o ambiente de produção não está em uso e será
+    zerado; em vez de rotacionar as contas do seed antigo, o banco é recriado e carregado pelo seed atual, que gera
+    senhas aleatórias. Se o zeramento não acontecer, volta a valer a rotação por scripts/rotacionar_credenciais_demo.py
+    --aplicar.'
   acceptance_criteria:
-  - Dado o banco de produção, quando rodar scripts/rotacionar_credenciais_demo.py, então ele lista as contas expostas.
-  - Depois do --aplicar, nenhuma conta ativa usa senha ou segredo TOTP do repositório e o alerta 'SEGURANÇA:' some
-    do log do Render.
-  - As novas senhas são entregues por canal seguro, não ficam em commit, issue nem chat.
+  - Dado o banco de produção recriado e carregado por POST /admin/seed (ou pelo seed atual), quando rodar scripts/rotacionar_credenciais_demo.py,
+    então nenhuma conta é listada.
+  - 'Depois de um reinício, o alerta SEGURANÇA: de credenciais de demonstração não aparece no log do Render.'
+  - As senhas geradas pelo seed são entregues por canal seguro, não ficam em commit, issue nem chat.
   priority: must
   rank: 20
   estimate: 1
@@ -2274,7 +2277,7 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -4471,3 +4474,264 @@ items:
     github:
       hash: bd57660755d62016
       remote_at: '2026-11-08T12:39:56Z'
+- id: DEBT-015
+  type: debt
+  title: Remover o perfil visualizador e recusar perfis desconhecidos
+  epic: EP-001
+  story: ''
+  description: 'Decisão do SPK-001 (ADR-0009): o perfil visualizador deixa de existir. Sem migração de contas: os
+    ambientes serão zerados e nenhuma conta com o perfil foi criada. As regras de app/deps.py restringem só locatário
+    e vistoriador; um perfil fora da lista ganharia acesso total, por isso get_current_user passa a recusar perfis
+    desconhecidos (fail secure).'
+  acceptance_criteria:
+  - Dado um pedido de criação ou alteração de usuário com role visualizador, quando enviado, então a API responde
+    422.
+  - Dado um token ou uma conta com um perfil fora de ROLES, quando chamar qualquer rota autenticada, então a API
+    recusa (401) e não libera nada.
+  - 'O modelo Usuario não tem perfil padrão: criar um usuário sem perfil explícito falha.'
+  - Testes, README, documentação de segurança e collection do Insomnia não citam mais o visualizador como perfil
+    ativo; os testes existentes alterados passam pelo relatório e pela aprovação do usuário.
+  priority: should
+  rank: 290
+  estimate: 2
+  status: in_sprint
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API5:2023
+    - CWE-285
+    - CWE-636
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0009-remocao-do-perfil-visualizador.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+- id: SEC-036
+  type: security
+  title: Respeitar o MFA opcional ligado pelo próprio usuário
+  epic: EP-001
+  story: ''
+  description: 'Decisão do SPK-003 (ADR-0011): hoje o locatário consegue ligar o MFA, mas needs_mfa (app/auth.py)
+    só vale para os perfis obrigatórios e o login nunca pede o código. Passa a valer: quem tem MFA ligado e segredo
+    configurado recebe mfa_required no login, em qualquer perfil.'
+  acceptance_criteria:
+  - Dado um locatário com MFA ligado e autenticador configurado, quando fizer login com a senha certa, então recebe
+    mfa_required e um temp_token, e não os tokens de sessão.
+  - Dado esse locatário, quando informar o código certo em /auth/mfa/verify, então recebe a sessão; código errado
+    conta no limite de tentativas.
+  - Dado um locatário sem MFA, quando fizer login, então continua recebendo os tokens direto.
+  - Os perfis obrigatórios continuam como hoje.
+  priority: should
+  rank: 291
+  estimate: 1
+  status: in_sprint
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API2:2023
+    - CWE-308
+    risk_id: R-002
+  source:
+    kind: spike
+    file: docs/adr/0011-mfa-opcional-respeitado.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+- id: US-018
+  type: story
+  title: Locatário vê os agendamentos do próprio contrato
+  epic: EP-003
+  story: Como locatário, quero ver as datas de vistoria agendadas no meu contrato, para me organizar para recebê-las.
+  description: Decisão do SPK-004, item 5 (ADR-0012). Hoje GET /contratos/{id}/agendamentos responde 403 para o
+    locatário, mesmo no contrato dele.
+  acceptance_criteria:
+  - Dado um locatário, quando chamar GET /contratos/{id}/agendamentos do próprio contrato, então recebe a lista.
+  - Dado um locatário, quando chamar a rota num contrato de outro locatário, então recebe 403 sem dados.
+  - Criar, alterar e excluir agendamentos continua só para admin e gestor.
+  priority: should
+  rank: 292
+  estimate: 1
+  status: in_sprint
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API1:2023
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+- id: US-019
+  type: story
+  title: Locatário comenta no próprio problema enquanto não estiver resolvido
+  epic: EP-005
+  story: Como locatário, quero acrescentar informações ao problema que abri, para ajudar a resolvê-lo.
+  description: Decisão do SPK-004, item 7 (ADR-0012). Hoje POST /problemas/{id}/atualizacoes é só de admin e gestor.
+  acceptance_criteria:
+  - Dado o locatário dono do contrato do problema, quando criar uma atualização num problema que não está resolvido,
+    então ela é gravada com ele como autor.
+  - Dado um problema resolvido, quando o locatário tentar criar uma atualização, então recebe 409.
+  - Dado um locatário de outro contrato, um vistoriador, quando tentarem criar uma atualização, então recebem 403
+    e nada é gravado.
+  - Mudar o status do problema continua só para admin e gestor.
+  priority: should
+  rank: 293
+  estimate: 2
+  status: in_sprint
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    - CWE-639
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+- id: US-020
+  type: story
+  title: Nova vistoria depois de uma rejeição, e fim do status pendente_revisao
+  epic: EP-004
+  story: Como gestor, quero criar uma nova vistoria quando a anterior foi rejeitada, para não travar o contrato
+    e sem alterar o laudo rejeitado.
+  description: 'Decisão do SPK-004, item 8 (ADR-0012). Hoje uma vistoria inicial rejeitada trava o contrato: criar
+    outra inicial dá 409 e a exclusão do US-015 não aceita checklist rejeitado. O status pendente_revisao não é
+    gravado por nenhum fluxo.'
+  acceptance_criteria:
+  - Dado um contrato cuja vistoria inicial foi rejeitada, quando o gestor criar uma nova vistoria inicial, então
+    ela é criada em preenchimento e a rejeitada continua intacta.
+  - Dado um contrato com uma vistoria inicial em preenchimento, enviada ou aceita, quando tentar criar outra inicial,
+    então continua recebendo 409.
+  - O status pendente_revisao deixa de existir no domínio (dashboard e status dos dados incluídos).
+  priority: should
+  rank: 294
+  estimate: 2
+  status: in_sprint
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - STRIDE:T
+    - CWE-841
+    risk_id: R-003
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+- id: DEBT-016
+  type: debt
+  title: Declarar no OpenAPI os tipos de agendamento (inicial e encerramento)
+  epic: EP-003
+  story: ''
+  description: 'Decisão do SPK-004, item 11 (ADR-0012): os tipos continuam só inicial e encerramento; o enum passa
+    a aparecer no OpenAPI.'
+  acceptance_criteria:
+  - O schema de criação e de alteração de agendamento declara tipo como enum (inicial, encerramento) no OpenAPI.
+  - Um tipo fora do enum continua respondendo 422 com a mensagem de campo.
+  - Existe teste que confere o enum no OpenAPI.
+  priority: could
+  rank: 295
+  estimate: 1
+  status: in_sprint
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API8:2023
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint

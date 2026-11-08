@@ -1,6 +1,6 @@
 # ADR-0005: MFA por TOTP, obrigatório para admin, gestor e vistoriador
 
-- **Status:** aceito (registro retroativo; decisão tomada em 2026-06 e revista nas correções de segurança de 2026-10)
+- **Status:** aceito (registro retroativo; decisão tomada em 2026-06 e revista nas correções de segurança de 2026-10); complementado pelo ADR-0011 (o MFA opcional passa a valer no login) e pelo ADR-0009 (o perfil visualizador é removido)
 - **Data:** 2026-11-08
 - **Itens relacionados:** DEBT-009, US-002, SEC-021, SPK-003, SEC-035, R-002, R-013
 
