@@ -26,7 +26,7 @@ API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóvei
 | Anônimo / atacante externo | Nenhuma | `/auth/login`, `/auth/mfa/*` com temp token, `/health`, `/uploads/{arquivo}`, `/docs` (só com `DOCS_ENABLED`), `/admin/*` (com `SEED_SECRET`) |
 | Locatário | Baixa | os próprios contratos, problemas, aceites; uploads de foto de problema |
 | Vistoriador | Média | checklists atribuídos (escrita), leitura de contratos/imóveis vinculados |
-| Gestor | Alta | gestão de imóveis, contratos, usuários não privilegiados, logs |
+| Gestor | Alta | gestão de imóveis, contratos e usuários não privilegiados; sem acesso aos logs de auditoria (SEC-018) |
 | Administrador | Total | tudo, inclusive contas admin/gestor e `/admin/*` |
 | Mantenedor / CI | Alta | repositório, GitHub Actions, painel do Render |
 | Serviços externos | Baixa | ViaCEP e Nominatim (respostas consumidas pela API) |
@@ -88,7 +88,7 @@ flowchart LR
 | T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie); CORS só para `CORS_ORIGINS`, sem credenciais; `/docs` desligado em produção; `no-store`, `nosniff`, HSTS | Mitigada (depende de `CORS_ORIGINS` no Render) | SEC-007 |
 | T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | `USER app`, `--only-binary`, `permissions: contents: read`, actions por SHA; compose com `cap_drop: ALL` e `no-new-privileges` | Mitigada | SEC-008 |
 | T-25 | Proxy / IP de origem | S/R | Cliente forja o `X-Forwarded-For` para escapar do limite por IP e gravar IP falso na auditoria | Não-repúdio, Disponibilidade | limite por conta independe do IP; `FORWARDED_ALLOW_IPS=*` usa o primeiro item do cabeçalho (`render.yaml:18`) | **Aberta** (a confirmar no Render) | SEC-017 |
-| T-26 | Auditoria (`GET /logs`) | I | Gestor consulta IP e padrão de acesso de todas as contas, inclusive admins | Confidencialidade (LGPD) | rota restrita a admin/gestor; retenção de `LOG_RETENCAO_DIAS` | **Aberta** | SEC-018, SEC-019 |
+| T-26 | Auditoria (`GET /logs`) | I | Gestor consulta IP e padrão de acesso de todas as contas, inclusive admins | Confidencialidade (LGPD) | rota só do admin desde o SEC-018 (2026-11-08); retenção de `LOG_RETENCAO_DIAS` | **Parcial**: falta o SEC-019 (e-mail digitado no login falho) | SEC-018 ✓, SEC-019 |
 | T-27 | Monitoramento | R | Falhas de login, MFA e acesso negado invisíveis nos logs por responderem 200 | Não-repúdio | status de erro em todo `fail()` e guarda na suíte (ADR-0003, `tests/conftest.py`) | Mitigada | — |
 
 Status: **Mitigada** · **Parcial** · **Aberta** · **Aceita**

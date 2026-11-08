@@ -502,7 +502,7 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
         Caso("✅ Locatário A vê a linha do tempo", "GET", "/problemas/{{ _.problema_id }}/atualizacoes", auth="token_locatario_a", sucesso=True),
         Caso("❌ Problema inexistente → 404", "GET", "/problemas/00000000-0000-0000-0000-000000000000", auth="token_admin", status=404, sucesso=False),
     ]),
-    ("07 Dashboard e logs", "O dashboard muda conforme o perfil; os logs são só de admin e gestor.", [
+    ("07 Dashboard e logs", "O dashboard muda conforme o perfil; os logs são só do admin (SEC-018).", [
         Caso("✅ Dashboard do admin", "GET", "/dashboard", auth="token_admin", sucesso=True),
         Caso("✅ Dashboard do gestor", "GET", "/dashboard", auth="token_gestor", sucesso=True),
         Caso("✅ Dashboard do vistoriador", "GET", "/dashboard", auth="token_vistoriador", sucesso=True),
@@ -510,7 +510,8 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
         Caso("✅ Admin consulta os logs", "GET", "/logs", auth="token_admin", sucesso=True),
         Caso("✅ Admin filtra os logs por ação", "GET", "/logs", auth="token_admin", query={"acao": "login_falho"}, sucesso=True,
              testes="insomnia.test('só login_falho', () => insomnia.expect((b.dados || []).every(l => l.acao === 'login_falho')).to.equal(true));"),
-        Caso("✅ Gestor consulta os logs (comportamento atual, ver SEC-018)", "GET", "/logs", auth="token_gestor", sucesso=True),
+        Caso("❌ Gestor não consulta os logs → 403", "GET", "/logs", auth="token_gestor", status=403,
+             descricao="SEC-018: a trilha de auditoria é só do admin."),
         Caso("⚠️ Filtro de data inválido é ignorado (comportamento atual, ver SEC-020)", "GET", "/logs", auth="token_admin", query={"de": "ontem"}, sucesso=True,
              descricao="Hoje a data inválida é descartada sem aviso. O SEC-020 propõe responder 422."),
         Caso("❌ Locatário não consulta os logs → 403", "GET", "/logs", auth="token_locatario_a", status=403),
