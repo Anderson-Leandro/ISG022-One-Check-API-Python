@@ -5001,7 +5001,7 @@ items:
   priority: should
   rank: 125
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -5017,8 +5017,12 @@ items:
   links:
     trello_card: null
     gh_issue: 174
-    prs: []
-  evidence: []
+    prs:
+    - '#190'
+  evidence:
+  - 'PR #190 (merge d46fa2a): checklist antes da revisão no modelo do registro, conferida pelo dod_check'
+  - 15 testes em tests/unit/test_dod_check.py
+  - 'SKILL.md do sprint-executor: preencher antes do /code-review'
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -5028,10 +5032,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: b5356afca602579c
-      remote_at: '2026-11-08T21:31:42Z'
+      hash: 5858fdcbad26d6eb
+      remote_at: '2026-11-08T21:42:47Z'
 - id: TK-020
   type: task
   title: Versionar o executor da collection do Insomnia com um comando que roda tudo do zero
