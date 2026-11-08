@@ -242,7 +242,7 @@ GET    /api/v1/problemas/{id}              # Detalhes da ocorrência (admin, ges
 DELETE /api/v1/problemas/{id}              # Exclusão lógica; só aberto e sem atualizações, 409 caso contrário (admin, gestor)
 PATCH  /api/v1/problemas/{id}/status       # Atualizar status (admin, gestor)
 GET    /api/v1/problemas/{id}/atualizacoes # Linha do tempo (admin, gestor, locatário do contrato)
-POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (admin, gestor)
+POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (admin, gestor; locatário do contrato enquanto não estiver resolvido ou fechado)
 ```
 
 ### 📊 Dashboard, Logs & Sistema

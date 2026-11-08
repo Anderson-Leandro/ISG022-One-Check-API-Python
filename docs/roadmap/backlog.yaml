@@ -4685,7 +4685,7 @@ items:
   priority: should
   rank: 293
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -4712,10 +4712,12 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 58c0562ac9f23c16
-      remote_at: '2026-11-08T14:48:34Z'
+      hash: 18aac2be4ee8e7e0
+      remote_at: '2026-11-08T15:51:55Z'
 - id: US-020
   type: story
   title: Nova vistoria depois de uma rejeição, e fim do status pendente_revisao

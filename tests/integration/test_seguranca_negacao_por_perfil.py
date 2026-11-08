@@ -69,8 +69,8 @@ ROTAS_RESTRITAS = [
     ("DELETE", "/checklists/{checklist_id}", ADMIN_GESTOR),
     ("PATCH", "/checklists/{checklist_id}/enviar-para-aceite", ADMIN_GESTOR),
     ("DELETE", "/problemas/{problema_id}", ADMIN_GESTOR),
+    ("POST", "/problemas/{problema_id}/atualizacoes", ("admin", "gestor", "locatario")),
     ("PATCH", "/problemas/{problema_id}/status", ADMIN_GESTOR),
-    ("POST", "/problemas/{problema_id}/atualizacoes", ADMIN_GESTOR),
     ("GET", "/logs", ADMIN_GESTOR),
 ]
 
@@ -124,11 +124,12 @@ def test_lista_confere_com_a_api(client):
 
 
 def test_combinacoes_cobertas():
-    """34 rotas de admin e gestor × vistoriador e locatário, mais a rota só de admin × 3 perfis.
+    """33 rotas de admin e gestor × vistoriador e locatário, a rota só de admin × 3 perfis e
+    POST /problemas/{id}/atualizacoes, que desde o US-019 aceita também o locatário (só o vistoriador é proibido).
 
     Eram 97 na avaliação SPK-005 e 106 com o US-015; as 35 do visualizador saíram com o perfil (ADR-0009).
     """
-    assert len(COMBINACOES_PROIBIDAS) == 34 * 2 + 3
+    assert len(COMBINACOES_PROIBIDAS) == 33 * 2 + 3 + 1
 
 
 # ── 2. Cada perfil proibido recebe 403 e nada é gravado ─────────────────────────
