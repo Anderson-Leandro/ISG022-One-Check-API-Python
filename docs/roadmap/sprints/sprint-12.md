@@ -2,7 +2,7 @@
 
 - **Período:** 2026-11-04 → 2026-11-17
 - **Sprint Goal:** Release v0.1.0, produção segura e escopo da F4 fechado
-- **Capacidade:** 40 pts (era 32, pelo prazo final de 11/12; ampliada em 2026-11-07 para incluir os itens da avaliação dos testes) · **Comprometido:** 40 pts
+- **Capacidade:** 40 pts (era 32, pelo prazo final de 11/12; ampliada em 2026-11-07 para incluir os itens da avaliação dos testes) · **Comprometido:** 54 pts (DEBT-014 em 2026-11-07; os seis itens dos spikes em 2026-11-08)
 - **Time:** sem ausências; sem feriado em dia útil (15/11 é domingo)
 
 > **Sprint Goal** é o "porquê" da sprint: se algum item não couber, o goal ajuda a decidir o que
@@ -11,7 +11,7 @@
 ## Itens comprometidos
 | ID | Título | Est. | Seg. | Status final |
 |---|---|---|---|---|
-| TK-002 | Rotacionar as credenciais de demonstração em produção | 1 | high | in_sprint |
+| TK-002 | Recriar o ambiente de produção sem credenciais de demonstração | 1 | high | in_sprint |
 | TK-003 | Configurar CORS_ORIGINS e conferir SEED_SECRET no Render | 1 | medium | in_sprint |
 | TK-017 | Proteger a branch main: merge só por PR e com CI verde | 1 | low | in_sprint |
 | DEBT-007 | CHANGELOG e release v0.1.0 | 2 | none | in_sprint |
@@ -29,6 +29,12 @@
 | SEC-034 | Testes de sessão revogada no setup de MFA e do teto de chaves do limitador | 2 | low | in_sprint |
 | DEBT-011 | Testes de negação por perfil em todas as rotas restritas | 3 | medium | in_sprint |
 | DEBT-012 | Testes de negação em escrita conferem o estado e o status exato | 3 | low | in_sprint |
+| DEBT-015 | Remover o perfil visualizador e recusar perfis desconhecidos | 2 | medium | in_sprint |
+| SEC-036 | Respeitar o MFA opcional ligado pelo próprio usuário | 1 | medium | in_sprint |
+| US-018 | Locatário vê os agendamentos do próprio contrato | 1 | low | in_sprint |
+| US-019 | Locatário comenta no próprio problema enquanto não estiver resolvido | 2 | medium | in_sprint |
+| US-020 | Nova vistoria depois de uma rejeição, e fim do status pendente_revisao | 2 | low | in_sprint |
+| DEBT-016 | Declarar no OpenAPI os tipos de agendamento (inicial e encerramento) | 1 | low | in_sprint |
 
 ## Ordem sugerida
 1. TK-002 e TK-003 (produção; risco alto R-006): primeiro dia.
@@ -58,6 +64,7 @@
 | 2026-11-08 | SEC-034 concluído (#138): token de primeiro acesso emitido antes da troca de senha recusado no setup do MFA, e teto de chaves do limitador testado com relógio controlado (1013 testes, cobertura 96%). Restam 20 pts | DEBT-006 (licença) aguarda a escolha do usuário | — |
 | 2026-11-08 | US-015 concluído (#141): exclusão lógica de checklist, contrato e problema por admin e gestor, só antes de virarem evidência (ADR-0008; 1047 testes, cobertura 96%). Restam 15 pts | SPK-003 aguarda decisão do PO | decisões do PO: exclusão lógica, admin e gestor, regra estrita; a revisão de código acrescentou a exigência de problema aberto. BUG-001 fora da sprint |
 | 2026-11-08 | US-017 concluído (#143): histórico do imóvel com contratos, vistorias e problemas em ordem cronológica, no recorte de cada perfil (1061 testes, cobertura 96%). Restam 12 pts | TK-002 e TK-003 (Render), DEBT-006 (licença) e SPK-001 a SPK-004 (decisões do PO) aguardam o usuário; DEBT-007 (release) entra por último | fim dos itens de código executáveis da sprint |
+| 2026-11-08 | Decisões dos spikes SPK-001 a SPK-004 (ADR-0009 a ADR-0012): visualizador removido, fotos públicas como risco aceito (R-007), MFA opcional respeitado e quatro regras de negócio. Seis itens novos entram na sprint (DEBT-015, SEC-036, US-018, US-019, US-020, DEBT-016; +9 pts, comprometido passa de 45 para 54) | — | decisão do usuário: os ambientes de produção e de desenvolvimento serão zerados; o TK-002 passa a ser recriar o ambiente sem credenciais de demonstração, e o R-017 deixa de ter fotos reais em risco até o uso de verdade |
 
 ## Sprint Review
 - **Incremento demonstrável:**
