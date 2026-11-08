@@ -1274,7 +1274,7 @@ items:
   priority: should
   rank: 50
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -1292,8 +1292,12 @@ items:
   links:
     trello_card: null
     gh_issue: 37
-    prs: []
-  evidence: []
+    prs:
+    - '#182'
+  evidence:
+  - 'PR #182 (merge 4b9a0f1): GET /logs só do admin (decisão do PO em 2026-11-08)'
+  - teste do gestor invertido e combinação nova na lista de rotas restritas, com aprovação do usuário em 2026-11-08
+  - collection do Insomnia 163/163; security-audit diff dev sem achado novo
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -1303,10 +1307,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 55f4b35578b38d5b
-      remote_at: '2026-11-08T19:42:16Z'
+      hash: a553bf835eae170d
+      remote_at: '2026-11-08T19:59:19Z'
 - id: SEC-019
   type: security
   title: Login falho grava o texto digitado no campo e-mail
