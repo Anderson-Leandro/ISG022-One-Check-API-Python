@@ -3978,7 +3978,7 @@ items:
   priority: should
   rank: 37
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F5
   depends_on: []
@@ -3997,16 +3997,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-07'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 9e332232d04d9e36
-      remote_at: '2026-11-07T16:15:09Z'
+      hash: 9fb44af5e85c78ce
+      remote_at: '2026-11-08T03:18:01Z'
 - id: SEC-034
   type: security
   title: Testes de sessão revogada no setup de MFA e do teto de chaves do limitador

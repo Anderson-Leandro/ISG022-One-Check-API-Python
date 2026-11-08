@@ -3900,7 +3900,7 @@
       "_type": "request",
       "parentId": "fld_4191c5cd961739430dfab585",
       "name": "❌ Foto em checklist já enviado (trava)",
-      "description": "Caso que a suíte automatizada não cobre hoje (SEC-033).",
+      "description": "Também coberto pela suíte automatizada desde o SEC-033 (tests/integration/test_seguranca_travas_checklist.py).",
       "method": "POST",
       "url": "{{ _.base_url }}/checklists/{{ _.checklist_id }}/itens/{{ _.checklist_item_id }}/fotos",
       "parameters": [],
