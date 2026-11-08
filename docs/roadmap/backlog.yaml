@@ -3281,7 +3281,7 @@ items:
   priority: should
   rank: 170
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F2
   depends_on: []
@@ -3298,16 +3298,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 6035c287bcc40e84
-      remote_at: '2026-11-03T01:16:39Z'
+      hash: 4f50627f61324cee
+      remote_at: '2026-11-08T11:54:55Z'
 - id: DEBT-010
   type: debt
   title: Cobrir os ramos não testados de agendamentos, geocoding e database
@@ -4299,3 +4301,88 @@ items:
     github:
       hash: 725aaa9d4fa60313
       remote_at: '2026-11-07T23:32:27Z'
+- id: SEC-035
+  type: security
+  title: QR do setup de MFA gerado por serviço externo recebe o segredo TOTP
+  epic: EP-001
+  story: ''
+  description: 'Encontrado na escrita do ADR-0005 (DEBT-009). mfa_provisioning_data (app/auth.py:172) devolve qr_url
+    apontando para https://api.qrserver.com com o otpauth:// na query string, que contém o segredo TOTP e o e-mail
+    da conta. Quem abre a URL entrega a semente do MFA ao serviço externo (logs, cache, proxies no caminho). Com
+    a semente e a senha, um terceiro gera códigos válidos. Rotas: GET /auth/mfa/setup, GET /auth/mfa/setup-login,
+    POST /usuarios/me/mfa/setup.'
+  acceptance_criteria:
+  - Dado um setup de MFA, quando a API responde, então nenhuma URL devolvida aponta para um domínio externo nem
+    contém o segredo TOTP.
+  - Dado o setup de MFA, quando o cliente precisa do QR, então ele é gerado pela própria API (imagem ou data URI)
+    ou a partir do otpauth_uri, sem enviar o segredo a terceiros.
+  - Existe teste que falha se a resposta do setup contiver uma URL externa com o segredo.
+  priority: should
+  rank: 1510
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - CWE-200
+    - CWE-359
+    - OWASP API3:2023
+    - STRIDE:I
+    risk_id: R-002
+  source:
+    kind: adr
+    file: docs/adr/0005-mfa-totp-obrigatorio-por-perfil.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+- id: TK-018
+  type: task
+  title: 'Fotos em disco efêmero no Render: confirmar e dar armazenamento durável'
+  epic: EP-008
+  story: ''
+  description: Encontrado na escrita do ADR-0006 (DEBT-009). As fotos ficam em UPLOAD_DIR (disco local) e o render.yaml
+    não declara disco persistente; pela documentação do Render, o sistema de arquivos do plano gratuito é efêmero
+    e se perde a cada deploy ou reinício. As fotos são evidência dos laudos (A-08). Depende de acesso ao painel
+    do Render para confirmar.
+  acceptance_criteria:
+  - Dado o serviço no Render, quando conferido no painel, então está registrado se o disco é efêmero e se fotos
+    antigas já se perderam.
+  - Dado um deploy ou reinício, quando uma foto enviada antes é pedida, então ela continua disponível (disco persistente
+    ou armazenamento de objetos), com a decisão registrada em ADR que substitui o ADR-0006.
+  - As fotos entram na rotina de backup (junto do TK-005) ou a ausência fica registrada como risco aceito.
+  priority: should
+  rank: 1520
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - STRIDE:D
+    - CWE-404
+    risk_id: R-017
+  source:
+    kind: adr
+    file: docs/adr/0006-uploads-em-disco-local.md
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
