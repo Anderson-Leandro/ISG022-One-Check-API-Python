@@ -3256,7 +3256,7 @@ items:
   priority: must
   rank: 10
   estimate: 2
-  status: in_progress
+  status: review
   sprint: 12
   phase: F3
   depends_on: []
@@ -3270,7 +3270,8 @@ items:
   links:
     trello_card: null
     gh_issue: 83
-    prs: []
+    prs:
+    - '#170'
   evidence: []
   created: '2026-11-02'
   updated: '2026-11-08'
@@ -3281,10 +3282,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: review
   sync:
     github:
-      hash: 68984287f1e16e6b
-      remote_at: '2026-11-08T17:42:52Z'
+      hash: 15e161e7256aaf1d
+      remote_at: '2026-11-08T17:47:23Z'
 - id: DEBT-008
   type: debt
   title: Conventional Commits em pelo menos 70% dos commits
