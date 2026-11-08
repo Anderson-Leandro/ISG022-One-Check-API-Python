@@ -12,6 +12,9 @@ T = TypeVar("T")
 # Senha nova (criação e troca). O login aceita a senha já cadastrada, mesmo fora da política
 SenhaNova = Annotated[str, AfterValidator(validar_senha)]
 Cpf = Annotated[str | None, AfterValidator(validar_cpf)]
+# Só documenta os valores no OpenAPI; a validação fica nas rotas, com a mensagem de campo (ADR-0012)
+TIPOS_AGENDAMENTO = ("inicial", "encerramento")
+TipoAgendamento = Annotated[str, Field(json_schema_extra={"enum": list(TIPOS_AGENDAMENTO)})]
 
 
 class Paginacao(BaseModel):
@@ -258,13 +261,13 @@ class ContratoOut(BaseModel):
 
 
 class AgendamentoCreate(BaseModel):
-    tipo: str
+    tipo: TipoAgendamento
     data_agendada: datetime | date | str
     observacao: str | None = None
 
 
 class AgendamentoUpdate(BaseModel):
-    tipo: str | None = None
+    tipo: TipoAgendamento | None = None
     data_agendada: datetime | date | str | None = None
     observacao: str | None = None
 
