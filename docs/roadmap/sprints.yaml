@@ -240,7 +240,7 @@ sprints:
   goal: Release v0.1.0, produção segura e escopo da F4 fechado
   start: '2026-11-04'
   end: '2026-11-17'
-  status: active
+  status: closed
   capacity: 40.0
   committed:
   - TK-017
@@ -267,9 +267,33 @@ sprints:
   - US-020
   - DEBT-016
   committed_points: 52.0
-  completed_points: null
-  completed: []
+  completed_points: 52.0
+  completed:
+  - SPK-001
+  - SPK-002
+  - SPK-003
+  - SPK-004
+  - US-015
+  - US-017
+  - DEBT-006
+  - DEBT-007
+  - DEBT-009
+  - TK-017
+  - SPK-005
+  - SEC-032
+  - SEC-033
+  - SEC-034
+  - DEBT-011
+  - DEBT-012
+  - DEBT-014
+  - DEBT-015
+  - SEC-036
+  - US-018
+  - US-019
+  - US-020
+  - DEBT-016
   carried_over: []
+  closed_on: '2026-11-08'
 - number: 13
   goal: Qualidade contínua e hardening
   start: '2026-11-18'

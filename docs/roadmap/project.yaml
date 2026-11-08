@@ -46,7 +46,7 @@ scrum:
     GG: 8
   max_item_size: 8
   capacity: 20
-  current_sprint: 12
+  current_sprint: 13
 security:
   profile: standard
   personal_data: true
@@ -61,4 +61,4 @@ board:
     repo: Anderson-Leandro/ISG022-One-Check-API-Python
     use_milestones: true
 roadmap:
-  current_phase: F3
+  current_phase: F5
