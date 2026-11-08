@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import get_current_user, negar_perfil_desconhecido, require_roles
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -20,7 +20,8 @@ router = APIRouter(tags=["dashboard"])
 
 
 def _contratos_visiveis(db: Session, user: Usuario):
-    """IDs dos contratos que o perfil vê em GET /contratos; None quando vê todos."""
+    """IDs dos contratos que o perfil vê em GET /contratos; None quando vê todos (só admin e gestor)."""
+    negar_perfil_desconhecido(user)
     if user.role == "locatario":
         return db.query(Contrato.id).filter(Contrato.locatario_id == user.id)
     if user.role == "vistoriador":

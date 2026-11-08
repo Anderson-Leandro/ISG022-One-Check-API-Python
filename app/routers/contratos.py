@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 
 from app.config import MAX_UPLOAD_MB
 from app.database import get_db
-from app.deps import assert_acesso_contrato, assert_acesso_problemas, get_current_user, require_roles
+from app.deps import (
+    assert_acesso_contrato,
+    assert_acesso_problemas,
+    get_current_user,
+    negar_perfil_desconhecido,
+    require_roles,
+)
 from app.exclusao import marcar_excluido
 from app.models import (
     AgendamentoVistoria,
@@ -49,6 +55,7 @@ def list_contratos(
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    negar_perfil_desconhecido(user)
     q = db.query(Contrato)
     if user.role == "locatario":
         q = q.filter(Contrato.locatario_id == user.id)
@@ -124,6 +131,7 @@ def get_contrato(
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    negar_perfil_desconhecido(user)
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
         return fail("Contrato não encontrado", status_code=404)
@@ -294,6 +302,7 @@ def list_checklists(
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    negar_perfil_desconhecido(user)
     ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if not ct:
         return fail("Contrato não encontrado", status_code=404)
