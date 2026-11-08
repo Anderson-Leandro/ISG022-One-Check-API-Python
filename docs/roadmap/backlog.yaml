@@ -2527,7 +2527,7 @@ items:
   priority: should
   rank: 70
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -2542,8 +2542,13 @@ items:
   links:
     trello_card: null
     gh_issue: 65
-    prs: []
-  evidence: []
+    prs:
+    - '#184'
+  evidence:
+  - 'PR #184 (merge 7b9dacd): rotação atômica do refresh; reuso de refresh trocado encerra todas as sessões e fica
+    na trilha (ADR-0004)'
+  - 8 testes em tests/integration/test_seguranca_reuso_refresh.py
+  - security-audit diff dev sem achado novo
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -2553,10 +2558,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: a74711d0a1f6ff1c
-      remote_at: '2026-11-08T20:02:48Z'
+      hash: 1fc460c36251f58f
+      remote_at: '2026-11-08T20:14:28Z'
 - id: SEC-028
   type: security
   title: 'Direitos do titular (LGPD): exportar e anonimizar os próprios dados'

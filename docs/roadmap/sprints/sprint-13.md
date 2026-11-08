@@ -52,6 +52,7 @@
 | 2026-11-08 | Sprint planejada: 22 itens, 47 pts, capacidade 50. Entram, além dos 38 pts já alocados, as ações da retro 12 (TK-019, TK-020, DEBT-018), SEC-035, BUG-001 e DEBT-017 | TK-002, TK-003, TK-005 e o teste do SEC-017 dependem do painel do Render | estimativas de SEC-035 (2), BUG-001 (1) e DEBT-017 (2) confirmadas pelo usuário; TK-018 (3) fica fora da sprint |
 | 2026-11-08 | SEC-035 concluído (#180): QR do setup de MFA gerado pela própria API, sem enviar o segredo TOTP a terceiros (1081 testes, cobertura 96%) | — | dependência nova segno==1.6.6 (puro Python, BSD-3) |
 | 2026-11-08 | SEC-018 concluído (#182): GET /logs só do admin; o gestor recebe 403 (1082 testes, cobertura 96%) | — | decisão do PO: só o admin (descartadas a visão reduzida e o risco aceito); testes ajustados com aprovação |
+| 2026-11-08 | SEC-027 concluído (#184): reuso de refresh trocado encerra todas as sessões; rotação atômica (1090 testes, cobertura 96%) | — | R-011 mitigado; contrapartida (refresh repetido pelo próprio cliente) no ADR-0004 |
 
 ## Sprint Review
 - **Incremento demonstrável:**
