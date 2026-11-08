@@ -3256,7 +3256,7 @@ items:
   priority: must
   rank: 10
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F3
   depends_on: []
@@ -3273,16 +3273,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: d39929e55afc5e8b
-      remote_at: '2026-11-03T01:16:37Z'
+      hash: 68984287f1e16e6b
+      remote_at: '2026-11-08T17:42:52Z'
 - id: DEBT-008
   type: debt
   title: Conventional Commits em pelo menos 70% dos commits
