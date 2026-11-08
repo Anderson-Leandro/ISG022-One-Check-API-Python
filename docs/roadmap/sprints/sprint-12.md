@@ -74,11 +74,43 @@
 | 2026-11-08 | DEBT-006 concluído (#168): licença MIT, titular Equipe One Check. Resta 1 item: DEBT-007 (release v0.1.0) | — | licença escolhida pelo usuário |
 
 ## Sprint Review
+_Feita em 2026-11-08._
+
 - **Incremento demonstrável:**
-- **Goal atingido?** sim / parcial / não — por quê:
-- **Evidências** (PRs, testes, prints, relatórios):
-- **Checagem de segurança** (`/security-audit diff`, segredos, riscos novos):
-- **Feedback do cliente/PO:**
+  - **Contrato da API:** erros de negócio com o status HTTP adequado (ADR-0003).
+  - **Perfis e MFA:** o perfil visualizador foi removido, e um perfil fora da lista é recusado em toda rota, no login e no refresh (ADR-0009); o MFA ligado pelo locatário passa a valer no login (ADR-0011).
+  - **Funcionalidades novas:**
+    - exclusão lógica de contrato, checklist e problema (ADR-0008);
+    - histórico do imóvel;
+    - agendamentos visíveis para o locatário;
+    - comentário do locatário no próprio problema;
+    - nova vistoria depois de uma rejeição;
+    - tipos de agendamento no OpenAPI.
+  - **Suíte de testes:** de 836 para 1076 testes, com cobertura de 96%; cenários negados em todas as rotas restritas, travas de estado e negações que conferem o banco (SPK-005, SEC-032 a SEC-034, DEBT-011, DEBT-012).
+  - **Processo:**
+    - ruleset na `main` e na `dev` (TK-017);
+    - `sprint-executor`, com `dod_check` e hook de barreiras;
+    - ADR-0004 a ADR-0012;
+    - licença MIT;
+    - `CHANGELOG.md` da 0.1.0.
+- **Goal atingido?** **Sim**, na avaliação do PO (2026-11-08):
+  - o escopo da F4 fechou, com os quatro spikes decididos e os seis itens nascidos deles entregues;
+  - a release v0.1.0 está pronta (CHANGELOG no #170, PR `dev → main` e tag em seguida);
+  - a produção segura (TK-002, TK-003) foi para a Sprint 13 por decisão do usuário, porque o ambiente vai ser recriado.
+- **Evidências:**
+  - 23 itens com `scripts/dod_check.py` verde (o DEBT-007 fecha com a tag);
+  - 50 PRs mesclados na `dev` desde 2026-11-04, com o CI verde;
+  - registros em `docs/roadmap/execucao/` (o do SPK-005 foi escrito de forma retroativa nesta review);
+  - collection do Insomnia rodada contra a API local (163 de 163, sem a pasta 00a).
+- **Checagem de segurança:**
+  - `/security-audit diff` da sprint inteira, contra `089d100` (2026-11-02): 111 arquivos e os 7 scanners sem falha. **Nenhum segredo nem achado novo.** Os resultados que aparecem já tinham sido avaliados: o arquivo de segredos local fora do índice, valores fictícios em testes, SHA-1 só para IDs da collection, o filtro de data dos logs (SEC-020), `subprocess` com argumentos fixos nos scripts de processo e o `HEALTHCHECK` do Dockerfile.
+  - **Riscos e itens novos, fora da sprint:**
+    - SEC-035 (o QR do MFA por serviço externo);
+    - TK-018 / R-017 (disco efêmero no Render, alto e a confirmar);
+    - BUG-001 (excluir cômodo referenciado);
+    - DEBT-017 (regras de acesso negando por padrão).
+  - R-007 foi aceito (ADR-0010).
+- **Feedback do cliente/PO:** satisfeito com o incremento; seguir para a release e para a Sprint 13 sem ajustes.
 
 ## Retrospectiva
 | Funcionou bem | Melhorar | Ação (vira item no backlog) |
