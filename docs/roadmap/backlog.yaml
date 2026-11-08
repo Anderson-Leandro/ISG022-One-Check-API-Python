@@ -5112,7 +5112,7 @@ items:
   priority: should
   rank: 127
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -5135,7 +5135,9 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 4586e1525acd94a6
-      remote_at: '2026-11-08T19:13:52Z'
+      hash: 8dbf9ce9f21c6d80
+      remote_at: '2026-11-08T22:01:29Z'

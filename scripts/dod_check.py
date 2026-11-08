@@ -5,8 +5,9 @@ Uso: python3 scripts/dod_check.py <ID> [--antes-do-merge]
 
 Sem --antes-do-merge (padrão, depois do merge), confere:
   1. o item existe, está done e tem evidências e PR registrados;
-  2. cada PR do item foi mesclado na dev, com todos os checks do CI em SUCCESS;
-  3. a branch de pelo menos um PR leva o ID do item (tipo/ID-descricao);
+  2. cada PR do item foi mesclado na dev, com todos os checks do CI em SUCCESS, e há pelo menos um.
+     Um PR de release (dev → main) listado no item confere só o merge e o CI;
+  3. a branch de cada PR de implementação leva o ID do item (tipo/ID-descricao);
   4. se o PR mexe em app/, o diff também mexe em tests/;
   5. se o PR altera ou remove um teste que já existia, o registro de execução traz o relatório
      com cada arquivo e a aprovação do usuário;
@@ -19,6 +20,7 @@ Sem --antes-do-merge (padrão, depois do merge), confere:
 Com --antes-do-merge, confere o PR aberto da branch atual (itens 3 a 6) antes de pedir o merge.
 Sai com 1 se alguma verificação falhar.
 """
+import functools
 import json
 import re
 import subprocess
@@ -70,10 +72,75 @@ def testes_alterados(pr: dict) -> list[str]:
     return alterados
 
 
-def conferir_pr(iid: str, numero: str, registro: str, depois_do_merge: bool) -> None:
+def secao(registro: str, titulo: str) -> str | None:
+    """Corpo da seção '## titulo' (o título no começo da linha), até a próxima seção; None se não existe."""
+    achado = re.search(rf"^## {re.escape(titulo)}(?:\s*[(:—–][^\n]*)?\s*$", registro, re.M)
+    if not achado:
+        return None
+    return registro[achado.end():].split("\n## ", 1)[0]
+
+
+def cita_id(texto: str, iid: str) -> bool:
+    """O texto cita o ID, direto ou num intervalo do mesmo tipo ('SPK-001 a SPK-004', 'até', '–')."""
+    if re.search(rf"\b{re.escape(iid)}\b", texto):
+        return True
+    prefixo, _, numero = iid.rpartition("-")
+    if not numero.isdigit():
+        return False
+    intervalo = rf"\b{re.escape(prefixo)}-(\d+)\s*(?:a|até|–|—|-)\s*{re.escape(prefixo)}-(\d+)\b"
+    return any(len(a) == len(b) == len(numero) and int(a) <= int(numero) <= int(b)
+               for a, b in re.findall(intervalo, texto))
+
+
+def faltando_no_relatorio(alterados: list[str], relatorio: str, arquivos_de_teste: list[str]) -> list[str]:
+    """Testes alterados que o relatório não cita. Vale o caminho completo, ou só o nome do arquivo quando
+    nenhum outro arquivo de teste do projeto tem o mesmo nome."""
+    nomes = [Path(a).name for a in set(arquivos_de_teste) | set(alterados)]
+
+    def citado(caminho: str) -> bool:
+        if caminho in relatorio:
+            return True
+        nome = Path(caminho).name
+        return nomes.count(nome) == 1 and re.search(rf"(?<![\w.\-/]){re.escape(nome)}(?![\w.\-])", relatorio) is not None
+
+    return [a for a in alterados if not citado(a)]
+
+
+_NAO_RODOU = re.compile(r"\bn[ãa]o\s+(?:foi\s+|foram\s+)?(?:rodad|rodou|executad|feit)|\bainda\s+n[ãa]o\b", re.I)
+_DE_ITEM = re.compile(r"\b[A-Z]{2,5}-\d+\b|\bite(?:m|ns)\b", re.I)
+
+
+def auditoria_rodou(seguranca: str) -> bool:
+    """A seção cita a security-audit e não diz que ela ficou por fazer.
+
+    'pendente' reprova, salvo numa frase que fala de um item do backlog ('SEC-019 continua pendente',
+    'os itens pendentes'), que não é a auditoria."""
+    if not re.search(r"security-audit", seguranca, re.I) or _NAO_RODOU.search(seguranca):
+        return False
+    frases = re.split(r"[.;\n]", seguranca)
+    return not any(re.search(r"pendente", f, re.I) and not _DE_ITEM.search(f) for f in frases)
+
+
+@functools.cache
+def arquivos_de_teste() -> list[str]:
+    """Arquivos em tests/ na origin/dev (a base dos PRs), lidos uma vez por execução."""
+    try:
+        return sh("git", "ls-tree", "-r", "--name-only", "origin/dev", "tests").splitlines()
+    except RuntimeError:
+        return sh("git", "ls-files", "tests").splitlines()
+
+
+def conferir_pr(iid: str, numero: str, registro: str, depois_do_merge: bool) -> bool:
+    """Confere um PR do item. Devolve True se é PR de implementação (False para a release dev → main)."""
     campos = "number,state,baseRefName,headRefName,mergeCommit,statusCheckRollup,files"
     pr = gh_json("pr", "view", numero, "--json", campos)
     rotulo = f"PR #{pr['number']}"
+    if pr["baseRefName"] == "main" and pr["headRefName"] == "dev":
+        # PR de release (dev → main): não é PR de implementação do item; confere só o merge e o CI
+        checks = pr.get("statusCheckRollup") or []
+        ok(pr["state"] == "MERGED" and checks and all(c.get("conclusion") == "SUCCESS" for c in checks),
+           f"{rotulo}: release na main mesclada com o CI verde")
+        return False
     if depois_do_merge:
         ok(pr["state"] == "MERGED" and pr["baseRefName"] == "dev", f"{rotulo} mesclado na dev")
     else:
@@ -89,12 +156,13 @@ def conferir_pr(iid: str, numero: str, registro: str, depois_do_merge: bool) -> 
 
     alterados = testes_alterados(pr)
     if alterados:
-        secao = registro.split("## Testes existentes alterados", 1)[-1].split("\n## ", 1)[0]
-        faltando = [a for a in alterados if a not in secao]
+        relatorio = secao(registro, "Testes existentes alterados") or ""
+        faltando = faltando_no_relatorio(alterados, relatorio, arquivos_de_teste())
         ok(not faltando, f"{rotulo}: relatório cita cada teste existente alterado"
            + (f" (faltam: {', '.join(faltando)})" if faltando else ""))
-        ok(re.search(r"Aprovado por:\s*\S+.*\d{4}-\d{2}-\d{2}", secao),
+        ok(re.search(r"Aprovado por:\s*\S+.*\d{4}-\d{2}-\d{2}", relatorio),
            f"{rotulo}: alteração de testes existentes aprovada pelo usuário (linha 'Aprovado por: <nome> em AAAA-MM-DD')")
+    return True
 
 
 _CHECKLIST = re.compile(r"^## Checklist antes da revis[ãa]o\s*$", re.M)
@@ -133,15 +201,14 @@ def main() -> int:
     registro = arq.read_text(encoding="utf-8") if arq.exists() else ""
     if ok(registro, f"registro de execução {arq.relative_to(RAIZ)}"):
         for s in SECOES:
-            corpo = registro.split(s, 1)[-1].split("\n## ", 1)[0].strip() if s in registro else ""
+            corpo = (secao(registro, s[3:]) or "").strip()
             ok(corpo and "<!--" not in corpo[:4], f"registro: seção '{s[3:]}' preenchida")
         pendentes = checklist_pendente(registro)
         if pendentes is not None:
             ok(not pendentes, "registro: checklist antes da revisão respondida"
                + (f" (sem resposta: {'; '.join(pendentes)})" if pendentes else ""))
-        seg = registro.split("## Segurança", 1)[-1].split("\n## ", 1)[0]
-        rodou = re.search(r"security-audit", seg, re.I) and not re.search(r"n[ãa]o foi rodad|pendente", seg, re.I)
-        ok(rodou, "registro: security-audit rodada e com resultado (sem 'não foi rodada' ou 'pendente')")
+        ok(auditoria_rodou(secao(registro, "Segurança") or ""),
+           "registro: security-audit rodada e com resultado (sem 'não foi rodada' ou auditoria pendente)")
 
     if depois:
         prs = [str(p).lstrip("#") for p in (item.get("links", {}) or {}).get("prs", []) or []]
@@ -154,11 +221,14 @@ def main() -> int:
         prs = [str(p["number"]) for p in abertos]
         ok(prs, f"PR aberto para a branch {branch}")
 
+    implementacao = 0
     for numero in prs:
         try:
-            conferir_pr(iid, numero, registro, depois)
+            implementacao += conferir_pr(iid, numero, registro, depois)
         except RuntimeError as e:
             ok(False, f"PR #{numero}: {e}")
+    if prs:
+        ok(implementacao, f"{iid} tem pelo menos um PR de implementação (base dev), além da release")
 
     if depois:
         issue = (item.get("links", {}) or {}).get("gh_issue")
@@ -168,8 +238,8 @@ def main() -> int:
         sprint = item.get("sprint")
         if sprint:
             md = RAIZ / f"docs/roadmap/sprints/sprint-{int(sprint):02d}.md"
-            acomp = md.read_text().split("## Acompanhamento", 1)[-1].split("\n## ", 1)[0] if md.exists() else ""
-            ok(iid in acomp, f"acompanhamento da Sprint {sprint} cita {iid}")
+            acomp = (secao(md.read_text(encoding="utf-8"), "Acompanhamento") or "") if md.exists() else ""
+            ok(cita_id(acomp, iid), f"acompanhamento da Sprint {sprint} cita {iid}")
 
     validar = subprocess.run(
         ["python3", str(Path.home() / ".claude/skills/_roadmap-shared/scripts/backlog.py"), "--root", str(RAIZ), "validate"],
