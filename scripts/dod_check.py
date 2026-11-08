@@ -97,6 +97,26 @@ def conferir_pr(iid: str, numero: str, registro: str, depois_do_merge: bool) -> 
            f"{rotulo}: alteração de testes existentes aprovada pelo usuário (linha 'Aprovado por: <nome> em AAAA-MM-DD')")
 
 
+_CHECKLIST = re.compile(r"^## Checklist antes da revis[ãa]o\s*$", re.M)
+_CAIXA = re.compile(r"^\s*(?:[-*+]|\d+\.)\s*\[(?P<marca>[^\]]*)\]\s*(?P<texto>.*)$")
+
+
+def checklist_pendente(registro: str) -> list[str] | None:
+    """Linhas da 'Checklist antes da revisão' sem resposta; None se o registro não tem a seção (registros antigos).
+
+    Responder é marcar [x] (conferido) ou [-] (não se aplica). Uma seção sem nenhuma linha de checklist também
+    conta como pendente.
+    """
+    achado = _CHECKLIST.search(registro)
+    if not achado:
+        return None
+    corpo = registro[achado.end():].split("\n## ", 1)[0]
+    caixas = [m for m in map(_CAIXA.match, corpo.splitlines()) if m]
+    if not caixas:
+        return ["a seção não tem as linhas da checklist"]
+    return [m["texto"].split(":", 1)[0][:60] for m in caixas if m["marca"].strip() not in ("x", "X", "-")]
+
+
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if len(args) != 1:
@@ -110,11 +130,15 @@ def main() -> int:
         return relatorio(iid)
 
     arq = RAIZ / f"docs/roadmap/execucao/{iid}.md"
-    registro = arq.read_text() if arq.exists() else ""
+    registro = arq.read_text(encoding="utf-8") if arq.exists() else ""
     if ok(registro, f"registro de execução {arq.relative_to(RAIZ)}"):
         for s in SECOES:
             corpo = registro.split(s, 1)[-1].split("\n## ", 1)[0].strip() if s in registro else ""
             ok(corpo and "<!--" not in corpo[:4], f"registro: seção '{s[3:]}' preenchida")
+        pendentes = checklist_pendente(registro)
+        if pendentes is not None:
+            ok(not pendentes, "registro: checklist antes da revisão respondida"
+               + (f" (sem resposta: {'; '.join(pendentes)})" if pendentes else ""))
         seg = registro.split("## Segurança", 1)[-1].split("\n## ", 1)[0]
         rodou = re.search(r"security-audit", seg, re.I) and not re.search(r"n[ãa]o foi rodad|pendente", seg, re.I)
         ok(rodou, "registro: security-audit rodada e com resultado (sem 'não foi rodada' ou 'pendente')")

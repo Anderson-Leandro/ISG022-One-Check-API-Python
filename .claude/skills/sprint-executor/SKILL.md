@@ -86,6 +86,10 @@ num teste existente sem tirar nenhuma não conta como alteração.
 ### 5. Revisar
 - `/security-audit diff dev`: registre os achados na seção "Segurança". Médio ou baixo novo → item no
   backlog fora da sprint. Alto ou crítico → ponto de parada 3.
+- **Antes do `/code-review`**, preencha a seção "Checklist antes da revisão" do registro: cada linha com `[x]`
+  (conferido, e como) ou `[-]` (não se aplica, e por quê). Ela pega cedo os defeitos que a revisão mais achou
+  na Sprint 12 (campos expostos ao perfil novo, status finais, autorização antes do corpo, login e refresh,
+  404 contra 403). O `dod_check` falha se sobrar `[ ]`.
 - `/code-review` no diff quando o item muda código; corrija o que for defeito real.
 
 ### 6. Documentar

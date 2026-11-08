@@ -5001,7 +5001,7 @@ items:
   priority: should
   rank: 125
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -5026,10 +5026,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 29625846f0ed3059
-      remote_at: '2026-11-08T19:13:49Z'
+      hash: b5356afca602579c
+      remote_at: '2026-11-08T21:31:42Z'
 - id: TK-020
   type: task
   title: Versionar o executor da collection do Insomnia com um comando que roda tudo do zero
