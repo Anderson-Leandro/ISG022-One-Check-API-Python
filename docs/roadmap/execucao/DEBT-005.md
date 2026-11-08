@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #81 · **Branch:** `chore/DEBT-005-dependabot` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #81 · **Branch:** `chore/DEBT-005-dependabot` · **PR:** #197
 
 ## Entrega
 - `.github/dependabot.yml` com os ecossistemas `pip` e `github-actions`. Os PRs saem toda segunda-feira, contra a `dev`, no máximo 5 abertos por ecossistema, com prefixo `chore(deps)`. Cada ecossistema tem um grupo (pip: minor e patch num PR só; actions: todas juntas) e um `cooldown` de 7 dias contra uma versão recém-publicada.
