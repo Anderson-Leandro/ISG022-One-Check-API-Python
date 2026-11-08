@@ -5058,7 +5058,7 @@ items:
   priority: should
   rank: 126
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -5073,8 +5073,13 @@ items:
   links:
     trello_card: null
     gh_issue: 175
-    prs: []
-  evidence: []
+    prs:
+    - '#192'
+  evidence:
+  - 'PR #192 (merge 55f1678): executor da collection versionado e scripts/rodar_collection.sh, que roda tudo do
+    zero'
+  - collection 166/166 (sem a pasta 00a)
+  - 'ONECHECK_SEM_DOTENV=1: a execução não lê o arquivo de configuração local, com teste'
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -5084,10 +5089,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 95f551672be36eff
-      remote_at: '2026-11-08T21:46:01Z'
+      hash: 8eb134673d1c0eec
+      remote_at: '2026-11-08T21:58:18Z'
 - id: DEBT-018
   type: debt
   title: 'dod_check sem falhas indevidas: PR de release, intervalos de IDs e caminhos curtos'

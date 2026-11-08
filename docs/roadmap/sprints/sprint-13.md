@@ -56,6 +56,7 @@
 | 2026-11-08 | BUG-001 concluído (#186): cômodo em uso responde 409 em vez de 500, inclusive com referência em registro excluído (1096 testes, cobertura 96%) | — | rede de segurança do IntegrityError (achado da revisão) |
 | 2026-11-08 | DEBT-017 concluído (#188): regras de acesso negam por padrão perfis fora de ROLES (1117 testes, cobertura 96%) | — | segunda camada além do get_current_user |
 | 2026-11-08 | TK-019 concluído (#190): checklist de autorização e exposição no registro, preenchida antes da revisão de código e conferida pelo dod_check | — | ação da retro 12; registros antigos sem a seção não são cobrados |
+| 2026-11-08 | TK-020 concluído (#192): executor da collection versionado e comando que roda tudo do zero (166/166) | — | ação da retro 12; a collection foi ajustada ao SEC-027 |
 
 ## Sprint Review
 - **Incremento demonstrável:**
