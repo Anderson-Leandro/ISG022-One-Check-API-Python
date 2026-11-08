@@ -42,7 +42,7 @@ def dashboard(db: Session = Depends(get_db), user: Usuario = Depends(get_current
     elif contratos is not None:
         imoveis = imoveis.filter(Imovel.id.in_(db.query(Contrato.imovel_id).filter(Contrato.id.in_(contratos))))
 
-    checklists = db.query(Checklist).filter(Checklist.status.in_(["pendente_aceite", "pendente_revisao", "pendente"]))
+    checklists = db.query(Checklist).filter(Checklist.status == "pendente_aceite")
     if user.role == "vistoriador":
         checklists = checklists.filter(Checklist.vistoriador_id == user.id)
     elif contratos is not None:
