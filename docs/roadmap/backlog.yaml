@@ -4743,7 +4743,7 @@ items:
   priority: should
   rank: 294
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -4759,8 +4759,13 @@ items:
   links:
     trello_card: null
     gh_issue: 150
-    prs: []
-  evidence: []
+    prs:
+    - '#161'
+  evidence:
+  - 'PR #161 (merge 9263306): nova vistoria inicial depois de rejeição, a rejeitada intacta; pendente_revisao fora
+    do domínio (ADR-0012)'
+  - 8 testes em tests/integration/test_nova_vistoria_apos_rejeicao.py
+  - security-audit diff dev sem achado novo
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4772,10 +4777,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 3c00ab03330b4ecb
-      remote_at: '2026-11-08T16:16:37Z'
+      hash: 4b597d580e2a30b0
+      remote_at: '2026-11-08T16:26:08Z'
 - id: DEBT-016
   type: debt
   title: Declarar no OpenAPI os tipos de agendamento (inicial e encerramento)
