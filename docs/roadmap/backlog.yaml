@@ -4432,7 +4432,7 @@ items:
   priority: should
   rank: 35
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -4450,8 +4450,12 @@ items:
   links:
     trello_card: null
     gh_issue: 135
-    prs: []
-  evidence: []
+    prs:
+    - '#180'
+  evidence:
+  - 'PR #180 (merge 339a689): QR do setup de MFA gerado pela API (segno, data URI PNG), sem enviar o segredo a terceiros'
+  - 5 testes em tests/integration/test_seguranca_qr_mfa_local.py
+  - security-audit diff dev sem achado novo; segno sem vulnerabilidade conhecida
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4461,10 +4465,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: f8831a03a57dbf17
-      remote_at: '2026-11-08T19:22:20Z'
+      hash: 5e9286828adafd57
+      remote_at: '2026-11-08T19:35:40Z'
 - id: TK-018
   type: task
   title: 'Fotos em disco efêmero no Render: confirmar e dar armazenamento durável'
