@@ -4575,7 +4575,7 @@ items:
   priority: should
   rank: 291
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -4602,10 +4602,12 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 40553bf2210aeb6f
-      remote_at: '2026-11-08T14:48:32Z'
+      hash: 08541207d157f315
+      remote_at: '2026-11-08T15:14:25Z'
 - id: US-018
   type: story
   title: Locatário vê os agendamentos do próprio contrato

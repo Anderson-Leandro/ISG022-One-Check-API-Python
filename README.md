@@ -81,7 +81,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | `admin` | Obrigatório | Acesso administrativo completo; único que atribui ou gerencia `admin` e `gestor`. |
 | `gestor` | Obrigatório | Gestão operacional de imóveis, contratos, agendamentos, vistorias, problemas e usuários `vistoriador` e `locatario`. |
 | `vistoriador` | Obrigatório | Preenchimento e submissão das vistorias atribuídas a ele; leitura dos contratos e imóveis dessas vistorias. |
-| `locatario` | Opcional | Consulta dos próprios contratos e imóveis, aceite ou rejeição de vistoria e abertura de problemas. |
+| `locatario` | Opcional (quando ligado, o login pede o código, ou a configuração do autenticador se ainda não houver, [ADR-0011](docs/adr/0011-mfa-opcional-respeitado.md)) | Consulta dos próprios contratos e imóveis, aceite ou rejeição de vistoria e abertura de problemas. |
 
 ### Quem acessa cada recurso
 

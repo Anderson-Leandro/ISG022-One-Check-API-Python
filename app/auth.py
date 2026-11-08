@@ -123,13 +123,16 @@ def revoke_refresh_token(db: Session, raw: str) -> None:
 
 
 def needs_mfa(user: Usuario) -> bool:
-    return (
-        user.role in MFA_REQUIRED_ROLES and user.mfa_enabled and bool(user.mfa_secret)
-    )
+    """O login pede o código a quem tem MFA ligado e autenticador configurado, em qualquer perfil (ADR-0011).
+
+    Nos perfis obrigatórios o MFA está sempre ligado; nos outros, vale o que o usuário ou o admin escolheu.
+    """
+    return bool(user.mfa_enabled and user.mfa_secret)
 
 
 def mfa_setup_required(user: Usuario) -> bool:
-    return user.role in MFA_REQUIRED_ROLES and user.mfa_enabled and not user.mfa_secret
+    """MFA ligado e sem autenticador: o login leva à configuração, em qualquer perfil (ADR-0011)."""
+    return bool(user.mfa_enabled and not user.mfa_secret)
 
 
 def reset_mfa(user: Usuario) -> None:

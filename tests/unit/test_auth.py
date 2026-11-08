@@ -237,10 +237,14 @@ def test_needs_mfa_false_mfa_disabled(user_admin):
     assert needs_mfa(user_admin) is False
 
 
-def test_needs_mfa_false_role_nao_obrigatorio(user_locatario):
-    # locatario não está em MFA_REQUIRED_ROLES
+def test_needs_mfa_true_locatario_com_mfa_ligado(user_locatario):
+    # MFA opcional: ligado e configurado pelo próprio locatário, passa a valer no login (ADR-0011)
     user_locatario.mfa_enabled = True
     user_locatario.mfa_secret = MFA_TEST_SECRET
+    assert needs_mfa(user_locatario) is True
+
+
+def test_needs_mfa_false_locatario_sem_mfa(user_locatario):
     assert needs_mfa(user_locatario) is False
 
 
@@ -254,8 +258,14 @@ def test_mfa_setup_required_false_com_secret():
     assert mfa_setup_required(u) is False
 
 
-def test_mfa_setup_required_false_role_nao_obrigatorio():
+def test_mfa_setup_required_true_locatario_com_mfa_ligado():
+    # MFA ligado sem autenticador leva à configuração em qualquer perfil (ADR-0011)
     u = Usuario(role="locatario", mfa_enabled=True, mfa_secret=None)
+    assert mfa_setup_required(u) is True
+
+
+def test_mfa_setup_required_false_locatario_sem_mfa():
+    u = Usuario(role="locatario", mfa_enabled=False, mfa_secret=None)
     assert mfa_setup_required(u) is False
 
 
