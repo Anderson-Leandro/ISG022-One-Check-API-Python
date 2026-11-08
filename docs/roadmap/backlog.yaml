@@ -2285,8 +2285,8 @@ items:
     status: in_sprint
   sync:
     github:
-      hash: 104b56054e29666e
-      remote_at: '2026-11-03T01:16:24Z'
+      hash: 26a0542d1d38d50e
+      remote_at: '2026-11-08T14:48:24Z'
 - id: TK-003
   type: task
   title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render
@@ -2700,7 +2700,7 @@ items:
   priority: should
   rank: 80
   estimate: 2
-  status: in_sprint
+  status: done
   sprint: 12
   phase: F6
   depends_on: []
@@ -2712,19 +2712,24 @@ items:
   links:
     trello_card: null
     gh_issue: 70
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0009, DEBT-015)'
+  - docs/roadmap/execucao/SPK-001.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 436fe6e4649f0e29
-      remote_at: '2026-11-03T01:16:27Z'
+      hash: 018b85ba0f72f3f8
+      remote_at: '2026-11-08T14:48:26Z'
 - id: SPK-002
   type: spike
   title: Decidir sobre as fotos públicas em /uploads (T-14)
@@ -2737,7 +2742,7 @@ items:
   priority: should
   rank: 90
   estimate: 2
-  status: in_sprint
+  status: done
   sprint: 12
   phase: F6
   depends_on: []
@@ -2749,19 +2754,24 @@ items:
   links:
     trello_card: null
     gh_issue: 71
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0010, R-007_aceito)'
+  - docs/roadmap/execucao/SPK-002.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 58d5e0592773cce5
-      remote_at: '2026-11-03T01:16:28Z'
+      hash: 343f2a1cea96ad23
+      remote_at: '2026-11-08T14:48:27Z'
 - id: SPK-003
   type: spike
   title: Decidir se o MFA vale para locatário e visualizador
@@ -2774,7 +2784,7 @@ items:
   priority: could
   rank: 210
   estimate: 1
-  status: in_sprint
+  status: done
   sprint: 12
   phase: F6
   depends_on: []
@@ -2786,19 +2796,24 @@ items:
   links:
     trello_card: null
     gh_issue: 72
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0011, SEC-036)'
+  - docs/roadmap/execucao/SPK-003.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 58cddc66b4d3b10a
-      remote_at: '2026-11-03T01:16:29Z'
+      hash: 4b87ee2c0b583a00
+      remote_at: '2026-11-08T14:48:28Z'
 - id: SPK-004
   type: spike
   title: Fechar as regras de negócio em aberto do PENDENCIAS_API.md (itens 5, 7, 8 e 11)
@@ -2814,7 +2829,7 @@ items:
   priority: should
   rank: 100
   estimate: 2
-  status: in_sprint
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -2829,19 +2844,25 @@ items:
   links:
     trello_card: null
     gh_issue: 73
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0012, US-018, US-019, US-020,
+    DEBT-016)'
+  - docs/roadmap/execucao/SPK-004.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 4ebed76afd522fc5
-      remote_at: '2026-11-03T01:16:31Z'
+      hash: f22d7a120b428e03
+      remote_at: '2026-11-08T14:48:30Z'
 - id: US-015
   type: story
   title: Excluir checklist, contrato e problema criados por engano
@@ -4510,7 +4531,7 @@ items:
     file: docs/adr/0009-remocao-do-perfil-visualizador.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 146
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4522,6 +4543,10 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  sync:
+    github:
+      hash: abbb23d41e47b590
+      remote_at: '2026-11-08T14:48:31Z'
 - id: SEC-036
   type: security
   title: Respeitar o MFA opcional ligado pelo próprio usuário
@@ -4555,7 +4580,7 @@ items:
     file: docs/adr/0011-mfa-opcional-respeitado.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 147
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4567,6 +4592,10 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  sync:
+    github:
+      hash: 40553bf2210aeb6f
+      remote_at: '2026-11-08T14:48:32Z'
 - id: US-018
   type: story
   title: Locatário vê os agendamentos do próprio contrato
@@ -4595,7 +4624,7 @@ items:
     file: docs/adr/0012-regras-de-negocio-pendentes.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 148
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4607,6 +4636,10 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  sync:
+    github:
+      hash: 1ce35fbc47a77d98
+      remote_at: '2026-11-08T14:48:33Z'
 - id: US-019
   type: story
   title: Locatário comenta no próprio problema enquanto não estiver resolvido
@@ -4638,7 +4671,7 @@ items:
     file: docs/adr/0012-regras-de-negocio-pendentes.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 149
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4650,6 +4683,10 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  sync:
+    github:
+      hash: 58c0562ac9f23c16
+      remote_at: '2026-11-08T14:48:34Z'
 - id: US-020
   type: story
   title: Nova vistoria depois de uma rejeição, e fim do status pendente_revisao
@@ -4683,7 +4720,7 @@ items:
     file: docs/adr/0012-regras-de-negocio-pendentes.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 150
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4695,6 +4732,10 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  sync:
+    github:
+      hash: 3ae459c359d336bc
+      remote_at: '2026-11-08T14:48:36Z'
 - id: DEBT-016
   type: debt
   title: Declarar no OpenAPI os tipos de agendamento (inicial e encerramento)
@@ -4723,7 +4764,7 @@ items:
     file: docs/adr/0012-regras-de-negocio-pendentes.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 151
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4735,3 +4776,7 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  sync:
+    github:
+      hash: c948315ecd3faff5
+      remote_at: '2026-11-08T14:48:37Z'
