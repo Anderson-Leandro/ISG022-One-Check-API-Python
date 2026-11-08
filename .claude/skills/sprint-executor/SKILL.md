@@ -1,7 +1,7 @@
 ---
 name: sprint-executor
 description: Executa os itens da sprint ativa um a um, seguindo o processo do projeto - branch própria a partir da dev, testes na cópia sem .env, security-audit diff, relatório de testes existentes alterados, PR, merge com CI verde, item e issue como concluídos, acompanhamento da sprint e conferência da DoD por scripts/dod_check.py. Use quando o usuário pedir para executar, implementar ou tocar a sprint, o próximo item, ou um item específico (ex. /sprint-executor SEC-032).
-argument-hint: "[ID do item | proximo | status]"
+argument-hint: "[ID do item | proximo | status] [--continuo]"
 ---
 
 # Sprint Executor
@@ -18,19 +18,24 @@ verde. Se o script não passar, o item não está pronto.
   com um venv do scratchpad (`pip install -r requirements-test.txt`).
 
 Argumento: `$ARGUMENTS`. Vazio ou `proximo` → próximo item; um ID → esse item; `status` → só mostra a fila.
+A flag `--continuo` (também aceite `--contínuo` ou `continuo`) pode vir sozinha ou junto com um ID
+(`/sprint-executor --continuo`, `/sprint-executor SEC-034 --continuo`) e liga o modo `contínuo` só nesta execução.
 
 ## Modo e autorização
 
-Leia a linha **Modo de execução** em `CLAUDE.md`:
-- `confirmar cada item` (atual): execute **um** item até o **PR aberto com o CI verde** e pare. **O merge é do
-  usuário.** O item fica em `review`; o fechamento (passo 8) acontece no início da execução seguinte, depois de
-  conferir que o usuário mesclou.
-- `contínuo`: faça o merge depois do CI verde, feche o item e siga para o próximo até um ponto de parada.
+O modo vem do argumento, não de arquivo: vale só para a execução atual e nunca é gravado.
+- **Sem a flag → `confirmar cada item` (padrão):** execute **um** item até o **PR aberto com o CI verde** e pare.
+  **O merge é do usuário.** O item fica em `review`; o fechamento (passo 8) acontece no início da execução
+  seguinte, depois de conferir que o usuário mesclou.
+- **Com `--continuo` → `contínuo`:** faça o merge depois do CI verde, feche o item (o PR de fechamento também é
+  mesclado por você) e siga para o próximo, até um ponto de parada ou o fim dos itens executáveis. No início,
+  diga em uma linha que o modo contínuo está ligado.
 
 Neste fluxo o usuário já autorizou, de forma permanente: criar branch, commitar, abrir PR, aplicar o board-sync
-do item (sempre com o dry-run mostrado antes, na mesma resposta) e, **só no modo `contínuo`**, fazer o merge
-depois do CI verde. No modo `confirmar cada item`, nunca rode `gh pr merge`. Fora deste fluxo, valem as regras
-normais de pedir confirmação.
+do item (sempre com o dry-run mostrado antes, na mesma resposta) e, **só com `--continuo`**, fazer o merge dos
+PRs abertos nesta execução depois do CI verde. Sem a flag, nunca rode `gh pr merge`. PRs que ficaram aguardando
+o usuário em execuções anteriores continuam com ele, mesmo no modo contínuo: liste-os e não os mescle. Fora deste
+fluxo, valem as regras normais de pedir confirmação.
 
 ## Pontos de parada (sempre, em qualquer modo)
 
@@ -45,7 +50,7 @@ Pare, explique e espere o usuário quando:
 
 ## Fluxo por item
 
-### 0. Fechar o que o usuário mesclou (modo `confirmar cada item`)
+### 0. Fechar o que o usuário mesclou
 - Para cada item da sprint em `review`: veja o PR em `links.prs` (`gh pr view <n> --json state`).
   - `MERGED` → faça o passo 8 (Fechar) desse item antes de escolher o próximo.
   - Ainda aberto → não comece outro item que dependa dele; avise que o PR aguarda o merge.
