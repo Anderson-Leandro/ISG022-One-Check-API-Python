@@ -53,6 +53,8 @@ class RefreshToken(Base):
     token_hash: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    # Preenchido na rotação: o refresh trocado fica guardado para detectar o reuso (SEC-027)
+    usado_em: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     usuario: Mapped[Usuario] = relationship(back_populates="refresh_tokens")
 

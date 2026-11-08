@@ -2527,7 +2527,7 @@ items:
   priority: should
   rank: 70
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F6
   depends_on: []
@@ -2551,10 +2551,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: e5747aee6279b1dc
-      remote_at: '2026-11-08T19:13:32Z'
+      hash: a74711d0a1f6ff1c
+      remote_at: '2026-11-08T20:02:48Z'
 - id: SEC-028
   type: security
   title: 'Direitos do titular (LGPD): exportar e anonimizar os próprios dados'

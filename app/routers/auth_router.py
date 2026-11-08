@@ -22,7 +22,7 @@ from app.auth import (
     revoke_refresh_token,
     sessao_vigente,
     usuario_to_dict,
-    verify_refresh_token,
+    trocar_refresh_token,
     verify_totp,
     verify_totp_code,
 )
@@ -285,13 +285,19 @@ def mfa_desabilitar(
 
 @router.post("/refresh")
 def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
-    user = verify_refresh_token(db, body.refresh_token)
-    if not user:
+    # A troca marca o token antes de emitir o par novo, de forma atômica: só um pedido vence (SEC-027)
+    resultado, user = trocar_refresh_token(db, body.refresh_token)
+    if resultado == "reuso":
+        # Um refresh já trocado voltou: alguém tem uma cópia. Encerra todas as sessões do dono
+        encerrar_sessoes(db, user)
+        db.commit()
+        log_operacao(db, user.id, "refresh_reutilizado", "usuario", user.id, "sessões encerradas")
+        return fail("Refresh token inválido ou expirado", status_code=401)
+    if resultado != "ok":
         return fail("Refresh token inválido ou expirado", status_code=401)
 
     access = create_access_token(user.id, user.role, user.token_version)
     new_refresh = create_refresh_token(db, user.id)
-    revoke_refresh_token(db, body.refresh_token)
     return ok({"access_token": access, "refresh_token": new_refresh})
 
 
@@ -302,6 +308,6 @@ def logout(
     body: RefreshRequest | None = None,
 ):
     if body is not None and body.refresh_token:
-        revoke_refresh_token(db, body.refresh_token)
+        revoke_refresh_token(db, body.refresh_token, usuario_id=user.id)
     log_operacao(db, user.id, "logout", "usuario", user.id)
     return ok(None)
