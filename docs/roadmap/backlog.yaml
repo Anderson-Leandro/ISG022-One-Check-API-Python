@@ -3978,7 +3978,7 @@ items:
   priority: should
   rank: 37
   estimate: 2
-  status: in_progress
+  status: review
   sprint: 12
   phase: F5
   depends_on: []
@@ -3994,7 +3994,8 @@ items:
   links:
     trello_card: null
     gh_issue: 105
-    prs: []
+    prs:
+    - '#127'
   evidence: []
   created: '2026-11-02'
   updated: '2026-11-08'
@@ -4005,10 +4006,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: review
   sync:
     github:
-      hash: 9fb44af5e85c78ce
-      remote_at: '2026-11-08T03:18:01Z'
+      hash: 9b8591f4ce2018d2
+      remote_at: '2026-11-08T03:34:15Z'
 - id: SEC-034
   type: security
   title: Testes de sessão revogada no setup de MFA e do teto de chaves do limitador
