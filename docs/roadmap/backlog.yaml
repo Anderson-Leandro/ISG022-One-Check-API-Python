@@ -5112,7 +5112,7 @@ items:
   priority: should
   rank: 127
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -5126,8 +5126,12 @@ items:
   links:
     trello_card: null
     gh_issue: 176
-    prs: []
-  evidence: []
+    prs:
+    - '#194'
+  evidence:
+  - 'PR #194 (merge f377720): PR #194: dod_check sem falhas indevidas em PR de release, intervalos de IDs e caminhos
+    curtos'
+  - 'tests/unit/test_dod_check.py: 38 testes novos; suíte 1172 passaram, cobertura 96%'
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -5137,7 +5141,9 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 8dbf9ce9f21c6d80
-      remote_at: '2026-11-08T22:01:29Z'
+      hash: 0ab3ccb225a30fab
+      remote_at: '2026-11-08T22:18:54Z'
