@@ -4629,7 +4629,7 @@ items:
   priority: should
   rank: 292
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -4644,8 +4644,14 @@ items:
   links:
     trello_card: null
     gh_issue: 148
-    prs: []
-  evidence: []
+    prs:
+    - '#157'
+  evidence:
+  - 'PR #157 (merge 41d8c95): locatário lê os agendamentos do próprio contrato, sem a observação interna; dashboard
+    com o mesmo recorte (ADR-0012)'
+  - 7 testes em tests/integration/test_agendamentos_locatario.py; 2 testes existentes ajustados com aprovação do
+    usuário em 2026-11-08
+  - collection do Insomnia 162/162; security-audit diff dev sem achado novo
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4657,10 +4663,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: ad429248b5db7982
-      remote_at: '2026-11-08T15:34:26Z'
+      hash: 637662baa82d8733
+      remote_at: '2026-11-08T15:49:21Z'
 - id: US-019
   type: story
   title: Locatário comenta no próprio problema enquanto não estiver resolvido
