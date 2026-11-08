@@ -292,6 +292,8 @@ pip install -r requirements-test.txt
 
 Para adicionar ou mudar uma dependência, edite `requirements.txt` e regenere o lockfile com o comando do cabeçalho de `requirements.lock` (usa o [`uv`](https://docs.astral.sh/uv/)). O teste `test_lockfile_coerente_com_requirements` falha se os dois arquivos divergirem.
 
+O Dependabot (`.github/dependabot.yml`) abre toda segunda-feira, contra a `dev`, PRs de atualização do pip e das GitHub Actions. Quando o PR do pip muda o `requirements.txt`, o CI fica vermelho até que alguém rode, na branch do PR, o comando do cabeçalho de `requirements.lock` e faça push do lock regenerado. Os PRs que mudam só o `requirements-test.txt` não mexem no lock.
+
 ### 4. Configurar Variáveis de Ambiente (`.env`)
 Copie o exemplo e preencha: `cp .env.example .env`. O `.env.example` traz todas as variáveis; as principais:
 ```env
