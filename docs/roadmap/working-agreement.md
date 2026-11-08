@@ -23,6 +23,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 ## Contexto deste projeto
 - **Time de quatro pessoas:** o PO prioriza e aceita as entregas na review; o TL cuida dos padrões técnicos; os devs implementam. O autor pode mergear o próprio PR sem aprovação de outra pessoa (decisão do time em 2026-11-02).
 - **Branches:** hoje o trabalho vai para `dev`, e a `main` recebe PR de `dev`. As branches curtas de item (`tipo/ID-descricao`) saem de `dev`.
+- **Proteção no GitHub (TK-017):** a `main` e a `dev` só recebem mudança por PR, com os checks `test` e `dependencias` verdes; sem aprovação obrigatória, sem force-push, sem apagar a branch e sem exceção para ninguém. A regra está versionada em [`.github/rulesets/protecao-branches.json`](../../.github/rulesets/protecao-branches.json); para mudar, edite o arquivo e reaplique com `gh api -X PUT repos/<dono>/<repo>/rulesets/<id> --input <arquivo>`.
 - **Origem:** a DoR e a DoD abaixo completam as do [`docs/product-backlog.md`](../product-backlog.md), seções 9 e 10.
 - **Segurança:** toda correção de segurança tem relatório em `docs/security/correcao-*.md` (causa, mudança, testes, impacto e riscos residuais), escrito com testes que falham antes da correção.
 - **Documentação viva:** toda mudança que afeta segurança atualiza o `threat-model.md` e a arquitetura (antigo DOC-001, agora TK-001).
