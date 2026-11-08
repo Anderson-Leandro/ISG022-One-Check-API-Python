@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 12 · **Issue:** #151 · **Branch:** `chore/DEBT-016-enum-tipos-agendamento` · **PR:** #<n>
+- **Sprint:** 12 · **Issue:** #151 · **Branch:** `chore/DEBT-016-enum-tipos-agendamento` · **PR:** #163
 
 ## Entrega
 Decisão do SPK-004, item 11 (ADR-0012): os tipos continuam só `inicial` e `encerramento`. `app/schemas.py` ganha a constante `TIPOS_AGENDAMENTO` e o tipo `TipoAgendamento`, um `str` com `enum` no schema JSON, usado em `AgendamentoCreate.tipo` e `AgendamentoUpdate.tipo`. As duas rotas que validam o tipo usam a mesma constante, então o que o OpenAPI declara e o que a API aceita não se separam. O OpenAPI passa a listar os valores aceitos. A validação continua nas rotas, com a mesma resposta 422 e a mensagem de campo, então quem já trata o erro não percebe diferença.
