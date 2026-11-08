@@ -4551,7 +4551,7 @@ items:
   priority: should
   rank: 85
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -4567,8 +4567,13 @@ items:
   links:
     trello_card: null
     gh_issue: 140
-    prs: []
-  evidence: []
+    prs:
+    - '#186'
+  evidence:
+  - 'PR #186 (merge e6314ce): cômodo usado em checklist ou problema (inclusive excluídos) responde 409; IntegrityError
+    no commit também vira 409'
+  - 6 testes em tests/integration/test_excluir_comodo_referenciado.py
+  - security-audit diff dev sem achado novo
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4578,10 +4583,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 8ee47d5950f5a763
-      remote_at: '2026-11-08T20:17:33Z'
+      hash: e9f5837746928c58
+      remote_at: '2026-11-08T20:25:51Z'
 - id: DEBT-015
   type: debt
   title: Remover o perfil visualizador e recusar perfis desconhecidos
