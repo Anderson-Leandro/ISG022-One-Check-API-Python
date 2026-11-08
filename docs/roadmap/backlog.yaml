@@ -3927,7 +3927,7 @@ items:
   priority: must
   rank: 36
   estimate: 3
-  status: in_sprint
+  status: review
   sprint: 12
   phase: F5
   depends_on: []
@@ -3943,7 +3943,8 @@ items:
   links:
     trello_card: null
     gh_issue: 104
-    prs: []
+    prs:
+    - '#125'
   evidence: []
   created: '2026-11-02'
   updated: '2026-11-07'
@@ -3952,10 +3953,14 @@ items:
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  - date: '2026-11-07'
+    status: in_progress
+  - date: '2026-11-07'
+    status: review
   sync:
     github:
-      hash: d1005c1a1e08774c
-      remote_at: '2026-11-07T16:15:08Z'
+      hash: 6314ee5cb99ffe69
+      remote_at: '2026-11-08T01:44:29Z'
 - id: SEC-033
   type: security
   title: Testes das travas do checklist depois do envio para aceite
