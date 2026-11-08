@@ -71,7 +71,7 @@ ROTAS_RESTRITAS = [
     ("DELETE", "/problemas/{problema_id}", ADMIN_GESTOR),
     ("POST", "/problemas/{problema_id}/atualizacoes", ("admin", "gestor", "locatario")),
     ("PATCH", "/problemas/{problema_id}/status", ADMIN_GESTOR),
-    ("GET", "/logs", ADMIN_GESTOR),
+    ("GET", "/logs", ("admin",)),
 ]
 
 COMBINACOES_PROIBIDAS = [
@@ -124,12 +124,13 @@ def test_lista_confere_com_a_api(client):
 
 
 def test_combinacoes_cobertas():
-    """33 rotas de admin e gestor × vistoriador e locatário, a rota só de admin × 3 perfis e
-    POST /problemas/{id}/atualizacoes, que desde o US-019 aceita também o locatário (só o vistoriador é proibido).
+    """32 rotas de admin e gestor × vistoriador e locatário, as 2 rotas só de admin (MFA disable e, desde o
+    SEC-018, GET /logs) × 3 perfis e POST /problemas/{id}/atualizacoes, que desde o US-019 aceita também o
+    locatário (só o vistoriador é proibido).
 
     Eram 97 na avaliação SPK-005 e 106 com o US-015; as 35 do visualizador saíram com o perfil (ADR-0009).
     """
-    assert len(COMBINACOES_PROIBIDAS) == 33 * 2 + 3 + 1
+    assert len(COMBINACOES_PROIBIDAS) == 32 * 2 + 2 * 3 + 1
 
 
 # ── 2. Cada perfil proibido recebe 403 e nada é gravado ─────────────────────────
@@ -203,17 +204,16 @@ def test_post_encerrar_e_cancelar_pelo_gestor(client, db, contrato, imovel, toke
     assert imovel.status == "disponivel"
 
 
-def test_gestor_le_os_logs(client, db, user_admin, token_gestor):
-    """Comportamento atual: o gestor lê a trilha de auditoria completa.
-
-    O SEC-018 (Sprint 13) vai decidir se o gestor deixa de ver os logs ou passa a ver uma versão
-    reduzida. Quando a decisão for implementada, este teste muda junto (com o relatório de teste
-    alterado).
-    """
-    db.add(LogOperacao(usuario_id=user_admin.id, acao="login", entidade="usuario", entidade_id=user_admin.id))
+def test_gestor_nao_le_os_logs(client, db, user_admin, token_gestor, token_admin):
+    """SEC-018 (decisão do PO em 2026-11-08): a trilha de auditoria é só do admin."""
+    db.add(LogOperacao(usuario_id=user_admin.id, acao="login", entidade="usuario", entidade_id=user_admin.id, ip="203.0.113.7"))
     db.flush()
 
     r = client.get(f"{API}/logs", headers=auth(token_gestor))
 
-    assert r.status_code == 200, r.text
-    assert [(log["acao"], log["usuario_id"]) for log in r.json()["dados"]] == [("login", user_admin.id)]
+    assert r.status_code == 403, r.text
+    assert r.json()["detail"] == "Permissão negada"
+    assert "203.0.113.7" not in r.text
+    admin = client.get(f"{API}/logs", headers=auth(token_admin))
+    assert admin.status_code == 200, admin.text
+    assert [(log["acao"], log["ip"]) for log in admin.json()["dados"]] == [("login", "203.0.113.7")]

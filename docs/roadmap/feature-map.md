@@ -18,7 +18,7 @@ python3 ~/.claude/skills/_roadmap-shared/scripts/feature_map.py --root .
 | Contratos e agendamentos | 15 | 6 auth (por dono), 9 admin/gestor | contratos 93%, agendamentos **84%** | 13 + 2 | PENDENCIAS 5, 11, 12 | implementada + testada | US-005, US-006, US-013, SPK-004, US-015 |
 | Checklists, fotos, aceite e PDF | 13 | 12 auth (por dono/perfil), 1 admin/gestor | 92%; PDF 98% | 10, jun–out/2026 | N3, PENDENCIAS 8 | implementada + testada | US-007, US-008, US-009, US-014, SEC-022 |
 | Problemas e notificações | 6 | auth com `assert_acesso_problemas`; status e atualizações admin/gestor | 91% | 4 + contratos | item 6, SEC-012, PENDENCIAS 7, 9 | implementada + testada | US-010, SEC-012, DEBT-001 |
-| Dashboard e logs | 2 | dashboard auth (recorte por perfil), logs admin/gestor | 91% | 5 | SEC-012; auditoria 2026-11-02 | implementada + testada; 2 achados abertos | US-011, SEC-018, SEC-020 |
+| Dashboard e logs | 2 | dashboard auth (recorte por perfil), logs só admin (SEC-018) | 91% | 5 | SEC-012; auditoria 2026-11-02 | implementada + testada; 2 achados abertos | US-011, SEC-018, SEC-020 |
 | Admin (seed) | 5 | `require_seed_access` (SEED_SECRET + admin) | 95% | 4 | N2, SEC-001 | implementada + testada | SEC-001, SEC-021 |
 | Health e uploads | 2 + `/` | públicas por design | 100% | 4 | T-14 (fotos públicas) | implementada + testada | SPK-002, SEC-026 |
 
@@ -97,7 +97,7 @@ Proteção: public = nenhum indício de autenticação no handler (confirme!) ·
 | POST | `/contratos/{contrato_id}/problemas` | auth |  | **não** | app/routers/contratos.py:334 (create_problema) |
 | GET | `/contratos/{contrato_id}/problemas` | auth |  | **não** | app/routers/contratos.py:467 (list_problemas) |
 | GET | `/dashboard` | auth |  | sim | app/routers/dashboard.py:31 (dashboard) |
-| GET | `/logs` | role | admin, gestor | sim | app/routers/dashboard.py:75 (logs) |
+| GET | `/logs` | role | admin | sim | app/routers/dashboard.py:75 (logs) |
 | GET | `/health` | public |  | sim | app/routers/health.py:10 (health) |
 | GET | `/uploads/{filename}` | public |  | sim | app/routers/health.py:15 (serve_upload) |
 | GET | `/imoveis` | auth |  | sim | app/routers/imoveis.py:57 (list_imoveis) |

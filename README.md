@@ -92,7 +92,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | Vistorias (checklists) | Todas | Só as atribuídas a ele | Só as dos próprios contratos |
 | Problemas | Todos | Sem acesso | Só os dos próprios contratos |
 | Usuários (`/usuarios`) | Sim (gestor: exceto admin/gestor) | Sem acesso | Sem acesso |
-| Logs de auditoria | Sim | Sem acesso | Sem acesso |
+| Logs de auditoria | Só o admin | Sem acesso | Sem acesso |
 
 ---
 
@@ -248,7 +248,7 @@ POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (a
 ### 📊 Dashboard, Logs & Sistema
 ```http
 GET    /api/v1/dashboard                   # Métricas no recorte do perfil; null no que o perfil não acessa
-GET    /api/v1/logs                        # Logs de auditoria, com filtros e paginação (admin, gestor)
+GET    /api/v1/logs                        # Logs de auditoria, com filtros e paginação (admin)
 GET    /api/v1/health                      # Health check da API (público)
 GET    /api/v1/uploads/{filename}          # Fotos enviadas (público, nome aleatório)
 ```

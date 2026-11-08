@@ -4807,7 +4807,7 @@
       "_type": "request_group",
       "parentId": "wrk_onecheck_api",
       "name": "07 Dashboard e logs",
-      "description": "O dashboard muda conforme o perfil; os logs são só de admin e gestor.",
+      "description": "O dashboard muda conforme o perfil; os logs são só do admin (SEC-018).",
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": 9000
@@ -4987,11 +4987,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_212cba2caa3fd795fe61652e",
+      "_id": "req_8f90c8d53f5985c4d8e3b3ed",
       "_type": "request",
       "parentId": "fld_9838fe9fc0175411d152934c",
-      "name": "✅ Gestor consulta os logs (comportamento atual, ver SEC-018)",
-      "description": "",
+      "name": "❌ Gestor não consulta os logs → 403",
+      "description": "SEC-018: a trilha de auditoria é só do admin.",
       "method": "GET",
       "url": "{{ _.base_url }}/logs",
       "parameters": [],
@@ -5004,7 +5004,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = true', () => insomnia.expect(b.sucesso).to.equal(true));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 403', () => insomnia.expect(r.code).to.equal(403));",
       "metaSortKey": 9007,
       "isPrivate": false,
       "settingStoreCookies": false,

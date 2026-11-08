@@ -1265,6 +1265,7 @@ items:
     Cenário: Um gestor chama GET /logs?acao=login e obtém IP e horário de login de todos os usuários, inclusive dos admins, e os e-mails digitados nos logins falhos.
     Impacto: Exposição de dados pessoais (IP, padrão de acesso) além da necessidade do perfil; o backlog do produto define a auditoria como atribuição do admin. Exige conta de gestor.
     Recomendação: Restringir GET /logs ao admin, ou para o gestor omitir ip/detalhes e eventos de contas admin/gestor.
+    Decisão do PO (2026-11-08): GET /logs só do admin; o gestor recebe 403. Opções descartadas: visão reduzida para o gestor; risco aceito.
   acceptance_criteria:
   - Dado um gestor autenticado, quando chamar GET /logs, então recebe 403 (ou a lista sem ip/detalhes e sem eventos
     de contas admin/gestor, conforme a decisão registrada).
@@ -1273,7 +1274,7 @@ items:
   priority: should
   rank: 50
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F6
   depends_on: []
@@ -1300,10 +1301,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 6be8f96a27a6b605
-      remote_at: '2026-11-08T19:13:25Z'
+      hash: 55f4b35578b38d5b
+      remote_at: '2026-11-08T19:42:16Z'
 - id: SEC-019
   type: security
   title: Login falho grava o texto digitado no campo e-mail
