@@ -7,6 +7,7 @@ from app.auditoria import campos_alterados
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
 from app.deps import get_current_user, require_roles
+from app.exclusao import marcar_excluido
 from app.models import (
     AceiteChecklist,
     Checklist,
@@ -320,6 +321,25 @@ def delete_foto(
     db.delete(foto_row)
     db.commit()
     log_operacao(db, user.id, "delete", "checklist_foto", foto_id)
+    return ok(None)
+
+
+@router.delete("/checklists/{checklist_id}")
+def excluir_checklist(
+    checklist_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    """Exclusão lógica (ADR-0008): só antes do envio para aceite, para preservar a evidência do laudo."""
+    ck = db.query(Checklist).filter(Checklist.id == checklist_id).first()
+    if not ck:
+        return fail("Checklist não encontrado", status_code=404)
+    if ck.status != "em_preenchimento":
+        return fail(f"Não é possível excluir um checklist com status '{ck.status}'", status_code=409)
+
+    marcar_excluido(ck, user)
+    db.commit()
+    log_operacao(db, user.id, "delete", "checklist", checklist_id)
     return ok(None)
 
 
