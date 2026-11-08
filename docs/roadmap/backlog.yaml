@@ -1222,7 +1222,7 @@ items:
   priority: should
   rank: 40
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -1244,14 +1244,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: e18df59c726e265d
-      remote_at: '2026-11-03T00:33:09Z'
+      hash: 2d171d4d3b6455ae
+      remote_at: '2026-11-08T19:13:24Z'
 - id: SEC-018
   type: security
   title: Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas
@@ -1271,7 +1273,7 @@ items:
   priority: should
   rank: 50
   estimate: 2
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -1292,14 +1294,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: bff56b703a66a502
-      remote_at: '2026-11-03T00:33:10Z'
+      hash: 6be8f96a27a6b605
+      remote_at: '2026-11-08T19:13:25Z'
 - id: SEC-019
   type: security
   title: Login falho grava o texto digitado no campo e-mail
@@ -1318,7 +1322,7 @@ items:
   priority: could
   rank: 190
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -1339,14 +1343,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 95970699ff14ada9
-      remote_at: '2026-11-03T00:33:11Z'
+      hash: 2f205d13af03888a
+      remote_at: '2026-11-08T19:13:26Z'
 - id: SEC-020
   type: security
   title: Filtros de data inválidos em /logs são ignorados em silêncio
@@ -1364,7 +1370,7 @@ items:
   priority: could
   rank: 200
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -1385,14 +1391,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: da1131d3c79ea2be
-      remote_at: '2026-11-03T00:33:12Z'
+      hash: bdf4876e1baeac96
+      remote_at: '2026-11-08T19:13:27Z'
 - id: US-001
   type: story
   title: Autenticar identidade com JWT e refresh
@@ -2258,7 +2266,7 @@ items:
   priority: must
   rank: 20
   estimate: 1
-  status: ready
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -2285,10 +2293,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: ready
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 84f020e2b80b964e
-      remote_at: '2026-11-08T17:24:25Z'
+      hash: bf5230801b38a2e6
+      remote_at: '2026-11-08T19:13:28Z'
 - id: TK-003
   type: task
   title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render
@@ -2302,7 +2312,7 @@ items:
   priority: must
   rank: 30
   estimate: 1
-  status: ready
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -2329,10 +2339,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: ready
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 2f355213aaee810b
-      remote_at: '2026-11-08T17:24:26Z'
+      hash: a97f2dcea279a5b3
+      remote_at: '2026-11-08T19:13:29Z'
 - id: TK-004
   type: task
   title: Agendar a limpeza de dados vencidos no Render
@@ -2381,7 +2393,7 @@ items:
   priority: should
   rank: 60
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -2396,14 +2408,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 57695ea24e111693
-      remote_at: '2026-11-03T00:34:04Z'
+      hash: 40abb13fd7898df3
+      remote_at: '2026-11-08T19:13:31Z'
 - id: SEC-025
   type: security
   title: Log de auditoria append-only
@@ -2504,7 +2518,7 @@ items:
   priority: should
   rank: 70
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -2522,14 +2536,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 0a26be499f6fcfdc
-      remote_at: '2026-11-03T00:34:07Z'
+      hash: e5747aee6279b1dc
+      remote_at: '2026-11-08T19:13:32Z'
 - id: SEC-028
   type: security
   title: 'Direitos do titular (LGPD): exportar e anonimizar os próprios dados'
@@ -2663,7 +2679,7 @@ items:
   priority: could
   rank: 240
   estimate: 5
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F6
   depends_on: []
@@ -2683,14 +2699,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 0b54b3a9cd8b3ee5
-      remote_at: '2026-11-03T00:34:12Z'
+      hash: 2c2e751db5783d46
+      remote_at: '2026-11-08T19:13:33Z'
 - id: SPK-001
   type: spike
   title: Definir o alcance do perfil visualizador
@@ -3023,7 +3041,7 @@ items:
   priority: should
   rank: 160
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F5
   depends_on: []
@@ -3041,14 +3059,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 19ab35c6459244aa
-      remote_at: '2026-11-03T00:34:21Z'
+      hash: 75a4a7e16a3f8d2b
+      remote_at: '2026-11-08T19:13:34Z'
 - id: DEBT-002
   type: debt
   title: response_model e nomes consistentes no OpenAPI
@@ -3061,7 +3081,7 @@ items:
   priority: could
   rank: 300
   estimate: 5
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F5
   depends_on: []
@@ -3079,14 +3099,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 2146fff6bfaed324
-      remote_at: '2026-11-03T00:34:23Z'
+      hash: ed7965411f1b52aa
+      remote_at: '2026-11-08T19:13:35Z'
 - id: DEBT-003
   type: debt
   title: Consolidar as rotas duplicadas de MFA e remover GET /auth/mfa/setup
@@ -3099,7 +3121,7 @@ items:
   priority: should
   rank: 150
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F5
   depends_on: []
@@ -3118,14 +3140,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: d880829069314979
-      remote_at: '2026-11-03T00:34:24Z'
+      hash: 77176cc7f0b836b8
+      remote_at: '2026-11-08T19:13:37Z'
 - id: DEBT-004
   type: debt
   title: Lint e formatação (ruff) no CI
@@ -3138,7 +3162,7 @@ items:
   priority: should
   rank: 140
   estimate: 2
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F5
   depends_on: []
@@ -3155,14 +3179,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 0c10484799c34796
-      remote_at: '2026-11-03T00:34:25Z'
+      hash: da9a5f040b71969b
+      remote_at: '2026-11-08T19:13:38Z'
 - id: DEBT-005
   type: debt
   title: Dependabot para pip e GitHub Actions
@@ -3175,7 +3201,7 @@ items:
   priority: should
   rank: 130
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F5
   depends_on: []
@@ -3193,14 +3219,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: f33bddeb2c0eace6
-      remote_at: '2026-11-03T00:34:26Z'
+      hash: 2abefd4a6e2d66c8
+      remote_at: '2026-11-08T19:13:39Z'
 - id: DEBT-006
   type: debt
   title: Definir a licença do repositório público
@@ -3309,7 +3337,7 @@ items:
   priority: could
   rank: 320
   estimate: 1
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F0
   depends_on: []
@@ -3326,14 +3354,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: daa3a6d266b3de91
-      remote_at: '2026-11-03T00:34:29Z'
+      hash: 4d98889f6ed39e4f
+      remote_at: '2026-11-08T19:13:40Z'
 - id: DEBT-009
   type: debt
   title: ADRs retroativos das decisões principais
@@ -3396,7 +3426,7 @@ items:
   priority: could
   rank: 310
   estimate: 3
-  status: backlog
+  status: in_sprint
   sprint: 13
   phase: F5
   depends_on: []
@@ -3411,14 +3441,16 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 0c566a95f2b316f5
-      remote_at: '2026-11-07T16:15:06Z'
+      hash: cf956c952e4813e5
+      remote_at: '2026-11-08T19:13:41Z'
 - id: TK-006
   type: task
   title: Auditoria de segurança completa antes da release candidata
@@ -4398,10 +4430,10 @@ items:
     ou a partir do otpauth_uri, sem enviar o segredo a terceiros.
   - Existe teste que falha se a resposta do setup contiver uma URL externa com o segredo.
   priority: should
-  rank: 1510
-  estimate: null
-  status: backlog
-  sprint: null
+  rank: 35
+  estimate: 2
+  status: in_sprint
+  sprint: 13
   phase: F6
   depends_on: []
   security:
@@ -4425,10 +4457,12 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: a11aaa6d1fcae116
-      remote_at: '2026-11-08T12:03:45Z'
+      hash: f38045f24db07140
+      remote_at: '2026-11-08T19:13:43Z'
 - id: TK-018
   type: task
   title: 'Fotos em disco efêmero no Render: confirmar e dar armazenamento durável'
@@ -4446,7 +4480,7 @@ items:
   - As fotos entram na rotina de backup (junto do TK-005) ou a ausência fica registrada como risco aceito.
   priority: should
   rank: 1520
-  estimate: null
+  estimate: 3
   status: backlog
   sprint: null
   phase: F6
@@ -4472,8 +4506,8 @@ items:
     status: backlog
   sync:
     github:
-      hash: 868cf03be0d5c060
-      remote_at: '2026-11-08T12:03:45Z'
+      hash: 01df3e7e13d3c5f2
+      remote_at: '2026-11-08T19:13:44Z'
 - id: BUG-001
   type: bug
   title: Excluir cômodo referenciado por checklist ou problema responde 500
@@ -4489,10 +4523,10 @@ items:
   - Dado um cômodo sem referências, quando excluído, então continua funcionando como hoje.
   - Existe teste para os dois casos.
   priority: should
-  rank: 1530
-  estimate: null
-  status: backlog
-  sprint: null
+  rank: 85
+  estimate: 1
+  status: in_sprint
+  sprint: 13
   phase: F5
   depends_on: []
   security:
@@ -4514,10 +4548,12 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: bd57660755d62016
-      remote_at: '2026-11-08T12:39:56Z'
+      hash: 1fced2f43dc062c9
+      remote_at: '2026-11-08T19:13:46Z'
 - id: DEBT-015
   type: debt
   title: Remover o perfil visualizador e recusar perfis desconhecidos
@@ -4874,10 +4910,10 @@ items:
   - Existe teste que chama as regras diretamente com um perfil fora de ROLES e confere a negação.
   - Os testes de autorização existentes continuam passando sem alteração.
   priority: could
-  rank: 1540
-  estimate: null
-  status: backlog
-  sprint: null
+  rank: 88
+  estimate: 2
+  status: in_sprint
+  sprint: 13
   phase: F6
   depends_on: []
   security:
@@ -4899,10 +4935,12 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: bae06e90dc8a8a7a
-      remote_at: '2026-11-08T16:41:00Z'
+      hash: d21bfa83c967a7bc
+      remote_at: '2026-11-08T19:13:47Z'
 - id: TK-019
   type: task
   title: Checklist de autorização e exposição no registro de execução, antes da revisão de código
@@ -4918,10 +4956,10 @@ items:
   - scripts/dod_check.py falha quando a seção existe no registro e tem itens sem resposta.
   - O SKILL.md do sprint-executor manda preencher a checklist antes do /code-review.
   priority: should
-  rank: 1550
+  rank: 125
   estimate: 1
-  status: backlog
-  sprint: null
+  status: in_sprint
+  sprint: 13
   phase: F5
   depends_on: []
   security:
@@ -4943,10 +4981,12 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: b62eaf94714d172a
-      remote_at: '2026-11-08T18:51:45Z'
+      hash: 29625846f0ed3059
+      remote_at: '2026-11-08T19:13:49Z'
 - id: TK-020
   type: task
   title: Versionar o executor da collection do Insomnia com um comando que roda tudo do zero
@@ -4965,10 +5005,10 @@ items:
   - docs/insomnia/README.md documenta o comando; rodar do zero passa com todos os testes, exceto a pasta 00a, que
     é documentada.
   priority: should
-  rank: 1560
+  rank: 126
   estimate: 2
-  status: backlog
-  sprint: null
+  status: in_sprint
+  sprint: 13
   phase: F5
   depends_on: []
   security:
@@ -4989,10 +5029,12 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: 6c15c4c01735e663
-      remote_at: '2026-11-08T18:51:46Z'
+      hash: 98ed520bbc3d24e7
+      remote_at: '2026-11-08T19:13:51Z'
 - id: DEBT-018
   type: debt
   title: 'dod_check sem falhas indevidas: PR de release, intervalos de IDs e caminhos curtos'
@@ -5008,10 +5050,10 @@ items:
   - O relatório de testes alterados aceita o nome do arquivo de teste sem o caminho completo, desde que seja único.
   - Existem testes do dod_check cobrindo os três casos.
   priority: should
-  rank: 1570
+  rank: 127
   estimate: 1
-  status: backlog
-  sprint: null
+  status: in_sprint
+  sprint: 13
   phase: F5
   depends_on: []
   security:
@@ -5031,7 +5073,9 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-08'
+    status: in_sprint
   sync:
     github:
-      hash: c75ff5a2a9d45577
-      remote_at: '2026-11-08T18:51:46Z'
+      hash: 4586e1525acd94a6
+      remote_at: '2026-11-08T19:13:52Z'
