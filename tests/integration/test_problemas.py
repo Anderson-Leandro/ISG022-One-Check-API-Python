@@ -3,7 +3,7 @@ import io
 import pytest
 
 from app.models import Contrato, Imovel, ImovelComodo, Problema, Usuario
-from tests.conftest import auth, small_image_bytes
+from tests.conftest import auth, small_image_bytes, foto_do_banco
 
 BASE_CONTRATOS = "/api/v1/contratos"
 BASE_PROBLEMAS = "/api/v1/problemas"
@@ -155,8 +155,9 @@ class TestCriarProblema:
         assert data["sucesso"] is False
 
     def test_locatario_alheio_recebe_403(
-        self, client, contrato, comodo_contrato, token_outro_locatario
+        self, client, db, contrato, comodo_contrato, token_outro_locatario
     ):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
             json={
@@ -169,6 +170,7 @@ class TestCriarProblema:
         assert r.status_code == 403
         data = r.json()
         assert data["sucesso"] is False
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_contrato_inexistente_retorna_404(self, client, token_admin):
         r = client.post(
@@ -304,13 +306,15 @@ class TestAtualizarStatusProblema:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_locatario_nao_pode_alterar_status_e_recebe_403(self, client, problema_criado, token_locatario):
+    def test_locatario_nao_pode_alterar_status_e_recebe_403(self, client, db, problema_criado, token_locatario):
+        banco_antes = foto_do_banco(db)
         r = client.patch(
             f"{BASE_PROBLEMAS}/{problema_criado['id']}/status",
             json={"status": "resolvido"},
             headers=auth(token_locatario),
         )
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── POST e GET /problemas/{id}/atualizacoes ─────────────────────────────────────
@@ -358,21 +362,25 @@ class TestAtualizacoesProblema:
         )
         assert r.status_code == 422
 
-    def test_locatario_nao_pode_adicionar_atualizacao(self, client, problema_criado, token_locatario):
+    def test_locatario_nao_pode_adicionar_atualizacao(self, client, db, problema_criado, token_locatario):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             f"{BASE_PROBLEMAS}/{problema_criado['id']}/atualizacoes",
             json={"descricao": "Tentativa de atualização pelo locatário."},
             headers=auth(token_locatario),
         )
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
-    def test_vistoriador_nao_pode_adicionar_atualizacao(self, client, problema_criado, token_vistoriador):
+    def test_vistoriador_nao_pode_adicionar_atualizacao(self, client, db, problema_criado, token_vistoriador):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             f"{BASE_PROBLEMAS}/{problema_criado['id']}/atualizacoes",
             json={"descricao": "Tentativa pelo vistoriador."},
             headers=auth(token_vistoriador),
         )
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_locatario_alheio_nao_pode_listar_atualizacoes(
         self, client, problema_criado, token_outro_locatario

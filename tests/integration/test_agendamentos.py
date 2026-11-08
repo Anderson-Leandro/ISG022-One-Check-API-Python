@@ -9,7 +9,7 @@ Rotas cobertas:
 """
 from datetime import datetime, timedelta
 
-from tests.conftest import auth
+from tests.conftest import auth, foto_do_banco
 
 BASE_CONTRATOS = "/api/v1/contratos"
 BASE_AGENDAMENTOS = "/api/v1/agendamentos"
@@ -205,6 +205,7 @@ class TestAtualizarEExcluirAgendamento:
         db.add(ag)
         db.commit()
 
+        banco_antes = foto_do_banco(db)
         r_put = client.put(
             f"{BASE_AGENDAMENTOS}/{ag.id}",
             json={"tipo": "encerramento"},
@@ -214,3 +215,4 @@ class TestAtualizarEExcluirAgendamento:
 
         r_del = client.delete(f"{BASE_AGENDAMENTOS}/{ag.id}", headers=auth(token_vistoriador))
         assert r_del.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
