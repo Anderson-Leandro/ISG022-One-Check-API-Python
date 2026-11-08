@@ -4136,7 +4136,7 @@ items:
   description: 'Hoje GET /auth/mfa/setup-login (auth_router.py:136) e POST /auth/mfa/activate-login respondem "Token
     MFA inválido ou expirado" tanto para token ilegível/expirado quanto para um token válido do tipo mfa (emitido
     para quem já tem autenticador). A recusa é correta (barreira da falha N1, SEC-021); só a mensagem confunde quem
-    integra o front. Separar os casos sem consultar a conta antes de recusar. Achado em teste manual com a collection
+    integra a API. Separar os casos sem consultar a conta antes de recusar. Achado em teste manual com a collection
     do Insomnia (PR #110). Relacionado: DEBT-003 (consolidar rotas de MFA).'
   acceptance_criteria:
   - Dado um token temporário válido do tipo mfa, quando chamar GET /auth/mfa/setup-login, então recebe 401 com mensagem
@@ -4187,7 +4187,7 @@ items:
   description: Implementa o ADR-0003 (docs/adr/0003-status-http-dos-erros.md). Hoje fail() (app/schemas.py:37) não
     define status e 46 handlers respondem 200 com sucesso=false, inclusive a negação de GET /contratos/{id}/checklists.
     Isso esconde login falho, MFA errado e acesso negado nos logs e no monitoramento (A09:2021, CWE-393). O envelope
-    continua igual; o front já trata !response.ok || !sucesso como erro (front-react/src/api/client.ts:128). Fazer
+    continua igual, então quem já lê o campo sucesso não muda a leitura. Fazer
     antes do DEBT-012, que confere o status exato nos testes de negação.
   acceptance_criteria:
   - Dado qualquer erro devolvido por fail(), quando a resposta sai da API, então o status é >= 400 conforme a tabela
@@ -4200,8 +4200,6 @@ items:
     403 e não 401; login, MFA do login e refresh recusados respondem 401 com mensagem genérica.
   - O corpo continua {sucesso:false, erro, erros?}; os testes existentes são ajustados ao novo status, a collection
     do Insomnia é gerada de novo e passa contra a API local, e o README descreve a tabela de status.
-  - A tabela de status para o front é atualizada, incluindo o ajuste do interceptador de 401 para ignorar /auth/login
-    e /auth/mfa/*.
   priority: must
   rank: 15
   estimate: 5
@@ -4232,9 +4230,8 @@ items:
   - 'PR #116 (merge 1f602f1): fail() com status de erro, 122 chamadas classificadas'
   - tests/integration/test_status_http_erros.py e guarda em tests/conftest.py; 836 testes, cobertura 95%
   - 'collection do Insomnia regenerada: 157/157 e 00a 11/11'
-  - MUDANCAS_API_PARA_FRONT.md item 30 (ajuste do interceptor de 401 no front)
   - 'PR #118 (merge efd0363): testes de refresh do seed com resultado fixo'
-  - 'security-audit diff ed36a41 (2026-11-07): 0 altos, SEC-035 baixo no backlog'
+  - 'security-audit diff ed36a41 (2026-11-07): 0 crítico, alto, médio ou baixo; 3 info'
   created: '2026-11-07'
   updated: '2026-11-07'
   history:
@@ -4246,48 +4243,3 @@ items:
     github:
       hash: 725aaa9d4fa60313
       remote_at: '2026-11-07T23:32:27Z'
-- id: SEC-035
-  type: security
-  title: Interceptor de 401 do front repete login e MFA recusados (conta em dobro no limite de tentativas)
-  epic: EP-006
-  story: ''
-  description: 'Achado SEC-035 da auditoria diff de 2026-11-07 (docs/security/relatorio-2026-11-07.md). Depois do
-    ADR-0003, login e MFA recusados respondem 401; o interceptor do front (front-react/src/api/client.ts:94) renova
-    a sessão e reenvia a requisição quando há refresh token guardado, e cada erro conta duas falhas. A correção
-    é no repositório front-react: ignorar /auth/login e /auth/mfa/* como já é feito com /auth/refresh (item 30 do
-    MUDANCAS_API_PARA_FRONT.md).'
-  acceptance_criteria:
-  - Dado um refresh token guardado, quando o login responde 401, então o front não renova a sessão nem reenvia o
-    login.
-  - Dado um código MFA errado no login, quando /auth/mfa/verify responde 401, então o front mostra o erro sem reenviar.
-  - Dado um access token expirado numa rota comum, quando a API responde 401, então o front continua renovando e
-    repetindo a requisição uma vez (sem regressão).
-  - Há teste no front para os três cenários.
-  priority: should
-  rank: 200
-  estimate: 1
-  status: backlog
-  sprint: null
-  phase: F5
-  depends_on:
-  - DEBT-014
-  security:
-    impact: low
-    refs:
-    - CWE-799
-    - OWASP API4:2023
-    risk_id: null
-  source:
-    kind: security-audit
-    file: docs/security/findings-2026-11-07.json
-    ref: 2026-11-07:SEC-035
-  links:
-    trello_card: null
-    gh_issue: null
-    prs: []
-  evidence: []
-  created: '2026-11-07'
-  updated: '2026-11-07'
-  history:
-  - date: '2026-11-07'
-    status: backlog

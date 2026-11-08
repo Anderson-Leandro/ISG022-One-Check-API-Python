@@ -10,34 +10,6 @@
           "rules": [
             {
               "id": "SEC-035",
-              "name": "Login e MFA recusados com 401 são repetidos pelo interceptor do front e contam em dobro no limite de tentativas",
-              "shortDescription": {
-                "text": "Login e MFA recusados com 401 são repetidos pelo interceptor do front e contam em dobro no limite de tentativas"
-              },
-              "fullDescription": {
-                "text": "Com um refresh token ainda guardado (outra conta na mesma máquina, sessão antiga), o usuário erra a senha no login. A API responde 401 (ADR-0003); o interceptor renova a sessão e reenvia o mesmo POST /auth/login com a senha errada. Cada erro conta duas falhas para a conta e para o IP."
-              },
-              "help": {
-                "text": "No front, ignorar /auth/login e /auth/mfa/* no interceptor de 401, como já é feito com /auth/refresh (item 30 do MUDANCAS_API_PARA_FRONT.md). Na API nada muda."
-              },
-              "properties": {
-                "security-severity": "3.0",
-                "tags": [
-                  "security",
-                  "CWE-799",
-                  "API4:2023",
-                  "STRIDE:D"
-                ],
-                "pillars": [
-                  "Disponibilidade"
-                ],
-                "principles": [
-                  "Fail secure"
-                ]
-              }
-            },
-            {
-              "id": "SEC-036",
               "name": "SHA-1 no gerador da collection do Insomnia é usado só para IDs estáveis",
               "shortDescription": {
                 "text": "SHA-1 no gerador da collection do Insomnia é usado só para IDs estáveis"
@@ -64,7 +36,7 @@
               }
             },
             {
-              "id": "SEC-037",
+              "id": "SEC-036",
               "name": "O hook guarda.py é uma barreira de conveniência, contornável por ofuscação",
               "shortDescription": {
                 "text": "O hook guarda.py é uma barreira de conveniência, contornável por ofuscação"
@@ -92,7 +64,7 @@
               }
             },
             {
-              "id": "SEC-038",
+              "id": "SEC-037",
               "name": "403 e 404 distinguem contrato inexistente de contrato alheio na listagem de checklists",
               "shortDescription": {
                 "text": "403 e 404 distinguem contrato inexistente de contrato alheio na listagem de checklists"
@@ -127,50 +99,6 @@
           "ruleId": "SEC-035",
           "level": "note",
           "message": {
-            "text": "Login e MFA recusados com 401 são repetidos pelo interceptor do front e contam em dobro no limite de tentativas. A conta é bloqueada por 15 minutos depois de 3 erros em vez de 5 (o mesmo vale para o código MFA). Não há ganho para um atacante: só reduz o limite para o próprio usuário. Baixa porque depende de token guardado e não expõe dados."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "app/routers/auth_router.py"
-                },
-                "region": {
-                  "startLine": 59
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "app/routers/auth_router.py"
-                },
-                "region": {
-                  "startLine": 106
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "../front-react/src/api/client.ts"
-                },
-                "region": {
-                  "startLine": 94
-                }
-              }
-            }
-          ],
-          "properties": {
-            "source": [
-              "claude"
-            ]
-          }
-        },
-        {
-          "ruleId": "SEC-036",
-          "level": "note",
-          "message": {
             "text": "SHA-1 no gerador da collection do Insomnia é usado só para IDs estáveis. Falso positivo do semgrep e do bandit em ferramenta de desenvolvimento."
           },
           "locations": [
@@ -193,7 +121,7 @@
           }
         },
         {
-          "ruleId": "SEC-037",
+          "ruleId": "SEC-036",
           "level": "note",
           "message": {
             "text": "O hook guarda.py é uma barreira de conveniência, contornável por ofuscação. O hook evita erros do agente; não é fronteira contra quem quer contornar. A proteção real do .env continua sendo o .gitignore, a ausência dele no índice e as regras do CLAUDE.md."
@@ -205,7 +133,7 @@
                   "uri": ".claude/hooks/guarda.py"
                 },
                 "region": {
-                  "startLine": 18
+                  "startLine": 21
                 }
               }
             }
@@ -217,7 +145,7 @@
           }
         },
         {
-          "ruleId": "SEC-038",
+          "ruleId": "SEC-037",
           "level": "note",
           "message": {
             "text": "403 e 404 distinguem contrato inexistente de contrato alheio na listagem de checklists. Nenhum novo: antes do ADR-0003 as mensagens já diferiam, e os IDs são UUID v4 (não adivinháveis). A tabela do ADR-0003 cita 404 para recurso 'não visível', o que deixa a escolha ambígua."

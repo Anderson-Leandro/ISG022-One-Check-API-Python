@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-11-07 ([auditoria diff](relatorio-2026-11-07.md) sobre `ed36a41`: status HTTP dos erros (ADR-0003), SEC-035 a SEC-038 abertos, nenhum alto). Antes: 2026-11-02 ([auditoria diff](relatorio-2026-11-02.md) sobre `d0b5f35`: SEC-017 a SEC-020 abertos; auditoria completa de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md), [011 e 012](correcao-sec-011-012-2026-10-30.md) e [014 e 015](correcao-sec-014-015-2026-10-30.md))_
+_Última atualização: 2026-11-07 ([auditoria diff](relatorio-2026-11-07.md) sobre `ed36a41`: status HTTP dos erros (ADR-0003), SEC-035 a SEC-037 só informativos). Antes: 2026-11-02 ([auditoria diff](relatorio-2026-11-02.md) sobre `d0b5f35`: SEC-017 a SEC-020 abertos; auditoria completa de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md), [011 e 012](correcao-sec-011-012-2026-10-30.md) e [014 e 015](correcao-sec-014-015-2026-10-30.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -90,8 +90,7 @@ flowchart LR
 | T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | `USER app`, `--only-binary`, `permissions: contents: read`, actions por SHA; compose com `cap_drop: ALL` e `no-new-privileges` | Mitigada | SEC-008 |
 | T-25 | Proxy / IP de origem | S/R | Cliente forja o `X-Forwarded-For` para escapar do limite por IP e gravar IP falso na auditoria | Não-repúdio, Disponibilidade | limite por conta independe do IP; `FORWARDED_ALLOW_IPS=*` usa o primeiro item do cabeçalho (`render.yaml:18`) | **Aberta** (a confirmar no Render) | SEC-017 |
 | T-26 | Auditoria (`GET /logs`) | I | Gestor consulta IP e padrão de acesso de todas as contas, inclusive admins | Confidencialidade (LGPD) | rota restrita a admin/gestor; retenção de `LOG_RETENCAO_DIAS` | **Aberta** | SEC-018, SEC-019 |
-| T-27 | Login / MFA (front) | D | Interceptor de 401 do front repete login e MFA recusados, e cada erro conta em dobro no limite de tentativas | Disponibilidade | API: reautenticação com sessão válida responde 403, não 401 (ADR-0003) | **Aberta** (ajuste no front) | SEC-035 |
-| T-28 | Monitoramento | R | Falhas de login, MFA e acesso negado invisíveis nos logs por responderem 200 | Não-repúdio | status de erro em todo `fail()` e guarda na suíte (ADR-0003, `tests/conftest.py`) | Mitigada | — |
+| T-27 | Monitoramento | R | Falhas de login, MFA e acesso negado invisíveis nos logs por responderem 200 | Não-repúdio | status de erro em todo `fail()` e guarda na suíte (ADR-0003, `tests/conftest.py`) | Mitigada | — |
 
 Status: **Mitigada** · **Parcial** · **Aberta** · **Aceita**
 

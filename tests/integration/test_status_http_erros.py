@@ -36,7 +36,7 @@ class TestSemSessaoValida401:
 
 class TestReautenticacaoComSessao403:
     def test_senha_atual_errada_responde_403_e_nao_401(self, client, db, user_locatario, token_locatario):
-        # 401 faria o front renovar a sessão e repetir a tentativa (client.ts do front)
+        # 401 levaria o cliente a renovar a sessão e repetir a tentativa (ADR-0003)
         hash_antes = user_locatario.senha_hash
         r = client.put(
             f"{API}/usuarios/me/senha",

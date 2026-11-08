@@ -113,7 +113,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | `422` | Campo inválido, com `erros: {campo: mensagem}` |
 | `429` | Muitas tentativas falhas; o header `Retry-After` traz a espera em segundos |
 
-> O `401` fica só para quem está sem sessão válida porque o front, ao recebê-lo, renova o token e repete a requisição. Senha atual errada numa rota autenticada responde `403`, para não repetir a tentativa.
+> O `401` fica só para quem está sem sessão válida, porque é comum o cliente tratá-lo como sessão expirada: renovar o token e repetir a requisição. Senha atual errada numa rota autenticada responde `403`, para não repetir a tentativa.
 
 ### Sessão e tokens
 - `Authorization: Bearer <access_token>` em todas as rotas autenticadas. A API não usa cookies; o front não deve enviar credenciais de navegador (`credentials: "include"` / `withCredentials`).

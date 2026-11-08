@@ -1,7 +1,7 @@
 # Testes manuais com o Insomnia
 
 > **Por que isso importa:** a suíte automatizada (`pytest`) roda a API em memória. Esta collection
-> testa a API de verdade, no ar, pelo mesmo caminho que o front usa: HTTP, tokens reais, MFA, upload
+> testa a API de verdade, no ar, pelo mesmo caminho que um cliente usa: HTTP, tokens reais, MFA, upload
 > de arquivo e PDF. Serve para conferir uma correção à mão, demonstrar o controle de acesso ou
 > investigar um bug.
 
