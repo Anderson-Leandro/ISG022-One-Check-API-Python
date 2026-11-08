@@ -58,6 +58,7 @@
 | 2026-11-08 | TK-019 concluído (#190): checklist de autorização e exposição no registro, preenchida antes da revisão de código e conferida pelo dod_check | — | ação da retro 12; registros antigos sem a seção não são cobrados |
 | 2026-11-08 | TK-020 concluído (#192): executor da collection versionado e comando que roda tudo do zero (166/166) | — | ação da retro 12; a collection foi ajustada ao SEC-027 |
 | 2026-11-08 | DEBT-018 concluído (PR #194): dod_check aceita release, intervalos de IDs e nome curto de teste; 38 testes novos |
+| 2026-11-08 | DEBT-005 concluído (PR #197): Dependabot para pip e GitHub Actions contra a dev; o CI barra o PR sem o lock regenerado; DEBT-019 criado fora da sprint |
 
 ## Sprint Review
 - **Incremento demonstrável:**
