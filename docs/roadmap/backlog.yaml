@@ -3793,11 +3793,12 @@ items:
       remote_at: '2026-11-03T00:34:54Z'
 - id: TK-017
   type: task
-  title: 'Proteger a branch main: merge só por PR e com CI verde'
+  title: 'Proteger as branches main e dev: merge só por PR e com CI verde'
   epic: EP-007
   story: ''
   description: 'Ação da retrospectiva da Sprint 11: os PRs #10 e #11 foram mergeados pelo autor sem revisão. Em
-    2026-11-02 o time decidiu que o PR não exige aprovação de outra pessoa; a proteção garante só o PR e o CI.'
+    2026-11-02 o time decidiu que o PR não exige aprovação de outra pessoa; a proteção garante só o PR e o CI. Em
+    2026-11-07 o escopo passou a incluir a dev, por onde todo o código é integrado (decisão do usuário na execução).'
   acceptance_criteria:
   - 'A main tem regra de proteção: merge só por PR, sem exigir aprovação (o autor pode mergear o próprio PR).'
   - O check do workflow tests.yml é obrigatório para o merge.
@@ -3805,7 +3806,7 @@ items:
   priority: must
   rank: 15
   estimate: 1
-  status: in_sprint
+  status: review
   sprint: 12
   phase: F0
   depends_on: []
@@ -3820,19 +3821,24 @@ items:
   links:
     trello_card: null
     gh_issue: 98
-    prs: []
+    prs:
+    - '#123'
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-07'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-07'
+    status: in_progress
+  - date: '2026-11-07'
+    status: review
   sync:
     github:
-      hash: 6580331e67dc75d3
-      remote_at: '2026-11-03T01:16:40Z'
+      hash: f50e34231332f48b
+      remote_at: '2026-11-08T01:24:35Z'
 - id: SPK-005
   type: spike
   title: Avaliar a qualidade e a cobertura real da suíte de testes
@@ -4187,8 +4193,8 @@ items:
   description: Implementa o ADR-0003 (docs/adr/0003-status-http-dos-erros.md). Hoje fail() (app/schemas.py:37) não
     define status e 46 handlers respondem 200 com sucesso=false, inclusive a negação de GET /contratos/{id}/checklists.
     Isso esconde login falho, MFA errado e acesso negado nos logs e no monitoramento (A09:2021, CWE-393). O envelope
-    continua igual, então quem já lê o campo sucesso não muda a leitura. Fazer
-    antes do DEBT-012, que confere o status exato nos testes de negação.
+    continua igual, então quem já lê o campo sucesso não muda a leitura. Fazer antes do DEBT-012, que confere o
+    status exato nos testes de negação.
   acceptance_criteria:
   - Dado qualquer erro devolvido por fail(), quando a resposta sai da API, então o status é >= 400 conforme a tabela
     do ADR-0003, e sem status explícito o padrão é 400 (nunca 200).

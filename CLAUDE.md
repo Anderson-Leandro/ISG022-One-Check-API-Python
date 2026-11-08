@@ -32,6 +32,9 @@ A execução segue `.claude/skills/sprint-executor/SKILL.md` (`/sprint-executor`
 push direto na `dev`/`main` e `git add` das notas locais. Um comando que só cita `.env` também é bloqueado:
 reescreva sem citar o arquivo.
 
+No GitHub, o ruleset `.github/rulesets/protecao-branches.json` (TK-017) recusa push direto, force-push e
+exclusão na `main` e na `dev`, e exige os checks `test` e `dependencias` para o merge.
+
 ## Conferência
 `python3 scripts/dod_check.py <ID>` confere a Definition of Done de um item (PR mesclado com CI verde, branch
 com o ID, testes, registro em `docs/roadmap/execucao/<ID>.md`, relatório de testes alterados aprovado, issue
