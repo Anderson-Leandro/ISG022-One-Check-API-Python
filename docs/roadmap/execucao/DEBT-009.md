@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 12 · **Issue:** #85 · **Branch:** `chore/DEBT-009-adrs-retroativos` · **PR:** #<n>
+- **Sprint:** 12 · **Issue:** #85 · **Branch:** `chore/DEBT-009-adrs-retroativos` · **PR:** #134
 
 ## Entrega
 Quatro ADRs retroativos, no modelo do ADR-0001, escritos a partir do código atual (cada afirmação com `arquivo:linha` conferido) e do histórico do git:
