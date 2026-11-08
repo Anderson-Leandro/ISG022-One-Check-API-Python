@@ -92,15 +92,6 @@ class TestLogin:
         assert data["sucesso"] is True
         assert data["dados"]["mfa_required"] is True
 
-    def test_login_visualizador_sem_mfa(self, client, user_visualizador):
-        r = client.post("/api/v1/auth/login", json={
-            "email": user_visualizador.email,
-            "senha": TEST_SENHA,
-        })
-        data = r.json()
-        assert data["sucesso"] is True
-        assert "access_token" in data["dados"]
-
 
 # ── POST /auth/mfa/verify ─────────────────────────────────────────────────────────
 

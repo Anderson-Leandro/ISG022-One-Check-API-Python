@@ -251,12 +251,12 @@ class TestUpdateUsuario:
     def test_admin_atualiza_role(self, client, user_locatario, token_admin):
         r = client.put(
             f"{BASE}/{user_locatario.id}",
-            json={"role": "visualizador"},
+            json={"role": "vistoriador"},
             headers=auth(token_admin),
         )
         data = r.json()
         assert data["sucesso"] is True
-        assert data["dados"]["role"] == "visualizador"
+        assert data["dados"]["role"] == "vistoriador"
 
     def test_desativar_mfa_limpa_secret(self, client, db, user_locatario, token_admin):
         # Perfil com MFA opcional; em perfis obrigatórios o PUT recusa (test_seguranca_mfa_desativacao.py)

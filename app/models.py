@@ -30,7 +30,8 @@ class Usuario(Base):
     nome: Mapped[str] = mapped_column(String(200), nullable=False)
     email: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     senha_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(String(50), nullable=False, default="visualizador")
+    # Sem padrão: todo usuário nasce com um perfil explícito (ADR-0009)
+    role: Mapped[str] = mapped_column(String(50), nullable=False)
     cpf: Mapped[str | None] = mapped_column(String(14))
     mfa_secret: Mapped[str | None] = mapped_column(String(64))
     # Segredo gerado no setup; só vira mfa_secret depois que um código válido confirmar

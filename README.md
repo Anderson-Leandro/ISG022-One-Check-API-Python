@@ -14,7 +14,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
   - Troca de senha, de autenticador ou de perfil encerra todas as sessões do usuário.
 
 - **👥 Gestão de Usuários & Perfis (RBAC)**:
-  - Perfis de acesso: `admin`, `gestor`, `vistoriador`, `locatario`, `visualizador`.
+  - Perfis de acesso: `admin`, `gestor`, `vistoriador`, `locatario` (o `visualizador` foi removido, [ADR-0009](docs/adr/0009-remocao-do-perfil-visualizador.md)); um perfil fora da lista é recusado com `401`.
   - Só `admin` atribui ou gerencia os perfis `admin` e `gestor`; a própria conta só muda por `/usuarios/me`.
   - Endpoint dedicado para alteração de senha (`PUT /usuarios/me/senha`).
   - Soft delete de usuários com bloqueio de auto-exclusão e proteção de integridade.
@@ -79,21 +79,20 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | Role | MFA | Permissões Principais |
 |---|---|---|
 | `admin` | Obrigatório | Acesso administrativo completo; único que atribui ou gerencia `admin` e `gestor`. |
-| `gestor` | Obrigatório | Gestão operacional de imóveis, contratos, agendamentos, vistorias, problemas e usuários `vistoriador`, `locatario` e `visualizador`. |
+| `gestor` | Obrigatório | Gestão operacional de imóveis, contratos, agendamentos, vistorias, problemas e usuários `vistoriador` e `locatario`. |
 | `vistoriador` | Obrigatório | Preenchimento e submissão das vistorias atribuídas a ele; leitura dos contratos e imóveis dessas vistorias. |
 | `locatario` | Opcional | Consulta dos próprios contratos e imóveis, aceite ou rejeição de vistoria e abertura de problemas. |
-| `visualizador` | Opcional | Leitura de imóveis, contratos e vistorias, sem acesso a problemas e usuários. |
 
 ### Quem acessa cada recurso
 
-| Recurso | admin, gestor | visualizador | vistoriador | locatário |
-|---|---|---|---|---|
-| Contratos e imóveis (lista e por ID, endereço, cômodos) | Todos | Todos (leitura) | Só os com vistoria dele | Só os próprios (imóvel com contrato ativo) |
-| Agendamentos do contrato | Todos | Todos (leitura) | Só os contratos com vistoria dele | Sem acesso |
-| Vistorias (checklists) | Todas | Todas (leitura) | Só as atribuídas a ele | Só as dos próprios contratos |
-| Problemas | Todos | Sem acesso | Sem acesso | Só os dos próprios contratos |
-| Usuários (`/usuarios`) | Sim (gestor: exceto admin/gestor) | Sem acesso | Sem acesso | Sem acesso |
-| Logs de auditoria | Sim | Sem acesso | Sem acesso | Sem acesso |
+| Recurso | admin, gestor | vistoriador | locatário |
+|---|---|---|---|
+| Contratos e imóveis (lista e por ID, endereço, cômodos) | Todos | Só os com vistoria dele | Só os próprios (imóvel com contrato ativo) |
+| Agendamentos do contrato | Todos | Só os contratos com vistoria dele | Sem acesso |
+| Vistorias (checklists) | Todas | Só as atribuídas a ele | Só as dos próprios contratos |
+| Problemas | Todos | Sem acesso | Só os dos próprios contratos |
+| Usuários (`/usuarios`) | Sim (gestor: exceto admin/gestor) | Sem acesso | Sem acesso |
+| Logs de auditoria | Sim | Sem acesso | Sem acesso |
 
 ---
 

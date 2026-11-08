@@ -4515,7 +4515,7 @@ items:
   priority: should
   rank: 290
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -4543,10 +4543,12 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: abbb23d41e47b590
-      remote_at: '2026-11-08T14:48:31Z'
+      hash: aafa999316af3b3d
+      remote_at: '2026-11-08T14:54:55Z'
 - id: SEC-036
   type: security
   title: Respeitar o MFA opcional ligado pelo próprio usuário
@@ -4780,3 +4782,44 @@ items:
     github:
       hash: c948315ecd3faff5
       remote_at: '2026-11-08T14:48:37Z'
+- id: DEBT-017
+  type: debt
+  title: Regras de acesso negam por padrão os perfis que não citam
+  epic: EP-006
+  story: ''
+  description: 'Encontrado na revisão de código do DEBT-015. assert_acesso_contrato, assert_acesso_imovel, dashboard._contratos_visiveis
+    e os filtros de listagem restringem só locatário e vistoriador; qualquer outro perfil cai no acesso total. Hoje
+    get_current_user, o login e o refresh recusam perfis fora de ROLES (ADR-0009), o que cobre todas as rotas; mas
+    um caminho que carregue o usuário sem passar por eles (job, dependência nova) trataria um perfil desconhecido
+    como admin. Inverter a lógica: liberar explicitamente admin e gestor e negar o resto.'
+  acceptance_criteria:
+  - Cada regra de acesso em app/deps.py e nos recortes de listagem libera admin e gestor explicitamente e nega qualquer
+    perfil não citado.
+  - Existe teste que chama as regras diretamente com um perfil fora de ROLES e confere a negação.
+  - Os testes de autorização existentes continuam passando sem alteração.
+  priority: could
+  rank: 1540
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-636
+    - OWASP API5:2023
+    risk_id: null
+  source:
+    kind: code-review
+    file: app/deps.py
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog

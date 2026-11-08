@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-from app.auth import decode_token, sessao_vigente
+from app.auth import ROLES, decode_token, sessao_vigente
 from app.database import get_db
 from app.models import Checklist, Contrato, Usuario
 
@@ -23,6 +23,10 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="Usuário não encontrado")
     if not sessao_vigente(payload, user):
         raise HTTPException(status_code=401, detail="Sessão encerrada; faça login novamente")
+    # Fail secure (ADR-0009): as regras de acesso restringem só locatário e vistoriador; um perfil fora da
+    # lista (removido, digitado errado, gravado por script) seria tratado como admin/gestor
+    if user.role not in ROLES:
+        raise HTTPException(status_code=401, detail="Perfil de acesso inválido")
     return user
 
 

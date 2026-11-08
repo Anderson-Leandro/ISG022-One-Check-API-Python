@@ -6,7 +6,7 @@ Rotas:
   DELETE /api/v1/contratos/{id}    só sem checklist nem problema
   DELETE /api/v1/problemas/{id}    só aberto e sem atualizações
 
-Admin e gestor excluem; os outros perfis recebem 403 (coberto também por
+Admin e gestor excluem; vistoriador e locatário recebem 403 (coberto também por
 test_seguranca_negacao_por_perfil.py). O registro some das leituras, continua no banco com quem e quando
 excluiu, e a exclusão fica no log.
 """
@@ -179,10 +179,10 @@ class TestExcluirProblema:
 # ── Perfis sem permissão ────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("rota", ["checklists/{checklist}", "contratos/{contrato}", "problemas/{problema}"])
-@pytest.mark.parametrize("perfil", ["vistoriador", "locatario", "visualizador"])
+@pytest.mark.parametrize("perfil", ["vistoriador", "locatario"])
 def test_perfil_sem_permissao_recebe_403(client, db, contrato, checklist, problema, token_vistoriador,
-                                         token_locatario, token_visualizador, rota, perfil):
-    tokens = {"vistoriador": token_vistoriador, "locatario": token_locatario, "visualizador": token_visualizador}
+                                         token_locatario, rota, perfil):
+    tokens = {"vistoriador": token_vistoriador, "locatario": token_locatario}
     antes = foto_do_banco(db)
     caminho = rota.format(checklist=checklist.id, contrato=contrato.id, problema=problema.id)
 

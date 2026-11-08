@@ -37,7 +37,7 @@ def _rotas(contrato_id, problema_id):
 
 
 class TestPerfisSemVinculo:
-    @pytest.mark.parametrize("token_fixture", ["token_vistoriador", "token_visualizador"])
+    @pytest.mark.parametrize("token_fixture", ["token_vistoriador"])
     @pytest.mark.parametrize("rota", ["por_id", "atualizacoes"])
     def test_sem_vinculo_recebe_403(self, client, request, contrato, problema, token_fixture, rota):
         token = request.getfixturevalue(token_fixture)
@@ -50,7 +50,7 @@ class TestPerfisSemVinculo:
 class TestConsistenciaListaPorId:
     @pytest.mark.parametrize(
         "token_fixture",
-        ["token_admin", "token_gestor", "token_locatario", "token_vistoriador", "token_visualizador"],
+        ["token_admin", "token_gestor", "token_locatario", "token_vistoriador"],
     )
     def test_mesma_decisao_em_todas_as_rotas(self, client, request, contrato, problema, token_fixture):
         token = request.getfixturevalue(token_fixture)
