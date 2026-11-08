@@ -67,6 +67,12 @@ def ensure_schema_updates() -> None:
             if "foto_url" not in cols:
                 conn.execute(text("ALTER TABLE problemas ADD COLUMN foto_url VARCHAR(500)"))
 
+        # Detecção de reuso do refresh trocado (SEC-027)
+        if "auth_refresh_tokens" in tables:
+            cols = {c["name"] for c in insp.get_columns("auth_refresh_tokens")}
+            if "usado_em" not in cols:
+                conn.execute(text("ALTER TABLE auth_refresh_tokens ADD COLUMN usado_em TIMESTAMP"))
+
         # Exclusão lógica (US-015, ADR-0008)
         exclusao = {
             "contratos": ("ALTER TABLE contratos ADD COLUMN excluido_em TIMESTAMP",

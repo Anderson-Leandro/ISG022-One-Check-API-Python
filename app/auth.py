@@ -112,14 +112,44 @@ def create_refresh_token(db: Session, usuario_id: str) -> str:
 def verify_refresh_token(db: Session, raw: str) -> Usuario | None:
     h = _hash_refresh(raw)
     row = db.query(RefreshToken).filter(RefreshToken.token_hash == h).first()
-    if not row or row.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
+    if not row or row.usado_em is not None or row.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
         return None
     return db.query(Usuario).filter(Usuario.id == row.usuario_id, Usuario.ativo, Usuario.role.in_(ROLES)).first()
 
 
-def revoke_refresh_token(db: Session, raw: str) -> None:
+def trocar_refresh_token(db: Session, raw: str) -> tuple[str, Usuario | None]:
+    """Marca o refresh como trocado de forma atômica (SEC-027). Faz commit.
+
+    - ("ok", usuario): este pedido marcou o token; só ele recebe um par novo, mesmo com pedidos simultâneos.
+    - ("reuso", dono): o token já tinha sido trocado e ainda não venceu; alguém tem uma cópia.
+    - ("invalido", None): desconhecido, vencido ou de conta inativa ou com perfil inválido.
+    """
     h = _hash_refresh(raw)
-    db.query(RefreshToken).filter(RefreshToken.token_hash == h).delete()
+    agora = datetime.now(timezone.utc).replace(tzinfo=None)
+    marcados = (
+        db.query(RefreshToken)
+        .filter(RefreshToken.token_hash == h, RefreshToken.usado_em.is_(None), RefreshToken.expires_at > agora)
+        .update({RefreshToken.usado_em: agora}, synchronize_session=False)
+    )
+    db.commit()
+    row = db.query(RefreshToken).filter(RefreshToken.token_hash == h).first()
+    if not row:
+        return "invalido", None
+    user = db.query(Usuario).filter(Usuario.id == row.usuario_id).first()
+    if marcados == 1:
+        valido = user is not None and user.ativo and user.role in ROLES
+        return ("ok", user) if valido else ("invalido", None)
+    if row.usado_em is not None and row.expires_at > agora and user is not None:
+        return "reuso", user
+    return "invalido", None
+
+
+def revoke_refresh_token(db: Session, raw: str, usuario_id: str | None = None) -> None:
+    """Apaga o refresh. Com usuario_id, só se for dele (o logout não apaga o refresh de outra conta)."""
+    q = db.query(RefreshToken).filter(RefreshToken.token_hash == _hash_refresh(raw))
+    if usuario_id is not None:
+        q = q.filter(RefreshToken.usuario_id == usuario_id)
+    q.delete()
     db.commit()
 
 
