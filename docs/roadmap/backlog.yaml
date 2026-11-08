@@ -4797,7 +4797,7 @@ items:
   priority: could
   rank: 295
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -4823,10 +4823,12 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: c948315ecd3faff5
-      remote_at: '2026-11-08T14:48:37Z'
+      hash: fd0a06f4f4bafdda
+      remote_at: '2026-11-08T16:29:24Z'
 - id: DEBT-017
   type: debt
   title: Regras de acesso negam por padrão os perfis que não citam

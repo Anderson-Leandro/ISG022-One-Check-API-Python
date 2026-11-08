@@ -20,6 +20,7 @@ from app.models import (
 from app.notification_service import notificar_admins
 from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 from app.schemas import (
+    TIPOS_AGENDAMENTO,
     AgendamentoCreate,
     ChecklistCreate,
     ContratoCreate,
@@ -262,7 +263,7 @@ def create_agendamento(
     if ct.status != "ativo":
         return fail("Agendamentos só podem ser criados em contratos ativos", status_code=409)
 
-    if body.tipo not in ("inicial", "encerramento"):
+    if body.tipo not in TIPOS_AGENDAMENTO:
         return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"}, status_code=422)
 
     try:

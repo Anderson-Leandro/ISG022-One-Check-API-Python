@@ -6,7 +6,7 @@ from app.auditoria import campos_alterados
 from app.database import get_db
 from app.deps import require_roles
 from app.models import AgendamentoVistoria, Usuario
-from app.schemas import AgendamentoUpdate, fail, ok
+from app.schemas import TIPOS_AGENDAMENTO, AgendamentoUpdate, fail, ok
 from app.serializers import log_operacao, serialize_agendamento
 
 router = APIRouter(prefix="/agendamentos", tags=["agendamentos"])
@@ -38,7 +38,7 @@ def update_agendamento(
         return fail("Agendamento não encontrado", status_code=404)
 
     if body.tipo is not None:
-        if body.tipo not in ("inicial", "encerramento"):
+        if body.tipo not in TIPOS_AGENDAMENTO:
             return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"}, status_code=422)
         ag.tipo = body.tipo
 
