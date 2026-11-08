@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #80 · **Branch:** `chore/DEBT-004-ruff-lint` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #80 · **Branch:** `chore/DEBT-004-ruff-lint` · **PR:** #199
 
 ## Entrega
 - `ruff.toml`: linha de 120, Python 3.12. Regras: o conjunto padrão (E4, E7, E9, F), `I` (ordem dos imports), `UP` (sintaxe do 3.12) e `B` (bugbear). Ficam de fora, com o motivo no arquivo: `B008` (o `Depends(...)` do FastAPI), `E712` (`coluna == True` monta o SQL no SQLAlchemy), `E741` e `UP046` (só estilo).
