@@ -6,8 +6,8 @@
 > investigar um bug.
 
 - **Arquivo para importar:** [`onecheck-api.insomnia.json`](onecheck-api.insomnia.json), no formato de exportação v4.
-- **Testado com:** Insomnia 12.5. As requisições também foram rodadas contra a API local por um executor que reproduz os scripts, com todos os testes passando (a última vez em 2026-11-08, no SEC-018).
-- **Conteúdo:** 174 requisições em 11 pastas, sendo 87 casos de sucesso (✅), 86 de falha (❌) e 1 de comportamento a revisar (⚠️).
+- **Testado com:** Insomnia 12.5. As requisições também foram rodadas contra a API local por um executor que reproduz os scripts, com todos os testes passando (a última vez em 2026-11-08, no TK-020, com `scripts/rodar_collection.sh`).
+- **Conteúdo:** 177 requisições em 11 pastas, sendo 89 casos de sucesso (✅), 87 de falha (❌) e 1 de comportamento a revisar (⚠️).
 
 ## Como importar
 1. No Insomnia: **Create → Import** (ou arraste o arquivo para a janela).
@@ -34,6 +34,20 @@ Clique no ambiente e preencha as variáveis abaixo. As outras (tokens e IDs) fic
   - as contas com MFA configuram o autenticador no primeiro login, pela pasta **00a**.
 
 Os segredos ficam só no ambiente do Insomnia, na sua máquina. **Não exporte a collection com o ambiente preenchido para o repositório.** O arquivo versionado tem todos os valores sensíveis vazios.
+
+## Rodar tudo do zero, sem o Insomnia
+```bash
+bash scripts/rodar_collection.sh            # pula a pasta 00a (primeiro acesso)
+PULAR= bash scripts/rodar_collection.sh     # roda todas as pastas
+```
+O script (TK-020):
+- sobe a API numa porta livre, nunca a 8000 do docker compose, com banco SQLite e uploads temporários;
+- roda o seed de desenvolvimento e monta as variáveis num arquivo temporário, apagado no fim;
+- executa a collection com [`executar.mjs`](executar.mjs), que reproduz os scripts `insomnia.*`, e para a API mesmo quando falha.
+
+A API roda com `ONECHECK_SEM_DOTENV=1` e não lê o arquivo de configuração local: banco, segredos e uploads vêm do script. Requer Python com o `requirements.lock` instalado e Node 18 ou mais.
+
+**Pasta 00a:** é o primeiro acesso das contas com MFA. O seed de desenvolvimento já cria as contas com MFA configurado, por isso a pasta fica de fora por padrão.
 
 ## Como rodar
 Rode as pastas **na ordem**, porque cada uma prepara o que a próxima usa: tokens, usuários, imóvel, contrato, checklist. O mais prático é o **Collection Runner**: clique com o botão direito na collection ou numa pasta e escolha **Run**. O resultado de cada teste aparece na aba **Tests** de cada requisição.
