@@ -3219,7 +3219,7 @@ items:
   priority: should
   rank: 130
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -3234,8 +3234,12 @@ items:
   links:
     trello_card: null
     gh_issue: 81
-    prs: []
-  evidence: []
+    prs:
+    - '#197'
+  evidence:
+  - 'PR #197 (merge c474ce4): PR #197: .github/dependabot.yml para pip e github-actions, contra a dev, com cooldown
+    de 7 dias'
+  - 'tests/unit/test_dependabot.py: 8 testes novos; suíte 1180 passaram, cobertura 96%'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -3245,10 +3249,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 1796cbc1846f4c1b
-      remote_at: '2026-11-08T22:22:27Z'
+      hash: 7b22d788043e2570
+      remote_at: '2026-11-08T22:32:46Z'
 - id: DEBT-006
   type: debt
   title: Definir a licença do repositório público
