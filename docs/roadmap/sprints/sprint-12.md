@@ -71,6 +71,7 @@
 | 2026-11-08 | US-020 concluído (#161): nova vistoria inicial depois de uma rejeição, com a rejeitada intacta; pendente_revisao fora do domínio (1072 testes, cobertura 96%) | — | trava por lista de status que bloqueiam (achado da revisão) |
 | 2026-11-08 | DEBT-016 concluído (#163): tipos de agendamento declarados como enum no OpenAPI (1076 testes, cobertura 96%) | — | fim dos itens de código da sprint; restam TK-002, TK-003, DEBT-006 e DEBT-007 |
 | 2026-11-08 | TK-002 e TK-003 (2 pts) passam para a Sprint 13, a pedido do usuário; comprometido de 54 para 52 pts. Restam 3 pts: DEBT-006 e DEBT-007 | o ambiente de produção será tratado depois pelo usuário | a parte "produção segura" do goal da Sprint 12 fica para a Sprint 13 |
+| 2026-11-08 | DEBT-006 concluído (#168): licença MIT, titular Equipe One Check. Resta 1 item: DEBT-007 (release v0.1.0) | — | licença escolhida pelo usuário |
 
 ## Sprint Review
 - **Incremento demonstrável:**
