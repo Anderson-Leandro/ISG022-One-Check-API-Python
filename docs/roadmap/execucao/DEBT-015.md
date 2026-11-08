@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 12 · **Issue:** #146 · **Branch:** `refactor/DEBT-015-remover-visualizador` · **PR:** #<n>
+- **Sprint:** 12 · **Issue:** #146 · **Branch:** `refactor/DEBT-015-remover-visualizador` · **PR:** #153
 
 ## Entrega
 Decisão do SPK-001 (ADR-0009). Sem migração de contas: nenhuma conta com o perfil foi criada, e os ambientes serão zerados.
