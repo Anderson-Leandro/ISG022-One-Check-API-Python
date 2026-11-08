@@ -4082,7 +4082,7 @@ items:
   priority: should
   rank: 145
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F5
   depends_on: []
@@ -4101,16 +4101,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-07'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 7913b8d13cd50d76
-      remote_at: '2026-11-07T16:15:11Z'
+      hash: d0f32f5328f63936
+      remote_at: '2026-11-08T03:41:33Z'
 - id: DEBT-012
   type: debt
   title: Testes de negação em escrita conferem o estado e o status exato
