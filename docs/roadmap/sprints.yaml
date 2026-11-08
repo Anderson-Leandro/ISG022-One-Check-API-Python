@@ -295,29 +295,35 @@ sprints:
   carried_over: []
   closed_on: '2026-11-08'
 - number: 13
-  goal: Qualidade contínua e hardening
+  goal: Produção recriada com segurança, falhas abertas corrigidas e qualidade verificada no CI
   start: '2026-11-18'
   end: '2026-12-01'
-  status: planned
-  capacity: 36.0
+  status: active
+  capacity: 50.0
   committed:
-  - DEBT-004
-  - DEBT-005
-  - DEBT-008
-  - DEBT-001
-  - DEBT-003
-  - DEBT-002
-  - DEBT-010
-  - SEC-017
-  - SEC-018
-  - SEC-019
-  - SEC-020
-  - SEC-027
-  - TK-005
-  - SEC-031
   - TK-002
   - TK-003
-  committed_points: 38.0
+  - SEC-035
+  - SEC-017
+  - SEC-018
+  - TK-005
+  - SEC-027
+  - BUG-001
+  - DEBT-017
+  - TK-019
+  - TK-020
+  - DEBT-018
+  - DEBT-005
+  - DEBT-004
+  - DEBT-003
+  - DEBT-001
+  - SEC-019
+  - SEC-020
+  - SEC-031
+  - DEBT-002
+  - DEBT-010
+  - DEBT-008
+  committed_points: 47.0
   completed_points: null
   completed: []
   carried_over: []

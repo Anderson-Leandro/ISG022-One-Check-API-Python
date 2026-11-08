@@ -16,7 +16,7 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 9–10 | 23/09 → 20/10 | fechadas, sem commits | — | — |
 | 11 | 21/10 → 03/11 | fechada (retroativa) | Corrigir as pendências e os 16 achados da auditoria; adotar a gestão ágil | 64 |
 | 12 | 04/11 → 17/11 | fechada (08/11) | Release v0.1.0, produção segura e escopo da F4 fechado | 52 |
-| **13** | 18/11 → 01/12 | **próxima** | Qualidade contínua e hardening | 38 |
+| **13** | 18/11 → 01/12 | **ativa** (planejada em 08/11) | Produção recriada com segurança, falhas abertas corrigidas e qualidade verificada no CI | 47 |
 | 14 | 02/12 → 11/12 (10 dias) | planejada | Conformidade, release candidata v0.9.0 e entrega final v1.0.0 | 31 |
 
 **Prazo final: 11/12/2026.** Todos os itens em aberto foram distribuídos nas Sprints 12 a 14 para caber nesse prazo, mesmo com carga acima do ritmo habitual; a velocity não foi usada como limite.
@@ -63,3 +63,4 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 2026-11-08 | Decisões dos spikes SPK-001 a SPK-004 (ADR-0009 a ADR-0012); seis itens novos entram na Sprint 12, que vai a 54 pts | Decisões do PO |
 | 2026-11-08 | TK-002 e TK-003 vão para a Sprint 13 (Sprint 12: 52 pts; Sprint 13: 38 pts) | Pedido do usuário: o ambiente de produção será recriado |
 | 2026-11-08 | Sprint 12 fechada com 52/52 pts e a release v0.1.0 (tag na `main`). F0, F2, F3 e F4 concluídas; fase atual passa a F5. Retro gerou TK-019, TK-020 e DEBT-018 (backlog) | Fechamento da Sprint 12 |
+| 2026-11-08 | Sprint 13 planejada: 47 pts (capacidade 50), com as ações da retro 12, SEC-035, BUG-001 e DEBT-017; goal "Produção recriada com segurança, falhas abertas corrigidas e qualidade verificada no CI" | Planejamento da Sprint 13 |
