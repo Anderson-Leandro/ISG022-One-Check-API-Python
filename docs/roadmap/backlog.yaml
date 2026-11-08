@@ -4947,7 +4947,7 @@ items:
   priority: could
   rank: 88
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -4963,8 +4963,12 @@ items:
   links:
     trello_card: null
     gh_issue: 165
-    prs: []
-  evidence: []
+    prs:
+    - '#188'
+  evidence:
+  - 'PR #188 (merge b16b871): regras de acesso negam perfis fora de ROLES antes de buscar o registro'
+  - 21 testes em tests/integration/test_seguranca_acesso_nega_por_padrao.py
+  - security-audit diff dev sem achado novo
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4974,10 +4978,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: d49f8dd94e69d4d8
-      remote_at: '2026-11-08T20:29:52Z'
+      hash: 0c687f0ebfd2be4e
+      remote_at: '2026-11-08T20:40:24Z'
 - id: TK-019
   type: task
   title: Checklist de autorização e exposição no registro de execução, antes da revisão de código
