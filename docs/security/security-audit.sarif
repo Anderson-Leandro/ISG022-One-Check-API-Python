@@ -9,114 +9,110 @@
           "informationUri": "https://owasp.org/www-project-application-security-verification-standard/",
           "rules": [
             {
-              "id": "SEC-017",
-              "name": "IP de origem lido do primeiro item do X-Forwarded-For, controlado pelo cliente",
+              "id": "SEC-035",
+              "name": "Login e MFA recusados com 401 são repetidos pelo interceptor do front e contam em dobro no limite de tentativas",
               "shortDescription": {
-                "text": "IP de origem lido do primeiro item do X-Forwarded-For, controlado pelo cliente"
+                "text": "Login e MFA recusados com 401 são repetidos pelo interceptor do front e contam em dobro no limite de tentativas"
               },
               "fullDescription": {
-                "text": "Se o proxy do Render acrescenta o IP real ao X-Forwarded-For enviado pelo cliente (em vez de sobrescrever), o cliente manda 'X-Forwarded-For: <IP aleatório>' a cada tentativa: o limite por IP (20 falhas/15 min) nunca dispara e log_operacao grava o IP forjado."
+                "text": "Com um refresh token ainda guardado (outra conta na mesma máquina, sessão antiga), o usuário erra a senha no login. A API responde 401 (ADR-0003); o interceptor renova a sessão e reenvia o mesmo POST /auth/login com a senha errada. Cada erro conta duas falhas para a conta e para o IP."
               },
               "help": {
-                "text": "Conferir no Render (enviar X-Forwarded-For forjado e ver o ip gravado em /logs). Se for acrescentado, usar o último item do cabeçalho (o que o proxy do Render adiciona) num middleware próprio, ou restringir FORWARDED_ALLOW_IPS à rede do proxy."
+                "text": "No front, ignorar /auth/login e /auth/mfa/* no interceptor de 401, como já é feito com /auth/refresh (item 30 do MUDANCAS_API_PARA_FRONT.md). Na API nada muda."
               },
               "properties": {
                 "security-severity": "3.0",
                 "tags": [
                   "security",
-                  "CWE-348",
+                  "CWE-799",
                   "API4:2023",
-                  "STRIDE:S",
-                  "STRIDE:R"
+                  "STRIDE:D"
                 ],
                 "pillars": [
-                  "Não-repúdio",
                   "Disponibilidade"
                 ],
                 "principles": [
-                  "Fail secure",
+                  "Fail secure"
+                ]
+              }
+            },
+            {
+              "id": "SEC-036",
+              "name": "SHA-1 no gerador da collection do Insomnia é usado só para IDs estáveis",
+              "shortDescription": {
+                "text": "SHA-1 no gerador da collection do Insomnia é usado só para IDs estáveis"
+              },
+              "fullDescription": {
+                "text": "Nenhum: o hash gera IDs de requisição estáveis entre gerações da collection; não protege nada."
+              },
+              "help": {
+                "text": "Usar hashlib.sha1(..., usedforsecurity=False) para documentar a intenção e calar os scanners."
+              },
+              "properties": {
+                "security-severity": "0.0",
+                "tags": [
+                  "security",
+                  "CWE-328",
+                  "A02:2021"
+                ],
+                "pillars": [
+                  "Integridade"
+                ],
+                "principles": [
+                  "Superfície de ataque mínima"
+                ]
+              }
+            },
+            {
+              "id": "SEC-037",
+              "name": "O hook guarda.py é uma barreira de conveniência, contornável por ofuscação",
+              "shortDescription": {
+                "text": "O hook guarda.py é uma barreira de conveniência, contornável por ofuscação"
+              },
+              "fullDescription": {
+                "text": "Um comando que monta o nome do arquivo em partes (variável, curinga) não cita '.env' literalmente e passa pelo hook."
+              },
+              "help": {
+                "text": "Manter como está e não tratar o hook como controle de segurança. Se quiser endurecer, negar Read(.env) também em permissions.deny no settings.json."
+              },
+              "properties": {
+                "security-severity": "0.0",
+                "tags": [
+                  "security",
+                  "CWE-184",
+                  "A05:2021",
+                  "STRIDE:I"
+                ],
+                "pillars": [
+                  "Confidencialidade"
+                ],
+                "principles": [
                   "Defesa em profundidade"
                 ]
               }
             },
             {
-              "id": "SEC-018",
-              "name": "Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas",
+              "id": "SEC-038",
+              "name": "403 e 404 distinguem contrato inexistente de contrato alheio na listagem de checklists",
               "shortDescription": {
-                "text": "Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas"
+                "text": "403 e 404 distinguem contrato inexistente de contrato alheio na listagem de checklists"
               },
               "fullDescription": {
-                "text": "Um gestor chama GET /logs?acao=login e obtém IP e horário de login de todos os usuários, inclusive dos admins, e os e-mails digitados nos logins falhos."
+                "text": "Um locatário autenticado testa IDs de contrato e separa os que existem (403) dos que não existem (404)."
               },
               "help": {
-                "text": "Restringir GET /logs ao admin, ou para o gestor omitir ip/detalhes e eventos de contas admin/gestor."
-              },
-              "properties": {
-                "security-severity": "3.0",
-                "tags": [
-                  "security",
-                  "CWE-359",
-                  "API3:2023",
-                  "STRIDE:I"
-                ],
-                "pillars": [
-                  "Confidencialidade"
-                ],
-                "principles": [
-                  "Menor privilégio"
-                ]
-              }
-            },
-            {
-              "id": "SEC-019",
-              "name": "Login falho grava o texto digitado no campo e-mail",
-              "shortDescription": {
-                "text": "Login falho grava o texto digitado no campo e-mail"
-              },
-              "fullDescription": {
-                "text": "Usuário digita a senha no campo de e-mail por engano; o texto fica em log_operacao e aparece em GET /logs."
-              },
-              "help": {
-                "text": "Gravar usuario_id quando a conta existir e, quando não existir, só um hash ou o domínio do e-mail."
+                "text": "Decidir no ADR-0003 se recurso de outro dono responde 403 ou 404 e aplicar o mesmo em todas as rotas por ID. Sem urgência."
               },
               "properties": {
                 "security-severity": "0.0",
                 "tags": [
                   "security",
-                  "CWE-532",
-                  "A09:2021",
+                  "CWE-204",
+                  "API1:2023",
                   "STRIDE:I"
                 ],
                 "pillars": [
                   "Confidencialidade"
-                ],
-                "principles": [
-                  "Minimização (LGPD)"
-                ]
-              }
-            },
-            {
-              "id": "SEC-020",
-              "name": "Filtros de data inválidos em /logs são ignorados em silêncio",
-              "shortDescription": {
-                "text": "Filtros de data inválidos em /logs são ignorados em silêncio"
-              },
-              "fullDescription": {
-                "text": "de=31/10/2026 (formato inválido) devolve logs de todo o período, sem aviso, a quem pediu um recorte."
-              },
-              "help": {
-                "text": "Responder 422 para data inválida (declarar os parâmetros como date/datetime)."
-              },
-              "properties": {
-                "security-severity": "0.0",
-                "tags": [
-                  "security",
-                  "CWE-390",
-                  "—",
-                  "STRIDE:I"
-                ],
-                "pillars": [
-                  "Integridade"
                 ],
                 "principles": [
                   "Fail secure"
@@ -128,88 +124,10 @@
       },
       "results": [
         {
-          "ruleId": "SEC-017",
+          "ruleId": "SEC-035",
           "level": "note",
           "message": {
-            "text": "IP de origem lido do primeiro item do X-Forwarded-For, controlado pelo cliente. Contorna a camada por IP do limite de tentativas (o limite por conta continua) e torna o IP da trilha de auditoria (SEC-010) inconfiável. Baixa porque depende do comportamento do proxy, não verificado; vira Média se confirmado."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "render.yaml"
-                },
-                "region": {
-                  "startLine": 18
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "app/rate_limit.py"
-                },
-                "region": {
-                  "startLine": 74
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "app/auditoria.py"
-                },
-                "region": {
-                  "startLine": 41
-                }
-              }
-            }
-          ],
-          "properties": {
-            "source": [
-              "claude"
-            ]
-          }
-        },
-        {
-          "ruleId": "SEC-018",
-          "level": "note",
-          "message": {
-            "text": "Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas. Exposição de dados pessoais (IP, padrão de acesso) além da necessidade do perfil; o backlog do produto define a auditoria como atribuição do admin. Exige conta de gestor."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "app/routers/dashboard.py"
-                },
-                "region": {
-                  "startLine": 85
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "app/routers/dashboard.py"
-                },
-                "region": {
-                  "startLine": 118
-                }
-              }
-            }
-          ],
-          "properties": {
-            "source": [
-              "claude"
-            ]
-          }
-        },
-        {
-          "ruleId": "SEC-019",
-          "level": "note",
-          "message": {
-            "text": "Login falho grava o texto digitado no campo e-mail. Dado sem finalidade guardado por até LOG_RETENCAO_DIAS. Mitigado pela retenção (SEC-014)."
+            "text": "Login e MFA recusados com 401 são repetidos pelo interceptor do front e contam em dobro no limite de tentativas. A conta é bloqueada por 15 minutos depois de 3 erros em vez de 5 (o mesmo vale para o código MFA). Não há ganho para um atacante: só reduz o limite para o próprio usuário. Baixa porque depende de token guardado e não expõe dados."
           },
           "locations": [
             {
@@ -218,7 +136,27 @@
                   "uri": "app/routers/auth_router.py"
                 },
                 "region": {
-                  "startLine": 58
+                  "startLine": 59
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/auth_router.py"
+                },
+                "region": {
+                  "startLine": 106
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "../front-react/src/api/client.ts"
+                },
+                "region": {
+                  "startLine": 94
                 }
               }
             }
@@ -230,36 +168,84 @@
           }
         },
         {
-          "ruleId": "SEC-020",
+          "ruleId": "SEC-036",
           "level": "note",
           "message": {
-            "text": "Filtros de data inválidos em /logs são ignorados em silêncio. Sem ganho de acesso (só admin/gestor); pode levar a conclusões erradas numa investigação."
+            "text": "SHA-1 no gerador da collection do Insomnia é usado só para IDs estáveis. Falso positivo do semgrep e do bandit em ferramenta de desenvolvimento."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "app/routers/dashboard.py"
+                  "uri": "docs/insomnia/gerar_collection.py"
                 },
                 "region": {
-                  "startLine": 98
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "app/routers/dashboard.py"
-                },
-                "region": {
-                  "startLine": 104
+                  "startLine": 148
                 }
               }
             }
           ],
           "properties": {
             "source": [
-              "bandit",
+              "semgrep",
+              "bandit"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-037",
+          "level": "note",
+          "message": {
+            "text": "O hook guarda.py é uma barreira de conveniência, contornável por ofuscação. O hook evita erros do agente; não é fronteira contra quem quer contornar. A proteção real do .env continua sendo o .gitignore, a ausência dele no índice e as regras do CLAUDE.md."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": ".claude/hooks/guarda.py"
+                },
+                "region": {
+                  "startLine": 18
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
+              "claude"
+            ]
+          }
+        },
+        {
+          "ruleId": "SEC-038",
+          "level": "note",
+          "message": {
+            "text": "403 e 404 distinguem contrato inexistente de contrato alheio na listagem de checklists. Nenhum novo: antes do ADR-0003 as mensagens já diferiam, e os IDs são UUID v4 (não adivinháveis). A tabela do ADR-0003 cita 404 para recurso 'não visível', o que deixa a escolha ambígua."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/contratos.py"
+                },
+                "region": {
+                  "startLine": 267
+                }
+              }
+            },
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/routers/contratos.py"
+                },
+                "region": {
+                  "startLine": 269
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": [
               "claude"
             ]
           }

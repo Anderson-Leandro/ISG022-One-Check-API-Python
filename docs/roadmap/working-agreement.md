@@ -45,7 +45,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 
 ## Definition of Done (DoD) — item só está pronto quando
 - [ ] Critérios de aceite atendidos e demonstráveis
-- [ ] Código integrado na `main` via PR, com CI verde e o diff relido pelo autor
+- [ ] Código integrado na `dev` via PR, com CI verde e o diff relido pelo autor (a `main` recebe a `dev` na release)
 - [ ] Testes relevantes escritos e passando no CI (incluindo o cenário negado, se houver)
 - [ ] Nenhum segredo, credencial ou dado pessoal real adicionado ao repositório
 - [ ] Logs não expõem dados sensíveis; erros não vazam detalhes internos
@@ -53,6 +53,8 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 - [ ] Mudança que afeta o front registrada no arquivo de mudanças para o front (fora do git)
 - [ ] Impactos/riscos de segurança avaliados (risco novo → docs/risks/risk-register.md)
 - [ ] Evidência registrada no item (PR, teste, commit, print)
+- [ ] Teste existente alterado ou removido: relatório no registro do item e aprovação do usuário antes do commit
+- [ ] `python3 scripts/dod_check.py <ID>` verde (registro em `docs/roadmap/execucao/<ID>.md`)
 
 ## Ética de testes de segurança
 - Testes ofensivos só no próprio ambiente ou com autorização explícita por escrito.
