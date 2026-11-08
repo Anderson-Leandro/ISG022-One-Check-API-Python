@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 12 · **Issue:** #107 · **Branch:** `test/DEBT-011-negacao-por-perfil` · **PR:** #<n>
+- **Sprint:** 12 · **Issue:** #107 · **Branch:** `test/DEBT-011-negacao-por-perfil` · **PR:** #129
 
 ## Entrega
 Só testes, sem mudança no código. Arquivo novo: `tests/integration/test_seguranca_negacao_por_perfil.py`, com 103 testes.
