@@ -83,7 +83,7 @@ def list_itens_vistoria(db: Session = Depends(get_db), _: Usuario = Depends(get_
 
 
 def _assert_pode_ver_checklist(checklist: Checklist, user: Usuario, db: Session) -> None:
-    if user.role in ("admin", "gestor", "visualizador"):
+    if user.role in ("admin", "gestor"):
         return
     if user.role == "vistoriador" and checklist.vistoriador_id == user.id:
         return

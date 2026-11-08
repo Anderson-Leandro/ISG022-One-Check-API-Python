@@ -225,12 +225,13 @@ def user_locatario(db):
 
 
 @pytest.fixture
-def user_visualizador(db):
+def user_locatario_2(db):
+    """Segundo locatário, para os testes que precisam de outra conta comum."""
     u = Usuario(
-        nome="Visualizador Teste",
-        email="visualizador@test.com",
+        nome="Locatario Dois",
+        email="locatario2@test.com",
         senha_hash=_SENHA_HASH,
-        role="visualizador",
+        role="locatario",
         mfa_enabled=False,
         ativo=True,
     )
@@ -261,11 +262,6 @@ def token_vistoriador(user_vistoriador):
 @pytest.fixture
 def token_locatario(user_locatario):
     return create_access_token(user_locatario.id, user_locatario.role)
-
-
-@pytest.fixture
-def token_visualizador(user_visualizador):
-    return create_access_token(user_visualizador.id, user_visualizador.role)
 
 
 # ── Fixtures de dados base ──────────────────────────────────────────────────────

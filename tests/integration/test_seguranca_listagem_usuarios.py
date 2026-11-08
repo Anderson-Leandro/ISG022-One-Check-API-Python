@@ -15,7 +15,7 @@ BASE = "/api/v1/usuarios"
 
 
 class TestPerfisSemPermissao:
-    @pytest.mark.parametrize("token_fixture", ["token_locatario", "token_vistoriador", "token_visualizador"])
+    @pytest.mark.parametrize("token_fixture", ["token_locatario", "token_vistoriador"])
     @pytest.mark.parametrize("query", ["", "?role=admin"])
     def test_listagem_negada(self, client, request, user_admin, token_fixture, query):
         token = request.getfixturevalue(token_fixture)

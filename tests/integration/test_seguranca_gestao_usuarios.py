@@ -7,7 +7,7 @@ outros, trocar senha/e-mail de um admin, zerar ou definir o MFA de um admin e
 criar novos admins.
 
 Regras verificadas:
-  - perfis aceitos: admin, gestor, vistoriador, locatario, visualizador
+  - perfis aceitos: admin, gestor, vistoriador, locatario
   - só admin atribui os perfis admin/gestor e gerencia contas admin/gestor
   - ninguém altera a própria conta pelas rotas /usuarios/{id} (usa /usuarios/me)
 """

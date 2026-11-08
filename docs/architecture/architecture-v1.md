@@ -8,10 +8,10 @@ O **OneCheck** é uma plataforma de gestão de vistorias e locações imobiliár
 
 ### Perfis de Acesso (RBAC)
 - **Administrador (`admin`):** Acesso irrestrito a configurações, usuários, auditoria e operações do sistema. Único perfil que atribui ou gerencia `admin` e `gestor`. Exige MFA obrigatório.
-- **Gestor (`gestor`):** Gestão operacional de imóveis, vistorias, contratos e dos usuários `vistoriador`, `locatario` e `visualizador`. Exige MFA obrigatório.
+- **Gestor (`gestor`):** Gestão operacional de imóveis, vistorias, contratos e dos usuários `vistoriador` e `locatario`. Exige MFA obrigatório.
 - **Vistoriador (`vistoriador`):** Preenchimento técnico das vistorias atribuídas a ele. Lê só os contratos e imóveis dessas vistorias. Não aprova a própria vistoria. Exige MFA obrigatório.
 - **Locatário (`locatario`):** Visualização dos próprios contratos e imóveis, aceite ou contestação de laudos e abertura de problemas.
-- **Visualizador (`visualizador`):** Leitura de imóveis, contratos e vistorias, sem acesso a problemas e usuários.
+- **Visualizador:** perfil removido em 2026-11-08 (ADR-0009).
 
 ---
 

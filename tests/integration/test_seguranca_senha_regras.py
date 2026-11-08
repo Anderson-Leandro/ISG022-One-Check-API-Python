@@ -155,11 +155,6 @@ class TestDashboardPorPerfil:
             "imoveis_locados": 2, "checklists_pendentes": 2, "problemas_abertos": 2, "vistorias_agendadas": 3,
         }
 
-    def test_visualizador_sem_problemas(self, client, cenario, token_visualizador):
-        assert _dashboard(client, token_visualizador) == {
-            "imoveis_locados": 2, "checklists_pendentes": 2, "problemas_abertos": None, "vistorias_agendadas": 3,
-        }
-
     def test_locatario_so_o_proprio_contrato(self, client, cenario, token_locatario):
         assert _dashboard(client, token_locatario) == {
             "imoveis_locados": 1, "checklists_pendentes": 1, "problemas_abertos": 1, "vistorias_agendadas": None,

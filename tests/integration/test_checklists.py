@@ -85,11 +85,6 @@ class TestGetChecklist:
         data = r.json()
         assert data["sucesso"] is True
 
-    def test_visualizador_obtem_checklist(self, client, checklist, token_visualizador):
-        r = client.get(f"{BASE}/{checklist.id}", headers=auth(token_visualizador))
-        data = r.json()
-        assert data["sucesso"] is True
-
     def test_id_inexistente_retorna_falha(self, client, token_admin):
         r = client.get(f"{BASE}/id-invalido", headers=auth(token_admin))
         data = r.json()

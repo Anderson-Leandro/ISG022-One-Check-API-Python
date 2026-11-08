@@ -70,10 +70,6 @@ class TestQuemPodeCriarChecklist:
         r = _criar(client, contrato.id, user_vistoriador.id, token_vistoriador)
         assert r.status_code == 403
 
-    def test_visualizador_nao_cria_checklist(self, client, db, contrato, user_vistoriador, token_visualizador):
-        r = _criar(client, contrato.id, user_vistoriador.id, token_visualizador)
-        assert r.status_code == 403
-
     def test_gestor_cria_checklist(self, client, db, contrato, user_vistoriador, token_gestor):
         r = _criar(client, contrato.id, user_vistoriador.id, token_gestor)
         assert r.json()["sucesso"] is True

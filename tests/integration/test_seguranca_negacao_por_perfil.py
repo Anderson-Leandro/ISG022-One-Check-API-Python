@@ -32,7 +32,7 @@ from app.routers import (
 from tests.conftest import auth
 
 API = "/api/v1"
-PERFIS = ("admin", "gestor", "vistoriador", "locatario", "visualizador")
+PERFIS = ("admin", "gestor", "vistoriador", "locatario")
 ADMIN_GESTOR = ("admin", "gestor")
 
 # (método, rota, perfis permitidos). O admin passa em toda require_roles (app/deps.py).
@@ -124,8 +124,11 @@ def test_lista_confere_com_a_api(client):
 
 
 def test_combinacoes_cobertas():
-    """97 combinações da matriz da avaliação SPK-005, mais 9 das exclusões do US-015 (3 rotas × 3 perfis)."""
-    assert len(COMBINACOES_PROIBIDAS) == 97 + 9
+    """34 rotas de admin e gestor × vistoriador e locatário, mais a rota só de admin × 3 perfis.
+
+    Eram 97 na avaliação SPK-005 e 106 com o US-015; as 35 do visualizador saíram com o perfil (ADR-0009).
+    """
+    assert len(COMBINACOES_PROIBIDAS) == 34 * 2 + 3
 
 
 # ── 2. Cada perfil proibido recebe 403 e nada é gravado ─────────────────────────
@@ -150,9 +153,9 @@ def ids(db, imovel, contrato, checklist, user_locatario):
 
 
 @pytest.fixture
-def tokens(token_admin, token_gestor, token_vistoriador, token_locatario, token_visualizador):
+def tokens(token_admin, token_gestor, token_vistoriador, token_locatario):
     return {"admin": token_admin, "gestor": token_gestor, "vistoriador": token_vistoriador,
-            "locatario": token_locatario, "visualizador": token_visualizador}
+            "locatario": token_locatario}
 
 
 def _foto_do_banco(db):

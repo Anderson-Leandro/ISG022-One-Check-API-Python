@@ -15,7 +15,6 @@ A vistoria de entrada e saída de um imóvel alugado costuma ser feita em papel 
 | Gestor | operação da imobiliária | operar imóveis, contratos, agendamentos e problemas | carteira operacional; não gerencia admin/gestor; MFA obrigatório |
 | Vistoriador | técnico de campo | preencher checklists com fotos e submeter vistorias | só contratos em que tem vistoria; MFA obrigatório |
 | Locatário | inquilino | consultar o próprio contrato, aceitar ou rejeitar o laudo, abrir problemas | só recursos do próprio contrato |
-| Visualizador | consulta interna | ler a operação | leitura (alcance em decisão: SPK-001) |
 | Sistemas externos | ViaCEP e Nominatim | completar endereço e coordenadas | só consulta, com timeout |
 
 ## Proposta de valor

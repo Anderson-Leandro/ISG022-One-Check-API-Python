@@ -4,7 +4,6 @@ US-017 — Histórico do imóvel: GET /api/v1/imoveis/{id}/historico
 Contratos, vistorias e problemas do imóvel em ordem cronológica (pela data de registro). Cada perfil vê
 só o que já acessa pelas listagens:
   - admin e gestor: tudo;
-  - visualizador: contratos e vistorias (problemas dão 403 para ele nas listagens);
   - locatário: só os próprios contratos, as vistorias e os problemas deles;
   - vistoriador: só os contratos em que tem vistoria e só as vistorias dele; nenhum problema.
 O acesso ao imóvel segue a mesma regra de GET /imoveis/{id}.
@@ -91,11 +90,6 @@ def test_evento_traz_a_data_e_o_registro(client, imovel, historico, token_admin)
     assert r.json()["dados"]["imovel_id"] == imovel.id
     assert primeiro["data"] == _em(1).isoformat()
     assert primeiro["dados"]["status"] == "encerrado"
-
-
-def test_visualizador_nao_ve_problemas(client, imovel, historico, token_visualizador):
-    tipos = {t for t, _ in _eventos(client, imovel.id, token_visualizador)}
-    assert tipos == {"contrato", "vistoria"}
 
 
 def test_locatario_ve_so_o_proprio_contrato(client, imovel, historico, token_locatario):
