@@ -59,6 +59,7 @@
 | 2026-11-08 | TK-020 concluído (#192): executor da collection versionado e comando que roda tudo do zero (166/166) | — | ação da retro 12; a collection foi ajustada ao SEC-027 |
 | 2026-11-08 | DEBT-018 concluído (PR #194): dod_check aceita release, intervalos de IDs e nome curto de teste; 38 testes novos |
 | 2026-11-08 | DEBT-005 concluído (PR #197): Dependabot para pip e GitHub Actions contra a dev; o CI barra o PR sem o lock regenerado; DEBT-019 criado fora da sprint |
+| 2026-11-08 | DEBT-004 concluído (PR #199): ruff no CI e base sem avisos; 58 arquivos de teste reformatados com aprovação |
 
 ## Sprint Review
 - **Incremento demonstrável:**

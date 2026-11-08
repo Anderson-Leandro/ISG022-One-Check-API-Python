@@ -3180,7 +3180,7 @@ items:
   priority: should
   rank: 140
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -3194,8 +3194,12 @@ items:
   links:
     trello_card: null
     gh_issue: 80
-    prs: []
-  evidence: []
+    prs:
+    - '#199'
+  evidence:
+  - 'PR #199 (merge 0dd7c70): PR #199: ruff check e ruff format --check no job test do CI; base sem avisos'
+  - ruff.toml com as regras e o motivo de cada exceção; suíte 1180 passaram, collection 166/166; relatório de testes
+    alterados aprovado por Anderson em 2026-11-08
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -3205,10 +3209,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 50b04013e9b6c52d
-      remote_at: '2026-11-08T22:38:45Z'
+      hash: fdc64b29336a70a8
+      remote_at: '2026-11-08T23:08:45Z'
 - id: DEBT-005
   type: debt
   title: Dependabot para pip e GitHub Actions
