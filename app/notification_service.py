@@ -2,8 +2,11 @@
 Serviço de notificações (e-mail / painel) para eventos de negócio (OneCheck).
 Espelha o NotificationService do PHP.
 """
+
 import logging
+
 from sqlalchemy.orm import Session
+
 from app.models import Usuario
 
 logger = logging.getLogger("onecheck.notifications")

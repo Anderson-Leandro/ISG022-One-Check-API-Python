@@ -10,6 +10,7 @@ Regras verificadas:
 
 Cada caso roda num processo novo porque app.config é lido na importação.
 """
+
 import os
 import subprocess
 import sys
@@ -23,21 +24,27 @@ PUBLICOS = ["admin123", "gestor123", "vistor123", "locat123", "JBSWY3DPEHPK3PXP"
 
 def _env(tmp_path, app_env: str) -> dict:
     env = {k: v for k, v in os.environ.items() if k != "TEST_DATABASE_URL"}
-    env.update({
-        # Vazio explícito: o load_dotenv não sobrescreve variáveis já definidas
-        "SEED_SECRET": "",
-        "APP_ENV": app_env,
-        "JWT_SECRET": "x" * 48,
-        "DATABASE_URL": f"sqlite:///{tmp_path / 'seed.db'}",
-        "UPLOAD_DIR": str(tmp_path / "uploads"),
-    })
+    env.update(
+        {
+            # Vazio explícito: o load_dotenv não sobrescreve variáveis já definidas
+            "SEED_SECRET": "",
+            "APP_ENV": app_env,
+            "JWT_SECRET": "x" * 48,
+            "DATABASE_URL": f"sqlite:///{tmp_path / 'seed.db'}",
+            "UPLOAD_DIR": str(tmp_path / "uploads"),
+        }
+    )
     return env
 
 
 def _seed(tmp_path, app_env: str) -> subprocess.CompletedProcess:
     return subprocess.run(
-        [sys.executable, "scripts/seed.py"], cwd=RAIZ, env=_env(tmp_path, app_env),
-        capture_output=True, text=True, timeout=120,
+        [sys.executable, "scripts/seed.py"],
+        cwd=RAIZ,
+        env=_env(tmp_path, app_env),
+        capture_output=True,
+        text=True,
+        timeout=120,
     )
 
 

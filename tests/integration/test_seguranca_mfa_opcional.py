@@ -5,6 +5,7 @@ O locatário conseguia ligar o MFA (POST /usuarios/me/mfa/enable), mas o login s
 perfis obrigatórios: com a senha, ele entrava direto. Agora quem tem MFA ligado e autenticador configurado
 recebe mfa_required no login, em qualquer perfil.
 """
+
 import pytest
 
 from app.models import Usuario
@@ -47,6 +48,7 @@ def test_codigo_certo_abre_a_sessao(client, locatario_com_mfa):
 
 def test_codigo_errado_e_recusado_e_conta_no_limite(client, locatario_com_mfa):
     from app.rate_limit import limitador
+
     temp = _login(client, locatario_com_mfa.email).json()["dados"]["temp_token"]
 
     r = client.post(f"{API}/auth/mfa/verify", json={"temp_token": temp, "codigo": "000000"})
@@ -77,7 +79,9 @@ def test_mfa_ligado_sem_autenticador_leva_a_configuracao(client, db, user_locata
 def test_habilitar_configurar_e_entrar_com_codigo(client, db, user_locatario, token_locatario):
     """Fluxo de /auth/mfa/habilitar: o próximo login configura o autenticador e, a partir daí, pede o código."""
     import pyotp
+
     from tests.conftest import auth
+
     assert client.post(f"{API}/auth/mfa/habilitar", headers=auth(token_locatario)).status_code == 200
 
     temp = _login(client, user_locatario.email).json()["dados"]["temp_token"]
@@ -97,10 +101,15 @@ def test_perfil_obrigatorio_continua_igual(client, user_gestor):
 def test_ligar_o_mfa_pela_api_passa_a_exigir_o_codigo(client, db, user_locatario, token_locatario):
     """Fluxo completo: o locatário configura o autenticador e o próximo login pede o código."""
     from tests.conftest import auth
+
     setup = client.post(f"{API}/usuarios/me/mfa/setup", headers=auth(token_locatario)).json()["dados"]
     import pyotp
-    r = client.post(f"{API}/usuarios/me/mfa/enable", headers=auth(token_locatario),
-                    json={"secret": setup["secret"], "codigo": pyotp.TOTP(setup["secret"]).now()})
+
+    r = client.post(
+        f"{API}/usuarios/me/mfa/enable",
+        headers=auth(token_locatario),
+        json={"secret": setup["secret"], "codigo": pyotp.TOTP(setup["secret"]).now()},
+    )
     assert r.status_code == 200, r.text
 
     db.expire_all()

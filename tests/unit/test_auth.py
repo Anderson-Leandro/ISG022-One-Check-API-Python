@@ -9,9 +9,10 @@ Grupos:
   - MFA / TOTP
   - usuario_to_dict
 """
+
 import base64
 import hashlib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import jwt
 import pyotp
@@ -43,6 +44,7 @@ MFA_TEST_SECRET = "JBSWY3DPEHPK3PXP"
 
 # ── Hash de senha ────────────────────────────────────────────────────────────────
 
+
 def test_hash_password_returns_bcrypt_string():
     h = hash_password("qualquersenha")
     assert h.startswith("$2b$")
@@ -65,6 +67,7 @@ def test_verify_password_invalid_hash():
 
 # ── Tokens de acesso ─────────────────────────────────────────────────────────────
 
+
 def test_create_access_token_decodable():
     token = create_access_token("user-id-123", "admin")
     payload = decode_token(token)
@@ -84,7 +87,7 @@ def test_decode_token_invalid_signature():
         {
             "sub": "x",
             "type": "access",
-            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+            "exp": datetime.now(UTC) + timedelta(hours=1),
         },
         "chave-errada-com-32-caracteres-ou-mais",
         algorithm=JWT_ALGORITHM,
@@ -97,7 +100,7 @@ def test_decode_token_expired():
         {
             "sub": "x",
             "type": "access",
-            "exp": datetime.now(timezone.utc) - timedelta(seconds=1),
+            "exp": datetime.now(UTC) - timedelta(seconds=1),
         },
         JWT_SECRET,
         algorithm=JWT_ALGORITHM,
@@ -115,6 +118,7 @@ def test_decode_token_empty_string():
 
 # ── Token MFA temporário ─────────────────────────────────────────────────────────
 
+
 def test_create_temp_token_type_is_mfa():
     token = create_temp_token("user-id-789")
     payload = decode_token(token)
@@ -124,16 +128,17 @@ def test_create_temp_token_type_is_mfa():
 
 
 def test_temp_token_expires_in_10_minutes():
-    agora = datetime.now(timezone.utc)
+    agora = datetime.now(UTC)
     token = create_temp_token("user-id-abc")
     payload = decode_token(token)
-    exp = datetime.fromtimestamp(payload["exp"], tz=timezone.utc)
+    exp = datetime.fromtimestamp(payload["exp"], tz=UTC)
     diferenca_segundos = (exp - agora).total_seconds()
     # 10 minutos com tolerância de ±5 segundos
     assert 595 <= diferenca_segundos <= 605
 
 
 # ── Refresh token [requer db] ─────────────────────────────────────────────────────
+
 
 def test_create_refresh_token_persists_hash(db, user_locatario):
     raw = create_refresh_token(db, user_locatario.id)
@@ -161,7 +166,7 @@ def test_verify_refresh_token_expired(db, user_locatario):
     # Forçar expiração no passado
     h = _hash_refresh(raw)
     row = db.query(RefreshToken).filter(RefreshToken.token_hash == h).first()
-    row.expires_at = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=1)
+    row.expires_at = datetime.now(UTC).replace(tzinfo=None) - timedelta(days=1)
     db.flush()
     assert verify_refresh_token(db, raw) is None
 
@@ -182,6 +187,7 @@ def test_revoke_refresh_token_removes_record(db, user_locatario):
 
 
 # ── MFA / TOTP ───────────────────────────────────────────────────────────────────
+
 
 def test_verify_totp_code_valid():
     codigo = pyotp.TOTP(MFA_TEST_SECRET).now()
@@ -292,6 +298,7 @@ def test_mfa_provisioning_data_uri_contem_email():
 
 
 # ── usuario_to_dict ──────────────────────────────────────────────────────────────
+
 
 def test_usuario_to_dict_campos(user_admin):
     d = usuario_to_dict(user_admin)

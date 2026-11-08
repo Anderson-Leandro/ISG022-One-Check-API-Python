@@ -13,6 +13,7 @@ Regras verificadas:
   - o activate confirma o código do segredo pendente
   - trocar um autenticador ativo exige o código do autenticador atual (codigo_atual)
 """
+
 import time
 
 import pyotp
@@ -49,6 +50,7 @@ def _login_mfa_ok(client, user) -> bool:
 
 # ── Setup não mexe no autenticador ativo ─────────────────────────────────────────
 
+
 class TestSetupNaoSobrescreve:
     @pytest.mark.parametrize("metodo", ["get", "post"])
     def test_setup_preserva_segredo_ativo(self, client, db, user_admin, token_admin, metodo):
@@ -64,6 +66,7 @@ class TestSetupNaoSobrescreve:
 
 
 # ── Activate em /auth ────────────────────────────────────────────────────────────
+
 
 class TestActivateTroca:
     def _setup(self, client, token):
@@ -135,6 +138,7 @@ class TestActivateTroca:
 
 
 # ── Enable em /usuarios/me ───────────────────────────────────────────────────────
+
 
 class TestEnableMe:
     def test_troca_sem_codigo_atual_e_recusada(self, client, db, user_admin, token_admin):

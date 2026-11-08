@@ -4,6 +4,7 @@ Roda em todo start (start.sh). Para instâncias que ficam muito tempo no ar, age
 também como cron job (Render Cron Job ou cron do host):
     python scripts/limpar_dados_vencidos.py
 """
+
 import sys
 from pathlib import Path
 

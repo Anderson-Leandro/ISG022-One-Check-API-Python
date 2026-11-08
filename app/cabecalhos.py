@@ -4,6 +4,7 @@ As respostas da API trazem dados pessoais e tokens: não podem ficar em cache do
 navegador ou de proxies, nem ser interpretadas como outro tipo ou embutidas em
 frames de outros sites.
 """
+
 from app.config import IS_DEV
 
 # As fotos são públicas e imutáveis (nome aleatório): podem ficar em cache

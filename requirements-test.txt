@@ -3,3 +3,5 @@ pytest-cov==6.0.0
 httpx==0.28.1
 # Lido pelos testes de configuração (dependabot, workflows); a mesma versão do requirements.lock
 pyyaml==6.0.3
+# Lint e formatação no CI (DEBT-004); regras em ruff.toml
+ruff==0.17.4

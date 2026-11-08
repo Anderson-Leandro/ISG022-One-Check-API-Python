@@ -11,6 +11,7 @@ Rotas cobertas:
   POST  /admin/seed
   POST  /admin/refresh-data
 """
+
 import importlib
 
 import pytest
@@ -38,6 +39,7 @@ def _usuarios(db) -> int:
 
 
 # ── Configuração (secure by default) ────────────────────────────────────────────
+
 
 class TestSeedSecretConfig:
     def _reload_config(self, monkeypatch, valor):
@@ -76,6 +78,7 @@ class TestSeedSecretConfig:
 
 # ── Ataque sem autenticação ─────────────────────────────────────────────────────
 
+
 class TestSeedSemAutenticacao:
     def test_rotas_admin_desabilitadas_sem_segredo_configurado(self, client, db, user_admin, monkeypatch):
         monkeypatch.setattr(admin_router, "SEED_SECRET", "")
@@ -96,9 +99,7 @@ class TestSeedSemAutenticacao:
         assert r.status_code == 403
         assert db.query(Usuario).filter(Usuario.id == user_admin.id).first() is not None
 
-    def test_segredo_correto_sem_token_admin_e_negado_quando_ha_usuarios(
-        self, client, db, user_admin, seed_secret
-    ):
+    def test_segredo_correto_sem_token_admin_e_negado_quando_ha_usuarios(self, client, db, user_admin, seed_secret):
         r = client.post(
             "/api/v1/admin/seed",
             json={"force": True},
@@ -107,9 +108,7 @@ class TestSeedSemAutenticacao:
         assert r.status_code == 401
         assert _usuarios(db) == 1
 
-    def test_segredo_correto_com_token_nao_admin_e_negado(
-        self, client, db, user_admin, token_gestor, seed_secret
-    ):
+    def test_segredo_correto_com_token_nao_admin_e_negado(self, client, db, user_admin, token_gestor, seed_secret):
         r = client.post(
             "/api/v1/admin/seed",
             json={"force": True},
@@ -130,6 +129,7 @@ class TestSeedSemAutenticacao:
 
 
 # ── Operações destrutivas ───────────────────────────────────────────────────────
+
 
 class TestSeedDestrutivo:
     def test_force_bloqueado_sem_flag_mesmo_com_admin(self, client, db, user_admin, token_admin, seed_secret):
@@ -172,6 +172,7 @@ class TestSeedDestrutivo:
 
 
 # ── Caminhos legítimos ──────────────────────────────────────────────────────────
+
 
 class TestSeedLegitimo:
     def test_data_status_com_segredo_e_admin(self, client, user_admin, token_admin, seed_secret):

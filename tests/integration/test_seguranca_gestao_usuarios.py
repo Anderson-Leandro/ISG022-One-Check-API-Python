@@ -11,11 +11,12 @@ Regras verificadas:
   - só admin atribui os perfis admin/gestor e gerencia contas admin/gestor
   - ninguém altera a própria conta pelas rotas /usuarios/{id} (usa /usuarios/me)
 """
+
 import pytest
 
 from app.auth import verify_password
 from app.models import Usuario
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now, foto_do_banco
+from tests.conftest import _SENHA_HASH, MFA_TEST_SECRET, TEST_SENHA, auth, foto_do_banco
 
 BASE = "/api/v1/usuarios"
 
@@ -23,8 +24,13 @@ BASE = "/api/v1/usuarios"
 @pytest.fixture
 def outro_gestor(db):
     u = Usuario(
-        nome="Outro Gestor", email="outro_gestor@test.com", senha_hash=_SENHA_HASH,
-        role="gestor", mfa_enabled=True, mfa_secret=MFA_TEST_SECRET, ativo=True,
+        nome="Outro Gestor",
+        email="outro_gestor@test.com",
+        senha_hash=_SENHA_HASH,
+        role="gestor",
+        mfa_enabled=True,
+        mfa_secret=MFA_TEST_SECRET,
+        ativo=True,
     )
     db.add(u)
     db.flush()
@@ -37,6 +43,7 @@ def _recarregar(db, user):
 
 
 # ── Gestor tentando escalar ─────────────────────────────────────────────────────
+
 
 class TestGestorNaoEscala:
     def test_gestor_nao_se_promove_a_admin(self, client, db, user_gestor, token_gestor):
@@ -74,6 +81,7 @@ class TestGestorNaoEscala:
 
     def test_gestor_nao_define_segredo_mfa_de_admin(self, client, db, user_admin, token_gestor):
         import pyotp
+
         segredo_atacante = pyotp.random_base32()
         r = client.post(
             f"{BASE}/{user_admin.id}/mfa/enable",
@@ -101,6 +109,7 @@ class TestGestorNaoEscala:
 
 # ── Validação de perfil ─────────────────────────────────────────────────────────
 
+
 class TestPerfisValidos:
     def test_admin_nao_atribui_perfil_inexistente(self, client, db, user_locatario, token_admin):
         r = client.put(f"{BASE}/{user_locatario.id}", json={"role": "superadmin"}, headers=auth(token_admin))
@@ -118,6 +127,7 @@ class TestPerfisValidos:
 
 # ── Própria conta pelas rotas administrativas ───────────────────────────────────
 
+
 class TestPropriaContaPelaRotaAdmin:
     def test_admin_nao_altera_a_propria_conta_por_id(self, client, db, user_admin, token_admin):
         r = client.put(f"{BASE}/{user_admin.id}", json={"senha": "nova-senha-123"}, headers=auth(token_admin))
@@ -131,6 +141,7 @@ class TestPropriaContaPelaRotaAdmin:
 
 
 # ── Caminhos legítimos ──────────────────────────────────────────────────────────
+
 
 class TestGestaoLegitima:
     def test_gestor_edita_locatario(self, client, db, user_locatario, token_gestor):

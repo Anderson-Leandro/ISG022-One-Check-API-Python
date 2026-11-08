@@ -217,7 +217,11 @@ def update_usuario(
         _assert_pode_atribuir(current, body.role)
         novo_role = body.role
     if body.mfa_enabled is False and novo_role in MFA_REQUIRED_ROLES:
-        return fail("MFA é obrigatório para este perfil", erros={"mfa_enabled": "MFA é obrigatório para este perfil"}, status_code=422)
+        return fail(
+            "MFA é obrigatório para este perfil",
+            erros={"mfa_enabled": "MFA é obrigatório para este perfil"},
+            status_code=422,
+        )
 
     if body.email is not None and body.email != user.email:
         existente = db.query(Usuario).filter(Usuario.email == body.email, Usuario.id != usuario_id).first()

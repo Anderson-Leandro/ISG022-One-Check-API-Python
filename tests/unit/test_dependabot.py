@@ -5,6 +5,7 @@ O .github/dependabot.yml cobre os dois ecossistemas e abre os PRs contra a dev, 
 que exige o requirements.lock com hash e coerente com o requirements.txt. As actions continuam fixadas
 por SHA: o Dependabot troca o SHA e o comentário de versão juntos.
 """
+
 import re
 from pathlib import Path
 

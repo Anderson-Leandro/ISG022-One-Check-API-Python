@@ -1,11 +1,9 @@
-from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy.orm import Session
 
 from app.auditoria import ip_atual
-from app.config import PUBLIC_BASE_URL
 from app.cpf import mascarar_cpf
-from typing import Any
 from app.models import (
     AceiteChecklist,
     AtualizacaoProblema,
@@ -16,7 +14,6 @@ from app.models import (
     Endereco,
     Imovel,
     ImovelComodo,
-    ItemVistoria,
     LogOperacao,
     Problema,
     Usuario,
@@ -219,8 +216,7 @@ def log_operacao(
     sanitized_payload = payload
     if isinstance(payload, dict):
         sanitized_payload = {
-            k: v for k, v in payload.items()
-            if k not in ("senha", "senha_hash", "mfa_secret", "password", "secret")
+            k: v for k, v in payload.items() if k not in ("senha", "senha_hash", "mfa_secret", "password", "secret")
         }
     db.add(
         LogOperacao(
@@ -240,12 +236,7 @@ def get_comodos_for_checklist(db: Session, checklist: Checklist) -> list[ImovelC
     contrato = db.query(Contrato).filter(Contrato.id == checklist.contrato_id).first()
     if not contrato:
         return []
-    return (
-        db.query(ImovelComodo)
-        .filter(ImovelComodo.imovel_id == contrato.imovel_id)
-        .order_by(ImovelComodo.tipo)
-        .all()
-    )
+    return db.query(ImovelComodo).filter(ImovelComodo.imovel_id == contrato.imovel_id).order_by(ImovelComodo.tipo).all()
 
 
 def ensure_default_comodos(db: Session, imovel_id: str) -> None:

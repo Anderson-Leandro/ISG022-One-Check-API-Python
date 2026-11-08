@@ -4,6 +4,7 @@ O IP vem de uma ContextVar preenchida por middleware, para que as rotas não
 precisem repassar o Request a cada chamada de log_operacao. Atrás do proxy do
 Render, o uvicorn já troca o client pelo X-Forwarded-For (FORWARDED_ALLOW_IPS).
 """
+
 from contextvars import ContextVar
 
 from sqlalchemy import inspect

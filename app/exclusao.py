@@ -6,7 +6,8 @@ num lugar só (evento `do_orm_execute`), para que uma rota nova não precise lem
 
 Os agendamentos de um contrato excluído também somem, porque não fazem sentido sem o contrato.
 """
-from datetime import datetime, timezone
+
+from datetime import UTC, datetime
 
 from sqlalchemy import event, select
 from sqlalchemy.orm import Session, with_loader_criteria
@@ -36,5 +37,5 @@ def _ocultar_excluidos(estado) -> None:
 
 def marcar_excluido(registro: Contrato | Checklist | Problema, user: Usuario) -> None:
     """Marca o registro como excluído por `user`. Não faz commit."""
-    registro.excluido_em = datetime.now(timezone.utc).replace(tzinfo=None)
+    registro.excluido_em = datetime.now(UTC).replace(tzinfo=None)
     registro.excluido_por = user.id

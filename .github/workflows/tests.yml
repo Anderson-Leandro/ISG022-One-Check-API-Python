@@ -53,7 +53,16 @@ jobs:
           pip install --require-hashes -r requirements.lock
           pip install -r requirements-test.txt
 
+      # Lint e formatação (DEBT-004): qualquer aviso falha o PR. Regras em ruff.toml
+      - name: Lint (ruff check)
+        run: ruff check --output-format=github .
+
+      - name: Formatação (ruff format)
+        run: ruff format --check .
+
+      # Roda mesmo com o lint vermelho, para o PR mostrar os dois resultados de uma vez
       - name: Rodar testes
+        if: ${{ !cancelled() }}
         run: pytest --cov-fail-under=70
 
   # Falha quando alguma dependência travada tem vulnerabilidade conhecida (SEC-006)

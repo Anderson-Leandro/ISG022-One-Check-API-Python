@@ -5,6 +5,7 @@ POST /problemas/{id}/atualizacoes passa a aceitar o locatário dono do contrato 
 problema não estiver resolvido. Admin e gestor continuam como antes; vistoriador e locatário de outro
 contrato recebem 403. Mudar o status continua só com admin e gestor.
 """
+
 from datetime import date
 
 import pytest
@@ -29,8 +30,13 @@ def problema_alheio(db, user_locatario_2):
     im = Imovel(tipo="casa", status="locado", garagem=False, garagem_vagas=0)
     db.add(im)
     db.flush()
-    ct = Contrato(imovel_id=im.id, locatario_id=user_locatario_2.id, data_inicio=date(2025, 1, 1),
-                  data_fim=date(2025, 12, 31), status="ativo")
+    ct = Contrato(
+        imovel_id=im.id,
+        locatario_id=user_locatario_2.id,
+        data_inicio=date(2025, 1, 1),
+        data_fim=date(2025, 12, 31),
+        status="ativo",
+    )
     db.add(ct)
     db.flush()
     pb = Problema(contrato_id=ct.id, titulo="Problema de outro contrato")
@@ -49,7 +55,9 @@ def _atualizacoes(db, problema_id):
 
 
 @pytest.mark.parametrize("status", ["aberto", "em_andamento"])
-def test_locatario_dono_comenta_no_problema_nao_resolvido(client, db, problema, user_locatario, token_locatario, status):
+def test_locatario_dono_comenta_no_problema_nao_resolvido(
+    client, db, problema, user_locatario, token_locatario, status
+):
     problema.status = status
     db.flush()
 
@@ -102,11 +110,16 @@ def test_vistoriador_recebe_403_mesmo_para_id_inexistente(client, db, problema, 
 def test_negado_com_upload_nao_grava_arquivo(client, db, problema_alheio, token_locatario):
     from app.config import UPLOAD_DIR
     from tests.conftest import small_image_bytes
+
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     arquivos_antes = sorted(p.name for p in UPLOAD_DIR.iterdir())
 
-    r = client.post(f"{API}/problemas/{problema_alheio.id}/atualizacoes", headers=auth(token_locatario),
-                    data={"descricao": TEXTO}, files={"foto": ("a.png", small_image_bytes(), "image/png")})
+    r = client.post(
+        f"{API}/problemas/{problema_alheio.id}/atualizacoes",
+        headers=auth(token_locatario),
+        data={"descricao": TEXTO},
+        files={"foto": ("a.png", small_image_bytes(), "image/png")},
+    )
 
     assert r.status_code == 403, r.text
     assert sorted(p.name for p in UPLOAD_DIR.iterdir()) == arquivos_antes
@@ -114,13 +127,18 @@ def test_negado_com_upload_nao_grava_arquivo(client, db, problema_alheio, token_
 
 def test_locatario_continua_sem_mudar_o_status(client, db, problema, token_locatario):
     antes = foto_do_banco(db)
-    r = client.patch(f"{API}/problemas/{problema.id}/status", json={"status": "resolvido"}, headers=auth(token_locatario))
+    r = client.patch(
+        f"{API}/problemas/{problema.id}/status", json={"status": "resolvido"}, headers=auth(token_locatario)
+    )
     assert r.status_code == 403
     assert foto_do_banco(db) == antes
 
 
-def test_comentario_do_locatario_avisa_a_equipe_e_nao_ele_mesmo(client, problema, user_locatario, token_locatario, monkeypatch):
+def test_comentario_do_locatario_avisa_a_equipe_e_nao_ele_mesmo(
+    client, problema, user_locatario, token_locatario, monkeypatch
+):
     from app.routers import problemas as rota
+
     avisos = {"usuario": [], "admins": []}
     monkeypatch.setattr(rota, "notificar_usuario", lambda db, uid, *a: avisos["usuario"].append(uid))
     monkeypatch.setattr(rota, "notificar_admins", lambda db, *a: avisos["admins"].append(True))
@@ -130,8 +148,11 @@ def test_comentario_do_locatario_avisa_a_equipe_e_nao_ele_mesmo(client, problema
     assert avisos == {"usuario": [], "admins": [True]}
 
 
-def test_comentario_da_equipe_continua_avisando_o_locatario(client, problema, user_locatario, token_gestor, monkeypatch):
+def test_comentario_da_equipe_continua_avisando_o_locatario(
+    client, problema, user_locatario, token_gestor, monkeypatch
+):
     from app.routers import problemas as rota
+
     avisos = []
     monkeypatch.setattr(rota, "notificar_usuario", lambda db, uid, *a: avisos.append(uid))
     assert _comentar(client, problema.id, token_gestor).status_code == 201

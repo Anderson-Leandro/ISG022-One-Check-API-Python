@@ -1,4 +1,5 @@
 """Testes do scripts/dod_check.py (a partir do TK-019): as conferências feitas só sobre o texto do registro."""
+
 import importlib.util
 from pathlib import Path
 
@@ -20,8 +21,10 @@ class TestChecklistAntesDaRevisao:
         assert len(dod_check.checklist_pendente(MODELO)) == 5
 
     def test_linha_sem_resposta_e_apontada(self):
-        registro = ("## Checklist antes da revisão\n- [x] Campos: só tipo e data\n"
-                    "- [ ] Status finais: todos tratados\n- [-] Login: não se aplica, sem sessão\n## Testes\n")
+        registro = (
+            "## Checklist antes da revisão\n- [x] Campos: só tipo e data\n"
+            "- [ ] Status finais: todos tratados\n- [-] Login: não se aplica, sem sessão\n## Testes\n"
+        )
         pendentes = dod_check.checklist_pendente(registro)
         assert len(pendentes) == 1 and pendentes[0].startswith("Status finais")
 
@@ -33,24 +36,41 @@ class TestChecklistAntesDaRevisao:
         assert dod_check.checklist_pendente("## Checklist antes da revisão\n<!-- nada -->\n## Testes\n")
 
     def test_titulo_citado_no_meio_do_texto_nao_conta(self):
-        registro = ("## Entrega\nAdiciona `## Checklist antes da revisão` ao modelo.\n"
-                    "## Checklist antes da revisão\n- [ ] Status finais\n## Testes\n")
+        registro = (
+            "## Entrega\nAdiciona `## Checklist antes da revisão` ao modelo.\n"
+            "## Checklist antes da revisão\n- [ ] Status finais\n## Testes\n"
+        )
         assert dod_check.checklist_pendente(registro) == ["Status finais"]
 
     def test_tudo_respondido_passa(self):
         registro = "## Checklist antes da revisão\n- [x] a\n- [-] b\n## Testes\n"
         assert dod_check.checklist_pendente(registro) == []
 
-    @pytest.mark.parametrize("item", ["Campos que o perfil", "Status finais", "Autorização antes de ler o corpo",
-                                      "Login, refresh e tokens", "Perfis proibidos barrados antes da busca"])
+    @pytest.mark.parametrize(
+        "item",
+        [
+            "Campos que o perfil",
+            "Status finais",
+            "Autorização antes de ler o corpo",
+            "Login, refresh e tokens",
+            "Perfis proibidos barrados antes da busca",
+        ],
+    )
     def test_modelo_traz_cada_item_da_checklist(self, item):
         assert item in MODELO.split("## Checklist antes da revisão", 1)[1].split("\n## ", 1)[0]
 
 
 # DEBT-018: falsos negativos do dod_check
 def _pr(base, arquivos=(), estado="MERGED", ci="SUCCESS", branch="dev"):
-    return {"number": 172, "state": estado, "baseRefName": base, "headRefName": branch, "mergeCommit": None,
-            "statusCheckRollup": [{"name": "test", "conclusion": ci}], "files": [{"path": a} for a in arquivos]}
+    return {
+        "number": 172,
+        "state": estado,
+        "baseRefName": base,
+        "headRefName": branch,
+        "mergeCommit": None,
+        "statusCheckRollup": [{"name": "test", "conclusion": ci}],
+        "files": [{"path": a} for a in arquivos],
+    }
 
 
 class TestPrDeRelease:
@@ -62,6 +82,7 @@ class TestPrDeRelease:
             monkeypatch.setattr(dod_check, "testes_alterados", lambda pr: [])
             dod_check.conferir_pr(iid, "172", "", depois_do_merge=True)
             return dod_check.resultados
+
         return _conferir
 
     def test_release_na_main_nao_passa_pelas_checagens_de_implementacao(self, conferir):
@@ -118,8 +139,12 @@ class TestRelatorioDeTestesAlterados:
     TODOS = ["tests/integration/test_auth.py", "tests/unit/test_auth.py", "tests/integration/test_problemas.py"]
 
     def test_nome_do_arquivo_unico_basta(self):
-        assert dod_check.faltando_no_relatorio(
-            ["tests/integration/test_problemas.py"], "| test_problemas.py :: test_x | ... |", self.TODOS) == []
+        assert (
+            dod_check.faltando_no_relatorio(
+                ["tests/integration/test_problemas.py"], "| test_problemas.py :: test_x | ... |", self.TODOS
+            )
+            == []
+        )
 
     def test_nome_repetido_em_outra_pasta_exige_o_caminho(self):
         alterado = ["tests/unit/test_auth.py"]
@@ -142,24 +167,30 @@ class TestRelatorioDeTestesAlterados:
 
 
 class TestSecaoSeguranca:
-    @pytest.mark.parametrize("texto", [
-        "- `/security-audit diff dev`: nenhum achado novo. Item SEC-019 continua pendente no backlog.",
-        "- `/security-audit diff dev`: ok. Os itens pendentes ficam para a Sprint 14.",
-        "- `/security-audit diff dev`: scanners ok; SEC-019 pendente.",
-    ])
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "- `/security-audit diff dev`: nenhum achado novo. Item SEC-019 continua pendente no backlog.",
+            "- `/security-audit diff dev`: ok. Os itens pendentes ficam para a Sprint 14.",
+            "- `/security-audit diff dev`: scanners ok; SEC-019 pendente.",
+        ],
+    )
     def test_pendente_fora_da_auditoria_nao_reprova(self, texto):
         assert dod_check.auditoria_rodou(texto)
 
-    @pytest.mark.parametrize("texto", [
-        "- `/security-audit`: não foi rodada.",
-        "- `/security-audit diff dev`: pendente.",
-        "- A auditoria ficou pendente.",
-        "- Nenhum scanner rodou.",
-        "- Pendente: rodar a /security-audit antes do merge.",
-        "- security-audit diff dev será rodada depois do review, resultado pendente.",
-        "- `/security-audit`: não rodada (só docs).",
-        "- security-audit ainda não executada.",
-    ])
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "- `/security-audit`: não foi rodada.",
+            "- `/security-audit diff dev`: pendente.",
+            "- A auditoria ficou pendente.",
+            "- Nenhum scanner rodou.",
+            "- Pendente: rodar a /security-audit antes do merge.",
+            "- security-audit diff dev será rodada depois do review, resultado pendente.",
+            "- `/security-audit`: não rodada (só docs).",
+            "- security-audit ainda não executada.",
+        ],
+    )
     def test_auditoria_nao_rodada_reprova(self, texto):
         assert not dod_check.auditoria_rodou(texto)
 

@@ -9,6 +9,7 @@ problema (e suas atualizações) de qualquer contrato, bastando o ID.
 Regra verificada: a mesma da listagem, em todas as rotas de leitura —
 admin, gestor e o locatário dono do contrato.
 """
+
 import pytest
 
 from app.models import AtualizacaoProblema, Problema

@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -40,9 +40,10 @@ def require_roles(*roles: str):
 
 
 def _vistoriador_atua_no_contrato(db: Session, contrato_id: str, user: Usuario) -> bool:
-    return db.query(Checklist.id).filter(
-        Checklist.contrato_id == contrato_id, Checklist.vistoriador_id == user.id
-    ).first() is not None
+    return (
+        db.query(Checklist.id).filter(Checklist.contrato_id == contrato_id, Checklist.vistoriador_id == user.id).first()
+        is not None
+    )
 
 
 # Perfis com visão de toda a operação: a mesma lista de app.auth (PRIVILEGED_ROLES). Toda regra de acesso libera
@@ -74,9 +75,11 @@ def assert_acesso_imovel(db: Session, imovel_id: str, user: Usuario) -> None:
     """Mesma regra da listagem de imóveis: locatário com contrato ativo, vistoriador com vistoria no imóvel."""
     negar_perfil_desconhecido(user)
     if user.role == "locatario":
-        permitido = db.query(Contrato.id).filter(
-            Contrato.imovel_id == imovel_id, Contrato.locatario_id == user.id, Contrato.status == "ativo"
-        ).first()
+        permitido = (
+            db.query(Contrato.id)
+            .filter(Contrato.imovel_id == imovel_id, Contrato.locatario_id == user.id, Contrato.status == "ativo")
+            .first()
+        )
     elif user.role == "vistoriador":
         permitido = (
             db.query(Checklist.id)

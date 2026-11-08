@@ -1,4 +1,5 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -22,7 +23,7 @@ def _parse_datetime(dt_val) -> datetime:
         try:
             return datetime.fromisoformat(dt_val)
         except Exception:
-            raise ValueError("Formato de data inválido")
+            raise ValueError("Formato de data inválido") from None
     raise ValueError("Formato de data inválido")
 
 
@@ -39,17 +40,29 @@ def update_agendamento(
 
     if body.tipo is not None:
         if body.tipo not in TIPOS_AGENDAMENTO:
-            return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"}, status_code=422)
+            return fail(
+                "Tipo inválido. Deve ser 'inicial' ou 'encerramento'",
+                erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"},
+                status_code=422,
+            )
         ag.tipo = body.tipo
 
     if body.data_agendada is not None:
         try:
             parsed_dt = _parse_datetime(body.data_agendada)
         except Exception:
-            return fail("Formato de data_agendada inválido", erros={"data_agendada": "Formato de data_agendada inválido"}, status_code=422)
-        now = datetime.now() if parsed_dt.tzinfo is None else datetime.now(timezone.utc)
+            return fail(
+                "Formato de data_agendada inválido",
+                erros={"data_agendada": "Formato de data_agendada inválido"},
+                status_code=422,
+            )
+        now = datetime.now() if parsed_dt.tzinfo is None else datetime.now(UTC)
         if parsed_dt <= now:
-            return fail("A data agendada deve ser uma data futura", erros={"data_agendada": "A data agendada deve ser uma data futura"}, status_code=422)
+            return fail(
+                "A data agendada deve ser uma data futura",
+                erros={"data_agendada": "A data agendada deve ser uma data futura"},
+                status_code=422,
+            )
         ag.data_agendada = parsed_dt.replace(tzinfo=None) if parsed_dt.tzinfo else parsed_dt
 
     if body.observacao is not None:

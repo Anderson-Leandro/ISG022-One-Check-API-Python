@@ -53,6 +53,7 @@ def fail(msg: str, erros: Any = None, status_code: int = 400) -> JSONResponse:
 
 # --- Auth ---
 
+
 class LoginRequest(BaseModel):
     email: str
     senha: str
@@ -117,6 +118,7 @@ class TokenResponse(BaseModel):
 
 # --- Usuarios ---
 
+
 class UsuarioCreate(BaseModel):
     nome: str
     email: str
@@ -145,6 +147,7 @@ class UsuarioUpdate(BaseModel):
 
 
 # --- Enderecos & Imoveis ---
+
 
 class EnderecoCreate(BaseModel):
     rua: str
@@ -185,6 +188,7 @@ class ImovelUpdate(BaseModel):
 
 
 # --- Comodos ---
+
 
 class ComodoCreate(BaseModel):
     tipo: str
@@ -239,6 +243,7 @@ class EnderecoOut(BaseModel):
 
 # --- Contratos ---
 
+
 class ContratoCreate(BaseModel):
     imovel_id: str
     locatario_id: str
@@ -284,6 +289,7 @@ class AgendamentoOut(BaseModel):
 
 
 # --- Checklists ---
+
 
 class ChecklistCreate(BaseModel):
     tipo: str
@@ -367,6 +373,7 @@ class ItemVistoriaOut(BaseModel):
 
 # --- Problemas ---
 
+
 class AtualizacaoProblemaCreate(BaseModel):
     descricao: str
     foto_url: str | None = None
@@ -408,6 +415,7 @@ class ProblemaOut(BaseModel):
 
 
 # --- Dashboard / Logs ---
+
 
 class DashboardOut(BaseModel):
     imoveis_locados: int

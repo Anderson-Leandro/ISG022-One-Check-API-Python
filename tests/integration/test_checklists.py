@@ -12,16 +12,16 @@ Rotas cobertas:
   PATCH  /api/v1/checklists/{id}/aceitar
   PATCH  /api/v1/checklists/{id}/rejeitar
 """
-import pytest
 
 from app.models import ChecklistItem, ChecklistItemFoto, ImovelComodo
-from tests.conftest import auth, small_image_bytes, foto_do_banco
+from tests.conftest import auth, foto_do_banco, small_image_bytes
 
 BASE = "/api/v1/checklists"
 ITENS_BASE = "/api/v1/itens-vistoria"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────────
+
 
 def _primeiro_comodo(db, imovel_id: str) -> ImovelComodo:
     return db.query(ImovelComodo).filter(ImovelComodo.imovel_id == imovel_id).first()
@@ -45,6 +45,7 @@ def _submete(client, checklist_id: str, token: str) -> None:
 
 # ── GET /itens-vistoria ───────────────────────────────────────────────────────────
 
+
 class TestListItensVistoria:
     def test_lista_itens_autenticado(self, client, item_vistoria, token_admin):
         r = client.get(ITENS_BASE, headers=auth(token_admin))
@@ -65,6 +66,7 @@ class TestListItensVistoria:
 
 
 # ── GET /checklists/{id} ──────────────────────────────────────────────────────────
+
 
 class TestGetChecklist:
     def test_admin_obtem_checklist(self, client, checklist, token_admin):
@@ -99,31 +101,42 @@ class TestGetChecklist:
 
 # ── POST /checklists/{id}/itens ───────────────────────────────────────────────────
 
+
 class TestAddItem:
     def test_vistoriador_adiciona_item(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         comodo = _primeiro_comodo(db, imovel.id)
-        r = client.post(f"{BASE}/{checklist.id}/itens", json={
-            "comodo_id": comodo.id,
-            "item_vistoria_id": item_vistoria.id,
-            "estado": "bom",
-        }, headers=auth(token_vistoriador))
+        r = client.post(
+            f"{BASE}/{checklist.id}/itens",
+            json={
+                "comodo_id": comodo.id,
+                "item_vistoria_id": item_vistoria.id,
+                "estado": "bom",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["estado"] == "bom"
 
     def test_admin_adiciona_item(self, client, db, checklist, item_vistoria, imovel, token_admin):
         comodo = _primeiro_comodo(db, imovel.id)
-        r = client.post(f"{BASE}/{checklist.id}/itens", json={
-            "comodo_id": comodo.id,
-            "item_vistoria_id": item_vistoria.id,
-            "estado": "otimo",
-            "observacao": "Perfeito estado",
-        }, headers=auth(token_admin))
+        r = client.post(
+            f"{BASE}/{checklist.id}/itens",
+            json={
+                "comodo_id": comodo.id,
+                "item_vistoria_id": item_vistoria.id,
+                "estado": "otimo",
+                "observacao": "Perfeito estado",
+            },
+            headers=auth(token_admin),
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["observacao"] == "Perfeito estado"
 
-    def test_upsert_item_existente_atualiza_estado(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
+    def test_upsert_item_existente_atualiza_estado(
+        self, client, db, checklist, item_vistoria, imovel, token_vistoriador
+    ):
         comodo = _primeiro_comodo(db, imovel.id)
         payload = {"comodo_id": comodo.id, "item_vistoria_id": item_vistoria.id, "estado": "bom"}
         client.post(f"{BASE}/{checklist.id}/itens", json=payload, headers=auth(token_vistoriador))
@@ -133,20 +146,28 @@ class TestAddItem:
         assert data["sucesso"] is True
         assert data["dados"]["estado"] == "ruim"
         # Verifica que só existe um item (não duplicou)
-        count = db.query(ChecklistItem).filter(
-            ChecklistItem.checklist_id == checklist.id,
-            ChecklistItem.comodo_id == comodo.id,
-            ChecklistItem.item_vistoria_id == item_vistoria.id,
-        ).count()
+        count = (
+            db.query(ChecklistItem)
+            .filter(
+                ChecklistItem.checklist_id == checklist.id,
+                ChecklistItem.comodo_id == comodo.id,
+                ChecklistItem.item_vistoria_id == item_vistoria.id,
+            )
+            .count()
+        )
         assert count == 1
 
     def test_estado_invalido_retorna_falha(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         comodo = _primeiro_comodo(db, imovel.id)
-        r = client.post(f"{BASE}/{checklist.id}/itens", json={
-            "comodo_id": comodo.id,
-            "item_vistoria_id": item_vistoria.id,
-            "estado": "perfeito",
-        }, headers=auth(token_vistoriador))
+        r = client.post(
+            f"{BASE}/{checklist.id}/itens",
+            json={
+                "comodo_id": comodo.id,
+                "item_vistoria_id": item_vistoria.id,
+                "estado": "perfeito",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is False
         assert "estado" in data["erro"].lower()
@@ -154,31 +175,42 @@ class TestAddItem:
     def test_locatario_nao_pode_adicionar_item(self, client, db, checklist, item_vistoria, imovel, token_locatario):
         comodo = _primeiro_comodo(db, imovel.id)
         banco_antes = foto_do_banco(db)
-        r = client.post(f"{BASE}/{checklist.id}/itens", json={
-            "comodo_id": comodo.id,
-            "item_vistoria_id": item_vistoria.id,
-            "estado": "bom",
-        }, headers=auth(token_locatario))
+        r = client.post(
+            f"{BASE}/{checklist.id}/itens",
+            json={
+                "comodo_id": comodo.id,
+                "item_vistoria_id": item_vistoria.id,
+                "estado": "bom",
+            },
+            headers=auth(token_locatario),
+        )
         assert r.status_code == 403
         assert r.json()["detail"] == "Vistoriador não autorizado neste checklist"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_checklist_inexistente_retorna_falha(self, client, item_vistoria, token_admin):
-        r = client.post(f"{BASE}/id-invalido/itens", json={
-            "comodo_id": "qualquer",
-            "item_vistoria_id": item_vistoria.id,
-            "estado": "bom",
-        }, headers=auth(token_admin))
+        r = client.post(
+            f"{BASE}/id-invalido/itens",
+            json={
+                "comodo_id": "qualquer",
+                "item_vistoria_id": item_vistoria.id,
+                "estado": "bom",
+            },
+            headers=auth(token_admin),
+        )
         data = r.json()
         assert data["sucesso"] is False
 
     def test_sem_autenticacao_retorna_401(self, client, db, checklist, item_vistoria):
         banco_antes = foto_do_banco(db)
-        r = client.post(f"{BASE}/{checklist.id}/itens", json={
-            "comodo_id": "qualquer",
-            "item_vistoria_id": item_vistoria.id,
-            "estado": "bom",
-        })
+        r = client.post(
+            f"{BASE}/{checklist.id}/itens",
+            json={
+                "comodo_id": "qualquer",
+                "item_vistoria_id": item_vistoria.id,
+                "estado": "bom",
+            },
+        )
         assert r.status_code == 401
         assert r.json()["detail"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
@@ -186,13 +218,18 @@ class TestAddItem:
 
 # ── PUT /checklists/{id}/itens/{item_id} ──────────────────────────────────────────
 
+
 class TestUpdateItem:
     def test_atualiza_estado_do_item(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         comodo = _primeiro_comodo(db, imovel.id)
         item = _cria_item(db, checklist.id, comodo.id, item_vistoria.id, "bom")
-        r = client.put(f"{BASE}/{checklist.id}/itens/{item.id}", json={
-            "estado": "regular",
-        }, headers=auth(token_vistoriador))
+        r = client.put(
+            f"{BASE}/{checklist.id}/itens/{item.id}",
+            json={
+                "estado": "regular",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["estado"] == "regular"
@@ -200,9 +237,13 @@ class TestUpdateItem:
     def test_atualiza_observacao_do_item(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         comodo = _primeiro_comodo(db, imovel.id)
         item = _cria_item(db, checklist.id, comodo.id, item_vistoria.id)
-        r = client.put(f"{BASE}/{checklist.id}/itens/{item.id}", json={
-            "observacao": "Necessita reparo",
-        }, headers=auth(token_vistoriador))
+        r = client.put(
+            f"{BASE}/{checklist.id}/itens/{item.id}",
+            json={
+                "observacao": "Necessita reparo",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["observacao"] == "Necessita reparo"
@@ -210,16 +251,24 @@ class TestUpdateItem:
     def test_estado_invalido_retorna_falha(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         comodo = _primeiro_comodo(db, imovel.id)
         item = _cria_item(db, checklist.id, comodo.id, item_vistoria.id)
-        r = client.put(f"{BASE}/{checklist.id}/itens/{item.id}", json={
-            "estado": "excelente",
-        }, headers=auth(token_vistoriador))
+        r = client.put(
+            f"{BASE}/{checklist.id}/itens/{item.id}",
+            json={
+                "estado": "excelente",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is False
 
     def test_item_inexistente_retorna_falha(self, client, checklist, token_vistoriador):
-        r = client.put(f"{BASE}/{checklist.id}/itens/id-invalido", json={
-            "estado": "bom",
-        }, headers=auth(token_vistoriador))
+        r = client.put(
+            f"{BASE}/{checklist.id}/itens/id-invalido",
+            json={
+                "estado": "bom",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is False
 
@@ -234,6 +283,7 @@ class TestUpdateItem:
 
 
 # ── POST /checklists/{id}/itens/{item_id}/fotos ───────────────────────────────────
+
 
 class TestUploadFoto:
     def test_upload_foto_valida(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
@@ -309,6 +359,7 @@ class TestUploadFoto:
 
 # ── DELETE /checklists/{id}/itens/{item_id}/fotos/{foto_id} ──────────────────────
 
+
 class TestDeleteFoto:
     def _upload(self, client, checklist_id, item_id, token):
         r = client.post(
@@ -353,6 +404,7 @@ class TestDeleteFoto:
 
 
 # ── PATCH /checklists/{id}/submeter ───────────────────────────────────────────────
+
 
 class TestSubmeterChecklist:
     def test_submete_com_item_preenchido(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
@@ -404,6 +456,7 @@ class TestSubmeterChecklist:
 
 # ── PATCH /checklists/{id}/aceitar ────────────────────────────────────────────────
 
+
 class TestAceitarChecklist:
     def _prepara_pendente(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         comodo = _primeiro_comodo(db, imovel.id)
@@ -417,13 +470,17 @@ class TestAceitarChecklist:
         assert data["sucesso"] is True
         assert data["dados"]["status"] == "aceito"
 
-    def test_gestor_aceita_checklist(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_gestor):
+    def test_gestor_aceita_checklist(
+        self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_gestor
+    ):
         self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
         r = client.patch(f"{BASE}/{checklist.id}/aceitar", headers=auth(token_gestor))
         data = r.json()
         assert data["sucesso"] is True
 
-    def test_locatario_aceita_checklist_proprio(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_locatario):
+    def test_locatario_aceita_checklist_proprio(
+        self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_locatario
+    ):
         self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
         r = client.patch(f"{BASE}/{checklist.id}/aceitar", headers=auth(token_locatario))
         data = r.json()
@@ -455,22 +512,31 @@ class TestAceitarChecklist:
 
 # ── PATCH /checklists/{id}/rejeitar ──────────────────────────────────────────────
 
+
 class TestRejeitarChecklist:
     def _prepara_pendente(self, client, db, checklist, item_vistoria, imovel, token_vistoriador):
         comodo = _primeiro_comodo(db, imovel.id)
         _cria_item(db, checklist.id, comodo.id, item_vistoria.id, "bom")
         _submete(client, checklist.id, token_vistoriador)
 
-    def test_admin_rejeita_checklist(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_admin):
+    def test_admin_rejeita_checklist(
+        self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_admin
+    ):
         self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
-        r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_admin), json={"motivo": "Fotos borradas"})
+        r = client.patch(
+            f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_admin), json={"motivo": "Fotos borradas"}
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["status"] == "rejeitado"
 
-    def test_locatario_rejeita_proprio_checklist(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_locatario):
+    def test_locatario_rejeita_proprio_checklist(
+        self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_locatario
+    ):
         self._prepara_pendente(client, db, checklist, item_vistoria, imovel, token_vistoriador)
-        r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_locatario), json={"motivo": "Pintura danificada"})
+        r = client.patch(
+            f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_locatario), json={"motivo": "Pintura danificada"}
+        )
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["status"] == "rejeitado"
@@ -498,6 +564,7 @@ class TestRejeitarChecklist:
 
 # ── PATCH /checklists/{id}/enviar-para-aceite ─────────────────────────────────────
 
+
 class TestEnviarParaAceite:
     def test_admin_envia_para_aceite_sucesso(self, client, db, checklist, item_vistoria, imovel, token_admin):
         comodo = _primeiro_comodo(db, imovel.id)
@@ -513,36 +580,49 @@ class TestEnviarParaAceite:
         assert data["sucesso"] is False
         assert "ao menos um item" in data["erro"].lower()
 
-    def test_bloqueia_adicionar_itens_em_checklist_pendente(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_admin):
+    def test_bloqueia_adicionar_itens_em_checklist_pendente(
+        self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_admin
+    ):
         comodo = _primeiro_comodo(db, imovel.id)
         _cria_item(db, checklist.id, comodo.id, item_vistoria.id, "bom")
         client.patch(f"{BASE}/{checklist.id}/enviar-para-aceite", headers=auth(token_admin))
 
         # Tentar adicionar item após envio
-        r = client.post(f"{BASE}/{checklist.id}/itens", json={
-            "comodo_id": comodo.id,
-            "item_vistoria_id": item_vistoria.id,
-            "estado": "otimo",
-        }, headers=auth(token_vistoriador))
+        r = client.post(
+            f"{BASE}/{checklist.id}/itens",
+            json={
+                "comodo_id": comodo.id,
+                "item_vistoria_id": item_vistoria.id,
+                "estado": "otimo",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is False
         assert "não é possível adicionar" in data["erro"].lower()
 
-    def test_bloqueia_editar_itens_em_checklist_pendente(self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_admin):
+    def test_bloqueia_editar_itens_em_checklist_pendente(
+        self, client, db, checklist, item_vistoria, imovel, token_vistoriador, token_admin
+    ):
         comodo = _primeiro_comodo(db, imovel.id)
         item = _cria_item(db, checklist.id, comodo.id, item_vistoria.id, "bom")
         client.patch(f"{BASE}/{checklist.id}/enviar-para-aceite", headers=auth(token_admin))
 
         # Tentar editar item após envio
-        r = client.put(f"{BASE}/{checklist.id}/itens/{item.id}", json={
-            "estado": "regular",
-        }, headers=auth(token_vistoriador))
+        r = client.put(
+            f"{BASE}/{checklist.id}/itens/{item.id}",
+            json={
+                "estado": "regular",
+            },
+            headers=auth(token_vistoriador),
+        )
         data = r.json()
         assert data["sucesso"] is False
         assert "não é possível editar" in data["erro"].lower()
 
 
 # ── GET /checklists/{id}/download (PDF) ───────────────────────────────────────────
+
 
 class TestDownloadPdf:
     def test_admin_baixa_pdf_checklist(self, client, db, checklist, item_vistoria, imovel, token_admin):
@@ -568,7 +648,10 @@ class TestDownloadPdf:
         from app.auth import create_access_token
         from app.models import Usuario
         from tests.conftest import _SENHA_HASH
-        u_outro = Usuario(nome="Outro Loc", email="outro_loc@teste.com", senha_hash=_SENHA_HASH, role="locatario", ativo=True)
+
+        u_outro = Usuario(
+            nome="Outro Loc", email="outro_loc@teste.com", senha_hash=_SENHA_HASH, role="locatario", ativo=True
+        )
         db.add(u_outro)
         db.commit()
         token_outro = create_access_token(u_outro.id, u_outro.role)

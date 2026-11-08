@@ -1,5 +1,6 @@
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -13,6 +14,7 @@ from app.serializers import log_operacao, serialize_atualizacao_problema, serial
 from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 
 router = APIRouter(tags=["problemas"])
+
 
 def _ok(dados: Any = None, mensagem: str | None = None, status_code: int = 200) -> JSONResponse:
     res = {"sucesso": True, "dados": dados}
@@ -148,8 +150,12 @@ async def criar_atualizacao(
         if foto and hasattr(foto, "read"):
             content = await foto.read()
             if len(content) > MAX_UPLOAD_MB * 1024 * 1024:
-                return _fail(f"A foto não pode exceder {MAX_UPLOAD_MB} MB", status_code=422, erros={"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"})
-            
+                return _fail(
+                    f"A foto não pode exceder {MAX_UPLOAD_MB} MB",
+                    status_code=422,
+                    erros={"foto": f"A foto não pode exceder {MAX_UPLOAD_MB} MB"},
+                )
+
             try:
                 foto_chave = salvar_imagem(content)
             except UploadInvalido as e:

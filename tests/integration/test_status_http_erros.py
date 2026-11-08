@@ -11,6 +11,7 @@ Rotas cobertas:
   GET  /imoveis/{id}
   POST /contratos/{id}/agendamentos
 """
+
 from tests.conftest import TEST_SENHA, auth
 
 API = "/api/v1"

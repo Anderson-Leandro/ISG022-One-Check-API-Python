@@ -3,12 +3,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from app.auditoria import IpRequisicaoMiddleware
 from app.cabecalhos import CabecalhosSegurancaMiddleware
 from app.config import CORS_ORIGINS, DOCS_ENABLED, IS_DEV, UPLOAD_DIR
-from app.database import Base, SessionLocal, ensure_schema_updates, engine
+from app.database import SessionLocal, ensure_schema_updates
 from app.limite_corpo import LimiteCorpoMiddleware
 from app.routers import (
     admin,

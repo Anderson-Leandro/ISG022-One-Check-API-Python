@@ -1,4 +1,5 @@
 """CPF: validação no cadastro e máscara nas respostas (LGPD, minimização)."""
+
 import re
 
 

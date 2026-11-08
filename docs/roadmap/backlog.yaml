@@ -3180,7 +3180,7 @@ items:
   priority: should
   rank: 140
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -3203,10 +3203,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: da9a5f040b71969b
-      remote_at: '2026-11-08T19:13:38Z'
+      hash: 50b04013e9b6c52d
+      remote_at: '2026-11-08T22:38:45Z'
 - id: DEBT-005
   type: debt
   title: Dependabot para pip e GitHub Actions

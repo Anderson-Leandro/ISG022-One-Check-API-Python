@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
@@ -37,9 +38,11 @@ def dashboard(db: Session = Depends(get_db), user: Usuario = Depends(get_current
     imoveis = db.query(Imovel).filter(Imovel.ativo == True, Imovel.status == "locado")
     if user.role == "locatario":
         # Como em GET /imoveis: só imóveis de contratos ativos do locatário
-        imoveis = imoveis.filter(Imovel.id.in_(
-            db.query(Contrato.imovel_id).filter(Contrato.locatario_id == user.id, Contrato.status == "ativo")
-        ))
+        imoveis = imoveis.filter(
+            Imovel.id.in_(
+                db.query(Contrato.imovel_id).filter(Contrato.locatario_id == user.id, Contrato.status == "ativo")
+            )
+        )
     elif contratos is not None:
         imoveis = imoveis.filter(Imovel.id.in_(db.query(Contrato.imovel_id).filter(Contrato.id.in_(contratos))))
 
@@ -63,12 +66,14 @@ def dashboard(db: Session = Depends(get_db), user: Usuario = Depends(get_current
         agendamentos = agendamentos.filter(AgendamentoVistoria.contrato_id.in_(contratos))
     vistorias_agendadas = agendamentos.count()
 
-    return ok({
-        "imoveis_locados": imoveis.count(),
-        "checklists_pendentes": checklists.count(),
-        "problemas_abertos": problemas_abertos,
-        "vistorias_agendadas": vistorias_agendadas,
-    })
+    return ok(
+        {
+            "imoveis_locados": imoveis.count(),
+            "checklists_pendentes": checklists.count(),
+            "problemas_abertos": problemas_abertos,
+            "vistorias_agendadas": vistorias_agendadas,
+        }
+    )
 
 
 @router.get("/logs")
@@ -107,17 +112,20 @@ def logs(
 
     q = q.order_by(LogOperacao.created_at.desc())
     items, pag = paginate(q, pagina, por_pagina)
-    return ok([
-        {
-            "id": l.id,
-            "usuario_id": l.usuario_id,
-            "acao": l.acao,
-            "entidade": l.entidade,
-            "entidade_id": l.entidade_id,
-            "detalhes": l.detalhes,
-            "payload": l.payload,
-            "ip": l.ip,
-            "created_at": l.created_at.isoformat() if l.created_at else None,
-        }
-        for l in items
-    ], pag)
+    return ok(
+        [
+            {
+                "id": l.id,
+                "usuario_id": l.usuario_id,
+                "acao": l.acao,
+                "entidade": l.entidade,
+                "entidade_id": l.entidade_id,
+                "detalhes": l.detalhes,
+                "payload": l.payload,
+                "ip": l.ip,
+                "created_at": l.created_at.isoformat() if l.created_at else None,
+            }
+            for l in items
+        ],
+        pag,
+    )

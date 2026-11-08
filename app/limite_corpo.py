@@ -4,6 +4,7 @@ Sem ele, o FastAPI lê e grava em disco o corpo inteiro (inclusive multipart de
 vários GB) antes de qualquer dependência rodar, então um anônimo conseguia
 consumir disco e CPU mesmo recebendo 401 no fim.
 """
+
 import json
 
 from starlette.exceptions import HTTPException
@@ -79,9 +80,15 @@ async def _responder_413(send, limite: int) -> None:
 async def _responder(send, status: int, detail: str) -> None:
     # Mesmo formato das HTTPException da API (401, 403, 429)
     corpo = json.dumps({"detail": detail}, ensure_ascii=False).encode()
-    await send({
-        "type": "http.response.start",
-        "status": status,
-        "headers": [(b"content-type", b"application/json"), (b"content-length", str(len(corpo)).encode()), (b"connection", b"close")],
-    })
+    await send(
+        {
+            "type": "http.response.start",
+            "status": status,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"content-length", str(len(corpo)).encode()),
+                (b"connection", b"close"),
+            ],
+        }
+    )
     await send({"type": "http.response.body", "body": corpo})

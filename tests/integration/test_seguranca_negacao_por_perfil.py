@@ -12,6 +12,7 @@ Duas camadas:
   2. test_perfil_proibido_recebe_403 chama cada rota com cada perfil fora da lista, usando IDs de
      objetos reais, e confere 403 e o banco igual ao de antes.
 """
+
 import pytest
 from fastapi.routing import APIRoute
 
@@ -97,14 +98,25 @@ def _perfis_da_dependencia(rota: APIRoute) -> set[str] | None:
 
 
 def _rotas_da_api():
-    for modulo in (health, auth_router, usuarios, imoveis, contratos, agendamentos, checklists, problemas,
-                   dashboard, admin):
+    for modulo in (
+        health,
+        auth_router,
+        usuarios,
+        imoveis,
+        contratos,
+        agendamentos,
+        checklists,
+        problemas,
+        dashboard,
+        admin,
+    ):
         for rota in modulo.router.routes:
             if isinstance(rota, APIRoute):
                 yield rota
 
 
 # ── 1. A lista esperada confere com a API ───────────────────────────────────────
+
 
 def test_lista_confere_com_a_api(client):
     na_api = set()
@@ -135,6 +147,7 @@ def test_combinacoes_cobertas():
 
 # ── 2. Cada perfil proibido recebe 403 e nada é gravado ─────────────────────────
 
+
 @pytest.fixture
 def ids(db, imovel, contrato, checklist, user_locatario):
     comodo = db.query(ImovelComodo).filter(ImovelComodo.imovel_id == imovel.id).first()
@@ -156,16 +169,17 @@ def ids(db, imovel, contrato, checklist, user_locatario):
 
 @pytest.fixture
 def tokens(token_admin, token_gestor, token_vistoriador, token_locatario):
-    return {"admin": token_admin, "gestor": token_gestor, "vistoriador": token_vistoriador,
-            "locatario": token_locatario}
+    return {
+        "admin": token_admin,
+        "gestor": token_gestor,
+        "vistoriador": token_vistoriador,
+        "locatario": token_locatario,
+    }
 
 
 def _foto_do_banco(db):
     db.expire_all()
-    return {
-        tabela.name: sorted(map(repr, db.execute(tabela.select()).all()))
-        for tabela in Base.metadata.sorted_tables
-    }
+    return {tabela.name: sorted(map(repr, db.execute(tabela.select()).all())) for tabela in Base.metadata.sorted_tables}
 
 
 @pytest.mark.parametrize(("metodo", "rota", "perfil"), COMBINACOES_PROIBIDAS)
@@ -206,7 +220,11 @@ def test_post_encerrar_e_cancelar_pelo_gestor(client, db, contrato, imovel, toke
 
 def test_gestor_nao_le_os_logs(client, db, user_admin, token_gestor, token_admin):
     """SEC-018 (decisão do PO em 2026-11-08): a trilha de auditoria é só do admin."""
-    db.add(LogOperacao(usuario_id=user_admin.id, acao="login", entidade="usuario", entidade_id=user_admin.id, ip="203.0.113.7"))
+    db.add(
+        LogOperacao(
+            usuario_id=user_admin.id, acao="login", entidade="usuario", entidade_id=user_admin.id, ip="203.0.113.7"
+        )
+    )
     db.flush()
 
     r = client.get(f"{API}/logs", headers=auth(token_gestor))

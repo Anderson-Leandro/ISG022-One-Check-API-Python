@@ -1,9 +1,10 @@
-from datetime import date
 import io
+from datetime import date
+
 import pytest
 
 from app.models import Contrato, Imovel, ImovelComodo, Problema, Usuario
-from tests.conftest import auth, small_image_bytes, foto_do_banco
+from tests.conftest import auth, foto_do_banco, small_image_bytes
 
 BASE_CONTRATOS = "/api/v1/contratos"
 BASE_PROBLEMAS = "/api/v1/problemas"
@@ -12,6 +13,7 @@ BASE_PROBLEMAS = "/api/v1/problemas"
 @pytest.fixture
 def outro_locatario(db):
     from tests.conftest import _SENHA_HASH
+
     u = Usuario(
         nome="Outro Locatario",
         email="outro_loc@teste.com",
@@ -29,6 +31,7 @@ def outro_locatario(db):
 @pytest.fixture
 def token_outro_locatario(outro_locatario):
     from app.auth import create_access_token
+
     return create_access_token(outro_locatario.id, outro_locatario.role)
 
 
@@ -88,10 +91,9 @@ def problema_criado(client, contrato, comodo_contrato, token_locatario):
 
 # ── POST /contratos/{id}/problemas ──────────────────────────────────────────────
 
+
 class TestCriarProblema:
-    def test_locatario_cria_problema_valido_e_retorna_201(
-        self, client, contrato, comodo_contrato, token_locatario
-    ):
+    def test_locatario_cria_problema_valido_e_retorna_201(self, client, contrato, comodo_contrato, token_locatario):
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
             json={
@@ -109,9 +111,7 @@ class TestCriarProblema:
         assert data["dados"]["titulo"] == "Vazamento na torneira"
         assert data["dados"]["status"] == "aberto"
 
-    def test_admin_cria_problema_no_contrato(
-        self, client, contrato, comodo_contrato, token_admin
-    ):
+    def test_admin_cria_problema_no_contrato(self, client, contrato, comodo_contrato, token_admin):
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
             json={
@@ -126,9 +126,7 @@ class TestCriarProblema:
         assert data["sucesso"] is True
         assert data["dados"]["status"] == "aberto"
 
-    def test_body_vazio_ao_criar_problema_retorna_422(
-        self, client, contrato, token_locatario
-    ):
+    def test_body_vazio_ao_criar_problema_retorna_422(self, client, contrato, token_locatario):
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
             json={},
@@ -138,9 +136,7 @@ class TestCriarProblema:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_comodo_nao_pertencente_ao_imovel_retorna_404(
-        self, client, contrato, comodo_alheio, token_locatario
-    ):
+    def test_comodo_nao_pertencente_ao_imovel_retorna_404(self, client, contrato, comodo_alheio, token_locatario):
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
             json={
@@ -154,9 +150,7 @@ class TestCriarProblema:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_locatario_alheio_recebe_403(
-        self, client, db, contrato, comodo_contrato, token_outro_locatario
-    ):
+    def test_locatario_alheio_recebe_403(self, client, db, contrato, comodo_contrato, token_outro_locatario):
         banco_antes = foto_do_banco(db)
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
@@ -182,9 +176,7 @@ class TestCriarProblema:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_contrato_encerrado_retorna_409(
-        self, client, db, contrato, comodo_contrato, token_admin
-    ):
+    def test_contrato_encerrado_retorna_409(self, client, db, contrato, comodo_contrato, token_admin):
         # Conflito com o estado do contrato, como agendamentos e vistorias (ADR-0003)
         contrato.status = "encerrado"
         db.commit()
@@ -204,9 +196,7 @@ class TestCriarProblema:
         assert data["sucesso"] is False
         assert "ativos" in data["erro"].lower()
 
-    def test_upload_foto_problema_multipart(
-        self, client, contrato, comodo_contrato, token_locatario
-    ):
+    def test_upload_foto_problema_multipart(self, client, contrato, comodo_contrato, token_locatario):
         fake_file = io.BytesIO(small_image_bytes())
         r = client.post(
             f"{BASE_CONTRATOS}/{contrato.id}/problemas",
@@ -225,6 +215,7 @@ class TestCriarProblema:
 
 
 # ── GET /contratos/{id}/problemas ───────────────────────────────────────────────
+
 
 class TestListarProblemas:
     def test_admin_lista_problemas(self, client, contrato, problema_criado, token_admin):
@@ -249,6 +240,7 @@ class TestListarProblemas:
 
 
 # ── GET /problemas/{id} ─────────────────────────────────────────────────────────
+
 
 class TestBuscarProblemaPorId:
     def test_admin_busca_problema_por_id(self, client, problema_criado, token_admin):
@@ -277,6 +269,7 @@ class TestBuscarProblemaPorId:
 
 
 # ── PATCH /problemas/{id}/status ────────────────────────────────────────────────
+
 
 class TestAtualizarStatusProblema:
     def test_admin_altera_status_para_em_andamento_e_resolvido(self, client, problema_criado, token_admin):
@@ -318,6 +311,7 @@ class TestAtualizarStatusProblema:
 
 
 # ── POST e GET /problemas/{id}/atualizacoes ─────────────────────────────────────
+
 
 class TestAtualizacoesProblema:
     def test_admin_adiciona_atualizacoes_e_lista_cronologicamente(
@@ -383,9 +377,7 @@ class TestAtualizacoesProblema:
         assert r.status_code == 403
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
-    def test_locatario_alheio_nao_pode_listar_atualizacoes(
-        self, client, problema_criado, token_outro_locatario
-    ):
+    def test_locatario_alheio_nao_pode_listar_atualizacoes(self, client, problema_criado, token_outro_locatario):
         r = client.get(
             f"{BASE_PROBLEMAS}/{problema_criado['id']}/atualizacoes",
             headers=auth(token_outro_locatario),

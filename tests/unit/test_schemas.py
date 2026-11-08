@@ -11,6 +11,7 @@ Grupos:
   - Modelos de Checklist (ChecklistCreate, AddChecklistItemRequest, ItemUpdateRequest)
   - Modelos de Problema (ProblemaCreate)
 """
+
 import json
 from datetime import date
 
@@ -38,8 +39,8 @@ from app.schemas import (
     ok,
 )
 
-
 # ── ok() ─────────────────────────────────────────────────────────────────────────
+
 
 def test_ok_sucesso_true():
     r = ok({"chave": "valor"})
@@ -86,6 +87,7 @@ def test_ok_paginacao_none_nao_inclui_chave():
 
 
 # ── fail() ────────────────────────────────────────────────────────────────────────
+
 
 def _corpo(r):
     return json.loads(r.body)
@@ -138,6 +140,7 @@ def test_fail_recusa_status_que_nao_e_de_erro(status):
 
 # ── Paginacao ─────────────────────────────────────────────────────────────────────
 
+
 def test_paginacao_instancia_valida():
     p = Paginacao(total=100, pagina=1, itensPorPagina=20)
     assert p.total == 100
@@ -152,6 +155,7 @@ def test_paginacao_model_dump():
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────────
+
 
 def test_login_request_valido():
     r = LoginRequest(email="user@test.com", senha="senha123")
@@ -203,6 +207,7 @@ class TestMfaEnableRequest:
 
 
 # ── Usuário ───────────────────────────────────────────────────────────────────────
+
 
 class TestUsuarioCreate:
     def test_valido(self):
@@ -260,6 +265,7 @@ class TestUsuarioUpdate:
 
 # ── Imóvel ────────────────────────────────────────────────────────────────────────
 
+
 class TestImovelCreate:
     def test_valido_apenas_tipo(self):
         im = ImovelCreate(tipo="apartamento")
@@ -313,14 +319,18 @@ class TestEnderecoCreate:
 
     def test_com_coordenadas(self):
         e = EnderecoCreate(
-            rua="Av. Paulista", cidade="São Paulo", estado="SP",
-            latitude=-23.5630, longitude=-46.6543,
+            rua="Av. Paulista",
+            cidade="São Paulo",
+            estado="SP",
+            latitude=-23.5630,
+            longitude=-46.6543,
         )
         assert e.latitude == pytest.approx(-23.5630)
         assert e.longitude == pytest.approx(-46.6543)
 
 
 # ── Contrato ──────────────────────────────────────────────────────────────────────
+
 
 class TestContratoCreate:
     def test_valido(self):
@@ -335,21 +345,26 @@ class TestContratoCreate:
 
     def test_valor_mensal_opcional(self):
         ct = ContratoCreate(
-            imovel_id="x", locatario_id="y",
-            data_inicio=date(2025, 1, 1), data_fim=date(2025, 12, 31),
+            imovel_id="x",
+            locatario_id="y",
+            data_inicio=date(2025, 1, 1),
+            data_fim=date(2025, 12, 31),
         )
         assert ct.valor_mensal is None
 
     def test_valor_mensal_preenchido(self):
         ct = ContratoCreate(
-            imovel_id="x", locatario_id="y",
-            data_inicio=date(2025, 1, 1), data_fim=date(2025, 12, 31),
+            imovel_id="x",
+            locatario_id="y",
+            data_inicio=date(2025, 1, 1),
+            data_fim=date(2025, 12, 31),
             valor_mensal=1500.0,
         )
         assert ct.valor_mensal == 1500.0
 
 
 # ── Checklist ─────────────────────────────────────────────────────────────────────
+
 
 class TestChecklistCreate:
     def test_valido_sem_data_vistoria(self):
@@ -378,8 +393,10 @@ class TestAddChecklistItemRequest:
 
     def test_com_observacao(self):
         r = AddChecklistItemRequest(
-            comodo_id="c", item_vistoria_id="i",
-            estado="ruim", observacao="Parede com umidade",
+            comodo_id="c",
+            item_vistoria_id="i",
+            estado="ruim",
+            observacao="Parede com umidade",
         )
         assert r.observacao == "Parede com umidade"
 
@@ -400,6 +417,7 @@ class TestItemUpdateRequest:
 
 
 # ── Problema ──────────────────────────────────────────────────────────────────────
+
 
 class TestProblemaCreate:
     def test_valido_apenas_titulo(self):
@@ -434,14 +452,17 @@ class TestProblemaCreate:
 
 # ── Aceite Checklist & Atualização Problema ───────────────────────────────────────
 
+
 class TestAceiteChecklistSchemas:
     def test_aceite_checklist_request(self):
         from app.schemas import AceiteChecklistRequest
+
         r = AceiteChecklistRequest(motivo_rejeicao="Pintura descascando")
         assert r.motivo_rejeicao == "Pintura descascando"
 
     def test_aceite_checklist_out(self):
         from app.schemas import AceiteChecklistOut
+
         out = AceiteChecklistOut(
             id="a-1",
             checklist_id="ck-1",
@@ -456,12 +477,14 @@ class TestAceiteChecklistSchemas:
 class TestAtualizacaoProblemaSchemas:
     def test_atualizacao_create(self):
         from app.schemas import AtualizacaoProblemaCreate
+
         a = AtualizacaoProblemaCreate(descricao="Técnico agendado", foto_url="foto.jpg")
         assert a.descricao == "Técnico agendado"
         assert a.foto_url == "foto.jpg"
 
     def test_atualizacao_out(self):
         from app.schemas import AtualizacaoProblemaOut
+
         a = AtualizacaoProblemaOut(
             id="at-1",
             problema_id="pb-1",
@@ -476,6 +499,7 @@ class TestAtualizacaoProblemaSchemas:
 class TestLogOutSchema:
     def test_log_out_com_payload_e_ip(self):
         from app.schemas import LogOut
+
         log = LogOut(
             id="l-1",
             acao="create",

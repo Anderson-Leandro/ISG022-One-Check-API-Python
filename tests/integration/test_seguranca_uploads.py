@@ -13,6 +13,7 @@ Regras verificadas:
   - o download nunca é servido como HTML/SVG e sempre leva nosniff e CSP restritiva
   - foto_url por JSON só referencia um upload existente
 """
+
 import uuid
 
 import pytest
@@ -58,7 +59,9 @@ def problema(db, contrato):
 
 
 def _upload_checklist(client, checklist, item, token, arquivo):
-    return client.post(f"/api/v1/checklists/{checklist.id}/itens/{item.id}/fotos", files={"foto": arquivo}, headers=auth(token))
+    return client.post(
+        f"/api/v1/checklists/{checklist.id}/itens/{item.id}/fotos", files={"foto": arquivo}, headers=auth(token)
+    )
 
 
 def _upload_problema(client, contrato, token, arquivo):
@@ -80,6 +83,7 @@ def _upload_atualizacao(client, problema, token, arquivo):
 
 
 # ── Conteúdo recusado ────────────────────────────────────────────────────────────
+
 
 class TestConteudoRecusado:
     @pytest.mark.parametrize("arquivo", MALICIOSOS, ids=[a[0] for a in MALICIOSOS])
@@ -106,9 +110,12 @@ class TestConteudoRecusado:
 
 # ── Extensão vem do conteúdo ─────────────────────────────────────────────────────
 
+
 class TestExtensaoPeloConteudo:
     def test_checklist(self, client, checklist, item_checklist, token_vistoriador):
-        r = _upload_checklist(client, checklist, item_checklist, token_vistoriador, ("x.html", small_image_bytes(), "text/html"))
+        r = _upload_checklist(
+            client, checklist, item_checklist, token_vistoriador, ("x.html", small_image_bytes(), "text/html")
+        )
         assert r.json()["sucesso"] is True
         assert r.json()["dados"]["url"].endswith(".png")
 
@@ -124,6 +131,7 @@ class TestExtensaoPeloConteudo:
 
 
 # ── Download ─────────────────────────────────────────────────────────────────────
+
 
 class TestDownload:
     def test_arquivo_legado_html_nao_e_servido_como_html(self, client):
@@ -159,7 +167,12 @@ class TestDownload:
 
 # ── foto_url por JSON ────────────────────────────────────────────────────────────
 
-FOTO_URL_INVALIDAS = ["javascript:alert(1)", "https://evil.example/x.png", "../../etc/passwd", f"{uuid.uuid4().hex}.png"]
+FOTO_URL_INVALIDAS = [
+    "javascript:alert(1)",
+    "https://evil.example/x.png",
+    "../../etc/passwd",
+    f"{uuid.uuid4().hex}.png",
+]
 
 
 class TestFotoUrlJson:

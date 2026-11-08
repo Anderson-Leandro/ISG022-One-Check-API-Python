@@ -9,6 +9,7 @@ vazamento), o token antigo não pode mais configurar o autenticador.
 Cada teste deixa o cenário pronto para o setup dar certo (segredo pendente e código válido), de modo
 que só a checagem da sessão impede a configuração.
 """
+
 import pytest
 
 from app.auth import create_mfa_setup_token
@@ -22,8 +23,15 @@ NOVA = "NovaSenha#2026segura"
 @pytest.fixture
 def novo_vistoriador(db):
     """Vistoriador no primeiro acesso: MFA obrigatório, ainda sem autenticador."""
-    u = Usuario(nome="Novo Vistoriador", email="novo.vist@test.com", senha_hash=_SENHA_HASH,
-                role="vistoriador", mfa_enabled=True, mfa_secret=None, ativo=True)
+    u = Usuario(
+        nome="Novo Vistoriador",
+        email="novo.vist@test.com",
+        senha_hash=_SENHA_HASH,
+        role="vistoriador",
+        mfa_enabled=True,
+        mfa_secret=None,
+        ativo=True,
+    )
     db.add(u)
     db.flush()
     return u

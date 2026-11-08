@@ -10,6 +10,7 @@ Admin e gestor excluem; vistoriador e locatário recebem 403 (coberto também po
 test_seguranca_negacao_por_perfil.py). O registro some das leituras, continua no banco com quem e quando
 excluiu, e a exclusão fica no log.
 """
+
 import pytest
 from sqlalchemy import select
 
@@ -43,8 +44,11 @@ def _linha_no_banco(db, modelo, id_):
 
 def _log_de_exclusao(db, entidade, id_):
     db.expire_all()
-    return db.query(LogOperacao).filter(LogOperacao.acao == "delete", LogOperacao.entidade == entidade,
-                                        LogOperacao.entidade_id == id_).all()
+    return (
+        db.query(LogOperacao)
+        .filter(LogOperacao.acao == "delete", LogOperacao.entidade == entidade, LogOperacao.entidade_id == id_)
+        .all()
+    )
 
 
 def _confere_excluido(db, modelo, entidade, id_, quem):
@@ -55,6 +59,7 @@ def _confere_excluido(db, modelo, entidade, id_, quem):
 
 
 # ── Checklist ───────────────────────────────────────────────────────────────────
+
 
 class TestExcluirChecklist:
     @pytest.mark.parametrize("perfil", ["admin", "gestor"])
@@ -98,8 +103,11 @@ class TestExcluirChecklist:
 
 # ── Contrato ────────────────────────────────────────────────────────────────────
 
+
 class TestExcluirContrato:
-    def test_sem_checklist_nem_problema_some_e_libera_o_imovel(self, client, db, contrato, imovel, user_gestor, token_gestor, token_admin):
+    def test_sem_checklist_nem_problema_some_e_libera_o_imovel(
+        self, client, db, contrato, imovel, user_gestor, token_gestor, token_admin
+    ):
         assert db.query(AgendamentoVistoria).filter(AgendamentoVistoria.contrato_id == contrato.id).count() == 2
 
         r = client.delete(f"{API}/contratos/{contrato.id}", headers=auth(token_gestor))
@@ -143,6 +151,7 @@ class TestExcluirContrato:
 
 # ── Problema ────────────────────────────────────────────────────────────────────
 
+
 class TestExcluirProblema:
     def test_sem_atualizacoes_some_das_leituras(self, client, db, contrato, problema, user_admin, token_admin):
         r = client.delete(f"{API}/problemas/{problema.id}", headers=auth(token_admin))
@@ -178,10 +187,12 @@ class TestExcluirProblema:
 
 # ── Perfis sem permissão ────────────────────────────────────────────────────────
 
+
 @pytest.mark.parametrize("rota", ["checklists/{checklist}", "contratos/{contrato}", "problemas/{problema}"])
 @pytest.mark.parametrize("perfil", ["vistoriador", "locatario"])
-def test_perfil_sem_permissao_recebe_403(client, db, contrato, checklist, problema, token_vistoriador,
-                                         token_locatario, rota, perfil):
+def test_perfil_sem_permissao_recebe_403(
+    client, db, contrato, checklist, problema, token_vistoriador, token_locatario, rota, perfil
+):
     tokens = {"vistoriador": token_vistoriador, "locatario": token_locatario}
     antes = foto_do_banco(db)
     caminho = rota.format(checklist=checklist.id, contrato=contrato.id, problema=problema.id)

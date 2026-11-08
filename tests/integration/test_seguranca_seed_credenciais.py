@@ -14,6 +14,7 @@ Regras verificadas (fora de APP_ENV=development/test):
   - contas antigas com credenciais públicas são detectadas e rotacionadas (senha, MFA e sessões)
 Em desenvolvimento as credenciais fixas continuam valendo.
 """
+
 import bcrypt
 import pytest
 
@@ -57,6 +58,7 @@ def _usuarios(db):
 
 # ── Produção ─────────────────────────────────────────────────────────────────────
 
+
 @pytest.mark.usefixtures("producao")
 class TestSeedEmProducao:
     def test_nenhuma_senha_de_demonstracao(self, client, db):
@@ -97,7 +99,8 @@ class TestSeedEmProducao:
 
     def test_mode_expand_tambem_gera_senhas(self, client, db, user_admin, token_admin):
         r = client.post(
-            "/api/v1/admin/seed", json={"mode": "expand"},
+            "/api/v1/admin/seed",
+            json={"mode": "expand"},
             headers={**HEADER, "Authorization": f"Bearer {token_admin}"},
         )
         assert r.json()["sucesso"] is True
@@ -109,6 +112,7 @@ class TestSeedEmProducao:
 
 
 # ── Desenvolvimento ──────────────────────────────────────────────────────────────
+
 
 class TestSeedEmDesenvolvimento:
     def test_mantem_credenciais_fixas(self, client, db, monkeypatch):
@@ -122,19 +126,38 @@ class TestSeedEmDesenvolvimento:
 
 # ── Contas já criadas pelo seed antigo ───────────────────────────────────────────
 
+
 @pytest.fixture
 def contas_antigas(db):
     """Simula um banco de produção populado pelo seed antigo."""
-    admin = Usuario(nome="Admin", email="admin@onecheck.local", senha_hash=hash_password("admin123"),
-                    role="admin", mfa_enabled=True, mfa_secret=MFA_SECRET_DEV)
+    admin = Usuario(
+        nome="Admin",
+        email="admin@onecheck.local",
+        senha_hash=hash_password("admin123"),
+        role="admin",
+        mfa_enabled=True,
+        mfa_secret=MFA_SECRET_DEV,
+    )
     # Senha já trocada, mas segredo TOTP ainda o público
-    vist = Usuario(nome="Vist", email="vistoriador@onecheck.local", senha_hash=hash_password("outra-senha-forte"),
-                   role="vistoriador", mfa_enabled=True, mfa_secret=MFA_SECRET_DEV)
+    vist = Usuario(
+        nome="Vist",
+        email="vistoriador@onecheck.local",
+        senha_hash=hash_password("outra-senha-forte"),
+        role="vistoriador",
+        mfa_enabled=True,
+        mfa_secret=MFA_SECRET_DEV,
+    )
     # Senha pública, sem MFA
     loc = Usuario(nome="Loc", email="locatario@onecheck.local", senha_hash=hash_password("locat123"), role="locatario")
     # Conta de seed que já foi corrigida
-    gestor = Usuario(nome="Gestor", email="gestor@onecheck.local", senha_hash=hash_password("senha-propria-forte"),
-                     role="gestor", mfa_enabled=True, mfa_secret="KRSXG5CTMVRXEZLU")
+    gestor = Usuario(
+        nome="Gestor",
+        email="gestor@onecheck.local",
+        senha_hash=hash_password("senha-propria-forte"),
+        role="gestor",
+        mfa_enabled=True,
+        mfa_secret="KRSXG5CTMVRXEZLU",
+    )
     db.add_all([admin, vist, loc, gestor])
     db.flush()
     return {"admin": admin, "vist": vist, "loc": loc, "gestor": gestor}

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, event, inspect, text
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config import DATABASE_URL
@@ -75,12 +75,18 @@ def ensure_schema_updates() -> None:
 
         # Exclusão lógica (US-015, ADR-0008)
         exclusao = {
-            "contratos": ("ALTER TABLE contratos ADD COLUMN excluido_em TIMESTAMP",
-                          "ALTER TABLE contratos ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)"),
-            "checklists": ("ALTER TABLE checklists ADD COLUMN excluido_em TIMESTAMP",
-                           "ALTER TABLE checklists ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)"),
-            "problemas": ("ALTER TABLE problemas ADD COLUMN excluido_em TIMESTAMP",
-                          "ALTER TABLE problemas ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)"),
+            "contratos": (
+                "ALTER TABLE contratos ADD COLUMN excluido_em TIMESTAMP",
+                "ALTER TABLE contratos ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)",
+            ),
+            "checklists": (
+                "ALTER TABLE checklists ADD COLUMN excluido_em TIMESTAMP",
+                "ALTER TABLE checklists ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)",
+            ),
+            "problemas": (
+                "ALTER TABLE problemas ADD COLUMN excluido_em TIMESTAMP",
+                "ALTER TABLE problemas ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)",
+            ),
         }
         for tabela, (add_em, add_por) in exclusao.items():
             if tabela in tables:

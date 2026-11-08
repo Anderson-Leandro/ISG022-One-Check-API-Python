@@ -11,6 +11,7 @@ Rotas cobertas:
   PUT    /api/v1/imoveis/{id}/endereco   (upsert)
   GET    /api/v1/imoveis/{id}/comodos
 """
+
 from tests.conftest import auth, foto_do_banco
 
 BASE = "/api/v1/imoveis"
@@ -26,6 +27,7 @@ _ENDERECO = {
 
 
 # ── GET /imoveis (listagem) ───────────────────────────────────────────────────────
+
 
 class TestListImoveis:
     def test_admin_lista_todos(self, client, imovel, token_admin):
@@ -76,6 +78,7 @@ class TestListImoveis:
 
 # ── POST /imoveis ─────────────────────────────────────────────────────────────────
 
+
 class TestCreateImovel:
     def test_cria_imovel_campos_obrigatorios(self, client, token_admin):
         r = client.post(
@@ -111,6 +114,7 @@ class TestCreateImovel:
 
     def test_criacao_gera_comodos_padrao(self, client, db, token_admin):
         from app.models import ImovelComodo
+
         r = client.post(BASE, json={"tipo": "casa"}, headers=auth(token_admin))
         imovel_id = r.json()["dados"]["id"]
         comodos = db.query(ImovelComodo).filter(ImovelComodo.imovel_id == imovel_id).all()
@@ -124,6 +128,7 @@ class TestCreateImovel:
 
 
 # ── GET /imoveis/{id} ─────────────────────────────────────────────────────────────
+
 
 class TestGetImovel:
     def test_retorna_imovel_com_endereco(self, client, imovel, token_admin):
@@ -145,6 +150,7 @@ class TestGetImovel:
 
 
 # ── PUT /imoveis/{id} ─────────────────────────────────────────────────────────────
+
 
 class TestUpdateImovel:
     def test_atualiza_status(self, client, imovel, token_admin):
@@ -186,9 +192,11 @@ class TestUpdateImovel:
 
 # ── GET /imoveis/{id}/endereco ────────────────────────────────────────────────────
 
+
 class TestGetEndereco:
     def test_retorna_endereco_existente(self, client, db, imovel, token_admin):
         from app.models import Endereco
+
         end = Endereco(imovel_id=imovel.id, **{k: v for k, v in _ENDERECO.items() if k != "estado"}, estado="PR")
         db.add(end)
         db.flush()
@@ -211,6 +219,7 @@ class TestGetEndereco:
 
 
 # ── POST/PUT /imoveis/{id}/endereco (upsert) ──────────────────────────────────────
+
 
 class TestUpsertEndereco:
     def test_cria_endereco_via_post(self, client, imovel, token_admin):
@@ -265,6 +274,7 @@ class TestUpsertEndereco:
 
 # ── GET /imoveis/{id}/comodos ─────────────────────────────────────────────────────
 
+
 class TestListComodos:
     def test_lista_comodos_do_imovel(self, client, imovel, token_admin):
         r = client.get(f"{BASE}/{imovel.id}/comodos", headers=auth(token_admin))
@@ -281,6 +291,7 @@ class TestListComodos:
 
     def test_cria_comodos_padrao_se_nao_existirem(self, client, db, token_admin):
         from app.models import Imovel, ImovelComodo
+
         im = Imovel(tipo="sala_comercial", status="disponivel", garagem=False, garagem_vagas=0)
         db.add(im)
         db.flush()
@@ -299,6 +310,7 @@ class TestListComodos:
 
 
 # ── Criação e Atualização Atômica com Endereço ────────────────────────────────────
+
 
 class TestImovelComEnderecoAtomico:
     def test_cria_imovel_com_endereco_aninhado(self, client, token_admin):
@@ -349,6 +361,7 @@ class TestImovelComEnderecoAtomico:
 
 # ── DELETE /imoveis/{id} (Soft Delete) ───────────────────────────────────────────
 
+
 class TestDeleteImovel:
     def test_admin_exclui_imovel_sucesso(self, client, db, imovel, token_admin):
         r = client.delete(f"{BASE}/{imovel.id}", headers=auth(token_admin))
@@ -373,6 +386,7 @@ class TestDeleteImovel:
 
 # ── Controle de Acesso por Locatário ─────────────────────────────────────────────
 
+
 class TestAcessoLocatarioImovel:
     def test_locatario_sem_contrato_recebe_403_no_get_imovel(self, client, imovel, token_locatario):
         r = client.get(f"{BASE}/{imovel.id}", headers=auth(token_locatario))
@@ -385,6 +399,7 @@ class TestAcessoLocatarioImovel:
 
 
 # ── CRUD Completo de Cômodos ──────────────────────────────────────────────────────
+
 
 class TestComodosCrud:
     def test_criar_comodo(self, client, imovel, token_admin):
@@ -400,6 +415,7 @@ class TestComodosCrud:
 
     def test_atualizar_comodo(self, client, db, imovel, token_admin):
         from app.models import ImovelComodo
+
         c = ImovelComodo(imovel_id=imovel.id, tipo="quarto_antigo")
         db.add(c)
         db.commit()
@@ -416,6 +432,7 @@ class TestComodosCrud:
 
     def test_excluir_comodo(self, client, db, imovel, token_admin):
         from app.models import ImovelComodo
+
         c = ImovelComodo(imovel_id=imovel.id, tipo="despensa")
         db.add(c)
         db.commit()

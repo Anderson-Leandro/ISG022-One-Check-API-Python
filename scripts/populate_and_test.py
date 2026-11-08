@@ -1,4 +1,5 @@
 """Popula e testa todas as funcionalidades usadas pelo web."""
+
 import json
 import os
 import sys
@@ -108,31 +109,50 @@ print("\n[4] Criações (POST web)")
 hoje = date.today().isoformat()
 fim = (date.today() + timedelta(days=365)).isoformat()
 
-r, c = req("POST", "/usuarios", {
-    "nome": "Teste Web Usuario",
-    "email": "teste.web@onecheck.local",
-    "senha": "teste123",
-    "role": "locatario",
-}, token=token)
+r, c = req(
+    "POST",
+    "/usuarios",
+    {
+        "nome": "Teste Web Usuario",
+        "email": "teste.web@onecheck.local",
+        "senha": "teste123",
+        "role": "locatario",
+    },
+    token=token,
+)
 test("Criar usuário", r.get("sucesso"), r.get("erro", c))
 novo_loc_id = (r.get("dados") or {}).get("id")
 
-r, c = req("POST", "/imoveis", {
-    "codigo": "IM-TEST",
-    "titulo": "Imóvel Teste Web",
-    "tipo": "Apartamento",
-    "tamanho": "50m²",
-    "garagem": True,
-    "status": "disponivel",
-}, token=token)
+r, c = req(
+    "POST",
+    "/imoveis",
+    {
+        "codigo": "IM-TEST",
+        "titulo": "Imóvel Teste Web",
+        "tipo": "Apartamento",
+        "tamanho": "50m²",
+        "garagem": True,
+        "status": "disponivel",
+    },
+    token=token,
+)
 test("Criar imóvel", r.get("sucesso"), r.get("erro", c))
 novo_im_id = (r.get("dados") or {}).get("id")
 
 if novo_im_id:
-    r, c = req("POST", f"/imoveis/{novo_im_id}/endereco", {
-        "rua": "Rua Teste", "numero": "99", "bairro": "Centro",
-        "cidade": "São Paulo", "estado": "SP", "cep": "01001000",
-    }, token=token)
+    r, c = req(
+        "POST",
+        f"/imoveis/{novo_im_id}/endereco",
+        {
+            "rua": "Rua Teste",
+            "numero": "99",
+            "bairro": "Centro",
+            "cidade": "São Paulo",
+            "estado": "SP",
+            "cep": "01001000",
+        },
+        token=token,
+    )
     test("Criar endereço imóvel", r.get("sucesso"), r.get("erro", c))
 
     r, c = req("PUT", f"/imoveis/{novo_im_id}", {"titulo": "Imóvel Teste Web Editado"}, token=token)
@@ -147,13 +167,18 @@ locs = r.get("dados") or []
 loc_id = novo_loc_id or (locs[0]["id"] if locs else None)
 
 if im_contrato and loc_id:
-    r, c = req("POST", "/contratos", {
-        "imovel_id": im_contrato,
-        "locatario_id": loc_id,
-        "data_inicio": hoje,
-        "data_fim": fim,
-        "valor_mensal": 2000,
-    }, token=token)
+    r, c = req(
+        "POST",
+        "/contratos",
+        {
+            "imovel_id": im_contrato,
+            "locatario_id": loc_id,
+            "data_inicio": hoje,
+            "data_fim": fim,
+            "valor_mensal": 2000,
+        },
+        token=token,
+    )
     test("Criar contrato", r.get("sucesso"), r.get("erro", c))
     ct_id = (r.get("dados") or {}).get("id")
 else:
@@ -169,11 +194,16 @@ if ct_id:
     vist_id = vists[0]["id"] if vists else None
 
     if vist_id:
-        r, c = req("POST", f"/contratos/{ct_id}/checklists", {
-            "tipo": "inicial",
-            "data_vistoria": hoje,
-            "vistoriador_id": vist_id,
-        }, token=token)
+        r, c = req(
+            "POST",
+            f"/contratos/{ct_id}/checklists",
+            {
+                "tipo": "inicial",
+                "data_vistoria": hoje,
+                "vistoriador_id": vist_id,
+            },
+            token=token,
+        )
         test("Criar vistoria/checklist", r.get("sucesso"), r.get("erro", c))
         ck_id = (r.get("dados") or {}).get("id")
 
@@ -181,11 +211,16 @@ if ct_id:
             r, c = req("GET", f"/checklists/{ck_id}", token=token)
             test("Ver checklist (web vistorias/checklist.php)", r.get("sucesso"), r.get("erro", c))
 
-    r, c = req("POST", f"/contratos/{ct_id}/problemas", {
-        "titulo": "Problema teste web",
-        "descricao": "Criado pelo script de teste",
-        "prioridade": "alta",
-    }, token=token)
+    r, c = req(
+        "POST",
+        f"/contratos/{ct_id}/problemas",
+        {
+            "titulo": "Problema teste web",
+            "descricao": "Criado pelo script de teste",
+            "prioridade": "alta",
+        },
+        token=token,
+    )
     test("Criar problema", r.get("sucesso") or c == 404, r.get("erro", "endpoint pode precisar deploy"))
 
     r, c = req("GET", f"/contratos/{ct_id}/problemas", token=token)
@@ -200,7 +235,7 @@ for ct in cts[:5]:
     r2, _ = req("GET", f"/contratos/{ct['id']}/checklists", token=token)
     if r2.get("sucesso"):
         ck_total += len(r2.get("dados") or [])
-test(f"Checklists em {min(len(cts),5)} contratos", ck_total >= 0, f"total={ck_total}")
+test(f"Checklists em {min(len(cts), 5)} contratos", ck_total >= 0, f"total={ck_total}")
 
 print(f"\n=== Resultado: {passed} OK, {failed} FAIL ===\n")
 sys.exit(1 if failed else 0)

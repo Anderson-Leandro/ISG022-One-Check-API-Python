@@ -1,4 +1,5 @@
 """Gravação e entrega das imagens enviadas pelos usuários (fotos de vistoria e de problemas)."""
+
 import io
 import re
 import uuid
@@ -36,8 +37,8 @@ def salvar_imagem(content: bytes) -> str:
         with Image.open(io.BytesIO(content), formats=_FORMATOS) as im:
             formato = im.format
             im.verify()
-    except Exception:  # inclui conteúdo truncado e DecompressionBombError
-        raise UploadInvalido("Envie uma imagem JPEG, PNG ou WebP")
+    except Exception as e:  # inclui conteúdo truncado e DecompressionBombError
+        raise UploadInvalido("Envie uma imagem JPEG, PNG ou WebP") from e
     extensao = _EXTENSAO_POR_FORMATO.get(formato)
     if not extensao:
         raise UploadInvalido("Envie uma imagem JPEG, PNG ou WebP")

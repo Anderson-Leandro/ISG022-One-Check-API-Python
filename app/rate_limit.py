@@ -4,6 +4,7 @@ O estado fica na memória do processo: vale para uma instância com um worker
 (o deploy atual). Com várias instâncias ou workers, cada um conta à parte e o
 limite efetivo se multiplica; nesse caso, mover o contador para Redis ou banco.
 """
+
 import math
 import threading
 import time

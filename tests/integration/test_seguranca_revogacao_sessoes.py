@@ -14,7 +14,8 @@ Regras verificadas:
   - mudanças que não são de credencial (ex.: nome) não derrubam a sessão
   - a sessão de outros usuários não é afetada
 """
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 
 import jwt
 import pyotp
@@ -56,6 +57,7 @@ def _nova_valida(client, dados) -> bool:
 
 # ── Ações do próprio usuário ─────────────────────────────────────────────────────
 
+
 class TestProprioUsuario:
     def test_put_senha(self, client, db, user_locatario):
         s = _sessao(db, user_locatario)
@@ -84,14 +86,19 @@ class TestProprioUsuario:
 
     def test_todas_as_sessoes_sao_encerradas(self, client, db, user_locatario):
         celular, notebook = _sessao(db, user_locatario), _sessao(db, user_locatario)
-        client.put(f"{ME}/senha", json={"senha_atual": TEST_SENHA, "nova_senha": NOVA}, headers=auth(notebook["access"]))
+        client.put(
+            f"{ME}/senha", json={"senha_atual": TEST_SENHA, "nova_senha": NOVA}, headers=auth(notebook["access"])
+        )
         assert _encerrada(client, celular)
 
     def test_troca_de_autenticador(self, client, db, user_admin):
         s = _sessao(db, user_admin)
         novo = pyotp.random_base32()
-        r = client.post(f"{ME}/mfa/enable", headers=auth(s["access"]),
-                        json={"secret": novo, "codigo": pyotp.TOTP(novo).now(), "codigo_atual": totp_now()})
+        r = client.post(
+            f"{ME}/mfa/enable",
+            headers=auth(s["access"]),
+            json={"secret": novo, "codigo": pyotp.TOTP(novo).now(), "codigo_atual": totp_now()},
+        )
         assert r.json()["sucesso"] is True
         assert _encerrada(client, s)
         assert _nova_valida(client, r.json()["dados"])
@@ -99,8 +106,11 @@ class TestProprioUsuario:
     def test_troca_de_autenticador_via_auth_activate(self, client, db, user_admin):
         s = _sessao(db, user_admin)
         novo = client.post("/api/v1/auth/mfa/setup", headers=auth(s["access"])).json()["dados"]["secret"]
-        r = client.post("/api/v1/auth/mfa/activate", headers=auth(s["access"]),
-                        json={"codigo": pyotp.TOTP(novo).now(), "codigo_atual": totp_now()})
+        r = client.post(
+            "/api/v1/auth/mfa/activate",
+            headers=auth(s["access"]),
+            json={"codigo": pyotp.TOTP(novo).now(), "codigo_atual": totp_now()},
+        )
         assert r.json()["sucesso"] is True
         assert _encerrada(client, s)
         assert _nova_valida(client, r.json()["dados"])
@@ -121,6 +131,7 @@ class TestProprioUsuario:
 
 
 # ── Ações do administrador sobre outro usuário ──────────────────────────────────
+
 
 class TestAdministrador:
     @pytest.mark.parametrize("body", [{"senha": NOVA}, {"role": "vistoriador"}], ids=["senha", "perfil"])
@@ -143,7 +154,9 @@ class TestAdministrador:
         elif rota == "usuarios_desabilitar":
             r = client.post(f"/api/v1/usuarios/{user_vistoriador.id}/mfa/desabilitar", headers=auth(token_admin))
         else:
-            r = client.post("/api/v1/auth/mfa/disable", json={"usuario_id": user_vistoriador.id}, headers=auth(token_admin))
+            r = client.post(
+                "/api/v1/auth/mfa/disable", json={"usuario_id": user_vistoriador.id}, headers=auth(token_admin)
+            )
         assert r.json()["sucesso"] is True
         assert _encerrada(client, s)
 
@@ -160,6 +173,7 @@ class TestAdministrador:
 
 # ── Tokens de MFA e compatibilidade ─────────────────────────────────────────────
 
+
 class TestTokensDeMfa:
     def test_temp_token_anterior_ao_reset_e_recusado(self, client, db, user_vistoriador, token_admin):
         temp = create_temp_token(user_vistoriador.id, user_vistoriador.token_version)
@@ -169,15 +183,25 @@ class TestTokensDeMfa:
 
     def test_login_novo_funciona_apos_troca(self, client, db, user_vistoriador, token_admin):
         client.put(f"/api/v1/usuarios/{user_vistoriador.id}", json={"senha": NOVA}, headers=auth(token_admin))
-        temp = client.post("/api/v1/auth/login", json={"email": user_vistoriador.email, "senha": NOVA}).json()["dados"]["temp_token"]
+        temp = client.post("/api/v1/auth/login", json={"email": user_vistoriador.email, "senha": NOVA}).json()["dados"][
+            "temp_token"
+        ]
         r = client.post("/api/v1/auth/mfa/verify", json={"temp_token": temp, "codigo": totp_now()})
         assert r.json()["sucesso"] is True
         assert client.get(ME, headers=auth(r.json()["dados"]["access_token"])).status_code == 200
 
     def test_token_emitido_antes_do_deploy_continua_valido(self, client, db, user_locatario):
         # Tokens antigos não têm "ver"; valem até a primeira troca de credencial
-        antigo = jwt.encode({"sub": user_locatario.id, "role": "locatario", "type": "access",
-                             "exp": datetime.now(timezone.utc) + timedelta(minutes=5)}, JWT_SECRET, algorithm=JWT_ALGORITHM)
+        antigo = jwt.encode(
+            {
+                "sub": user_locatario.id,
+                "role": "locatario",
+                "type": "access",
+                "exp": datetime.now(UTC) + timedelta(minutes=5),
+            },
+            JWT_SECRET,
+            algorithm=JWT_ALGORITHM,
+        )
         assert client.get(ME, headers=auth(antigo)).status_code == 200
         db.expire_all()
         u = db.query(Usuario).filter(Usuario.id == user_locatario.id).first()

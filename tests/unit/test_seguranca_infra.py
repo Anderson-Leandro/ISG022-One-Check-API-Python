@@ -12,6 +12,7 @@ Cenários originais:
 
 Regras verificadas por leitura estática dos arquivos de deploy e do índice do git.
 """
+
 import re
 import shutil
 import subprocess
@@ -57,8 +58,13 @@ class TestContainer:
 
 class TestCI:
     def test_actions_fixadas_por_sha(self):
-        usos = [passo["uses"] for wf in _workflows() for job in wf["jobs"].values()
-                for passo in job.get("steps", []) if "uses" in passo]
+        usos = [
+            passo["uses"]
+            for wf in _workflows()
+            for job in wf["jobs"].values()
+            for passo in job.get("steps", [])
+            if "uses" in passo
+        ]
         assert usos
         assert [u for u in usos if not SHA.match(u)] == []
 

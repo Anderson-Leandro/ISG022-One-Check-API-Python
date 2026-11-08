@@ -1,4 +1,5 @@
 """TK-020: ONECHECK_SEM_DOTENV=1 faz a API ignorar o arquivo de configuração local (execuções descartáveis)."""
+
 import os
 import subprocess
 import sys

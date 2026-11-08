@@ -7,6 +7,7 @@ sem limite (OWASP API4:2023). A avaliação SPK-005 mostrou que esse ramo nunca 
 
 O relógio é controlado: _agora devolve o valor que o teste define.
 """
+
 import pytest
 
 from app import rate_limit

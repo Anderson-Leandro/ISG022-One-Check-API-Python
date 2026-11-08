@@ -1,6 +1,6 @@
 import hashlib
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import bcrypt
 import jwt
@@ -45,13 +45,13 @@ def conferir_credenciais(user: Usuario | None, senha: str) -> bool:
 
 
 def create_access_token(usuario_id: str, role: str, versao: int = 0) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_ACCESS_MINUTES)
+    expire = datetime.now(UTC) + timedelta(minutes=JWT_ACCESS_MINUTES)
     payload = {"sub": usuario_id, "role": role, "type": "access", "ver": versao, "exp": expire}
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 def _create_short_token(usuario_id: str, token_type: str, versao: int) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=10)
+    expire = datetime.now(UTC) + timedelta(minutes=10)
     payload = {"sub": usuario_id, "type": token_type, "ver": versao, "exp": expire}
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -102,7 +102,7 @@ def create_refresh_token(db: Session, usuario_id: str) -> str:
     token = RefreshToken(
         usuario_id=usuario_id,
         token_hash=_hash_refresh(raw),
-        expires_at=datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=JWT_REFRESH_DAYS),
+        expires_at=datetime.now(UTC).replace(tzinfo=None) + timedelta(days=JWT_REFRESH_DAYS),
     )
     db.add(token)
     db.commit()
@@ -112,7 +112,7 @@ def create_refresh_token(db: Session, usuario_id: str) -> str:
 def verify_refresh_token(db: Session, raw: str) -> Usuario | None:
     h = _hash_refresh(raw)
     row = db.query(RefreshToken).filter(RefreshToken.token_hash == h).first()
-    if not row or row.usado_em is not None or row.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
+    if not row or row.usado_em is not None or row.expires_at < datetime.now(UTC).replace(tzinfo=None):
         return None
     return db.query(Usuario).filter(Usuario.id == row.usuario_id, Usuario.ativo, Usuario.role.in_(ROLES)).first()
 
@@ -125,7 +125,7 @@ def trocar_refresh_token(db: Session, raw: str) -> tuple[str, Usuario | None]:
     - ("invalido", None): desconhecido, vencido ou de conta inativa ou com perfil inválido.
     """
     h = _hash_refresh(raw)
-    agora = datetime.now(timezone.utc).replace(tzinfo=None)
+    agora = datetime.now(UTC).replace(tzinfo=None)
     marcados = (
         db.query(RefreshToken)
         .filter(RefreshToken.token_hash == h, RefreshToken.usado_em.is_(None), RefreshToken.expires_at > agora)
