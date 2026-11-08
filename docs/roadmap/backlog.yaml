@@ -4868,7 +4868,7 @@ items:
     file: app/deps.py
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 165
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4876,3 +4876,7 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  sync:
+    github:
+      hash: bae06e90dc8a8a7a
+      remote_at: '2026-11-08T16:41:00Z'
