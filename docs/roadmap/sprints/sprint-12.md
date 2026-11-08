@@ -66,6 +66,7 @@
 | 2026-11-08 | US-017 concluído (#143): histórico do imóvel com contratos, vistorias e problemas em ordem cronológica, no recorte de cada perfil (1061 testes, cobertura 96%). Restam 12 pts | TK-002 e TK-003 (Render), DEBT-006 (licença) e SPK-001 a SPK-004 (decisões do PO) aguardam o usuário; DEBT-007 (release) entra por último | fim dos itens de código executáveis da sprint |
 | 2026-11-08 | Decisões dos spikes SPK-001 a SPK-004 (ADR-0009 a ADR-0012): visualizador removido, fotos públicas como risco aceito (R-007), MFA opcional respeitado e quatro regras de negócio. Seis itens novos entram na sprint (DEBT-015, SEC-036, US-018, US-019, US-020, DEBT-016; +9 pts, comprometido passa de 45 para 54) | — | decisão do usuário: os ambientes de produção e de desenvolvimento serão zerados; o TK-002 passa a ser recriar o ambiente sem credenciais de demonstração, e o R-017 deixa de ter fotos reais em risco até o uso de verdade |
 | 2026-11-08 | SPK-001, SPK-002, SPK-003 e SPK-004 concluídos (#145). Restam 13 pts: TK-002, TK-003, DEBT-006 e DEBT-007, mais os seis itens novos | TK-002 e TK-003 dependem do painel do Render; DEBT-006 da escolha da licença | — |
+| 2026-11-08 | DEBT-015 concluído (#153): perfil visualizador removido; perfil fora da lista recusado em toda rota, no login e no refresh (1037 testes, cobertura 96%) | — | testes do visualizador removidos ou ajustados, com aprovação do usuário; DEBT-017 fora da sprint |
 
 ## Sprint Review
 - **Incremento demonstrável:**
