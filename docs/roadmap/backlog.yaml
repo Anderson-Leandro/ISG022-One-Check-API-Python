@@ -4797,7 +4797,7 @@ items:
   priority: could
   rank: 295
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -4812,8 +4812,12 @@ items:
   links:
     trello_card: null
     gh_issue: 151
-    prs: []
-  evidence: []
+    prs:
+    - '#163'
+  evidence:
+  - 'PR #163 (merge 1700178): tipos de agendamento declarados como enum no OpenAPI, com constante única (ADR-0012)'
+  - 4 testes em tests/integration/test_openapi_tipos_agendamento.py
+  - security-audit diff dev sem achado novo
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4825,10 +4829,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: fd0a06f4f4bafdda
-      remote_at: '2026-11-08T16:29:24Z'
+      hash: bc15fc0fd1f906dc
+      remote_at: '2026-11-08T16:37:23Z'
 - id: DEBT-017
   type: debt
   title: Regras de acesso negam por padrão os perfis que não citam

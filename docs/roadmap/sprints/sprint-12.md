@@ -71,6 +71,7 @@
 | 2026-11-08 | US-018 concluído (#157): o locatário lê os agendamentos do próprio contrato, sem a observação interna, e o dashboard conta os dele (1054 testes, cobertura 96%) | — | dois testes existentes ajustados, com aprovação do usuário |
 | 2026-11-08 | US-019 concluído (#159): o locatário dono comenta no próprio problema enquanto não estiver resolvido ou fechado (1064 testes, cobertura 96%) | — | dois testes existentes ajustados, com aprovação do usuário |
 | 2026-11-08 | US-020 concluído (#161): nova vistoria inicial depois de uma rejeição, com a rejeitada intacta; pendente_revisao fora do domínio (1072 testes, cobertura 96%) | — | trava por lista de status que bloqueiam (achado da revisão) |
+| 2026-11-08 | DEBT-016 concluído (#163): tipos de agendamento declarados como enum no OpenAPI (1076 testes, cobertura 96%) | — | fim dos itens de código da sprint; restam TK-002, TK-003, DEBT-006 e DEBT-007 |
 
 ## Sprint Review
 - **Incremento demonstrável:**
