@@ -63,7 +63,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | **Linguagem** | Python 3.12+ |
 | **Framework** | FastAPI 0.162 + Starlette 1.10 + Uvicorn |
 | **ORM & Banco** | SQLAlchemy 2.0 + SQLite (desenvolvimento/testes) / PostgreSQL (produção) |
-| **Autenticação** | `PyJWT` (JWT HS256) + `pyotp` (TOTP MFA) + `bcrypt` |
+| **Autenticação** | `PyJWT` (JWT HS256) + `pyotp` (TOTP MFA) + `segno` (QR do MFA gerado na API) + `bcrypt` |
 | **Imagens** | `Pillow` 13 (validação de uploads) |
 | **Geocoding** | Nominatim (OpenStreetMap) + ViaCEP via `httpx` |
 | **Geração de PDF** | Motor PDF 1.4 Pure Python (sem dependências binárias C externas) |

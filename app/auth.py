@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 import bcrypt
 import jwt
 import pyotp
+import segno
 from sqlalchemy.orm import Session
 
 from app.config import (
@@ -174,14 +175,11 @@ def generate_mfa_secret() -> str:
 
 
 def mfa_provisioning_data(email: str, secret: str) -> dict:
-    import urllib.parse
-
     totp = pyotp.TOTP(secret)
     uri = totp.provisioning_uri(name=email, issuer_name="OneCheck")
-    qr_url = (
-        "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="
-        + urllib.parse.quote(uri, safe="")
-    )
+    # QR gerado aqui, como data URI PNG (o mesmo formato que o serviço externo devolvia): o otpauth://
+    # (segredo e e-mail) nunca sai para terceiros (SEC-035). O campo continua "qr_url" e funciona em <img src>.
+    qr_url = segno.make(uri, error="m").png_data_uri(scale=5, border=4)
     return {
         "secret": secret,
         "provisioning_uri": uri,

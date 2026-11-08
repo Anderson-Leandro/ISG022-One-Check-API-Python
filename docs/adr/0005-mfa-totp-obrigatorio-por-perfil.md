@@ -45,5 +45,5 @@ Vamos usar a **opção 2**:
   - o primeiro acesso das contas privilegiadas tem um passo a mais.
 - **Segurança:**
   - o segredo TOTP fica em texto no banco (ativo A-01); quem lê o banco consegue gerar códigos. Cifrar a coluna fica para quando houver gestão de chaves (o mesmo caso do CPF, SEC-031);
-  - **o `qr_url` devolvido no setup aponta para um serviço externo** (`api.qrserver.com`, `app/auth.py:178`) e leva na URL o `otpauth://` com o segredo e o e-mail. Quem abre o QR entrega a semente do MFA a um terceiro. Registrado em 2026-11-08, na escrita deste ADR, como SEC-035;
+  - **o `qr_url` devolvido no setup aponta para um serviço externo** (`api.qrserver.com`, `app/auth.py:178`) e leva na URL o `otpauth://` com o segredo e o e-mail. Quem abre o QR entrega a semente do MFA a um terceiro. Registrado em 2026-11-08, na escrita deste ADR, como SEC-035, e **corrigido no próprio SEC-035**: o QR passou a ser gerado pela API (`segno`), como data URI PNG, sem sair para terceiros;
   - o código TOTP pode ser reusado dentro da janela de 90 segundos; o limite de tentativas reduz, mas não elimina, o ataque de quem já viu o código.
