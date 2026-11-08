@@ -57,6 +57,7 @@
 | 2026-11-08 | DEBT-009 concluído (#134): ADR-0004 a ADR-0007 (sessão JWT, MFA TOTP, uploads em disco, Render com 1 worker). Restam 22 pts | R-017 (alto, a confirmar): disco efêmero no plano gratuito do Render pode apagar as fotos; depende do painel do Render | achados fora da sprint: SEC-035 (QR do MFA por serviço externo recebe o segredo) e TK-018 |
 | 2026-11-08 | SEC-034 concluído (#138): token de primeiro acesso emitido antes da troca de senha recusado no setup do MFA, e teto de chaves do limitador testado com relógio controlado (1013 testes, cobertura 96%). Restam 20 pts | DEBT-006 (licença) aguarda a escolha do usuário | — |
 | 2026-11-08 | US-015 concluído (#141): exclusão lógica de checklist, contrato e problema por admin e gestor, só antes de virarem evidência (ADR-0008; 1047 testes, cobertura 96%). Restam 15 pts | SPK-003 aguarda decisão do PO | decisões do PO: exclusão lógica, admin e gestor, regra estrita; a revisão de código acrescentou a exigência de problema aberto. BUG-001 fora da sprint |
+| 2026-11-08 | US-017 concluído (#143): histórico do imóvel com contratos, vistorias e problemas em ordem cronológica, no recorte de cada perfil (1061 testes, cobertura 96%). Restam 12 pts | TK-002 e TK-003 (Render), DEBT-006 (licença) e SPK-001 a SPK-004 (decisões do PO) aguardam o usuário; DEBT-007 (release) entra por último | fim dos itens de código executáveis da sprint |
 
 ## Sprint Review
 - **Incremento demonstrável:**
