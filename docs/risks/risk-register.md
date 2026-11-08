@@ -27,6 +27,7 @@ Escala: probabilidade e impacto de 1 (baixo) a 3 (alto). Nível = P × I → 1�
 | R-014 | Acesso direto ao banco ou a um backup → CPFs em texto | A-03, A-12 | I | 1 | 2 | 2 baixo | mitigar | SEC-031 | Anderson Mendes Leandro | aberto | — |
 | R-015 | Perda do banco sem backup testado → indisponibilidade e perda de laudos | A-12, A-07 | D | 1 | 3 | 3 médio | mitigar | TK-005 | Anderson Mendes Leandro | **aberto** | — |
 | R-016 | Titular pede acesso ou eliminação dos dados e não há como atender → não conformidade com a LGPD | A-03 | — | 2 | 2 | 4 médio | mitigar | SEC-028 | Anderson Mendes Leandro | aberto | — |
+| R-017 | Deploy ou reinício no Render com disco efêmero → fotos de vistoria e de problemas apagadas → laudos sem evidência | A-08, A-07 | D | 2 | 3 | 6 alto | mitigar | TK-018 (confirmar no painel do Render); ADR-0006 | Anderson Mendes Leandro | **aberto** | — |
 
 **Tratamentos:** mitigar (cria item SEC no backlog) · aceitar (justificar + quem aceitou + quando
 revisar) · transferir (seguro, fornecedor) · evitar (remover a funcionalidade).
