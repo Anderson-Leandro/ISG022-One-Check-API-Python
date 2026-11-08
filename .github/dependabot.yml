@@ -1,0 +1,47 @@
+# Atualização automática de dependências (DEBT-005, OWASP A06:2021).
+#
+# - Os PRs abrem contra a dev, como qualquer mudança, e passam pelo mesmo CI (test e dependencias).
+# - pip: o Dependabot muda as versões diretas em requirements.txt e requirements-test.txt, mas não sabe
+#   regenerar o requirements.lock (dependências de produção, com hash). Num PR que muda o
+#   requirements.txt, o CI falha até o lock ser regenerado (test_lockfile_coerente_com_requirements),
+#   então nada entra na produção sem hash. Para concluir o PR: na branch do Dependabot, rode o comando do
+#   cabeçalho de requirements.lock e faça push do lock. As transitivas, que só existem no lock, não
+#   ganham PR: o job dependencias (pip-audit) do CI aponta as que tiverem vulnerabilidade.
+# - github-actions: o Dependabot troca o SHA fixado e o comentário de versão juntos.
+# - cooldown: só propõe versões publicadas há pelo menos 7 dias, para um pacote malicioso ou quebrado
+#   recém-publicado ter tempo de ser retirado. Vale para estas atualizações de versão; as "security
+#   updates" do Dependabot são outra função, ligada nas configurações do repositório (hoje desligada),
+#   que abre PRs contra a main, ignorando o target-branch.
+# - Este arquivo só vale na branch padrão (main): passa a funcionar na próxima release dev → main.
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # minor e patch num PR só: um lock para regenerar por semana, não um por pacote
+      pip-minor-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      actions:
+        patterns: ["*"]

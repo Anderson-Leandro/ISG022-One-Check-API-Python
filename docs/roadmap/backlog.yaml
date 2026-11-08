@@ -3219,7 +3219,7 @@ items:
   priority: should
   rank: 130
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -3243,10 +3243,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 2abefd4a6e2d66c8
-      remote_at: '2026-11-08T19:13:39Z'
+      hash: 1796cbc1846f4c1b
+      remote_at: '2026-11-08T22:22:27Z'
 - id: DEBT-006
   type: debt
   title: Definir a licença do repositório público
@@ -5147,3 +5149,46 @@ items:
     github:
       hash: 0ab3ccb225a30fab
       remote_at: '2026-11-08T22:18:54Z'
+- id: DEBT-019
+  type: debt
+  title: Lock que o Dependabot regenera sozinho, com as transitivas e a imagem base
+  epic: EP-007
+  story: ''
+  description: 'Achado do /code-review do DEBT-005. O requirements.lock é gerado por uv pip compile a partir de
+    um .txt, sem cabeçalho, e o Dependabot pip não o reconhece: cada PR do pip precisa de alguém para regenerar
+    o lock na branch, e depois de um push humano o Dependabot para de rebasear o PR. As transitivas, que só existem
+    no lock, não ganham PR de atualização (só o pip-audit aponta as vulneráveis). A imagem base do Dockerfile segue
+    numa tag móvel, sem o ecossistema docker no dependabot.yml (pendência do SEC-008).'
+  acceptance_criteria:
+  - Um PR do Dependabot que muda uma dependência direta já traz o lock regenerado, com hashes, sem passo manual.
+  - As dependências transitivas do lock recebem PRs de atualização.
+  - O dependabot.yml cobre o ecossistema docker e o Dockerfile fixa a imagem base por digest.
+  priority: could
+  rank: 1530
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A06:2021
+    risk_id: null
+  source:
+    kind: review
+    ref: code-review do DEBT-005
+  links:
+    trello_card: null
+    gh_issue: 196
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: 5911ac3c37af511d
+      remote_at: '2026-11-08T22:29:25Z'
