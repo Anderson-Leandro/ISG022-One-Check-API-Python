@@ -17,6 +17,15 @@
 <!-- Resultado da /security-audit diff dev: achados por severidade e o que foi feito com cada um.
      Se não se aplica (só documentação), dizer por quê. -->
 
+## Checklist antes da revisão
+<!-- Preencha ANTES do /code-review. Marque cada linha com [x] (conferido, diga como) ou [-] (não se aplica,
+     diga por quê). O dod_check falha se sobrar alguma linha com [ ]. -->
+- [ ] Campos que o perfil que ganha acesso passa a ver: a resposta não leva nada além do necessário (notas internas, IP, e-mails, segredos).
+- [ ] Status finais: toda regra que depende do status trata todos os estados finais (ex.: resolvido e fechado; aceito e rejeitado).
+- [ ] Autorização antes de ler o corpo: quem não pode agir é recusado antes de o corpo ou o upload serem lidos.
+- [ ] Login, refresh e tokens: o caso novo também vale no login, no refresh e nos tokens já emitidos.
+- [ ] Perfis proibidos barrados antes da busca por ID: um 404 contra 403 não revela quais registros existem.
+
 ## Testes existentes alterados
 <!-- "Nenhum." quando só houve testes novos ou asserções acrescentadas.
      Caso contrário, uma linha por teste alterado ou removido, ANTES do commit, e parar para aprovação:
