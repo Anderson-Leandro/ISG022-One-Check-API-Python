@@ -33,7 +33,7 @@ Ação da retrospectiva da Sprint 12. Mudanças em `scripts/dod_check.py`, com f
   - **Corrigidos:**
     - a release exige head `dev` (uma feature mesclada direto na `main` continua conferida como implementação);
     - o item precisa de pelo menos um PR de implementação, além da release;
-    - a regra da auditoria pendente, por frase, e as outras grafias de "não rodada";
+    - a regra que detecta a auditoria por fazer passa a ler frase a frase e reconhece mais grafias;
     - o título de seção com complemento;
     - a largura dos dois limites do intervalo;
     - o nome do arquivo com sufixo;
