@@ -4685,7 +4685,7 @@ items:
   priority: should
   rank: 293
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -4701,8 +4701,13 @@ items:
   links:
     trello_card: null
     gh_issue: 149
-    prs: []
-  evidence: []
+    prs:
+    - '#159'
+  evidence:
+  - 'PR #159 (merge f300253): locatário dono comenta no próprio problema não resolvido nem fechado (ADR-0012)'
+  - 11 testes em tests/integration/test_problema_comentario_locatario.py; 2 testes existentes ajustados com aprovação
+    do usuário em 2026-11-08
+  - collection do Insomnia 163/163; security-audit diff dev sem achado novo
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4714,10 +4719,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 18aac2be4ee8e7e0
-      remote_at: '2026-11-08T15:51:55Z'
+      hash: ae3688e8c4404d7b
+      remote_at: '2026-11-08T16:13:32Z'
 - id: US-020
   type: story
   title: Nova vistoria depois de uma rejeição, e fim do status pendente_revisao
