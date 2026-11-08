@@ -22,12 +22,15 @@ Argumento: `$ARGUMENTS`. Vazio ou `proximo` → próximo item; um ID → esse it
 ## Modo e autorização
 
 Leia a linha **Modo de execução** em `CLAUDE.md`:
-- `confirmar cada item` (atual): execute **um** item e pare no fim para o usuário conferir.
-- `contínuo`: siga para o próximo item até um ponto de parada.
+- `confirmar cada item` (atual): execute **um** item até o **PR aberto com o CI verde** e pare. **O merge é do
+  usuário.** O item fica em `review`; o fechamento (passo 8) acontece no início da execução seguinte, depois de
+  conferir que o usuário mesclou.
+- `contínuo`: faça o merge depois do CI verde, feche o item e siga para o próximo até um ponto de parada.
 
-Neste fluxo o usuário já autorizou, de forma permanente: criar branch, commitar, abrir PR, **fazer o merge
-depois do CI verde** e aplicar o board-sync do item (sempre com o dry-run mostrado antes, na mesma resposta).
-Fora deste fluxo, valem as regras normais de pedir confirmação.
+Neste fluxo o usuário já autorizou, de forma permanente: criar branch, commitar, abrir PR, aplicar o board-sync
+do item (sempre com o dry-run mostrado antes, na mesma resposta) e, **só no modo `contínuo`**, fazer o merge
+depois do CI verde. No modo `confirmar cada item`, nunca rode `gh pr merge`. Fora deste fluxo, valem as regras
+normais de pedir confirmação.
 
 ## Pontos de parada (sempre, em qualquer modo)
 
@@ -41,6 +44,12 @@ Pare, explique e espere o usuário quando:
 6. qualquer ação fora das regras do `CLAUDE.md` (produção, `.env`, reescrever histórico).
 
 ## Fluxo por item
+
+### 0. Fechar o que o usuário mesclou (modo `confirmar cada item`)
+- Para cada item da sprint em `review`: veja o PR em `links.prs` (`gh pr view <n> --json state`).
+  - `MERGED` → faça o passo 8 (Fechar) desse item antes de escolher o próximo.
+  - Ainda aberto → não comece outro item que dependa dele; avise que o PR aguarda o merge.
+- Os PRs de fechamento (`chore/<ID>-concluido`) também ficam para o usuário mesclar.
 
 ### 1. Escolher
 - `SP report` e `BL list`: o próximo item `in_sprint`/`ready` da sprint ativa pelo `rank`, com `depends_on`
@@ -81,23 +90,29 @@ num teste existente sem tirar nenhuma não conta como alteração.
 - Preencha as seções "Entrega", "Testes" e "Documentação" do registro.
 
 ### 7. Publicar
-- `python3 scripts/dod_check.py <ID> --antes-do-merge` precisa passar nas verificações do PR.
 - Commit em Conventional Commits, terminando com a linha `Co-Authored-By` combinada no projeto.
 - `git push -u origin <branch>` e `gh pr create --base dev` com: o que muda, critérios atendidos, testes,
   segurança, testes existentes alterados (copie a tabela) e `Refs #<issue>`. Termine com a linha de atribuição
   do projeto.
-- `gh pr checks <n> --watch`. Verde → `gh pr merge <n> --merge`. Falhou → corrija; segunda falha → parada 4.
+- `gh pr checks <n> --watch`. Falhou → corrija; segunda falha → parada 4.
+- Com o CI verde, `python3 scripts/dod_check.py <ID> --antes-do-merge` precisa passar. Depois:
+  - modo `contínuo`: `gh pr merge <n> --merge` e siga para o passo 8;
+  - modo `confirmar cada item`: **não faça o merge.** Na mesma branch, `BL update <ID> --json '{"status": "review",
+    "prs_add": ["#<n>"]}'`, `GH push --ids <ID>` (dry-run e `--apply`), commit e push no mesmo PR; espere o CI
+    verde de novo e vá para o passo 9.
 
 ### 8. Fechar
 - `git switch dev && git pull --ff-only` e uma branch `chore/<ID>-concluido` para os registros.
 - `BL update <ID> --json '{"status": "done", "prs_add": ["#<n>"], "evidence": [...]}'`.
 - `GH push --ids <ID>` (dry-run e `--apply`): fecha a issue.
 - Uma linha na tabela "Acompanhamento" do `docs/roadmap/sprints/sprint-NN.md`.
-- `python3 scripts/dod_check.py <ID>`: precisa sair verde. Commit, PR, CI verde e merge desses registros.
+- `python3 scripts/dod_check.py <ID>`: precisa sair verde. Commit, PR e CI verde desses registros; o merge segue
+  o modo (`contínuo`: você faz; `confirmar cada item`: o usuário faz).
 
 ### 9. Relatar
 Resumo curto ao usuário: o que foi entregue, testes, segurança, testes existentes alterados (e aprovação),
-PRs, o resultado do `dod_check` e o burndown (`SP report`). No modo `confirmar cada item`, pare aqui.
+PRs, o resultado do `dod_check` e o burndown (`SP report`). No modo `confirmar cada item`, pare aqui e diga
+quais PRs aguardam o merge do usuário (o do item e, se houver, o de fechamento do item anterior).
 
 ## Fim da sprint
 Quando não houver mais itens executáveis, liste os que ficaram (com o motivo) e sugira `/sprint-manager review`.
