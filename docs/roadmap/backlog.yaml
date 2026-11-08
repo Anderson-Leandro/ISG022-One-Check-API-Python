@@ -3927,7 +3927,7 @@ items:
   priority: must
   rank: 36
   estimate: 3
-  status: review
+  status: done
   sprint: 12
   phase: F5
   depends_on: []
@@ -3945,9 +3945,13 @@ items:
     gh_issue: 104
     prs:
     - '#125'
-  evidence: []
+  evidence:
+  - 'PR #125 (merge 0e7e760): 17 testes em tests/integration/test_seguranca_checklist_dono.py'
+  - 'mutação and→or nas três checagens de dono: sobrevive à suíte antiga (872 passam) e derruba os testes novos
+    (docs/roadmap/execucao/SEC-032.md)'
+  - 'security-audit diff dev (2026-11-07): nenhum achado novo'
   created: '2026-11-02'
-  updated: '2026-11-07'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -3957,10 +3961,12 @@ items:
     status: in_progress
   - date: '2026-11-07'
     status: review
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 6314ee5cb99ffe69
-      remote_at: '2026-11-08T01:44:29Z'
+      hash: 4153afb056f7b41e
+      remote_at: '2026-11-08T03:17:26Z'
 - id: SEC-033
   type: security
   title: Testes das travas do checklist depois do envio para aceite
