@@ -68,6 +68,7 @@
 | 2026-11-08 | SPK-001, SPK-002, SPK-003 e SPK-004 concluídos (#145). Restam 13 pts: TK-002, TK-003, DEBT-006 e DEBT-007, mais os seis itens novos | TK-002 e TK-003 dependem do painel do Render; DEBT-006 da escolha da licença | — |
 | 2026-11-08 | DEBT-015 concluído (#153): perfil visualizador removido; perfil fora da lista recusado em toda rota, no login e no refresh (1037 testes, cobertura 96%) | — | testes do visualizador removidos ou ajustados, com aprovação do usuário; DEBT-017 fora da sprint |
 | 2026-11-08 | SEC-036 concluído (#155): o MFA ligado pelo locatário passa a valer no login, com configuração do autenticador quando ainda não houver (1047 testes, cobertura 96%) | — | dois testes unitários invertidos, com aprovação do usuário |
+| 2026-11-08 | US-018 concluído (#157): o locatário lê os agendamentos do próprio contrato, sem a observação interna, e o dashboard conta os dele (1054 testes, cobertura 96%) | — | dois testes existentes ajustados, com aprovação do usuário |
 
 ## Sprint Review
 - **Incremento demonstrável:**
