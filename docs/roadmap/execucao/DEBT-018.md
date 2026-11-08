@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #176 · **Branch:** `chore/DEBT-018-dod-check-falsos-negativos` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #176 · **Branch:** `chore/DEBT-018-dod-check-falsos-negativos` · **PR:** #194
 
 ## Entrega
 Ação da retrospectiva da Sprint 12. Mudanças em `scripts/dod_check.py`, com funções puras e testáveis:
