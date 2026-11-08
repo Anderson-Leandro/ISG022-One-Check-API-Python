@@ -11,7 +11,7 @@ import pytest
 
 from app.auth import create_mfa_setup_token, create_refresh_token, create_temp_token
 from app.models import Usuario
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now
+from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now, foto_do_banco
 
 
 # ── POST /auth/login ──────────────────────────────────────────────────────────────
@@ -74,13 +74,14 @@ class TestLogin:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_login_resposta_http_200_mesmo_em_falha(self, client):
-        # A API usa padrão de envelope JSON — sempre retorna 200
+    def test_login_falho_responde_401_com_envelope(self, client):
+        # ADR-0003: o erro mantém o envelope e o status acompanha o resultado
         r = client.post("/api/v1/auth/login", json={
             "email": "x@x.com",
             "senha": "errado",
         })
-        assert r.status_code == 200
+        assert r.status_code == 401
+        assert r.json() == {"sucesso": False, "erro": "Credenciais inválidas"}
 
     def test_login_role_gestor_com_mfa(self, client, user_gestor):
         r = client.post("/api/v1/auth/login", json={
@@ -90,15 +91,6 @@ class TestLogin:
         data = r.json()
         assert data["sucesso"] is True
         assert data["dados"]["mfa_required"] is True
-
-    def test_login_visualizador_sem_mfa(self, client, user_visualizador):
-        r = client.post("/api/v1/auth/login", json={
-            "email": user_visualizador.email,
-            "senha": TEST_SENHA,
-        })
-        data = r.json()
-        assert data["sucesso"] is True
-        assert "access_token" in data["dados"]
 
 
 # ── POST /auth/mfa/verify ─────────────────────────────────────────────────────────
@@ -221,9 +213,11 @@ class TestLogout:
         data = r.json()
         assert data["sucesso"] is True
 
-    def test_logout_sem_autenticacao_retorna_401(self, client):
+    def test_logout_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post("/api/v1/auth/logout")
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_logout_revoga_refresh_token(self, client, db, user_locatario, token_locatario):
         raw_token = create_refresh_token(db, user_locatario.id)
@@ -237,12 +231,14 @@ class TestLogout:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_logout_token_invalido_retorna_401(self, client):
+    def test_logout_token_invalido_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post(
             "/api/v1/auth/logout",
             headers=auth("token.invalido.aqui"),
         )
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── MFA Extended Endpoints (Fase 2) ────────────────────────────────────────────────

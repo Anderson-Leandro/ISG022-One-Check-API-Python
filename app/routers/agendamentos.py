@@ -6,7 +6,7 @@ from app.auditoria import campos_alterados
 from app.database import get_db
 from app.deps import require_roles
 from app.models import AgendamentoVistoria, Usuario
-from app.schemas import AgendamentoUpdate, fail, ok
+from app.schemas import TIPOS_AGENDAMENTO, AgendamentoUpdate, fail, ok
 from app.serializers import log_operacao, serialize_agendamento
 
 router = APIRouter(prefix="/agendamentos", tags=["agendamentos"])
@@ -35,21 +35,21 @@ def update_agendamento(
 ):
     ag = db.query(AgendamentoVistoria).filter(AgendamentoVistoria.id == agendamento_id).first()
     if not ag:
-        return fail("Agendamento não encontrado")
+        return fail("Agendamento não encontrado", status_code=404)
 
     if body.tipo is not None:
-        if body.tipo not in ("inicial", "encerramento"):
-            return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'")
+        if body.tipo not in TIPOS_AGENDAMENTO:
+            return fail("Tipo inválido. Deve ser 'inicial' ou 'encerramento'", erros={"tipo": "Tipo inválido. Deve ser 'inicial' ou 'encerramento'"}, status_code=422)
         ag.tipo = body.tipo
 
     if body.data_agendada is not None:
         try:
             parsed_dt = _parse_datetime(body.data_agendada)
         except Exception:
-            return fail("Formato de data_agendada inválido")
+            return fail("Formato de data_agendada inválido", erros={"data_agendada": "Formato de data_agendada inválido"}, status_code=422)
         now = datetime.now() if parsed_dt.tzinfo is None else datetime.now(timezone.utc)
         if parsed_dt <= now:
-            return fail("A data agendada deve ser uma data futura")
+            return fail("A data agendada deve ser uma data futura", erros={"data_agendada": "A data agendada deve ser uma data futura"}, status_code=422)
         ag.data_agendada = parsed_dt.replace(tzinfo=None) if parsed_dt.tzinfo else parsed_dt
 
     if body.observacao is not None:
@@ -70,7 +70,7 @@ def delete_agendamento(
 ):
     ag = db.query(AgendamentoVistoria).filter(AgendamentoVistoria.id == agendamento_id).first()
     if not ag:
-        return fail("Agendamento não encontrado")
+        return fail("Agendamento não encontrado", status_code=404)
 
     db.delete(ag)
     db.commit()

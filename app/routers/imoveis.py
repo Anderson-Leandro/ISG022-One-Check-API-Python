@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session, joinedload
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.auditoria import campos_alterados
 from app.database import get_db
-from app.deps import assert_acesso_imovel, get_current_user, require_roles
+from app.deps import assert_acesso_imovel, assert_acesso_problemas, get_current_user, require_roles
 from app.geocoding import buscar_coordenadas
-from app.models import Checklist, Contrato, Endereco, Imovel, ImovelComodo, Usuario
+from app.models import Checklist, Contrato, Endereco, Imovel, ImovelComodo, Problema, Usuario
 from app.schemas import (
     ComodoCreate,
     ComodoUpdate,
@@ -19,9 +21,12 @@ from app.serializers import (
     ensure_default_comodos,
     log_operacao,
     paginate,
+    serialize_checklist,
     serialize_comodo,
+    serialize_contrato,
     serialize_endereco,
     serialize_imovel,
+    serialize_problema,
 )
 
 router = APIRouter(prefix="/imoveis", tags=["imoveis"])
@@ -129,9 +134,77 @@ def get_imovel(
         .first()
     )
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
     assert_acesso_imovel(db, imovel_id, user)
     return ok(serialize_imovel(im, include_endereco=True))
+
+
+@router.get("/{imovel_id}/historico")
+def historico_imovel(
+    imovel_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user),
+):
+    """Contratos, vistorias e problemas do imóvel em ordem cronológica de registro (US-017).
+
+    Cada perfil vê só o que já acessa pelas listagens (GET /contratos, GET /contratos/{id}/checklists e
+    /problemas): o locatário, os próprios contratos, inclusive os encerrados; o vistoriador, os contratos em
+    que tem vistoria e só as vistorias dele; problemas, pela regra de assert_acesso_problemas.
+    Locatário ou vistoriador sem nenhum contrato visível no imóvel recebe 403.
+    """
+    im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
+    if not im:
+        return fail("Imóvel não encontrado", status_code=404)
+
+    q = db.query(Contrato).filter(Contrato.imovel_id == imovel_id)
+    if user.role == "locatario":
+        q = q.filter(Contrato.locatario_id == user.id)
+    elif user.role == "vistoriador":
+        q = q.filter(Contrato.id.in_(db.query(Checklist.contrato_id).filter(Checklist.vistoriador_id == user.id)))
+    contratos = q.all()
+    if not contratos and user.role in ("locatario", "vistoriador"):
+        raise HTTPException(status_code=403, detail="Você não tem acesso a este imóvel")
+
+    vistorias, problemas = [], []
+    if contratos:
+        qv = (
+            db.query(Checklist)
+            .options(selectinload(Checklist.aceite))
+            .filter(Checklist.contrato_id.in_([c.id for c in contratos]))
+        )
+        if user.role == "vistoriador":
+            qv = qv.filter(Checklist.vistoriador_id == user.id)
+        vistorias = qv.all()
+
+        com_acesso_aos_problemas = []
+        for c in contratos:
+            try:
+                assert_acesso_problemas(c, user)
+                com_acesso_aos_problemas.append(c.id)
+            except HTTPException:
+                pass
+        if com_acesso_aos_problemas:
+            problemas = (
+                db.query(Problema)
+                .options(selectinload(Problema.atualizacoes))
+                .filter(Problema.contrato_id.in_(com_acesso_aos_problemas))
+                .all()
+            )
+
+    ordem = {"contrato": 0, "vistoria": 1, "problema": 2}
+    eventos = (
+        [("contrato", c.created_at, c.id, serialize_contrato(c)) for c in contratos]
+        + [("vistoria", v.created_at, v.id, serialize_checklist(v)) for v in vistorias]
+        + [("problema", p.created_at, p.id, serialize_problema(p)) for p in problemas]
+    )
+    eventos.sort(key=lambda e: (e[1] is None, e[1] or datetime.min, ordem[e[0]], e[2]))
+    return ok({
+        "imovel_id": imovel_id,
+        "eventos": [
+            {"tipo": tipo, "data": data.isoformat() if data else None, "dados": dados}
+            for tipo, data, _, dados in eventos
+        ],
+    })
 
 
 @router.put("/{imovel_id}")
@@ -143,7 +216,7 @@ def update_imovel(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     data = body.model_dump(exclude_unset=True)
     endereco_data = data.pop("endereco", None)
@@ -177,10 +250,10 @@ def delete_imovel(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     if im.status == "locado":
-        return fail("Não é possível excluir um imóvel com contrato ativo (status: locado)")
+        return fail("Não é possível excluir um imóvel com contrato ativo (status: locado)", status_code=409)
 
     im.ativo = False
     if im.endereco:
@@ -199,12 +272,12 @@ def get_endereco(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
     assert_acesso_imovel(db, imovel_id, user)
 
     end = db.query(Endereco).filter(Endereco.imovel_id == imovel_id, Endereco.ativo == True).first()
     if not end:
-        return fail("Endereço não encontrado")
+        return fail("Endereço não encontrado", status_code=404)
     return ok(serialize_endereco(end))
 
 
@@ -219,7 +292,7 @@ def upsert_endereco(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     end = db.query(Endereco).filter(Endereco.imovel_id == imovel_id).first()
     if end:
@@ -246,7 +319,7 @@ def list_comodos(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
     assert_acesso_imovel(db, imovel_id, user)
 
     ensure_default_comodos(db, imovel_id)
@@ -268,7 +341,7 @@ def create_comodo(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     comodo = ImovelComodo(
         imovel_id=imovel_id,
@@ -292,14 +365,14 @@ def update_comodo(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     comodo = db.query(ImovelComodo).filter(
         ImovelComodo.id == comodo_id,
         ImovelComodo.imovel_id == imovel_id,
     ).first()
     if not comodo:
-        return fail("Cômodo não encontrado")
+        return fail("Cômodo não encontrado", status_code=404)
 
     if body.tipo is not None:
         comodo.tipo = body.tipo
@@ -322,14 +395,14 @@ def delete_comodo(
 ):
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
-        return fail("Imóvel não encontrado")
+        return fail("Imóvel não encontrado", status_code=404)
 
     comodo = db.query(ImovelComodo).filter(
         ImovelComodo.id == comodo_id,
         ImovelComodo.imovel_id == imovel_id,
     ).first()
     if not comodo:
-        return fail("Cômodo não encontrado")
+        return fail("Cômodo não encontrado", status_code=404)
 
     db.delete(comodo)
     db.commit()

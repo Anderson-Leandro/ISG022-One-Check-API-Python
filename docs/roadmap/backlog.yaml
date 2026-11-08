@@ -2243,20 +2243,23 @@ items:
       remote_at: '2026-11-03T00:33:59Z'
 - id: TK-002
   type: task
-  title: Rotacionar as credenciais de demonstração em produção
+  title: Recriar o ambiente de produção sem credenciais de demonstração
   epic: EP-008
   story: ''
-  description: 'Risco residual do SEC-001: contas criadas pelo seed antigo ainda podem ter senha e TOTP públicos.'
+  description: 'Risco residual do SEC-001. Ajustado em 2026-11-08: o ambiente de produção não está em uso e será
+    zerado; em vez de rotacionar as contas do seed antigo, o banco é recriado e carregado pelo seed atual, que gera
+    senhas aleatórias. Se o zeramento não acontecer, volta a valer a rotação por scripts/rotacionar_credenciais_demo.py
+    --aplicar.'
   acceptance_criteria:
-  - Dado o banco de produção, quando rodar scripts/rotacionar_credenciais_demo.py, então ele lista as contas expostas.
-  - Depois do --aplicar, nenhuma conta ativa usa senha ou segredo TOTP do repositório e o alerta 'SEGURANÇA:' some
-    do log do Render.
-  - As novas senhas são entregues por canal seguro, não ficam em commit, issue nem chat.
+  - Dado o banco de produção recriado e carregado por POST /admin/seed (ou pelo seed atual), quando rodar scripts/rotacionar_credenciais_demo.py,
+    então nenhuma conta é listada.
+  - 'Depois de um reinício, o alerta SEGURANÇA: de credenciais de demonstração não aparece no log do Render.'
+  - As senhas geradas pelo seed são entregues por canal seguro, não ficam em commit, issue nem chat.
   priority: must
   rank: 20
   estimate: 1
-  status: backlog
-  sprint: 12
+  status: ready
+  sprint: 13
   phase: F6
   depends_on: []
   security:
@@ -2274,14 +2277,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: ready
   sync:
     github:
-      hash: 0d88030d306860c5
-      remote_at: '2026-11-03T00:34:01Z'
+      hash: 84f020e2b80b964e
+      remote_at: '2026-11-08T17:24:25Z'
 - id: TK-003
   type: task
   title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render
@@ -2295,8 +2302,8 @@ items:
   priority: must
   rank: 30
   estimate: 1
-  status: backlog
-  sprint: 12
+  status: ready
+  sprint: 13
   phase: F6
   depends_on: []
   security:
@@ -2314,14 +2321,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: ready
   sync:
     github:
-      hash: 4d3b09bb84343908
-      remote_at: '2026-11-03T00:34:02Z'
+      hash: 2f355213aaee810b
+      remote_at: '2026-11-08T17:24:26Z'
 - id: TK-004
   type: task
   title: Agendar a limpeza de dados vencidos no Render
@@ -2693,7 +2704,7 @@ items:
   priority: should
   rank: 80
   estimate: 2
-  status: backlog
+  status: done
   sprint: 12
   phase: F6
   depends_on: []
@@ -2705,17 +2716,24 @@ items:
   links:
     trello_card: null
     gh_issue: 70
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0009, DEBT-015)'
+  - docs/roadmap/execucao/SPK-001.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 3364f504ad8649ef
-      remote_at: '2026-11-03T00:34:13Z'
+      hash: 018b85ba0f72f3f8
+      remote_at: '2026-11-08T14:48:26Z'
 - id: SPK-002
   type: spike
   title: Decidir sobre as fotos públicas em /uploads (T-14)
@@ -2728,7 +2746,7 @@ items:
   priority: should
   rank: 90
   estimate: 2
-  status: backlog
+  status: done
   sprint: 12
   phase: F6
   depends_on: []
@@ -2740,17 +2758,24 @@ items:
   links:
     trello_card: null
     gh_issue: 71
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0010, R-007_aceito)'
+  - docs/roadmap/execucao/SPK-002.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: d46883193fec86f8
-      remote_at: '2026-11-03T00:34:14Z'
+      hash: 343f2a1cea96ad23
+      remote_at: '2026-11-08T14:48:27Z'
 - id: SPK-003
   type: spike
   title: Decidir se o MFA vale para locatário e visualizador
@@ -2763,7 +2788,7 @@ items:
   priority: could
   rank: 210
   estimate: 1
-  status: backlog
+  status: done
   sprint: 12
   phase: F6
   depends_on: []
@@ -2775,17 +2800,24 @@ items:
   links:
     trello_card: null
     gh_issue: 72
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0011, SEC-036)'
+  - docs/roadmap/execucao/SPK-003.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: d7bfe90333048023
-      remote_at: '2026-11-03T00:34:15Z'
+      hash: 4b87ee2c0b583a00
+      remote_at: '2026-11-08T14:48:28Z'
 - id: SPK-004
   type: spike
   title: Fechar as regras de negócio em aberto do PENDENCIAS_API.md (itens 5, 7, 8 e 11)
@@ -2801,7 +2833,7 @@ items:
   priority: should
   rank: 100
   estimate: 2
-  status: backlog
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -2816,17 +2848,25 @@ items:
   links:
     trello_card: null
     gh_issue: 73
-    prs: []
-  evidence: []
+    prs:
+    - '#145'
+  evidence:
+  - 'PR #145 (merge 5bb1195): decisão do usuário (PO) em 2026-11-08 registrada (ADR-0012, US-018, US-019, US-020,
+    DEBT-016)'
+  - docs/roadmap/execucao/SPK-004.md
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 4f32fe9a3eafe4de
-      remote_at: '2026-11-03T00:34:17Z'
+      hash: f22d7a120b428e03
+      remote_at: '2026-11-08T14:48:30Z'
 - id: US-015
   type: story
   title: Excluir checklist, contrato e problema criados por engano
@@ -2842,7 +2882,7 @@ items:
   priority: could
   rank: 270
   estimate: 5
-  status: backlog
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -2857,17 +2897,29 @@ items:
   links:
     trello_card: null
     gh_issue: 74
-    prs: []
-  evidence: []
+    prs:
+    - '#141'
+  evidence:
+  - 'PR #141 (merge 2815be5): DELETE de checklist, contrato e problema com exclusão lógica (ADR-0008); 25 testes
+    em tests/integration/test_exclusao_registros.py'
+  - 'decisões do PO em 2026-11-08: exclusão lógica, admin e gestor, regra estrita'
+  - teste existente alterado (lista de rotas restritas) aprovado pelo usuário em 2026-11-08
+  - collection do Insomnia 164/164 contra a API local; security-audit diff dev sem achado novo
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: a8d37817f1050334
-      remote_at: '2026-11-03T00:34:18Z'
+      hash: e0cec57d52e754d0
+      remote_at: '2026-11-08T13:02:55Z'
 - id: US-016
   type: story
   title: Anexos e assinatura de contrato
@@ -2881,7 +2933,7 @@ items:
   rank: 290
   estimate: 8
   status: backlog
-  sprint: 12
+  sprint: null
   phase: F4
   depends_on: []
   security:
@@ -2902,10 +2954,14 @@ items:
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-02'
+    status: backlog
   sync:
     github:
-      hash: c5e4fdb83286bb32
-      remote_at: '2026-11-03T00:34:19Z'
+      hash: 6762c8422cfddf2b
+      remote_at: '2026-11-03T01:46:56Z'
 - id: US-017
   type: story
   title: Histórico do imóvel
@@ -2918,7 +2974,7 @@ items:
   priority: could
   rank: 280
   estimate: 3
-  status: backlog
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -2933,17 +2989,27 @@ items:
   links:
     trello_card: null
     gh_issue: 76
-    prs: []
-  evidence: []
+    prs:
+    - '#143'
+  evidence:
+  - 'PR #143 (merge 6c707f1): GET /imoveis/{id}/historico; 14 testes em tests/integration/test_historico_imovel.py'
+  - mutação nos recortes por perfil, no 403 e na ordenação (docs/roadmap/execucao/US-017.md)
+  - collection do Insomnia 168/168 contra a API local; security-audit diff dev sem achado novo
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 51c2b3999438d86d
-      remote_at: '2026-11-03T00:34:20Z'
+      hash: 9959db8b045c1ca3
+      remote_at: '2026-11-08T13:18:54Z'
 - id: DEBT-001
   type: debt
   title: Modelos Pydantic nos corpos das rotas de problemas
@@ -3146,7 +3212,7 @@ items:
   priority: should
   rank: 180
   estimate: 1
-  status: backlog
+  status: done
   sprint: 12
   phase: F0
   depends_on: []
@@ -3160,17 +3226,28 @@ items:
   links:
     trello_card: null
     gh_issue: 82
-    prs: []
-  evidence: []
+    prs:
+    - '#168'
+  evidence:
+  - 'PR #168 (merge 359a5d1): LICENSE MIT na raiz, titular Equipe One Check, e seção Licença no README'
+  - decisão do usuário em 2026-11-08
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: review
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 919a8b10e98033ef
-      remote_at: '2026-11-03T00:34:27Z'
+      hash: 314a703e913d7fd4
+      remote_at: '2026-11-08T17:39:10Z'
 - id: DEBT-007
   type: debt
   title: CHANGELOG e release v0.1.0
@@ -3183,7 +3260,7 @@ items:
   priority: must
   rank: 10
   estimate: 2
-  status: backlog
+  status: review
   sprint: 12
   phase: F3
   depends_on: []
@@ -3197,17 +3274,24 @@ items:
   links:
     trello_card: null
     gh_issue: 83
-    prs: []
+    prs:
+    - '#170'
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: review
   sync:
     github:
-      hash: 564cde054c6bf2b9
-      remote_at: '2026-11-03T00:34:28Z'
+      hash: 15e161e7256aaf1d
+      remote_at: '2026-11-08T17:47:23Z'
 - id: DEBT-008
   type: debt
   title: Conventional Commits em pelo menos 70% dos commits
@@ -3257,7 +3341,7 @@ items:
   priority: should
   rank: 170
   estimate: 3
-  status: backlog
+  status: done
   sprint: 12
   phase: F2
   depends_on: []
@@ -3271,26 +3355,39 @@ items:
   links:
     trello_card: null
     gh_issue: 85
-    prs: []
-  evidence: []
+    prs:
+    - '#134'
+  evidence:
+  - 'PR #134 (merge 387b881): ADR-0004 (sessão JWT, refresh rotativo, token_version), ADR-0005 (MFA TOTP por perfil),
+    ADR-0006 (uploads em disco local), ADR-0007 (Render com 1 worker)'
+  - 'achados registrados fora da sprint: SEC-035 e TK-018 (risco R-017)'
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 1865f57c3d06aedd
-      remote_at: '2026-11-03T00:34:30Z'
+      hash: 52593870a8cde593
+      remote_at: '2026-11-08T12:03:44Z'
 - id: DEBT-010
   type: debt
   title: Cobrir os ramos não testados de agendamentos, geocoding e database
   epic: EP-007
   story: ''
-  description: 'Cobertura atual: agendamentos 84%, geocoding 82%, database 70%.'
+  description: 'Refinado pela avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md): o que é de segurança
+    saiu para SEC-032, SEC-033 e SEC-034. Ficam os ramos de ''não encontrado'' e validação dos routers, mais database.py
+    (PostgreSQL) e main.py (inicialização).'
   acceptance_criteria:
-  - app/routers/agendamentos.py e app/geocoding.py com ≥ 90% de cobertura, incluindo cenários negados.
-  - ensure_schema_updates testado com um banco antigo.
+  - Cobertura de ramos (pytest --cov-branch) de agendamentos, imoveis, problemas e contratos em pelo menos 90%.
+  - Os ramos de 'não encontrado' listados no relatório têm teste que confere a resposta.
+  - A cobertura de ramos total sobe de 83,7% para pelo menos 90%.
   priority: could
   rank: 310
   estimate: 3
@@ -3315,8 +3412,8 @@ items:
     status: backlog
   sync:
     github:
-      hash: 7319fa6566b5940f
-      remote_at: '2026-11-03T00:34:31Z'
+      hash: 0c566a95f2b316f5
+      remote_at: '2026-11-07T16:15:06Z'
 - id: TK-006
   type: task
   title: Auditoria de segurança completa antes da release candidata
@@ -3764,11 +3861,12 @@ items:
       remote_at: '2026-11-03T00:34:54Z'
 - id: TK-017
   type: task
-  title: 'Proteger a branch main: merge só por PR e com CI verde'
+  title: 'Proteger as branches main e dev: merge só por PR e com CI verde'
   epic: EP-007
   story: ''
   description: 'Ação da retrospectiva da Sprint 11: os PRs #10 e #11 foram mergeados pelo autor sem revisão. Em
-    2026-11-02 o time decidiu que o PR não exige aprovação de outra pessoa; a proteção garante só o PR e o CI.'
+    2026-11-02 o time decidiu que o PR não exige aprovação de outra pessoa; a proteção garante só o PR e o CI. Em
+    2026-11-07 o escopo passou a incluir a dev, por onde todo o código é integrado (decisão do usuário na execução).'
   acceptance_criteria:
   - 'A main tem regra de proteção: merge só por PR, sem exigir aprovação (o autor pode mergear o próprio PR).'
   - O check do workflow tests.yml é obrigatório para o merge.
@@ -3776,7 +3874,7 @@ items:
   priority: must
   rank: 15
   estimate: 1
-  status: backlog
+  status: done
   sprint: 12
   phase: F0
   depends_on: []
@@ -3791,14 +3889,1012 @@ items:
   links:
     trello_card: null
     gh_issue: 98
-    prs: []
-  evidence: []
+    prs:
+    - '#123'
+  evidence:
+  - 'PR #123 (merge b225c31): ruleset 26780877 ativo em main e dev, versionado em .github/rulesets/protecao-branches.json'
+  - 'cenário negado: push direto numa branch descartável incluída na regra recusado com GH013 (docs/roadmap/execucao/TK-017.md)'
+  - 'security-audit diff dev (2026-11-07): nenhum achado novo'
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-07'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-07'
+    status: in_progress
+  - date: '2026-11-07'
+    status: review
+  - date: '2026-11-07'
+    status: done
   sync:
     github:
-      hash: 51d2156350bd8e15
-      remote_at: '2026-11-03T00:34:55Z'
+      hash: 0b43d52c88f96df3
+      remote_at: '2026-11-08T01:33:51Z'
+- id: SPK-005
+  type: spike
+  title: Avaliar a qualidade e a cobertura real da suíte de testes
+  epic: EP-007
+  story: ''
+  description: 'Pergunta: a suíte cobre todos os caminhos e realmente detecta quando o comportamento da aplicação
+    quebra? Hoje há 824 testes e 95% de cobertura de linhas, mas sem medida de ramos nem de mutação. Timebox: 3
+    pontos. A avaliação é só leitura e execução local: não altera código nem testes; as lacunas viram itens no backlog.'
+  acceptance_criteria:
+  - Existe docs/quality/avaliacao-testes-AAAA-MM-DD.md com a cobertura de ramos (pytest --cov --cov-branch) por
+    módulo, comparada à de linhas.
+  - O relatório tem a matriz de autorização (rotas × perfis × dono/não dono) indicando, para cada combinação, se
+    há teste do cenário negado e qual é.
+  - Testes de mutação (mutmut ou equivalente) rodados em app/auth.py, app/deps.py, na máquina de estados dos checklists
+    e em app/rate_limit.py, com a taxa de mutantes mortos por módulo e a lista dos sobreviventes relevantes.
+  - Revisão dos testes dos módulos com mutantes sobreviventes, apontando testes fracos (só status HTTP, sem conferir
+    corpo ou efeito no banco, mock excessivo).
+  - Cada lacuna relevante virou item no backlog (DEBT ou SEC) com critério de aceite objetivo; o DEBT-010 foi absorvido
+    ou refinado com base no resultado.
+  priority: must
+  rank: 35
+  estimate: 3
+  status: done
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    - OWASP API5:2023
+    risk_id: null
+  source:
+    kind: board
+    ref: pedido do time em 2026-11-03
+  links:
+    trello_card: null
+    gh_issue: 102
+    prs:
+    - 109
+    - '#113'
+  evidence:
+  - docs/quality/avaliacao-testes-2026-11-02.md
+  - 'PR #109 (merge 70a31fc)'
+  - 'itens gerados: SEC-032, SEC-033, SEC-034, DEBT-011, DEBT-012'
+  created: '2026-11-02'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-02'
+    status: in_sprint
+  - date: '2026-11-02'
+    status: in_progress
+  - date: '2026-11-07'
+    status: done
+  sync:
+    github:
+      hash: 6db3f8884c9687ff
+      remote_at: '2026-11-07T22:12:31Z'
+- id: SEC-032
+  type: security
+  title: Testes de negação de acesso aos checklists por quem não é dono
+  epic: EP-004
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seções 1 a 3): a negação em _assert_pode_ver_checklist
+    (app/routers/checklists.py:89-93) e em _assert_pode_aceitar (:73-75) nunca é executada; trocar ''and'' por ''or''
+    na checagem do locatário não faz nenhum teste falhar. Só testes; o código atual está correto.'
+  acceptance_criteria:
+  - Dado um locatário de outro contrato, quando ele chama GET /checklists/{id}, então recebe 403 e o corpo não traz
+    dados do checklist.
+  - Dado um segundo vistoriador, quando ele chama GET /checklists/{id}, PUT itens, POST e DELETE fotos ou PATCH
+    submeter num checklist que não é seu, então recebe 403 e o checklist fica inalterado no banco.
+  - Dado um locatário de outro contrato, quando ele chama PATCH aceitar ou rejeitar, então recebe 403 e o status
+    do checklist não muda.
+  - Dado o gestor, quando ele chama GET /checklists/{id}, então recebe 200 (caso permitido).
+  - Dado um vistoriador, quando ele lista GET /contratos/{id}/checklists, então só vê os checklists em que é o vistoriador.
+  - GET /checklists/{id}/pdf e /download-pdf têm o caso do dono (200) e o de quem não é dono (403).
+  - Com 'and' trocado por 'or' em _assert_pode_ver_checklist, pelo menos um teste falha (mutação conferida à mão
+    e registrada no item).
+  priority: must
+  rank: 36
+  estimate: 3
+  status: done
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP API1:2023
+    - CWE-639
+    risk_id: R-001
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 104
+    prs:
+    - '#125'
+  evidence:
+  - 'PR #125 (merge 0e7e760): 17 testes em tests/integration/test_seguranca_checklist_dono.py'
+  - 'mutação and→or nas três checagens de dono: sobrevive à suíte antiga (872 passam) e derruba os testes novos
+    (docs/roadmap/execucao/SEC-032.md)'
+  - 'security-audit diff dev (2026-11-07): nenhum achado novo'
+  created: '2026-11-02'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  - date: '2026-11-07'
+    status: in_progress
+  - date: '2026-11-07'
+    status: review
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 4153afb056f7b41e
+      remote_at: '2026-11-08T03:17:26Z'
+- id: SEC-033
+  type: security
+  title: Testes das travas do checklist depois do envio para aceite
+  epic: EP-004
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seção 1): os ramos que recusam upload
+    e exclusão de foto (checklists.py:241, :301) e o envio para aceite (:366) quando o checklist já saiu de em_preenchimento
+    nunca são executados.'
+  acceptance_criteria:
+  - Dado um checklist pendente_aceite ou aceito, quando o vistoriador envia ou exclui uma foto, então a operação
+    é recusada e a foto no banco e no disco fica igual.
+  - Dado um checklist fora de em_preenchimento, quando chamar PATCH enviar-para-aceite, então é recusado e o status
+    não muda.
+  - Dado um contrato não ativo, quando cancelar ou agendar vistoria, então é recusado (contratos.py:169, :231).
+  priority: should
+  rank: 37
+  estimate: 2
+  status: done
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - STRIDE:T
+    - CWE-841
+    risk_id: R-003
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 105
+    prs:
+    - '#127'
+  evidence:
+  - 'PR #127 (merge 6ca4129): 15 testes em tests/integration/test_seguranca_travas_checklist.py'
+  - 'mutação: desligar cada uma das cinco travas sobrevive à suíte antiga (889 passam) e derruba de 2 a 4 testes
+    novos (docs/roadmap/execucao/SEC-033.md)'
+  - 'security-audit diff dev (2026-11-08): nenhum achado novo'
+  created: '2026-11-02'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: review
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 78de21d2da24fa31
+      remote_at: '2026-11-08T03:41:00Z'
+- id: SEC-034
+  type: security
+  title: Testes de sessão revogada no setup de MFA e do teto de chaves do limitador
+  epic: EP-001
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seção 1): auth_router.py:128-131
+    e :151-154 (sessao_vigente falso em setup-login e activate-login) e rate_limit.py:48-51 (descarte de chaves
+    acima de 10.000) não têm teste.'
+  acceptance_criteria:
+  - Dado um token mfa_setup emitido antes da troca de senha, quando usado em GET /auth/mfa/setup-login ou POST /auth/mfa/activate-login,
+    então é recusado e nenhum segredo pendente é gravado.
+  - Dado o limitador com mais de 10.000 chaves, quando registrar uma nova falha, então as chaves expiradas são descartadas
+    e a nova é contada (teste unitário com relógio controlado).
+  priority: could
+  rank: 195
+  estimate: 2
+  status: done
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API2:2023
+    - OWASP API4:2023
+    risk_id: null
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 106
+    prs:
+    - '#138'
+  evidence:
+  - 'PR #138 (merge fa1d3c3): 6 testes em tests/integration/test_seguranca_mfa_setup_sessao_revogada.py e tests/unit/test_rate_limit_teto_de_chaves.py'
+  - 'mutação: desligar a checagem de sessão no setup-login, no activate-login ou o teto do limitador sobrevive à
+    suíte antiga e derruba os testes novos (docs/roadmap/execucao/SEC-034.md)'
+  - 'security-audit diff dev (2026-11-08): nenhum achado novo'
+  created: '2026-11-02'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 6e1ce0b02d827629
+      remote_at: '2026-11-08T12:17:58Z'
+- id: DEBT-011
+  type: debt
+  title: Testes de negação por perfil em todas as rotas restritas
+  epic: EP-007
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seção 2): 77 de 97 combinações perfil
+    proibido × rota restrita não têm teste de negação (visualizador 30, vistoriador 25, locatário 21); 18 de 32
+    rotas restritas não têm nenhum; 6 rotas não têm teste algum.'
+  acceptance_criteria:
+  - Existe um teste parametrizado que, para cada rota com require_roles, confere 403 para cada perfil fora da lista
+    (sem gravar nada).
+  - Existe teste para PATCH /imoveis/{id}/endereco, POST /contratos/{id}/encerrar e POST /contratos/{id}/cancelar,
+    ou essas rotas duplicadas são removidas com ADR.
+  - Existe teste de GET /logs com o gestor, alinhado à decisão do SEC-018.
+  - A matriz de autorização refeita (método do relatório) não mostra combinação perfil proibido sem 'N' nas rotas
+    restritas.
+  priority: should
+  rank: 145
+  estimate: 3
+  status: done
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API5:2023
+    - CWE-285
+    risk_id: null
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 107
+    prs:
+    - '#129'
+  evidence:
+  - 'PR #129 (merge b826d72): 103 testes em tests/integration/test_seguranca_negacao_por_perfil.py (97 combinações
+    perfil proibido × rota restrita, lista conferida com a API)'
+  - 'mutação: rota de endereço aceitando o vistoriador sobrevive à suíte antiga e derruba 4 testes novos (docs/roadmap/execucao/DEBT-011.md)'
+  - 'security-audit diff dev (2026-11-08): nenhum achado novo'
+  created: '2026-11-02'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: review
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 763e085b567c7661
+      remote_at: '2026-11-08T04:04:07Z'
+- id: DEBT-012
+  type: debt
+  title: Testes de negação em escrita conferem o estado e o status exato
+  epic: EP-007
+  story: ''
+  description: 'Avaliação SPK-005 (docs/quality/avaliacao-testes-2026-11-02.md, seções 3 e 4): 54 de 76 testes de
+    negação em escrita não conferem se o recurso ficou intacto; mutantes que trocam 403 por 404 ou removem a mensagem
+    sobrevivem; test_outro_vistoriador_nao_pode_submeter usa o token do gestor.'
+  acceptance_criteria:
+  - Os testes de negação em escrita listados no relatório releem o recurso no banco e conferem que nada mudou.
+  - Os testes de negação de checklists e contratos conferem o status exato (403) e a mensagem.
+  - test_outro_vistoriador_nao_pode_submeter é renomeado (é o gestor) e o caso de um segundo vistoriador ganha teste
+    próprio.
+  priority: should
+  rank: 146
+  estimate: 3
+  status: done
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-284
+    risk_id: null
+  source:
+    kind: quality
+    file: docs/quality/avaliacao-testes-2026-11-02.md
+  links:
+    trello_card: null
+    gh_issue: 108
+    prs:
+    - '#131'
+  evidence:
+  - 'PR #131 (merge 101b404): foto_do_banco(db) em tests/conftest.py; 54 testes de negação passam a conferir o banco
+    (45) e a mensagem exata (25)'
+  - 'mutação: rota que grava antes de negar passa nos testes antigos e derruba os novos (docs/roadmap/execucao/DEBT-012.md)'
+  - testes existentes alterados aprovados pelo usuário em 2026-11-08
+  - 'security-audit diff dev (2026-11-08): nenhum achado novo'
+  created: '2026-11-02'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-02'
+    status: backlog
+  - date: '2026-11-07'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: review
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 96669914567b23c7
+      remote_at: '2026-11-08T11:51:26Z'
+- id: DEBT-013
+  type: debt
+  title: Mensagem de erro específica para token de verificação usado no setup-login e no activate-login
+  epic: EP-001
+  story: ''
+  description: 'Hoje GET /auth/mfa/setup-login (auth_router.py:136) e POST /auth/mfa/activate-login respondem "Token
+    MFA inválido ou expirado" tanto para token ilegível/expirado quanto para um token válido do tipo mfa (emitido
+    para quem já tem autenticador). A recusa é correta (barreira da falha N1, SEC-021); só a mensagem confunde quem
+    integra a API. Separar os casos sem consultar a conta antes de recusar. Achado em teste manual com a collection
+    do Insomnia (PR #110). Relacionado: DEBT-003 (consolidar rotas de MFA).'
+  acceptance_criteria:
+  - Dado um token temporário válido do tipo mfa, quando chamar GET /auth/mfa/setup-login, então recebe 401 com mensagem
+    indicando que o token é de verificação e deve ser usado em /auth/mfa/verify.
+  - Dado o mesmo token, quando chamar POST /auth/mfa/activate-login, então recebe sucesso=false com a mesma mensagem
+    específica, e nenhum segredo é gerado ou alterado.
+  - Dado um token ilegível, com assinatura inválida ou expirado, quando chamar qualquer das duas rotas, então a
+    mensagem continua genérica (Token MFA inválido ou expirado).
+  - A recusa do token do tipo mfa acontece antes de consultar o usuário no banco; os testes de test_seguranca_mfa_bypass.py
+    continuam passando e há teste novo para cada mensagem.
+  - Os casos da collection do Insomnia (pastas 01 e 00a) são atualizados com a nova mensagem.
+  priority: could
+  rank: 155
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - fail secure
+    - CWE-209
+    risk_id: null
+  source:
+    kind: manual-test
+    file: docs/insomnia/onecheck-api.insomnia.json
+    ref: 01 / Token de verificação não serve no setup-login
+  links:
+    trello_card: null
+    gh_issue: 112
+    prs: []
+  evidence: []
+  created: '2026-11-07'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-07'
+    status: backlog
+  sync:
+    github:
+      hash: 6e24c2c6cd5e7829
+      remote_at: '2026-11-07T21:56:56Z'
+- id: DEBT-014
+  type: debt
+  title: Erros de negócio respondem com o status HTTP adequado em vez de 200
+  epic: EP-006
+  story: ''
+  description: Implementa o ADR-0003 (docs/adr/0003-status-http-dos-erros.md). Hoje fail() (app/schemas.py:37) não
+    define status e 46 handlers respondem 200 com sucesso=false, inclusive a negação de GET /contratos/{id}/checklists.
+    Isso esconde login falho, MFA errado e acesso negado nos logs e no monitoramento (A09:2021, CWE-393). O envelope
+    continua igual, então quem já lê o campo sucesso não muda a leitura. Fazer antes do DEBT-012, que confere o
+    status exato nos testes de negação.
+  acceptance_criteria:
+  - Dado qualquer erro devolvido por fail(), quando a resposta sai da API, então o status é >= 400 conforme a tabela
+    do ADR-0003, e sem status explícito o padrão é 400 (nunca 200).
+  - Dada a suíte de testes, quando qualquer requisição do TestClient recebe sucesso=false, então um teste (fixture
+    em tests/conftest.py) falha se o status for 2xx.
+  - Dado um locatário que não é dono do contrato, quando chamar GET /contratos/{id}/checklists, então recebe 403
+    e nenhum checklist.
+  - Dada uma senha atual errada numa rota autenticada (desligar MFA, trocar senha), quando a API recusa, então responde
+    403 e não 401; login, MFA do login e refresh recusados respondem 401 com mensagem genérica.
+  - O corpo continua {sucesso:false, erro, erros?}; os testes existentes são ajustados ao novo status, a collection
+    do Insomnia é gerada de novo e passa contra a API local, e o README descreve a tabela de status.
+  priority: must
+  rank: 15
+  estimate: 5
+  status: done
+  sprint: 12
+  phase: F5
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP A09:2021
+    - CWE-393
+    - fail secure
+    risk_id: null
+  source:
+    kind: manual-test
+    file: docs/insomnia/README.md
+    ref: HTTP 200 com sucesso:false
+  links:
+    trello_card: null
+    gh_issue: 114
+    prs:
+    - '#115'
+    - '#116'
+    - '#118'
+  evidence:
+  - 'ADR-0003 (docs/adr/0003-status-http-dos-erros.md, PR #115)'
+  - 'PR #116 (merge 1f602f1): fail() com status de erro, 122 chamadas classificadas'
+  - tests/integration/test_status_http_erros.py e guarda em tests/conftest.py; 836 testes, cobertura 95%
+  - 'collection do Insomnia regenerada: 157/157 e 00a 11/11'
+  - 'PR #118 (merge efd0363): testes de refresh do seed com resultado fixo'
+  - 'security-audit diff ed36a41 (2026-11-07): 0 crítico, alto, médio ou baixo; 3 info'
+  created: '2026-11-07'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-07'
+    status: in_sprint
+  - date: '2026-11-07'
+    status: done
+  sync:
+    github:
+      hash: 725aaa9d4fa60313
+      remote_at: '2026-11-07T23:32:27Z'
+- id: SEC-035
+  type: security
+  title: QR do setup de MFA gerado por serviço externo recebe o segredo TOTP
+  epic: EP-001
+  story: ''
+  description: 'Encontrado na escrita do ADR-0005 (DEBT-009). mfa_provisioning_data (app/auth.py:172) devolve qr_url
+    apontando para https://api.qrserver.com com o otpauth:// na query string, que contém o segredo TOTP e o e-mail
+    da conta. Quem abre a URL entrega a semente do MFA ao serviço externo (logs, cache, proxies no caminho). Com
+    a semente e a senha, um terceiro gera códigos válidos. Rotas: GET /auth/mfa/setup, GET /auth/mfa/setup-login,
+    POST /usuarios/me/mfa/setup.'
+  acceptance_criteria:
+  - Dado um setup de MFA, quando a API responde, então nenhuma URL devolvida aponta para um domínio externo nem
+    contém o segredo TOTP.
+  - Dado o setup de MFA, quando o cliente precisa do QR, então ele é gerado pela própria API (imagem ou data URI)
+    ou a partir do otpauth_uri, sem enviar o segredo a terceiros.
+  - Existe teste que falha se a resposta do setup contiver uma URL externa com o segredo.
+  priority: should
+  rank: 1510
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - CWE-200
+    - CWE-359
+    - OWASP API3:2023
+    - STRIDE:I
+    risk_id: R-002
+  source:
+    kind: adr
+    file: docs/adr/0005-mfa-totp-obrigatorio-por-perfil.md
+  links:
+    trello_card: null
+    gh_issue: 135
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: a11aaa6d1fcae116
+      remote_at: '2026-11-08T12:03:45Z'
+- id: TK-018
+  type: task
+  title: 'Fotos em disco efêmero no Render: confirmar e dar armazenamento durável'
+  epic: EP-008
+  story: ''
+  description: Encontrado na escrita do ADR-0006 (DEBT-009). As fotos ficam em UPLOAD_DIR (disco local) e o render.yaml
+    não declara disco persistente; pela documentação do Render, o sistema de arquivos do plano gratuito é efêmero
+    e se perde a cada deploy ou reinício. As fotos são evidência dos laudos (A-08). Depende de acesso ao painel
+    do Render para confirmar.
+  acceptance_criteria:
+  - Dado o serviço no Render, quando conferido no painel, então está registrado se o disco é efêmero e se fotos
+    antigas já se perderam.
+  - Dado um deploy ou reinício, quando uma foto enviada antes é pedida, então ela continua disponível (disco persistente
+    ou armazenamento de objetos), com a decisão registrada em ADR que substitui o ADR-0006.
+  - As fotos entram na rotina de backup (junto do TK-005) ou a ausência fica registrada como risco aceito.
+  priority: should
+  rank: 1520
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - STRIDE:D
+    - CWE-404
+    risk_id: R-017
+  source:
+    kind: adr
+    file: docs/adr/0006-uploads-em-disco-local.md
+  links:
+    trello_card: null
+    gh_issue: 136
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: 868cf03be0d5c060
+      remote_at: '2026-11-08T12:03:45Z'
+- id: BUG-001
+  type: bug
+  title: Excluir cômodo referenciado por checklist ou problema responde 500
+  epic: EP-002
+  story: ''
+  description: Encontrado na revisão de código do US-015. DELETE /imoveis/{id}/comodos/{cid} (app/routers/imoveis.py,
+    delete_comodo) apaga o cômodo sem conferir se algum item de checklist (checklist_itens.comodo_id) ou problema
+    (problemas.comodo_id) o referencia. No PostgreSQL, a chave estrangeira recusa e a rota responde 500. Com a exclusão
+    lógica (ADR-0008), a referência pode estar num checklist ou problema excluído, invisível para quem chama.
+  acceptance_criteria:
+  - Dado um cômodo usado por um item de checklist ou por um problema (excluído ou não), quando o admin ou o gestor
+    tentar excluí-lo, então a API responde 409 com mensagem clara e nada é apagado.
+  - Dado um cômodo sem referências, quando excluído, então continua funcionando como hoje.
+  - Existe teste para os dois casos.
+  priority: should
+  rank: 1530
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-755
+    - STRIDE:D
+    risk_id: null
+  source:
+    kind: code-review
+    file: app/routers/imoveis.py
+  links:
+    trello_card: null
+    gh_issue: 140
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: bd57660755d62016
+      remote_at: '2026-11-08T12:39:56Z'
+- id: DEBT-015
+  type: debt
+  title: Remover o perfil visualizador e recusar perfis desconhecidos
+  epic: EP-001
+  story: ''
+  description: 'Decisão do SPK-001 (ADR-0009): o perfil visualizador deixa de existir. Sem migração de contas: os
+    ambientes serão zerados e nenhuma conta com o perfil foi criada. As regras de app/deps.py restringem só locatário
+    e vistoriador; um perfil fora da lista ganharia acesso total, por isso get_current_user passa a recusar perfis
+    desconhecidos (fail secure).'
+  acceptance_criteria:
+  - Dado um pedido de criação ou alteração de usuário com role visualizador, quando enviado, então a API responde
+    422.
+  - Dado um token ou uma conta com um perfil fora de ROLES, quando chamar qualquer rota autenticada, então a API
+    recusa (401) e não libera nada.
+  - 'O modelo Usuario não tem perfil padrão: criar um usuário sem perfil explícito falha.'
+  - Testes, README, documentação de segurança e collection do Insomnia não citam mais o visualizador como perfil
+    ativo; os testes existentes alterados passam pelo relatório e pela aprovação do usuário.
+  priority: should
+  rank: 290
+  estimate: 2
+  status: done
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API5:2023
+    - CWE-285
+    - CWE-636
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0009-remocao-do-perfil-visualizador.md
+  links:
+    trello_card: null
+    gh_issue: 146
+    prs:
+    - '#153'
+  evidence:
+  - 'PR #153 (merge 7bb575a): perfil visualizador removido (ADR-0009); fail secure em get_current_user, login e
+    refresh'
+  - 25 testes em tests/integration/test_seguranca_perfis_validos.py; testes existentes alterados aprovados pelo
+    usuário em 2026-11-08
+  - collection do Insomnia 161/161; security-audit diff dev sem achado novo
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 369ee954f906d7a5
+      remote_at: '2026-11-08T15:11:22Z'
+- id: SEC-036
+  type: security
+  title: Respeitar o MFA opcional ligado pelo próprio usuário
+  epic: EP-001
+  story: ''
+  description: 'Decisão do SPK-003 (ADR-0011): hoje o locatário consegue ligar o MFA, mas needs_mfa (app/auth.py)
+    só vale para os perfis obrigatórios e o login nunca pede o código. Passa a valer: quem tem MFA ligado e segredo
+    configurado recebe mfa_required no login, em qualquer perfil.'
+  acceptance_criteria:
+  - Dado um locatário com MFA ligado e autenticador configurado, quando fizer login com a senha certa, então recebe
+    mfa_required e um temp_token, e não os tokens de sessão.
+  - Dado esse locatário, quando informar o código certo em /auth/mfa/verify, então recebe a sessão; código errado
+    conta no limite de tentativas.
+  - Dado um locatário sem MFA, quando fizer login, então continua recebendo os tokens direto.
+  - Os perfis obrigatórios continuam como hoje.
+  priority: should
+  rank: 291
+  estimate: 1
+  status: done
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API2:2023
+    - CWE-308
+    risk_id: R-002
+  source:
+    kind: spike
+    file: docs/adr/0011-mfa-opcional-respeitado.md
+  links:
+    trello_card: null
+    gh_issue: 147
+    prs:
+    - '#155'
+  evidence:
+  - 'PR #155 (merge fe6988e): needs_mfa e mfa_setup_required sem depender do perfil (ADR-0011)'
+  - 8 testes em tests/integration/test_seguranca_mfa_opcional.py; 2 testes unitários invertidos com aprovação do
+    usuário em 2026-11-08
+  - security-audit diff dev sem achado novo
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 48079d666489661f
+      remote_at: '2026-11-08T15:30:58Z'
+- id: US-018
+  type: story
+  title: Locatário vê os agendamentos do próprio contrato
+  epic: EP-003
+  story: Como locatário, quero ver as datas de vistoria agendadas no meu contrato, para me organizar para recebê-las.
+  description: Decisão do SPK-004, item 5 (ADR-0012). Hoje GET /contratos/{id}/agendamentos responde 403 para o
+    locatário, mesmo no contrato dele.
+  acceptance_criteria:
+  - Dado um locatário, quando chamar GET /contratos/{id}/agendamentos do próprio contrato, então recebe a lista.
+  - Dado um locatário, quando chamar a rota num contrato de outro locatário, então recebe 403 sem dados.
+  - Criar, alterar e excluir agendamentos continua só para admin e gestor.
+  priority: should
+  rank: 292
+  estimate: 1
+  status: done
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API1:2023
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: 148
+    prs:
+    - '#157'
+  evidence:
+  - 'PR #157 (merge 41d8c95): locatário lê os agendamentos do próprio contrato, sem a observação interna; dashboard
+    com o mesmo recorte (ADR-0012)'
+  - 7 testes em tests/integration/test_agendamentos_locatario.py; 2 testes existentes ajustados com aprovação do
+    usuário em 2026-11-08
+  - collection do Insomnia 162/162; security-audit diff dev sem achado novo
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 637662baa82d8733
+      remote_at: '2026-11-08T15:49:21Z'
+- id: US-019
+  type: story
+  title: Locatário comenta no próprio problema enquanto não estiver resolvido
+  epic: EP-005
+  story: Como locatário, quero acrescentar informações ao problema que abri, para ajudar a resolvê-lo.
+  description: Decisão do SPK-004, item 7 (ADR-0012). Hoje POST /problemas/{id}/atualizacoes é só de admin e gestor.
+  acceptance_criteria:
+  - Dado o locatário dono do contrato do problema, quando criar uma atualização num problema que não está resolvido,
+    então ela é gravada com ele como autor.
+  - Dado um problema resolvido, quando o locatário tentar criar uma atualização, então recebe 409.
+  - Dado um locatário de outro contrato, um vistoriador, quando tentarem criar uma atualização, então recebem 403
+    e nada é gravado.
+  - Mudar o status do problema continua só para admin e gestor.
+  priority: should
+  rank: 293
+  estimate: 2
+  status: done
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - OWASP API1:2023
+    - CWE-639
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: 149
+    prs:
+    - '#159'
+  evidence:
+  - 'PR #159 (merge f300253): locatário dono comenta no próprio problema não resolvido nem fechado (ADR-0012)'
+  - 11 testes em tests/integration/test_problema_comentario_locatario.py; 2 testes existentes ajustados com aprovação
+    do usuário em 2026-11-08
+  - collection do Insomnia 163/163; security-audit diff dev sem achado novo
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: ae3688e8c4404d7b
+      remote_at: '2026-11-08T16:13:32Z'
+- id: US-020
+  type: story
+  title: Nova vistoria depois de uma rejeição, e fim do status pendente_revisao
+  epic: EP-004
+  story: Como gestor, quero criar uma nova vistoria quando a anterior foi rejeitada, para não travar o contrato
+    e sem alterar o laudo rejeitado.
+  description: 'Decisão do SPK-004, item 8 (ADR-0012). Hoje uma vistoria inicial rejeitada trava o contrato: criar
+    outra inicial dá 409 e a exclusão do US-015 não aceita checklist rejeitado. O status pendente_revisao não é
+    gravado por nenhum fluxo.'
+  acceptance_criteria:
+  - Dado um contrato cuja vistoria inicial foi rejeitada, quando o gestor criar uma nova vistoria inicial, então
+    ela é criada em preenchimento e a rejeitada continua intacta.
+  - Dado um contrato com uma vistoria inicial em preenchimento, enviada ou aceita, quando tentar criar outra inicial,
+    então continua recebendo 409.
+  - O status pendente_revisao deixa de existir no domínio (dashboard e status dos dados incluídos).
+  priority: should
+  rank: 294
+  estimate: 2
+  status: done
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - STRIDE:T
+    - CWE-841
+    risk_id: R-003
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: 150
+    prs:
+    - '#161'
+  evidence:
+  - 'PR #161 (merge 9263306): nova vistoria inicial depois de rejeição, a rejeitada intacta; pendente_revisao fora
+    do domínio (ADR-0012)'
+  - 8 testes em tests/integration/test_nova_vistoria_apos_rejeicao.py
+  - security-audit diff dev sem achado novo
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: 4b597d580e2a30b0
+      remote_at: '2026-11-08T16:26:08Z'
+- id: DEBT-016
+  type: debt
+  title: Declarar no OpenAPI os tipos de agendamento (inicial e encerramento)
+  epic: EP-003
+  story: ''
+  description: 'Decisão do SPK-004, item 11 (ADR-0012): os tipos continuam só inicial e encerramento; o enum passa
+    a aparecer no OpenAPI.'
+  acceptance_criteria:
+  - O schema de criação e de alteração de agendamento declara tipo como enum (inicial, encerramento) no OpenAPI.
+  - Um tipo fora do enum continua respondendo 422 com a mensagem de campo.
+  - Existe teste que confere o enum no OpenAPI.
+  priority: could
+  rank: 295
+  estimate: 1
+  status: done
+  sprint: 12
+  phase: F4
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API8:2023
+    risk_id: null
+  source:
+    kind: spike
+    file: docs/adr/0012-regras-de-negocio-pendentes.md
+  links:
+    trello_card: null
+    gh_issue: 151
+    prs:
+    - '#163'
+  evidence:
+  - 'PR #163 (merge 1700178): tipos de agendamento declarados como enum no OpenAPI, com constante única (ADR-0012)'
+  - 4 testes em tests/integration/test_openapi_tipos_agendamento.py
+  - security-audit diff dev sem achado novo
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  - date: '2026-11-08'
+    status: ready
+  - date: '2026-11-08'
+    status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
+  - date: '2026-11-08'
+    status: done
+  sync:
+    github:
+      hash: bc15fc0fd1f906dc
+      remote_at: '2026-11-08T16:37:23Z'
+- id: DEBT-017
+  type: debt
+  title: Regras de acesso negam por padrão os perfis que não citam
+  epic: EP-006
+  story: ''
+  description: 'Encontrado na revisão de código do DEBT-015. assert_acesso_contrato, assert_acesso_imovel, dashboard._contratos_visiveis
+    e os filtros de listagem restringem só locatário e vistoriador; qualquer outro perfil cai no acesso total. Hoje
+    get_current_user, o login e o refresh recusam perfis fora de ROLES (ADR-0009), o que cobre todas as rotas; mas
+    um caminho que carregue o usuário sem passar por eles (job, dependência nova) trataria um perfil desconhecido
+    como admin. Inverter a lógica: liberar explicitamente admin e gestor e negar o resto.'
+  acceptance_criteria:
+  - Cada regra de acesso em app/deps.py e nos recortes de listagem libera admin e gestor explicitamente e nega qualquer
+    perfil não citado.
+  - Existe teste que chama as regras diretamente com um perfil fora de ROLES e confere a negação.
+  - Os testes de autorização existentes continuam passando sem alteração.
+  priority: could
+  rank: 1540
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-636
+    - OWASP API5:2023
+    risk_id: null
+  source:
+    kind: code-review
+    file: app/deps.py
+  links:
+    trello_card: null
+    gh_issue: 165
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: bae06e90dc8a8a7a
+      remote_at: '2026-11-08T16:41:00Z'

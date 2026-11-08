@@ -9,7 +9,7 @@ qualquer contrato pelo ID. GET /imoveis/{id}/comodos não restringia ninguém.
 Regras verificadas (as mesmas das listagens):
   - vistoriador: só contratos/imóveis em que tem checklist atribuído
   - locatário: só o próprio contrato; imóvel só com contrato ativo
-  - admin, gestor e visualizador mantêm a leitura (alcance do visualizador: decisão de negócio pendente)
+  - admin e gestor mantêm a leitura (o perfil visualizador foi removido, ADR-0009)
 """
 from datetime import date
 
@@ -109,7 +109,7 @@ class TestLocatario:
 
 
 class TestPerfisComLeituraGeral:
-    @pytest.mark.parametrize("perfil", ["admin", "gestor", "visualizador"])
+    @pytest.mark.parametrize("perfil", ["admin", "gestor"])
     def test_leitura_mantida(self, client, db, contrato, imovel, endereco, perfil):
         u = Usuario(nome=perfil, email=f"{perfil}.leitura@test.com", senha_hash=_SENHA_HASH, role=perfil)
         db.add(u)

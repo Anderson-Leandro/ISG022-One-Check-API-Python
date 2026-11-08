@@ -64,6 +64,18 @@ def auth(token: str) -> dict:
     return {"Authorization": f"Bearer {token}"}
 
 
+def foto_do_banco(db: Session) -> dict:
+    """Todas as linhas de todas as tabelas, para conferir que uma requisição negada não gravou nada.
+
+    Uso: banco_antes = foto_do_banco(db); <requisição negada>; assert foto_do_banco(db) == banco_antes
+    """
+    db.expire_all()
+    return {
+        tabela.name: sorted(map(repr, db.execute(tabela.select()).all()))
+        for tabela in Base.metadata.sorted_tables
+    }
+
+
 def totp_now() -> str:
     """Retorna o código TOTP atual gerado com o secret fixo de teste."""
     return pyotp.TOTP(MFA_TEST_SECRET).now()
@@ -121,10 +133,29 @@ def db(setup_database):
             conn.execute(table.delete())
 
 
+class ClienteComContratoDeErro(TestClient):
+    """TestClient que barra erro com status de sucesso (ADR-0003).
+
+    Toda resposta JSON com "sucesso": false precisa ter status >= 400. Assim, uma rota nova que
+    volte ao padrão antigo (200 com sucesso=false) quebra a suíte em qualquer teste que a chame.
+    """
+
+    def request(self, *args, **kwargs):
+        r = super().request(*args, **kwargs)
+        if r.status_code < 400 and "application/json" in r.headers.get("content-type", ""):
+            corpo = r.json()
+            if isinstance(corpo, dict) and corpo.get("sucesso") is False:
+                raise AssertionError(
+                    f"{r.request.method} {r.request.url.path} respondeu {r.status_code} com sucesso=false "
+                    f"(ADR-0003 exige status de erro): {corpo.get('erro')!r}"
+                )
+        return r
+
+
 @pytest.fixture
 def client(db):
     """TestClient do FastAPI com banco de teste já injetado."""
-    with TestClient(app) as c:
+    with ClienteComContratoDeErro(app) as c:
         yield c
 
 
@@ -194,12 +225,13 @@ def user_locatario(db):
 
 
 @pytest.fixture
-def user_visualizador(db):
+def user_locatario_2(db):
+    """Segundo locatário, para os testes que precisam de outra conta comum."""
     u = Usuario(
-        nome="Visualizador Teste",
-        email="visualizador@test.com",
+        nome="Locatario Dois",
+        email="locatario2@test.com",
         senha_hash=_SENHA_HASH,
-        role="visualizador",
+        role="locatario",
         mfa_enabled=False,
         ativo=True,
     )
@@ -230,11 +262,6 @@ def token_vistoriador(user_vistoriador):
 @pytest.fixture
 def token_locatario(user_locatario):
     return create_access_token(user_locatario.id, user_locatario.role)
-
-
-@pytest.fixture
-def token_visualizador(user_visualizador):
-    return create_access_token(user_visualizador.id, user_visualizador.role)
 
 
 # ── Fixtures de dados base ──────────────────────────────────────────────────────

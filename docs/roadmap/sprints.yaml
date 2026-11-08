@@ -240,23 +240,33 @@ sprints:
   goal: Release v0.1.0, produção segura e escopo da F4 fechado
   start: '2026-11-04'
   end: '2026-11-17'
-  status: planned
-  capacity: 32.0
+  status: active
+  capacity: 40.0
   committed:
-  - DEBT-007
-  - TK-002
-  - TK-003
   - TK-017
+  - DEBT-007
   - DEBT-006
   - DEBT-009
-  - SPK-004
   - SPK-001
   - SPK-002
+  - SPK-004
   - SPK-003
   - US-015
   - US-017
-  - US-016
-  committed_points: 32.0
+  - SPK-005
+  - SEC-032
+  - SEC-033
+  - SEC-034
+  - DEBT-011
+  - DEBT-012
+  - DEBT-014
+  - DEBT-015
+  - SEC-036
+  - US-018
+  - US-019
+  - US-020
+  - DEBT-016
+  committed_points: 52.0
   completed_points: null
   completed: []
   carried_over: []
@@ -281,7 +291,9 @@ sprints:
   - SEC-027
   - TK-005
   - SEC-031
-  committed_points: 36.0
+  - TK-002
+  - TK-003
+  committed_points: 38.0
   completed_points: null
   completed: []
   carried_over: []

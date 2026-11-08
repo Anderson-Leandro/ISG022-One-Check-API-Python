@@ -9,7 +9,7 @@ Rotas cobertas:
 """
 from datetime import datetime, timedelta
 
-from tests.conftest import auth
+from tests.conftest import auth, foto_do_banco
 
 BASE_CONTRATOS = "/api/v1/contratos"
 BASE_AGENDAMENTOS = "/api/v1/agendamentos"
@@ -120,9 +120,12 @@ class TestListarAgendamentos:
         assert r_vist.status_code == 200
         assert r_vist.json()["sucesso"] is True
 
-    def test_locatario_nao_pode_listar_agendamentos(self, client, contrato, token_locatario):
+    def test_locatario_lista_agendamentos_do_proprio_contrato(self, client, contrato, token_locatario):
+        # Liberado só para leitura e só no próprio contrato (ADR-0012); o contrato alheio está em
+        # test_agendamentos_locatario.py
         r = client.get(f"{BASE_CONTRATOS}/{contrato.id}/agendamentos", headers=auth(token_locatario))
-        assert r.status_code == 403
+        assert r.status_code == 200
+        assert len(r.json()["dados"]) == 2
 
     def test_contrato_inexistente_retorna_falha(self, client, token_admin):
         r = client.get(f"{BASE_CONTRATOS}/00000000-0000-0000-0000-000000000000/agendamentos", headers=auth(token_admin))
@@ -205,6 +208,7 @@ class TestAtualizarEExcluirAgendamento:
         db.add(ag)
         db.commit()
 
+        banco_antes = foto_do_banco(db)
         r_put = client.put(
             f"{BASE_AGENDAMENTOS}/{ag.id}",
             json={"tipo": "encerramento"},
@@ -214,3 +218,4 @@ class TestAtualizarEExcluirAgendamento:
 
         r_del = client.delete(f"{BASE_AGENDAMENTOS}/{ag.id}", headers=auth(token_vistoriador))
         assert r_del.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"

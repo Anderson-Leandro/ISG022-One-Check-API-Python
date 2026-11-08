@@ -6,8 +6,9 @@ from sqlalchemy.orm import Session
 from app.config import MAX_UPLOAD_MB
 from app.database import get_db
 from app.deps import assert_acesso_problemas, get_current_user, require_roles
+from app.exclusao import marcar_excluido
 from app.models import AtualizacaoProblema, Contrato, Problema, Usuario
-from app.notification_service import notificar_usuario
+from app.notification_service import notificar_admins, notificar_usuario
 from app.serializers import log_operacao, serialize_atualizacao_problema, serialize_problema
 from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 
@@ -25,6 +26,10 @@ def _fail(erro: str, status_code: int = 400, erros: dict | None = None) -> JSONR
     if erros:
         res["erros"] = erros
     return JSONResponse(status_code=status_code, content=res)
+
+
+# Status em que o locatário não comenta mais (ADR-0012)
+_STATUS_ENCERRADOS = {"resolvido", "fechado"}
 
 
 def _assert_pode_acessar_problema(pb: Problema, user: Usuario, db: Session) -> Contrato:
@@ -51,6 +56,27 @@ def get_problema_by_id(
         return _fail(e.detail, status_code=e.status_code)
 
     return _ok(serialize_problema(pb))
+
+
+@router.delete("/problemas/{problema_id}")
+def excluir_problema(
+    problema_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    """Exclusão lógica (ADR-0008): só para problema ainda aberto e sem atualizações."""
+    pb = db.query(Problema).filter(Problema.id == problema_id).first()
+    if not pb:
+        return _fail("Problema não encontrado", status_code=404)
+    if pb.status != "aberto":
+        return _fail(f"Não é possível excluir um problema com status '{pb.status}'", status_code=409)
+    if db.query(AtualizacaoProblema.id).filter(AtualizacaoProblema.problema_id == problema_id).first():
+        return _fail("Não é possível excluir um problema que já tem atualizações", status_code=409)
+
+    marcar_excluido(pb, user)
+    db.commit()
+    log_operacao(db, user.id, "delete", "problema", problema_id)
+    return _ok(None)
 
 
 @router.patch("/problemas/{problema_id}/status")
@@ -96,11 +122,20 @@ async def criar_atualizacao(
     problema_id: str,
     request: Request,
     db: Session = Depends(get_db),
-    user: Usuario = Depends(require_roles("admin", "gestor")),
+    # O perfil é barrado antes da busca: um vistoriador não descobre quais IDs de problema existem
+    user: Usuario = Depends(require_roles("admin", "gestor", "locatario")),
 ):
+    """Admin e gestor comentam sempre; o locatário dono, enquanto o problema não estiver encerrado (ADR-0012)."""
     pb = db.query(Problema).filter(Problema.id == problema_id).first()
     if not pb:
         return _fail("Problema não encontrado", status_code=404)
+    # Autorização antes de ler o corpo: quem não pode comentar não chega a enviar arquivo
+    try:
+        contrato = _assert_pode_acessar_problema(pb, user, db)
+    except HTTPException as e:
+        return _fail(e.detail, status_code=e.status_code)
+    if user.role == "locatario" and pb.status in _STATUS_ENCERRADOS:
+        return _fail("Não é possível comentar num problema resolvido", status_code=409)
 
     content_type = request.headers.get("content-type", "")
     descricao = ""
@@ -138,6 +173,11 @@ async def criar_atualizacao(
             erros={"descricao": "O campo descrição deve ter pelo menos 5 caracteres"},
         )
 
+    # O status pode ter mudado durante o upload: confere de novo antes de gravar
+    db.refresh(pb)
+    if user.role == "locatario" and pb.status in _STATUS_ENCERRADOS:
+        return _fail("Não é possível comentar num problema resolvido", status_code=409)
+
     atualizacao = AtualizacaoProblema(
         problema_id=problema_id,
         autor_id=user.id,
@@ -157,8 +197,13 @@ async def criar_atualizacao(
         payload={"problema_id": problema_id, "autor_id": user.id},
     )
 
-    contrato = db.query(Contrato).filter(Contrato.id == pb.contrato_id).first()
-    if contrato:
+    if user.role == "locatario":
+        notificar_admins(
+            db,
+            f"Novo comentário do locatário — {pb.titulo}",
+            f"O locatário comentou no problema.\n\nProblema: {pb.titulo}\nComentário: {descricao}\n\nAcesse o painel para visualizar os detalhes.",
+        )
+    elif contrato:
         notificar_usuario(
             db,
             contrato.locatario_id,

@@ -38,7 +38,7 @@ def _login(client, email, senha):
 
 def _esgota_conta(client, email):
     for _ in range(RATE_LIMIT_FALHAS_CONTA):
-        assert _login(client, email, "senha-errada").status_code == 200
+        assert _login(client, email, "senha-errada").status_code == 401
 
 
 # ── Login por conta ──────────────────────────────────────────────────────────────
@@ -55,9 +55,9 @@ class TestLoginPorConta:
         _esgota_conta(client, user_locatario.email.upper())
         assert _login(client, user_locatario.email, TEST_SENHA).status_code == 429
 
-    def test_outra_conta_nao_e_afetada(self, client, user_locatario, user_visualizador):
+    def test_outra_conta_nao_e_afetada(self, client, user_locatario, user_locatario_2):
         _esgota_conta(client, user_locatario.email)
-        r = _login(client, user_visualizador.email, TEST_SENHA)
+        r = _login(client, user_locatario_2.email, TEST_SENHA)
         assert r.json()["sucesso"] is True
 
     def test_sucesso_zera_o_contador(self, client, user_locatario):

@@ -7,7 +7,7 @@ outros, trocar senha/e-mail de um admin, zerar ou definir o MFA de um admin e
 criar novos admins.
 
 Regras verificadas:
-  - perfis aceitos: admin, gestor, vistoriador, locatario, visualizador
+  - perfis aceitos: admin, gestor, vistoriador, locatario
   - só admin atribui os perfis admin/gestor e gerencia contas admin/gestor
   - ninguém altera a própria conta pelas rotas /usuarios/{id} (usa /usuarios/me)
 """
@@ -15,7 +15,7 @@ import pytest
 
 from app.auth import verify_password
 from app.models import Usuario
-from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now
+from tests.conftest import MFA_TEST_SECRET, TEST_SENHA, _SENHA_HASH, auth, totp_now, foto_do_banco
 
 BASE = "/api/v1/usuarios"
 
@@ -61,8 +61,10 @@ class TestGestorNaoEscala:
         assert _recarregar(db, user_admin).email == "admin@test.com"
 
     def test_gestor_nao_altera_outro_gestor(self, client, db, outro_gestor, token_gestor):
+        banco_antes = foto_do_banco(db)
         r = client.put(f"{BASE}/{outro_gestor.id}", json={"nome": "X"}, headers=auth(token_gestor))
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     @pytest.mark.parametrize("metodo,sufixo", [("delete", "/mfa"), ("post", "/mfa/desabilitar")])
     def test_gestor_nao_reseta_mfa_de_admin(self, client, db, user_admin, token_gestor, metodo, sufixo):

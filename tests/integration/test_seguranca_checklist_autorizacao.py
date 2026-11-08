@@ -16,7 +16,7 @@ from datetime import date
 import pytest
 
 from app.models import Checklist, Contrato, Imovel, Usuario
-from tests.conftest import _SENHA_HASH, auth
+from tests.conftest import _SENHA_HASH, auth, foto_do_banco
 
 BASE = "/api/v1/contratos"
 
@@ -70,10 +70,6 @@ class TestQuemPodeCriarChecklist:
         r = _criar(client, contrato.id, user_vistoriador.id, token_vistoriador)
         assert r.status_code == 403
 
-    def test_visualizador_nao_cria_checklist(self, client, db, contrato, user_vistoriador, token_visualizador):
-        r = _criar(client, contrato.id, user_vistoriador.id, token_visualizador)
-        assert r.status_code == 403
-
     def test_gestor_cria_checklist(self, client, db, contrato, user_vistoriador, token_gestor):
         r = _criar(client, contrato.id, user_vistoriador.id, token_gestor)
         assert r.json()["sucesso"] is True
@@ -85,7 +81,7 @@ class TestQuemPodeCriarChecklist:
 class TestValidacaoCriacaoChecklist:
     def test_vistoriador_inexistente_nao_gera_500(self, client, db, contrato, token_admin):
         r = _criar(client, contrato.id, "00000000-0000-0000-0000-000000000000", token_admin)
-        assert r.status_code == 200
+        assert r.status_code == 404
         assert r.json()["sucesso"] is False
         assert "Vistoriador não encontrado" in r.json()["erro"]
         assert _checklists(db, contrato.id) == 0
@@ -134,8 +130,10 @@ class TestSeparacaoDeDeveresNoAceite:
         assert checklist_do_gestor.status == "pendente_aceite"
 
     def test_quem_vistoriou_nao_rejeita(self, client, db, checklist_do_gestor, token_gestor):
+        banco_antes = foto_do_banco(db)
         r = client.patch(f"/api/v1/checklists/{checklist_do_gestor.id}/rejeitar", headers=auth(token_gestor))
         assert r.status_code == 403
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_outro_aprovador_aceita(self, client, checklist_do_gestor, token_admin):
         r = client.patch(f"/api/v1/checklists/{checklist_do_gestor.id}/aceitar", headers=auth(token_admin))

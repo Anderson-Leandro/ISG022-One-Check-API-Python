@@ -30,7 +30,8 @@ class Usuario(Base):
     nome: Mapped[str] = mapped_column(String(200), nullable=False)
     email: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     senha_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(String(50), nullable=False, default="visualizador")
+    # Sem padrão: todo usuário nasce com um perfil explícito (ADR-0009)
+    role: Mapped[str] = mapped_column(String(50), nullable=False)
     cpf: Mapped[str | None] = mapped_column(String(14))
     mfa_secret: Mapped[str | None] = mapped_column(String(64))
     # Segredo gerado no setup; só vira mfa_secret depois que um código válido confirmar
@@ -119,6 +120,8 @@ class Contrato(Base):
     valor_mensal: Mapped[float | None] = mapped_column(Numeric(12, 2))
     status: Mapped[str] = mapped_column(String(50), default="ativo")
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    excluido_em: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    excluido_por: Mapped[str | None] = mapped_column(String(36), ForeignKey("usuarios.id"), nullable=True)
 
     agendamentos: Mapped[list["AgendamentoVistoria"]] = relationship(back_populates="contrato")
     checklists: Mapped[list["Checklist"]] = relationship(back_populates="contrato")
@@ -148,6 +151,8 @@ class Checklist(Base):
     status: Mapped[str] = mapped_column(String(50), default="em_preenchimento")
     data_vistoria: Mapped[Date | None] = mapped_column(Date)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    excluido_em: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    excluido_por: Mapped[str | None] = mapped_column(String(36), ForeignKey("usuarios.id"), nullable=True)
 
     contrato: Mapped[Contrato] = relationship(back_populates="checklists")
     itens: Mapped[list["ChecklistItem"]] = relationship(back_populates="checklist", cascade="all, delete-orphan")
@@ -216,6 +221,8 @@ class Problema(Base):
     prioridade: Mapped[str] = mapped_column(String(50), default="normal")
     status: Mapped[str] = mapped_column(String(50), default="aberto")
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    excluido_em: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    excluido_por: Mapped[str | None] = mapped_column(String(36), ForeignKey("usuarios.id"), nullable=True)
 
     contrato: Mapped[Contrato] = relationship(back_populates="problemas")
     comodo: Mapped["ImovelComodo | None"] = relationship()
@@ -248,3 +255,7 @@ class LogOperacao(Base):
     payload: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+# Registra o filtro de exclusão lógica em toda sessão (US-015). Fica no fim: app.exclusao importa estas classes.
+import app.exclusao  # noqa: E402,F401

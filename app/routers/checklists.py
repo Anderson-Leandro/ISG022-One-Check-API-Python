@@ -7,6 +7,7 @@ from app.auditoria import campos_alterados
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
 from app.deps import get_current_user, require_roles
+from app.exclusao import marcar_excluido
 from app.models import (
     AceiteChecklist,
     Checklist,
@@ -82,7 +83,7 @@ def list_itens_vistoria(db: Session = Depends(get_db), _: Usuario = Depends(get_
 
 
 def _assert_pode_ver_checklist(checklist: Checklist, user: Usuario, db: Session) -> None:
-    if user.role in ("admin", "gestor", "visualizador"):
+    if user.role in ("admin", "gestor"):
         return
     if user.role == "vistoriador" and checklist.vistoriador_id == user.id:
         return
@@ -101,7 +102,7 @@ def get_checklist(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     _assert_pode_ver_checklist(ck, user, db)
     comodos = get_comodos_for_checklist(db, ck)
     return ok(serialize_checklist(ck, include_itens=True, comodos=comodos))
@@ -116,14 +117,14 @@ def add_item(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     _assert_vistoriador(ck, user)
 
     if ck.status != "em_preenchimento":
-        return fail(f"Não é possível adicionar itens a um checklist com status '{ck.status}'")
+        return fail(f"Não é possível adicionar itens a um checklist com status '{ck.status}'", status_code=409)
 
     if body.estado not in ("otimo", "bom", "regular", "ruim"):
-        return fail("Estado inválido")
+        return fail("Estado inválido", erros={"estado": "Estado inválido"}, status_code=422)
 
     # Validar que comodo existe
     contrato = db.query(Contrato).filter(Contrato.id == ck.contrato_id).first()
@@ -133,12 +134,12 @@ def add_item(
             ImovelComodo.imovel_id == contrato.imovel_id,
         ).first()
         if not comodo:
-            return fail("Cômodo não encontrado")
+            return fail("Cômodo não encontrado", status_code=404)
 
     # Validar que item_vistoria existe
     it_vist = db.query(ItemVistoria).filter(ItemVistoria.id == body.item_vistoria_id).first()
     if not it_vist:
-        return fail("Item de vistoria não encontrado")
+        return fail("Item de vistoria não encontrado", status_code=404)
 
     existing = (
         db.query(ChecklistItem)
@@ -180,11 +181,11 @@ def update_item(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     _assert_vistoriador(ck, user)
 
     if ck.status != "em_preenchimento":
-        return fail(f"Não é possível editar itens de um checklist com status '{ck.status}'")
+        return fail(f"Não é possível editar itens de um checklist com status '{ck.status}'", status_code=409)
 
     item = (
         db.query(ChecklistItem)
@@ -193,14 +194,14 @@ def update_item(
         .first()
     )
     if not item:
-        return fail("Item não encontrado")
+        return fail("Item não encontrado", status_code=404)
 
     if item.checklist_id != checklist_id:
-        return fail("Este item não pertence ao checklist informado")
+        return fail("Este item não pertence ao checklist informado", status_code=404)
 
     if body.estado is not None:
         if body.estado not in ("otimo", "bom", "regular", "ruim"):
-            return fail("Estado inválido")
+            return fail("Estado inválido", erros={"estado": "Estado inválido"}, status_code=422)
         item.estado = body.estado
     if body.observacao is not None:
         item.observacao = body.observacao
@@ -235,11 +236,11 @@ async def upload_foto(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     _assert_vistoriador(ck, user)
 
     if ck.status != "em_preenchimento":
-        return fail(f"Não é possível adicionar fotos a um checklist com status '{ck.status}'")
+        return fail(f"Não é possível adicionar fotos a um checklist com status '{ck.status}'", status_code=409)
 
     item = (
         db.query(ChecklistItem)
@@ -248,27 +249,27 @@ async def upload_foto(
         .first()
     )
     if not item:
-        return fail("Item não encontrado")
+        return fail("Item não encontrado", status_code=404)
 
     if item.checklist_id != checklist_id:
-        return fail("Este item não pertence ao checklist informado")
+        return fail("Este item não pertence ao checklist informado", status_code=404)
 
     if not item.estado:
-        return fail("Selecione o estado do item antes de enviar a foto")
+        return fail("Selecione o estado do item antes de enviar a foto", status_code=400)
 
     form = await request.form(max_files=1, max_fields=5)
     foto = form.get("foto")
     if not hasattr(foto, "read"):
-        return fail("Envie o arquivo no campo 'foto'")
+        return fail("Envie o arquivo no campo 'foto'", erros={"foto": "Envie o arquivo no campo 'foto'"}, status_code=422)
     content = await foto.read()
     max_bytes = MAX_UPLOAD_MB * 1024 * 1024
     if len(content) > max_bytes:
-        return fail(f"Arquivo excede {MAX_UPLOAD_MB}MB")
+        return fail(f"Arquivo excede {MAX_UPLOAD_MB}MB", status_code=413)
 
     try:
         filename = salvar_imagem(content)
     except UploadInvalido as e:
-        return fail(str(e))
+        return fail(str(e), erros={"foto": str(e)}, status_code=422)
 
     for old in list(item.fotos):
         old_path = UPLOAD_DIR / old.arquivo
@@ -295,11 +296,11 @@ def delete_foto(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     _assert_vistoriador(ck, user)
 
     if ck.status != "em_preenchimento":
-        return fail(f"Não é possível excluir fotos de um checklist com status '{ck.status}'")
+        return fail(f"Não é possível excluir fotos de um checklist com status '{ck.status}'", status_code=409)
 
     foto_row = (
         db.query(ChecklistItemFoto)
@@ -312,7 +313,7 @@ def delete_foto(
         .first()
     )
     if not foto_row:
-        return fail("Foto não encontrada")
+        return fail("Foto não encontrada", status_code=404)
 
     old_path = UPLOAD_DIR / foto_row.arquivo
     if old_path.exists():
@@ -320,6 +321,25 @@ def delete_foto(
     db.delete(foto_row)
     db.commit()
     log_operacao(db, user.id, "delete", "checklist_foto", foto_id)
+    return ok(None)
+
+
+@router.delete("/checklists/{checklist_id}")
+def excluir_checklist(
+    checklist_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    """Exclusão lógica (ADR-0008): só antes do envio para aceite, para preservar a evidência do laudo."""
+    ck = db.query(Checklist).filter(Checklist.id == checklist_id).first()
+    if not ck:
+        return fail("Checklist não encontrado", status_code=404)
+    if ck.status != "em_preenchimento":
+        return fail(f"Não é possível excluir um checklist com status '{ck.status}'", status_code=409)
+
+    marcar_excluido(ck, user)
+    db.commit()
+    log_operacao(db, user.id, "delete", "checklist", checklist_id)
     return ok(None)
 
 
@@ -331,11 +351,11 @@ def submit_checklist(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     _assert_vistoriador(ck, user)
 
     if ck.status in ("pendente_aceite", "aceito") or ck.status != "em_preenchimento":
-        return fail("Checklist já foi submetido")
+        return fail("Checklist já foi submetido", status_code=409)
 
     filled = (
         db.query(ChecklistItem)
@@ -343,7 +363,7 @@ def submit_checklist(
         .count()
     )
     if filled == 0:
-        return fail("Preencha ao menos um item antes de submeter")
+        return fail("Preencha ao menos um item antes de submeter", status_code=400)
 
     ck.status = "pendente_aceite"
     ck.data_vistoria = date.today()
@@ -361,10 +381,10 @@ def enviar_para_aceite(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
 
     if ck.status != "em_preenchimento":
-        return fail(f"Não é possível enviar para aceite um checklist com status '{ck.status}'")
+        return fail(f"Não é possível enviar para aceite um checklist com status '{ck.status}'", status_code=409)
 
     filled = (
         db.query(ChecklistItem)
@@ -372,7 +392,7 @@ def enviar_para_aceite(
         .count()
     )
     if filled == 0:
-        return fail("O checklist deve ter ao menos um item preenchido antes de ser enviado para aceite")
+        return fail("O checklist deve ter ao menos um item preenchido antes de ser enviado para aceite", status_code=400)
 
     ck.status = "pendente_aceite"
     db.commit()
@@ -389,10 +409,10 @@ def aceitar_checklist(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     contrato = _assert_pode_aceitar(ck, user, db)
     if ck.status != "pendente_aceite":
-        return fail("Checklist não está pendente de aceite")
+        return fail("Checklist não está pendente de aceite", status_code=409)
 
     loc_id = contrato.locatario_id if contrato else user.id
     aceite = db.query(AceiteChecklist).filter(AceiteChecklist.checklist_id == checklist_id).first()
@@ -419,10 +439,10 @@ def rejeitar_checklist(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
     contrato = _assert_pode_aceitar(ck, user, db)
     if ck.status != "pendente_aceite":
-        return fail("Checklist não está pendente de aceite")
+        return fail("Checklist não está pendente de aceite", status_code=409)
 
     motivo = (body.motivo or body.motivo_rejeicao or "").strip()
 
@@ -452,7 +472,7 @@ def download_pdf(
 ):
     ck = _get_checklist(db, checklist_id)
     if not ck:
-        return fail("Checklist não encontrado")
+        return fail("Checklist não encontrado", status_code=404)
 
     if user.role == "vistoriador":
         raise HTTPException(status_code=403, detail="Vistoriadores não têm acesso ao PDF do checklist")

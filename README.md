@@ -14,7 +14,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
   - Troca de senha, de autenticador ou de perfil encerra todas as sessões do usuário.
 
 - **👥 Gestão de Usuários & Perfis (RBAC)**:
-  - Perfis de acesso: `admin`, `gestor`, `vistoriador`, `locatario`, `visualizador`.
+  - Perfis de acesso: `admin`, `gestor`, `vistoriador`, `locatario` (o `visualizador` foi removido, [ADR-0009](docs/adr/0009-remocao-do-perfil-visualizador.md)); um perfil fora da lista é recusado com `401`.
   - Só `admin` atribui ou gerencia os perfis `admin` e `gestor`; a própria conta só muda por `/usuarios/me`.
   - Endpoint dedicado para alteração de senha (`PUT /usuarios/me/senha`).
   - Soft delete de usuários com bloqueio de auto-exclusão e proteção de integridade.
@@ -24,11 +24,13 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
   - Geocoding automático de latitude e longitude via **OpenStreetMap / Nominatim** e busca de CEP via **ViaCEP**.
   - CRUD completo e isolamento de cômodos (`/imoveis/{id}/comodos`).
   - Soft delete protegido (bloqueio de exclusão para imóveis com locação ativa).
+  - Histórico do imóvel (`/imoveis/{id}/historico`): contratos, vistorias e problemas em ordem cronológica; cada perfil vê só o que já acessa pelas listagens.
 
 - **📄 Contratos de Locação & Ciclo de Vida**:
   - Vínculo de imóvel a locatário com validação de datas e disponibilidade.
   - Consulta individual restrita por perfil: o locatário vê só os próprios contratos, e o vistoriador só aqueles em que tem vistoria.
   - Encerramento (`/encerrar`) e cancelamento (`/cancelar`) com liberação atômica do status do imóvel para `disponivel`.
+  - Exclusão lógica de contrato, checklist e problema criados por engano (admin, gestor), só antes de virarem evidência: checklist em preenchimento, contrato sem checklist nem problema, problema aberto e sem atualizações ([ADR-0008](docs/adr/0008-exclusao-logica-de-registros.md)).
 
 - **📅 Agendamentos de Vistoria**:
   - Agendamento de vistorias iniciais e de encerramento vinculadas a contratos ativos.
@@ -77,39 +79,42 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | Role | MFA | Permissões Principais |
 |---|---|---|
 | `admin` | Obrigatório | Acesso administrativo completo; único que atribui ou gerencia `admin` e `gestor`. |
-| `gestor` | Obrigatório | Gestão operacional de imóveis, contratos, agendamentos, vistorias, problemas e usuários `vistoriador`, `locatario` e `visualizador`. |
+| `gestor` | Obrigatório | Gestão operacional de imóveis, contratos, agendamentos, vistorias, problemas e usuários `vistoriador` e `locatario`. |
 | `vistoriador` | Obrigatório | Preenchimento e submissão das vistorias atribuídas a ele; leitura dos contratos e imóveis dessas vistorias. |
-| `locatario` | Opcional | Consulta dos próprios contratos e imóveis, aceite ou rejeição de vistoria e abertura de problemas. |
-| `visualizador` | Opcional | Leitura de imóveis, contratos e vistorias, sem acesso a problemas e usuários. |
+| `locatario` | Opcional (quando ligado, o login pede o código, ou a configuração do autenticador se ainda não houver, [ADR-0011](docs/adr/0011-mfa-opcional-respeitado.md)) | Consulta dos próprios contratos e imóveis, aceite ou rejeição de vistoria e abertura de problemas. |
 
 ### Quem acessa cada recurso
 
-| Recurso | admin, gestor | visualizador | vistoriador | locatário |
-|---|---|---|---|---|
-| Contratos e imóveis (lista e por ID, endereço, cômodos) | Todos | Todos (leitura) | Só os com vistoria dele | Só os próprios (imóvel com contrato ativo) |
-| Agendamentos do contrato | Todos | Todos (leitura) | Só os contratos com vistoria dele | Sem acesso |
-| Vistorias (checklists) | Todas | Todas (leitura) | Só as atribuídas a ele | Só as dos próprios contratos |
-| Problemas | Todos | Sem acesso | Sem acesso | Só os dos próprios contratos |
-| Usuários (`/usuarios`) | Sim (gestor: exceto admin/gestor) | Sem acesso | Sem acesso | Sem acesso |
-| Logs de auditoria | Sim | Sem acesso | Sem acesso | Sem acesso |
+| Recurso | admin, gestor | vistoriador | locatário |
+|---|---|---|---|
+| Contratos e imóveis (lista e por ID, endereço, cômodos) | Todos | Só os com vistoria dele | Só os próprios (imóvel com contrato ativo) |
+| Agendamentos do contrato | Todos | Só os contratos com vistoria dele | Só os dos próprios contratos (leitura) |
+| Vistorias (checklists) | Todas | Só as atribuídas a ele | Só as dos próprios contratos |
+| Problemas | Todos | Sem acesso | Só os dos próprios contratos |
+| Usuários (`/usuarios`) | Sim (gestor: exceto admin/gestor) | Sem acesso | Sem acesso |
+| Logs de auditoria | Sim | Sem acesso | Sem acesso |
 
 ---
 
 ## 📐 Convenções da API
 
 ### Respostas
-- Sucesso e erros de regra de negócio usam o envelope `{"sucesso": bool, "dados": ..., "erro": "mensagem" | null}`. Erros de negócio respondem `200` (alguns de validação, `422`, com `erros: {campo: mensagem}`).
-- Falhas de acesso e de protocolo usam `{"detail": "mensagem"}`:
+- Sucesso e erros de regra de negócio usam o envelope `{"sucesso": bool, "dados": ..., "erro": "mensagem" | null}`. Nos erros de validação de campo vem também `erros: {campo: mensagem}`.
+- **O status HTTP acompanha o resultado** ([ADR-0003](docs/adr/0003-status-http-dos-erros.md)): um erro nunca responde `2xx`. O cliente pode confiar no status e ler a mensagem em `erro`.
+- Falhas de acesso e de protocolo levantadas pelo framework usam `{"detail": "mensagem"}`.
 
 | Status | Quando |
 |---|---|
-| `400` | `Content-Length` inválido; mais de um arquivo no upload |
-| `401` | Token ausente, inválido ou expirado; sessão encerrada por troca de credencial (`"Sessão encerrada; faça login novamente"`) |
-| `403` | Perfil sem permissão ou recurso fora do escopo do usuário |
-| `404` | Rota ou arquivo inexistente; `/admin/*` sem `SEED_SECRET` |
-| `409` | Setup de MFA de primeiro acesso para quem já tem MFA |
-| `413` | Corpo acima do limite (`MAX_UPLOAD_MB` + 1 MB para multipart, `MAX_BODY_KB` para o resto) |
+| `400` | Regra de negócio violada que não é conflito nem campo inválido (datas incoerentes, checklist sem itens); `Content-Length` inválido; mais de um arquivo no upload |
+| `401` | Sem sessão válida: token ausente, inválido ou expirado; sessão encerrada por troca de credencial; **login, MFA do login e refresh recusados** (mensagem genérica) |
+| `403` | Perfil sem permissão ou recurso fora do escopo do usuário; senha ou código atual errados numa rota autenticada (reautenticação) |
+| `404` | Recurso inexistente ou fora do alcance de quem pede; rota ou arquivo inexistente; `/admin/*` sem `SEED_SECRET` |
+| `409` | Conflito com o estado atual: e-mail já cadastrado, imóvel já locado, checklist já enviado (travas), contrato já encerrado, MFA já configurado |
+| `413` | Corpo ou arquivo acima do limite (`MAX_UPLOAD_MB` + 1 MB para multipart, `MAX_BODY_KB` para o resto) |
+| `422` | Campo inválido, com `erros: {campo: mensagem}` |
 | `429` | Muitas tentativas falhas; o header `Retry-After` traz a espera em segundos |
+
+> O `401` fica só para quem está sem sessão válida, porque é comum o cliente tratá-lo como sessão expirada: renovar o token e repetir a requisição. Senha atual errada numa rota autenticada responde `403`, para não repetir a tentativa.
 
 ### Sessão e tokens
 - `Authorization: Bearer <access_token>` em todas as rotas autenticadas. A API não usa cookies; o front não deve enviar credenciais de navegador (`credentials: "include"` / `withCredentials`).
@@ -186,6 +191,7 @@ Gestor não age sobre contas `admin`/`gestor`. Toda mudança de credencial feita
 GET    /api/v1/imoveis                     # Listar imóveis; ?com_endereco=true
 POST   /api/v1/imoveis                     # Criar imóvel com endereço e geocoding (admin, gestor)
 GET    /api/v1/imoveis/{id}                # Detalhes do imóvel
+GET    /api/v1/imoveis/{id}/historico      # Contratos, vistorias e problemas em ordem cronológica, no recorte de cada perfil
 PUT    /api/v1/imoveis/{id}                # Atualizar imóvel e endereço (admin, gestor)
 DELETE /api/v1/imoveis/{id}                # Excluir imóvel, soft delete (admin, gestor)
 GET    /api/v1/imoveis/{id}/endereco       # Consultar endereço
@@ -201,9 +207,10 @@ DELETE /api/v1/imoveis/{id}/comodos/{cid}  # Excluir cômodo (admin, gestor)
 GET    /api/v1/contratos                   # Listar contratos
 POST   /api/v1/contratos                   # Criar contrato de locação (admin, gestor)
 GET    /api/v1/contratos/{id}              # Detalhes do contrato
+DELETE /api/v1/contratos/{id}              # Exclusão lógica; só sem checklist nem problema, 409 caso contrário (admin, gestor)
 PATCH  /api/v1/contratos/{id}/encerrar     # Encerrar e liberar o imóvel; também POST (admin, gestor)
 PATCH  /api/v1/contratos/{id}/cancelar     # Cancelar e liberar o imóvel; também POST (admin, gestor)
-GET    /api/v1/contratos/{id}/agendamentos # Agendamentos do contrato (exceto locatário)
+GET    /api/v1/contratos/{id}/agendamentos # Agendamentos do contrato (locatário: só o próprio, leitura)
 POST   /api/v1/contratos/{id}/agendamentos # Agendar vistoria (admin, gestor)
 PUT    /api/v1/agendamentos/{id}           # Atualizar agendamento (admin, gestor)
 DELETE /api/v1/agendamentos/{id}           # Cancelar/excluir agendamento (admin, gestor)
@@ -213,8 +220,9 @@ DELETE /api/v1/agendamentos/{id}           # Cancelar/excluir agendamento (admin
 ```http
 GET    /api/v1/itens-vistoria              # Catálogo de itens inspecionáveis
 GET    /api/v1/contratos/{id}/checklists   # Listar checklists do contrato
-POST   /api/v1/contratos/{id}/checklists   # Iniciar vistoria; vistoriador_id com perfil vistoriador, contrato ativo (admin, gestor)
+POST   /api/v1/contratos/{id}/checklists   # Iniciar vistoria; vistoriador_id com perfil vistoriador, contrato ativo; uma inicial por contrato, salvo se a anterior foi rejeitada (admin, gestor)
 GET    /api/v1/checklists/{id}             # Detalhes do checklist
+DELETE /api/v1/checklists/{id}             # Exclusão lógica; só em preenchimento, 409 caso contrário (admin, gestor)
 POST   /api/v1/checklists/{id}/itens       # Adicionar item (vistoriador do checklist, admin)
 PUT    /api/v1/checklists/{id}/itens/{iid} # Atualizar estado/observação do item (vistoriador do checklist, admin)
 POST   /api/v1/checklists/{id}/itens/{iid}/fotos # Upload da foto, multipart campo "foto" (vistoriador do checklist, admin)
@@ -231,9 +239,10 @@ GET    /api/v1/checklists/{id}/download    # Laudo em PDF; também /pdf e /downl
 GET    /api/v1/contratos/{id}/problemas    # Listar problemas (admin, gestor, locatário do contrato)
 POST   /api/v1/contratos/{id}/problemas    # Registrar ocorrência, JSON ou multipart com foto (admin, gestor, locatário do contrato); nasce "aberto", outro status dá 422
 GET    /api/v1/problemas/{id}              # Detalhes da ocorrência (admin, gestor, locatário do contrato)
+DELETE /api/v1/problemas/{id}              # Exclusão lógica; só aberto e sem atualizações, 409 caso contrário (admin, gestor)
 PATCH  /api/v1/problemas/{id}/status       # Atualizar status (admin, gestor)
 GET    /api/v1/problemas/{id}/atualizacoes # Linha do tempo (admin, gestor, locatário do contrato)
-POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (admin, gestor)
+POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (admin, gestor; locatário do contrato enquanto não estiver resolvido ou fechado)
 ```
 
 ### 📊 Dashboard, Logs & Sistema
@@ -370,6 +379,9 @@ A suíte cobre os fluxos de negócio e as correções de segurança com **824 te
 TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/bin/pytest
 ```
 
+### Testes manuais (Insomnia)
+A collection em [`docs/insomnia/`](docs/insomnia/README.md) tem 168 requisições, com casos de sucesso e de falha para todas as áreas da API. Os scripts gravam os tokens e os IDs no ambiente, e os códigos de MFA podem ser calculados a partir do segredo. Importe `docs/insomnia/onecheck-api.insomnia.json` e siga o guia.
+
 ---
 
 ## 📁 Estrutura do Repositório
@@ -418,3 +430,9 @@ TEST_DATABASE_URL=postgresql://usuario:senha@localhost:5432/onecheck_test .venv/
     ├── unit/                    # Testes unitários (auth, config, pdf, geocoding, schemas, serializers)
     └── integration/             # Testes de integração de todas as rotas da API
 ```
+
+## 📄 Licença
+
+Distribuído sob a licença **MIT**: o código pode ser usado, copiado, modificado e distribuído, inclusive para fins comerciais, desde que o aviso de copyright e a licença acompanhem as cópias. O software é fornecido sem garantia. Texto completo em [`LICENSE`](LICENSE).
+
+Copyright (c) 2026 Equipe One Check.

@@ -1,0 +1,98 @@
+{
+  "project": "OneCheck API",
+  "mode": "diff",
+  "base": "ed36a41",
+  "date": "2026-11-07",
+  "findings": [
+    {
+      "id": "SEC-035",
+      "title": "SHA-1 no gerador da collection do Insomnia é usado só para IDs estáveis",
+      "severity": "info",
+      "pillars": [
+        "Integridade"
+      ],
+      "principles": [
+        "Superfície de ataque mínima"
+      ],
+      "stride": [],
+      "cwe": "CWE-328",
+      "owasp": "A02:2021",
+      "locations": [
+        {
+          "file": "docs/insomnia/gerar_collection.py",
+          "line": 148
+        }
+      ],
+      "evidence": "return prefixo + \"_\" + hashlib.sha1(\"|\".join(partes).encode()).hexdigest()[:24]",
+      "scenario": "Nenhum: o hash gera IDs de requisição estáveis entre gerações da collection; não protege nada.",
+      "impact": "Falso positivo do semgrep e do bandit em ferramenta de desenvolvimento.",
+      "recommendation": "Usar hashlib.sha1(..., usedforsecurity=False) para documentar a intenção e calar os scanners.",
+      "source": [
+        "semgrep",
+        "bandit"
+      ]
+    },
+    {
+      "id": "SEC-036",
+      "title": "O hook guarda.py é uma barreira de conveniência, contornável por ofuscação",
+      "severity": "info",
+      "pillars": [
+        "Confidencialidade"
+      ],
+      "principles": [
+        "Defesa em profundidade"
+      ],
+      "stride": [
+        "I"
+      ],
+      "cwe": "CWE-184",
+      "owasp": "A05:2021",
+      "locations": [
+        {
+          "file": ".claude/hooks/guarda.py",
+          "line": 21
+        }
+      ],
+      "evidence": "ENV = re.compile(r\"(?<![\\w.-])\\.env(?![\\w.-])\")",
+      "scenario": "Um comando que monta o nome do arquivo em partes (variável, curinga) não cita '.env' literalmente e passa pelo hook.",
+      "impact": "O hook evita erros do agente; não é fronteira contra quem quer contornar. A proteção real do .env continua sendo o .gitignore, a ausência dele no índice e as regras do CLAUDE.md.",
+      "recommendation": "Manter como está e não tratar o hook como controle de segurança. Se quiser endurecer, negar Read(.env) também em permissions.deny no settings.json.",
+      "source": [
+        "claude"
+      ]
+    },
+    {
+      "id": "SEC-037",
+      "title": "403 e 404 distinguem contrato inexistente de contrato alheio na listagem de checklists",
+      "severity": "info",
+      "pillars": [
+        "Confidencialidade"
+      ],
+      "principles": [
+        "Fail secure"
+      ],
+      "stride": [
+        "I"
+      ],
+      "cwe": "CWE-204",
+      "owasp": "API1:2023",
+      "locations": [
+        {
+          "file": "app/routers/contratos.py",
+          "line": 267
+        },
+        {
+          "file": "app/routers/contratos.py",
+          "line": 269
+        }
+      ],
+      "evidence": "return fail(\"Contrato não encontrado\", status_code=404) ... return fail(\"Sem permissão para ver vistorias deste contrato\", status_code=403)",
+      "scenario": "Um locatário autenticado testa IDs de contrato e separa os que existem (403) dos que não existem (404).",
+      "impact": "Nenhum novo: antes do ADR-0003 as mensagens já diferiam, e os IDs são UUID v4 (não adivinháveis). A tabela do ADR-0003 cita 404 para recurso 'não visível', o que deixa a escolha ambígua.",
+      "recommendation": "Decidir no ADR-0003 se recurso de outro dono responde 403 ou 404 e aplicar o mesmo em todas as rotas por ID. Sem urgência.",
+      "source": [
+        "claude"
+      ]
+    }
+  ]
+}

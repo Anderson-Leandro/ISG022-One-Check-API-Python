@@ -23,6 +23,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 ## Contexto deste projeto
 - **Time de quatro pessoas:** o PO prioriza e aceita as entregas na review; o TL cuida dos padrões técnicos; os devs implementam. O autor pode mergear o próprio PR sem aprovação de outra pessoa (decisão do time em 2026-11-02).
 - **Branches:** hoje o trabalho vai para `dev`, e a `main` recebe PR de `dev`. As branches curtas de item (`tipo/ID-descricao`) saem de `dev`.
+- **Proteção no GitHub (TK-017):** a `main` e a `dev` só recebem mudança por PR, com os checks `test` e `dependencias` verdes; sem aprovação obrigatória, sem force-push, sem apagar a branch e sem exceção para ninguém. A regra está versionada em [`.github/rulesets/protecao-branches.json`](../../.github/rulesets/protecao-branches.json); para mudar, edite o arquivo e reaplique com `gh api -X PUT repos/<dono>/<repo>/rulesets/<id> --input <arquivo>`.
 - **Origem:** a DoR e a DoD abaixo completam as do [`docs/product-backlog.md`](../product-backlog.md), seções 9 e 10.
 - **Segurança:** toda correção de segurança tem relatório em `docs/security/correcao-*.md` (causa, mudança, testes, impacto e riscos residuais), escrito com testes que falham antes da correção.
 - **Documentação viva:** toda mudança que afeta segurança atualiza o `threat-model.md` e a arquitetura (antigo DOC-001, agora TK-001).
@@ -45,7 +46,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 
 ## Definition of Done (DoD) — item só está pronto quando
 - [ ] Critérios de aceite atendidos e demonstráveis
-- [ ] Código integrado na `main` via PR, com CI verde e o diff relido pelo autor
+- [ ] Código integrado na `dev` via PR, com CI verde e o diff relido pelo autor (a `main` recebe a `dev` na release)
 - [ ] Testes relevantes escritos e passando no CI (incluindo o cenário negado, se houver)
 - [ ] Nenhum segredo, credencial ou dado pessoal real adicionado ao repositório
 - [ ] Logs não expõem dados sensíveis; erros não vazam detalhes internos
@@ -53,6 +54,8 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 - [ ] Mudança que afeta o front registrada no arquivo de mudanças para o front (fora do git)
 - [ ] Impactos/riscos de segurança avaliados (risco novo → docs/risks/risk-register.md)
 - [ ] Evidência registrada no item (PR, teste, commit, print)
+- [ ] Teste existente alterado ou removido: relatório no registro do item e aprovação do usuário antes do commit
+- [ ] `python3 scripts/dod_check.py <ID>` verde (registro em `docs/roadmap/execucao/<ID>.md`)
 
 ## Ética de testes de segurança
 - Testes ofensivos só no próprio ambiente ou com autorização explícita por escrito.

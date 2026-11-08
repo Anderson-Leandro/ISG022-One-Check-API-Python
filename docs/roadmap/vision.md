@@ -15,7 +15,6 @@ A vistoria de entrada e saída de um imóvel alugado costuma ser feita em papel 
 | Gestor | operação da imobiliária | operar imóveis, contratos, agendamentos e problemas | carteira operacional; não gerencia admin/gestor; MFA obrigatório |
 | Vistoriador | técnico de campo | preencher checklists com fotos e submeter vistorias | só contratos em que tem vistoria; MFA obrigatório |
 | Locatário | inquilino | consultar o próprio contrato, aceitar ou rejeitar o laudo, abrir problemas | só recursos do próprio contrato |
-| Visualizador | consulta interna | ler a operação | leitura (alcance em decisão: SPK-001) |
 | Sistemas externos | ViaCEP e Nominatim | completar endereço e coordenadas | só consulta, com timeout |
 
 ## Proposta de valor
@@ -36,7 +35,7 @@ Para imobiliárias e locatários que precisam registrar o estado de um imóvel s
 - Checklists com itens e fotos, envio para aceite, aceite/rejeição e laudo em PDF.
 - Problemas com fotos, linha do tempo e notificações.
 - Dashboard por perfil e consulta da trilha de auditoria.
-- Até a entrega final: anexos de contrato (US-016) e fotos com URL assinada (SEC-026), se o prazo permitir.
+- Até a entrega final: fotos com URL assinada (SEC-026), se o prazo permitir. Anexos de contrato (US-016) ficaram fora das sprints e entram só se sobrar tempo.
 
 ## Fora de escopo (por enquanto)
 - Pagamentos e cobrança do aluguel.

@@ -15,7 +15,7 @@ from app.config import (
 )
 from app.models import RefreshToken, Usuario
 
-ROLES = {"admin", "gestor", "vistoriador", "locatario", "visualizador"}
+ROLES = {"admin", "gestor", "vistoriador", "locatario"}
 # Só admin atribui estes perfis ou gerencia contas que os possuem
 PRIVILEGED_ROLES = {"admin", "gestor"}
 MFA_REQUIRED_ROLES = {"admin", "vistoriador", "gestor"}
@@ -39,7 +39,8 @@ _HASH_FICTICIO = bcrypt.hashpw(secrets.token_bytes(16), bcrypt.gensalt()).decode
 def conferir_credenciais(user: Usuario | None, senha: str) -> bool:
     """Confere a senha gastando o mesmo tempo quando a conta não existe, para não revelar quais e-mails existem."""
     senha_ok = verify_password(senha, user.senha_hash if user else _HASH_FICTICIO)
-    return user is not None and senha_ok
+    # Perfil fora da lista não abre sessão (ADR-0009); a resposta é a mesma de senha errada
+    return user is not None and senha_ok and user.role in ROLES
 
 
 def create_access_token(usuario_id: str, role: str, versao: int = 0) -> str:
@@ -112,7 +113,7 @@ def verify_refresh_token(db: Session, raw: str) -> Usuario | None:
     row = db.query(RefreshToken).filter(RefreshToken.token_hash == h).first()
     if not row or row.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
         return None
-    return db.query(Usuario).filter(Usuario.id == row.usuario_id, Usuario.ativo).first()
+    return db.query(Usuario).filter(Usuario.id == row.usuario_id, Usuario.ativo, Usuario.role.in_(ROLES)).first()
 
 
 def revoke_refresh_token(db: Session, raw: str) -> None:
@@ -122,13 +123,16 @@ def revoke_refresh_token(db: Session, raw: str) -> None:
 
 
 def needs_mfa(user: Usuario) -> bool:
-    return (
-        user.role in MFA_REQUIRED_ROLES and user.mfa_enabled and bool(user.mfa_secret)
-    )
+    """O login pede o código a quem tem MFA ligado e autenticador configurado, em qualquer perfil (ADR-0011).
+
+    Nos perfis obrigatórios o MFA está sempre ligado; nos outros, vale o que o usuário ou o admin escolheu.
+    """
+    return bool(user.mfa_enabled and user.mfa_secret)
 
 
 def mfa_setup_required(user: Usuario) -> bool:
-    return user.role in MFA_REQUIRED_ROLES and user.mfa_enabled and not user.mfa_secret
+    """MFA ligado e sem autenticador: o login leva à configuração, em qualquer perfil (ADR-0011)."""
+    return bool(user.mfa_enabled and not user.mfa_secret)
 
 
 def reset_mfa(user: Usuario) -> None:

@@ -1,6 +1,6 @@
 # Modelo de Ameaças — OneCheck API
 
-_Última atualização: 2026-11-02 ([auditoria diff](relatorio-2026-11-02.md) sobre `d0b5f35`: SEC-017 a SEC-020 abertos; auditoria completa de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md), [011 e 012](correcao-sec-011-012-2026-10-30.md) e [014 e 015](correcao-sec-014-015-2026-10-30.md))_
+_Última atualização: 2026-11-07 ([auditoria diff](relatorio-2026-11-07.md) sobre `ed36a41`: status HTTP dos erros (ADR-0003), SEC-035 a SEC-037 só informativos). Antes: 2026-11-02 ([auditoria diff](relatorio-2026-11-02.md) sobre `d0b5f35`: SEC-017 a SEC-020 abertos; auditoria completa de 2026-10-25 sobre `f081c60`; SEC-001 a SEC-016 corrigidos em seguida, ver correções [001–003](correcao-sec-001-002-003-2026-10-25.md), [004–005](correcao-sec-004-005-2026-10-25.md), [006–007](correcao-sec-006-007-2026-10-25.md), [008, 009 e 016](correcao-sec-008-009-016-2026-10-26.md), [010 e 013](correcao-sec-010-013-2026-10-26.md), [011 e 012](correcao-sec-011-012-2026-10-30.md) e [014 e 015](correcao-sec-014-015-2026-10-30.md))_
 
 ## 1. Visão geral
 API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóveis e contratos, checklists de vistoria com fotos, aceite pelo locatário, registro e acompanhamento de problemas e geração de PDF do laudo.
@@ -25,7 +25,6 @@ API REST (FastAPI + SQLAlchemy) para vistorias de locação: cadastro de imóvei
 |---|---|---|
 | Anônimo / atacante externo | Nenhuma | `/auth/login`, `/auth/mfa/*` com temp token, `/health`, `/uploads/{arquivo}`, `/docs` (só com `DOCS_ENABLED`), `/admin/*` (com `SEED_SECRET`) |
 | Locatário | Baixa | os próprios contratos, problemas, aceites; uploads de foto de problema |
-| Visualizador | Baixa | leitura de checklists e PDFs (global, por decisão a confirmar) |
 | Vistoriador | Média | checklists atribuídos (escrita), leitura de contratos/imóveis vinculados |
 | Gestor | Alta | gestão de imóveis, contratos, usuários não privilegiados, logs |
 | Administrador | Total | tudo, inclusive contas admin/gestor e `/admin/*` |
@@ -72,7 +71,7 @@ flowchart LR
 | T-06 | Login | I | Enumerar e-mails pelo tempo de resposta | Confidencialidade | mensagem genérica; bcrypt contra hash fictício de mesmo custo quando a conta não existe (`conferir_credenciais`, `app/auth.py`) | Mitigada | SEC-013 |
 | T-07 | Usuários | E | Gestor se promove ou gerencia admins | Autorização | `_assert_pode_gerenciar` / `_assert_pode_atribuir` (N4) | Mitigada | — |
 | T-08 | Checklists | E/T | Locatário cria e aprova a própria vistoria | Integridade | criação só admin/gestor; separação de deveres (N3) | Mitigada | — |
-| T-09 | Contratos / Imóveis | I | Vistoriador lê qualquer contrato/imóvel pelo ID | Confidencialidade | `assert_acesso_contrato` / `assert_acesso_imovel` (`app/deps.py`) | Mitigada (visualizador com leitura global, a decidir) | SEC-004 |
+| T-09 | Contratos / Imóveis | I | Vistoriador lê qualquer contrato/imóvel pelo ID | Confidencialidade | `assert_acesso_contrato` / `assert_acesso_imovel` (`app/deps.py`) | Mitigada | SEC-004 |
 | T-10 | Problemas | I | BOLA por ID | Confidencialidade | `assert_acesso_problemas` (item 6) | Mitigada | — |
 | T-11 | Usuários | I | Listagem de usuários com CPF para qualquer perfil | Confidencialidade (LGPD) | restrito a admin/gestor (item 2); CPF mascarado fora de `/me` e do detalhe (`app/cpf.py`); retenção de logs e tokens (`app/retencao.py`) | Mitigada (CPF em texto no banco) | SEC-014 |
 | T-12 | Uploads | T/E | Arquivo malicioso explora o decoder de imagem | Integridade | Pillow 13; assinatura antes do parser; `formats` restrito; limite de pixels (`app/uploads.py`) | Mitigada | SEC-002 |
@@ -90,6 +89,7 @@ flowchart LR
 | T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | `USER app`, `--only-binary`, `permissions: contents: read`, actions por SHA; compose com `cap_drop: ALL` e `no-new-privileges` | Mitigada | SEC-008 |
 | T-25 | Proxy / IP de origem | S/R | Cliente forja o `X-Forwarded-For` para escapar do limite por IP e gravar IP falso na auditoria | Não-repúdio, Disponibilidade | limite por conta independe do IP; `FORWARDED_ALLOW_IPS=*` usa o primeiro item do cabeçalho (`render.yaml:18`) | **Aberta** (a confirmar no Render) | SEC-017 |
 | T-26 | Auditoria (`GET /logs`) | I | Gestor consulta IP e padrão de acesso de todas as contas, inclusive admins | Confidencialidade (LGPD) | rota restrita a admin/gestor; retenção de `LOG_RETENCAO_DIAS` | **Aberta** | SEC-018, SEC-019 |
+| T-27 | Monitoramento | R | Falhas de login, MFA e acesso negado invisíveis nos logs por responderem 200 | Não-repúdio | status de erro em todo `fail()` e guarda na suíte (ADR-0003, `tests/conftest.py`) | Mitigada | — |
 
 Status: **Mitigada** · **Parcial** · **Aberta** · **Aceita**
 
@@ -103,4 +103,4 @@ _Seção mantida manualmente pela equipe — preservar entre execuções._
 - O deploy roda com **uma instância e um worker**; o limite de tentativas em memória depende disso.
 - O proxy do Render sobrescreve o `X-Forwarded-For` (não verificado). Com `FORWARDED_ALLOW_IPS=*`, o uvicorn usa o **primeiro** item do cabeçalho; se o proxy só acrescentar, o cliente escolhe o IP (T-25, SEC-017).
 - A autenticação do front é só por header Bearer; não há cookies de sessão.
-- O perfil `visualizador` tem leitura global de checklists e PDFs por decisão de negócio (a confirmar).
+- O perfil `visualizador` foi removido (ADR-0009); `get_current_user` recusa qualquer perfil fora da lista (fail secure).

@@ -11,7 +11,7 @@ Rotas cobertas:
   PUT    /api/v1/imoveis/{id}/endereco   (upsert)
   GET    /api/v1/imoveis/{id}/comodos
 """
-from tests.conftest import auth
+from tests.conftest import auth, foto_do_banco
 
 BASE = "/api/v1/imoveis"
 
@@ -116,9 +116,11 @@ class TestCreateImovel:
         comodos = db.query(ImovelComodo).filter(ImovelComodo.imovel_id == imovel_id).all()
         assert len(comodos) == 4
 
-    def test_sem_autenticacao_retorna_401(self, client):
+    def test_sem_autenticacao_retorna_401(self, client, db):
+        banco_antes = foto_do_banco(db)
         r = client.post(BASE, json={"tipo": "apartamento"})
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── GET /imoveis/{id} ─────────────────────────────────────────────────────────────
@@ -175,9 +177,11 @@ class TestUpdateImovel:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_sem_autenticacao_retorna_401(self, client, imovel):
+    def test_sem_autenticacao_retorna_401(self, client, db, imovel):
+        banco_antes = foto_do_banco(db)
         r = client.put(f"{BASE}/{imovel.id}", json={"status": "disponivel"})
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── GET /imoveis/{id}/endereco ────────────────────────────────────────────────────
@@ -252,9 +256,11 @@ class TestUpsertEndereco:
         data = r.json()
         assert data["sucesso"] is False
 
-    def test_sem_autenticacao_retorna_401(self, client, imovel):
+    def test_sem_autenticacao_retorna_401(self, client, db, imovel):
+        banco_antes = foto_do_banco(db)
         r = client.post(f"{BASE}/{imovel.id}/endereco", json=_ENDERECO)
         assert r.status_code == 401
+        assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
 # ── GET /imoveis/{id}/comodos ─────────────────────────────────────────────────────

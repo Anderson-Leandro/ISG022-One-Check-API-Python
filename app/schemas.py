@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from typing import Annotated, Any, Generic, TypeVar
 
+from fastapi.responses import JSONResponse
 from pydantic import AfterValidator, BaseModel, Field
 
 from app.cpf import validar_cpf
@@ -11,6 +12,9 @@ T = TypeVar("T")
 # Senha nova (criação e troca). O login aceita a senha já cadastrada, mesmo fora da política
 SenhaNova = Annotated[str, AfterValidator(validar_senha)]
 Cpf = Annotated[str | None, AfterValidator(validar_cpf)]
+# Só documenta os valores no OpenAPI; a validação fica nas rotas, com a mensagem de campo (ADR-0012)
+TIPOS_AGENDAMENTO = ("inicial", "encerramento")
+TipoAgendamento = Annotated[str, Field(json_schema_extra={"enum": list(TIPOS_AGENDAMENTO)})]
 
 
 class Paginacao(BaseModel):
@@ -34,11 +38,17 @@ def ok(data: Any, paginacao: Paginacao | dict | None = None) -> dict:
     return out
 
 
-def fail(msg: str, erros: Any = None) -> dict:
+def fail(msg: str, erros: Any = None, status_code: int = 400) -> JSONResponse:
+    """Resposta de erro no envelope padrão, sempre com status de erro (ADR-0003).
+
+    Sem status explícito, o padrão é 400: um erro nunca sai como 2xx (fail secure).
+    """
+    if status_code < 400:
+        raise ValueError(f"fail() exige status de erro (>= 400), recebeu {status_code}")
     out: dict[str, Any] = {"sucesso": False, "erro": msg}
     if erros is not None:
         out["erros"] = erros
-    return out
+    return JSONResponse(status_code=status_code, content=out)
 
 
 # --- Auth ---
@@ -251,13 +261,13 @@ class ContratoOut(BaseModel):
 
 
 class AgendamentoCreate(BaseModel):
-    tipo: str
+    tipo: TipoAgendamento
     data_agendada: datetime | date | str
     observacao: str | None = None
 
 
 class AgendamentoUpdate(BaseModel):
-    tipo: str | None = None
+    tipo: TipoAgendamento | None = None
     data_agendada: datetime | date | str | None = None
     observacao: str | None = None
 

@@ -123,7 +123,7 @@ class TestProprioUsuario:
 # ── Ações do administrador sobre outro usuário ──────────────────────────────────
 
 class TestAdministrador:
-    @pytest.mark.parametrize("body", [{"senha": NOVA}, {"role": "visualizador"}], ids=["senha", "perfil"])
+    @pytest.mark.parametrize("body", [{"senha": NOVA}, {"role": "vistoriador"}], ids=["senha", "perfil"])
     def test_put_usuario_com_credencial(self, client, db, user_locatario, token_admin, body):
         s = _sessao(db, user_locatario)
         r = client.put(f"/api/v1/usuarios/{user_locatario.id}", json=body, headers=auth(token_admin))
@@ -152,8 +152,8 @@ class TestAdministrador:
         client.delete(f"/api/v1/usuarios/{user_locatario.id}", headers=auth(token_admin))
         assert _encerrada(client, s)
 
-    def test_sessao_de_outro_usuario_nao_e_afetada(self, client, db, user_locatario, user_visualizador, token_admin):
-        alheia = _sessao(db, user_visualizador)
+    def test_sessao_de_outro_usuario_nao_e_afetada(self, client, db, user_locatario, user_locatario_2, token_admin):
+        alheia = _sessao(db, user_locatario_2)
         client.put(f"/api/v1/usuarios/{user_locatario.id}", json={"senha": NOVA}, headers=auth(token_admin))
         assert _ativa(client, alheia) and _refresh_ok(client, alheia)
 
