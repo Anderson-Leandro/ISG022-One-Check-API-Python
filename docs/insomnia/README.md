@@ -68,7 +68,7 @@ O Insomnia guarda o caminho absoluto da sua máquina, e por isso o arquivo versi
   - o campo `sucesso` do envelope;
   - quando faz sentido, um trecho da mensagem de erro e o efeito esperado (status do checklist, dono do recurso).
 - **Status dos erros:** todo erro responde com status de erro e o envelope `{"sucesso": false, "erro": ...}` ([ADR-0003](../adr/0003-status-http-dos-erros.md)). Os testes conferem os dois: o status exato e o campo `sucesso`.
-- **Casos que a suíte automatizada ainda não cobre** estão marcados na descrição: SEC-033 (travas depois do envio). Os de checklist de outro locatário passaram a ser cobertos no SEC-032. Ver [`docs/quality/avaliacao-testes-2026-11-02.md`](../quality/avaliacao-testes-2026-11-02.md).
+- **Casos negados também cobertos pela suíte automatizada:** os de checklist de outro locatário (SEC-032) e as travas depois do envio (SEC-033) trazem na descrição o arquivo de teste correspondente. Ver [`docs/quality/avaliacao-testes-2026-11-02.md`](../quality/avaliacao-testes-2026-11-02.md).
 - **⚠️** marca um comportamento atual que já está no backlog para mudar (SEC-020: filtro de data inválido ignorado).
 
 ## Cuidados

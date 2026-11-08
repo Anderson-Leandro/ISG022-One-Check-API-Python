@@ -453,7 +453,7 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
              testes="insomnia.test('status pendente_aceite', () => insomnia.expect(b.dados.status).to.equal('pendente_aceite'));"),
         Caso("❌ Foto em checklist já enviado (trava)", "POST", "/checklists/{{ _.checklist_id }}/itens/{{ _.checklist_item_id }}/fotos", status=409, auth="token_vistoriador",
              form=[{"name": "foto", "type": "file", "fixture": "foto-valida.png"}], sucesso=False, erro="Não é possível adicionar fotos",
-             descricao="Caso que a suíte automatizada não cobre hoje (SEC-033)."),
+             descricao="Também coberto pela suíte automatizada desde o SEC-033 (tests/integration/test_seguranca_travas_checklist.py)."),
         Caso("❌ Editar item de checklist já enviado (trava)", "PUT", "/checklists/{{ _.checklist_id }}/itens/{{ _.checklist_item_id }}", status=409, auth="token_vistoriador",
              corpo={"estado": "ruim"}, sucesso=False, erro="Não é possível editar itens"),
         Caso("❌ Enviar para aceite um checklist já pendente", "PATCH", "/checklists/{{ _.checklist_id }}/enviar-para-aceite", status=409, auth="token_admin",
