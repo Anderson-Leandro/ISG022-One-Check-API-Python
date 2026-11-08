@@ -88,7 +88,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 | Recurso | admin, gestor | vistoriador | locatário |
 |---|---|---|---|
 | Contratos e imóveis (lista e por ID, endereço, cômodos) | Todos | Só os com vistoria dele | Só os próprios (imóvel com contrato ativo) |
-| Agendamentos do contrato | Todos | Só os contratos com vistoria dele | Sem acesso |
+| Agendamentos do contrato | Todos | Só os contratos com vistoria dele | Só os dos próprios contratos (leitura) |
 | Vistorias (checklists) | Todas | Só as atribuídas a ele | Só as dos próprios contratos |
 | Problemas | Todos | Sem acesso | Só os dos próprios contratos |
 | Usuários (`/usuarios`) | Sim (gestor: exceto admin/gestor) | Sem acesso | Sem acesso |
@@ -210,7 +210,7 @@ GET    /api/v1/contratos/{id}              # Detalhes do contrato
 DELETE /api/v1/contratos/{id}              # Exclusão lógica; só sem checklist nem problema, 409 caso contrário (admin, gestor)
 PATCH  /api/v1/contratos/{id}/encerrar     # Encerrar e liberar o imóvel; também POST (admin, gestor)
 PATCH  /api/v1/contratos/{id}/cancelar     # Cancelar e liberar o imóvel; também POST (admin, gestor)
-GET    /api/v1/contratos/{id}/agendamentos # Agendamentos do contrato (exceto locatário)
+GET    /api/v1/contratos/{id}/agendamentos # Agendamentos do contrato (locatário: só o próprio, leitura)
 POST   /api/v1/contratos/{id}/agendamentos # Agendar vistoria (admin, gestor)
 PUT    /api/v1/agendamentos/{id}           # Atualizar agendamento (admin, gestor)
 DELETE /api/v1/agendamentos/{id}           # Cancelar/excluir agendamento (admin, gestor)

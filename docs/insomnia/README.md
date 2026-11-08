@@ -6,8 +6,8 @@
 > investigar um bug.
 
 - **Arquivo para importar:** [`onecheck-api.insomnia.json`](onecheck-api.insomnia.json), no formato de exportação v4.
-- **Testado com:** Insomnia 12.5. As requisições também foram rodadas contra a API local por um executor que reproduz os scripts, com todos os testes passando (a última vez em 2026-11-08, no DEBT-015).
-- **Conteúdo:** 172 requisições em 11 pastas, sendo 86 casos de sucesso (✅), 85 de falha (❌) e 1 de comportamento a revisar (⚠️).
+- **Testado com:** Insomnia 12.5. As requisições também foram rodadas contra a API local por um executor que reproduz os scripts, com todos os testes passando (a última vez em 2026-11-08, no US-018).
+- **Conteúdo:** 173 requisições em 11 pastas, sendo 87 casos de sucesso (✅), 85 de falha (❌) e 1 de comportamento a revisar (⚠️).
 
 ## Como importar
 1. No Insomnia: **Create → Import** (ou arraste o arquivo para a janela).

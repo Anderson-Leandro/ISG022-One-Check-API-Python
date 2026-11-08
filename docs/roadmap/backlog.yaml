@@ -4629,7 +4629,7 @@ items:
   priority: should
   rank: 292
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -4655,10 +4655,12 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 1ce35fbc47a77d98
-      remote_at: '2026-11-08T14:48:33Z'
+      hash: ad429248b5db7982
+      remote_at: '2026-11-08T15:34:26Z'
 - id: US-019
   type: story
   title: Locatário comenta no próprio problema enquanto não estiver resolvido

@@ -56,13 +56,11 @@ def dashboard(db: Session = Depends(get_db), user: Usuario = Depends(get_current
             problemas = problemas.filter(Problema.contrato_id.in_(contratos))
         problemas_abertos = problemas.count()
 
-    # Agendamentos: o locatário não os acessa (GET /contratos/{id}/agendamentos)
-    vistorias_agendadas = None
-    if user.role != "locatario":
-        agendamentos = db.query(AgendamentoVistoria)
-        if contratos is not None:
-            agendamentos = agendamentos.filter(AgendamentoVistoria.contrato_id.in_(contratos))
-        vistorias_agendadas = agendamentos.count()
+    # Agendamentos: mesmo recorte de GET /contratos/{id}/agendamentos (o locatário vê os dos próprios contratos)
+    agendamentos = db.query(AgendamentoVistoria)
+    if contratos is not None:
+        agendamentos = agendamentos.filter(AgendamentoVistoria.contrato_id.in_(contratos))
+    vistorias_agendadas = agendamentos.count()
 
     return ok({
         "imoveis_locados": imoveis.count(),
