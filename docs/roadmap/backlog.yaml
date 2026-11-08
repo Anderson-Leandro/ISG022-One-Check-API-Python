@@ -4088,7 +4088,7 @@ items:
   priority: should
   rank: 145
   estimate: 3
-  status: review
+  status: done
   sprint: 12
   phase: F5
   depends_on: []
@@ -4106,7 +4106,11 @@ items:
     gh_issue: 107
     prs:
     - '#129'
-  evidence: []
+  evidence:
+  - 'PR #129 (merge b826d72): 103 testes em tests/integration/test_seguranca_negacao_por_perfil.py (97 combinações
+    perfil proibido × rota restrita, lista conferida com a API)'
+  - 'mutação: rota de endereço aceitando o vistoriador sobrevive à suíte antiga e derruba 4 testes novos (docs/roadmap/execucao/DEBT-011.md)'
+  - 'security-audit diff dev (2026-11-08): nenhum achado novo'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -4118,10 +4122,12 @@ items:
     status: in_progress
   - date: '2026-11-08'
     status: review
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 167c30d8348dd709
-      remote_at: '2026-11-08T03:52:44Z'
+      hash: 763e085b567c7661
+      remote_at: '2026-11-08T04:04:07Z'
 - id: DEBT-012
   type: debt
   title: Testes de negação em escrita conferem o estado e o status exato
