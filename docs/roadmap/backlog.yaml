@@ -2946,7 +2946,7 @@ items:
   priority: could
   rank: 280
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -2964,16 +2964,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: d1cedf2b4ed7a18b
-      remote_at: '2026-11-03T01:16:35Z'
+      hash: 779600b62a449ac7
+      remote_at: '2026-11-08T13:06:22Z'
 - id: DEBT-001
   type: debt
   title: Modelos Pydantic nos corpos das rotas de problemas
