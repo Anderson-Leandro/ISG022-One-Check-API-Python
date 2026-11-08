@@ -4947,7 +4947,7 @@ items:
   priority: could
   rank: 88
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F6
   depends_on: []
@@ -4972,10 +4972,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: d21bfa83c967a7bc
-      remote_at: '2026-11-08T19:13:47Z'
+      hash: d49f8dd94e69d4d8
+      remote_at: '2026-11-08T20:29:52Z'
 - id: TK-019
   type: task
   title: Checklist de autorização e exposição no registro de execução, antes da revisão de código

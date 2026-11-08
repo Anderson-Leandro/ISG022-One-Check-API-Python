@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.auditoria import campos_alterados
 from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import get_current_user, negar_perfil_desconhecido, require_roles
 from app.exclusao import marcar_excluido
 from app.models import (
     AceiteChecklist,
@@ -470,6 +470,7 @@ def download_pdf(
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    negar_perfil_desconhecido(user)
     ck = _get_checklist(db, checklist_id)
     if not ck:
         return fail("Checklist não encontrado", status_code=404)

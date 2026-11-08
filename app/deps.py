@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-from app.auth import ROLES, decode_token, sessao_vigente
+from app.auth import PRIVILEGED_ROLES, ROLES, decode_token, sessao_vigente
 from app.database import get_db
 from app.models import Checklist, Contrato, Usuario
 
@@ -45,8 +45,25 @@ def _vistoriador_atua_no_contrato(db: Session, contrato_id: str, user: Usuario) 
     ).first() is not None
 
 
+# Perfis com visão de toda a operação: a mesma lista de app.auth (PRIVILEGED_ROLES). Toda regra de acesso libera
+# estes explicitamente e nega qualquer perfil fora de ROLES (DEBT-017): um perfil desconhecido nunca cai no
+# acesso total
+PERFIS_GESTAO = PRIVILEGED_ROLES
+
+
+def negar_perfil_desconhecido(user: Usuario) -> None:
+    """Fail secure: recusa perfil que nenhuma regra conhece, mesmo num caminho que não passe pelo get_current_user.
+
+    Chamar antes de buscar o registro: assim um perfil desconhecido não distingue, pelo 404 contra 403, quais
+    IDs existem.
+    """
+    if user.role not in ROLES:
+        raise HTTPException(status_code=403, detail="Permissão negada")
+
+
 def assert_acesso_contrato(db: Session, contrato: Contrato, user: Usuario) -> None:
     """Mesma regra da listagem de contratos: locatário só os próprios, vistoriador só onde tem vistoria."""
+    negar_perfil_desconhecido(user)
     if user.role == "locatario" and contrato.locatario_id != user.id:
         raise HTTPException(status_code=403, detail="Você não tem acesso a este contrato")
     if user.role == "vistoriador" and not _vistoriador_atua_no_contrato(db, contrato.id, user):
@@ -55,6 +72,7 @@ def assert_acesso_contrato(db: Session, contrato: Contrato, user: Usuario) -> No
 
 def assert_acesso_imovel(db: Session, imovel_id: str, user: Usuario) -> None:
     """Mesma regra da listagem de imóveis: locatário com contrato ativo, vistoriador com vistoria no imóvel."""
+    negar_perfil_desconhecido(user)
     if user.role == "locatario":
         permitido = db.query(Contrato.id).filter(
             Contrato.imovel_id == imovel_id, Contrato.locatario_id == user.id, Contrato.status == "ativo"
@@ -66,7 +84,7 @@ def assert_acesso_imovel(db: Session, imovel_id: str, user: Usuario) -> None:
             .filter(Contrato.imovel_id == imovel_id, Checklist.vistoriador_id == user.id)
             .first()
         )
-    else:
+    else:  # PERFIS_GESTAO
         return
     if not permitido:
         raise HTTPException(status_code=403, detail="Você não tem acesso a este imóvel")

@@ -7,7 +7,13 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.auditoria import campos_alterados
 from app.database import get_db
-from app.deps import assert_acesso_imovel, assert_acesso_problemas, get_current_user, require_roles
+from app.deps import (
+    assert_acesso_imovel,
+    assert_acesso_problemas,
+    get_current_user,
+    negar_perfil_desconhecido,
+    require_roles,
+)
 from app.geocoding import buscar_coordenadas
 from app.models import Checklist, ChecklistItem, Contrato, Endereco, Imovel, ImovelComodo, Problema, Usuario
 from app.schemas import (
@@ -87,6 +93,7 @@ def list_imoveis(
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    negar_perfil_desconhecido(user)
     q = db.query(Imovel).filter(Imovel.ativo == True)
     if com_endereco:
         q = q.options(joinedload(Imovel.endereco))
@@ -146,6 +153,7 @@ def get_imovel(
     db: Session = Depends(get_db),
     user: Usuario = Depends(get_current_user),
 ):
+    negar_perfil_desconhecido(user)
     im = (
         db.query(Imovel)
         .options(joinedload(Imovel.endereco))
@@ -171,6 +179,7 @@ def historico_imovel(
     que tem vistoria e só as vistorias dele; problemas, pela regra de assert_acesso_problemas.
     Locatário ou vistoriador sem nenhum contrato visível no imóvel recebe 403.
     """
+    negar_perfil_desconhecido(user)
     im = db.query(Imovel).filter(Imovel.id == imovel_id, Imovel.ativo == True).first()
     if not im:
         return fail("Imóvel não encontrado", status_code=404)
