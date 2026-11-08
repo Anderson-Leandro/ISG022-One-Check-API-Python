@@ -2946,7 +2946,7 @@ items:
   priority: could
   rank: 280
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -2961,8 +2961,12 @@ items:
   links:
     trello_card: null
     gh_issue: 76
-    prs: []
-  evidence: []
+    prs:
+    - '#143'
+  evidence:
+  - 'PR #143 (merge 6c707f1): GET /imoveis/{id}/historico; 14 testes em tests/integration/test_historico_imovel.py'
+  - mutação nos recortes por perfil, no 403 e na ordenação (docs/roadmap/execucao/US-017.md)
+  - collection do Insomnia 168/168 contra a API local; security-audit diff dev sem achado novo
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -2972,10 +2976,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 779600b62a449ac7
-      remote_at: '2026-11-08T13:06:22Z'
+      hash: 9959db8b045c1ca3
+      remote_at: '2026-11-08T13:18:54Z'
 - id: DEBT-001
   type: debt
   title: Modelos Pydantic nos corpos das rotas de problemas
