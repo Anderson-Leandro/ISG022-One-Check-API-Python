@@ -16,6 +16,8 @@ import pytest
 
 import app.routers.admin as admin_router
 from app.config import UPLOAD_DIR
+from app.auth import create_access_token
+from app.models import Usuario
 from tests.conftest import auth, small_image_bytes
 
 # Os testes de /admin rodam com banco vazio (bootstrap), em que basta o segredo.
@@ -28,6 +30,17 @@ SEED_HEADER = {"X-Seed-Secret": SEED_TEST_SECRET}
 def seed_configurado(monkeypatch):
     monkeypatch.setattr(admin_router, "SEED_SECRET", SEED_TEST_SECRET)
     monkeypatch.setattr(admin_router, "SEED_ALLOW_DESTRUCTIVE", True)
+
+
+def _seed_e_headers_do_admin(client, db) -> dict:
+    """Roda o seed e devolve os headers do admin criado por ele.
+
+    Com usuários no banco, /admin/* exige o segredo e um admin autenticado (SEC-021).
+    """
+    assert client.post("/api/v1/admin/seed", headers=SEED_HEADER).status_code == 200
+    admin = db.query(Usuario).filter(Usuario.email == "admin@onecheck.local").one()
+    token = create_access_token(admin.id, admin.role, admin.token_version)
+    return {**SEED_HEADER, **auth(token)}
 
 
 # ── GET /dashboard ────────────────────────────────────────────────────────────────
@@ -216,12 +229,25 @@ class TestAdminSeed:
         assert r.status_code == 200
         assert "sucesso" in r.json()
 
-    def test_seed_mode_refresh_data(self, client, db):
+    def test_seed_mode_refresh_data_sem_usuarios_minimos_responde_409(self, client, db):
+        # Os usuários das fixtures são @test.com; o refresh exige as contas @onecheck.local
         r = client.post("/api/v1/admin/seed",
                         json={"mode": "refresh_data"},
                         headers=SEED_HEADER)
-        # Sem os usuários mínimos, o refresh é recusado com 409 (ADR-0003)
-        assert r.status_code == (200 if r.json()["sucesso"] else 409)
+        assert r.status_code == 409
+        assert r.json() == {"sucesso": False, "erro": "Usuários mínimos ausentes (admin, vistoriador ou locatario)."}
+
+    def test_seed_mode_refresh_data_depois_do_seed_recria_os_dados(self, client, db):
+        headers = _seed_e_headers_do_admin(client, db)
+        usuarios_antes = db.query(Usuario).count()
+
+        r = client.post("/api/v1/admin/seed",
+                        json={"mode": "refresh_data"},
+                        headers=headers)
+        assert r.status_code == 200
+        assert r.json()["sucesso"] is True
+        assert r.json()["dados"]["preservado"] == "usuarios"
+        assert db.query(Usuario).count() == usuarios_antes
 
 
 # ── POST /admin/refresh-data ──────────────────────────────────────────────────────
@@ -237,11 +263,24 @@ class TestAdminRefreshData:
                         headers={"X-Seed-Secret": "errado"})
         assert r.status_code == 403
 
-    def test_refresh_retorna_resposta_json(self, client, db):
+    def test_refresh_sem_usuarios_minimos_responde_409(self, client, db):
         r = client.post("/api/v1/admin/refresh-data", headers=SEED_HEADER)
-        assert r.status_code == (200 if r.json()["sucesso"] else 409)
+        assert r.status_code == 409
+        assert r.json()["erro"] == "Usuários mínimos ausentes (admin, vistoriador ou locatario)."
+
+    def test_refresh_depois_do_seed_responde_200_e_preserva_usuarios(self, client, db):
+        headers = _seed_e_headers_do_admin(client, db)
+        usuarios_antes = db.query(Usuario).count()
+
+        r = client.post("/api/v1/admin/refresh-data", headers=headers)
+        assert r.status_code == 200
+        assert r.json()["sucesso"] is True
+        assert r.json()["dados"]["preservado"] == "usuarios"
+        assert db.query(Usuario).count() == usuarios_antes
 
     def test_put_e_patch_tambem_funcionam(self, client, db):
+        headers = _seed_e_headers_do_admin(client, db)
         for method in (client.put, client.patch):
-            r = method("/api/v1/admin/refresh-data", headers=SEED_HEADER)
-            assert r.status_code == (200 if r.json()["sucesso"] else 409)
+            r = method("/api/v1/admin/refresh-data", headers=headers)
+            assert r.status_code == 200
+            assert r.json()["sucesso"] is True
