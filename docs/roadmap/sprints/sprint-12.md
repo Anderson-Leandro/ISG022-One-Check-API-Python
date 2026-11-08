@@ -55,6 +55,7 @@
 | 2026-11-08 | DEBT-011 concluído (#129): 103 testes de negação por perfil; as 97 combinações perfil proibido × rota restrita têm teste, e a lista das 32 rotas é conferida com a API (1007 testes, cobertura 96%). Restam 28 pts | o critério de GET /logs depende da decisão do SEC-018 (Sprint 13) | teste fixa o comportamento atual do gestor nos logs; muda junto com o SEC-018 |
 | 2026-11-08 | DEBT-012 concluído (#131): 54 testes de negação existentes passam a conferir o banco inteiro (45) e a mensagem exata (25); um 403 devolvido depois de gravar agora quebra o CI. `sprint-executor` ganha a flag `--continuo` (#132). Restam 25 pts | — | alteração de testes existentes aprovada pelo usuário (só acréscimos e um teste renomeado); o modo contínuo passa a vir do argumento, não do CLAUDE.md |
 | 2026-11-08 | DEBT-009 concluído (#134): ADR-0004 a ADR-0007 (sessão JWT, MFA TOTP, uploads em disco, Render com 1 worker). Restam 22 pts | R-017 (alto, a confirmar): disco efêmero no plano gratuito do Render pode apagar as fotos; depende do painel do Render | achados fora da sprint: SEC-035 (QR do MFA por serviço externo recebe o segredo) e TK-018 |
+| 2026-11-08 | SEC-034 concluído (#138): token de primeiro acesso emitido antes da troca de senha recusado no setup do MFA, e teto de chaves do limitador testado com relógio controlado (1013 testes, cobertura 96%). Restam 20 pts | DEBT-006 (licença) aguarda a escolha do usuário | — |
 
 ## Sprint Review
 - **Incremento demonstrável:**
