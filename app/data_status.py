@@ -1,4 +1,5 @@
 """Totais atuais do banco (somente leitura)."""
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models import (
@@ -29,8 +30,10 @@ def get_data_status(db: Session) -> dict:
         "agendamentos": db.query(AgendamentoVistoria).count(),
         "problemas": db.query(Problema).count(),
         "itens_vistoria": db.query(ItemVistoria).count(),
+        # Os quatro status do fluxo sempre aparecem; um status fora do fluxo (dado antigo) aparece também,
+        # em vez de sumir da contagem
         "checklists_por_status": {
-            status: db.query(Checklist).filter(Checklist.status == status).count()
-            for status in ("em_preenchimento", "pendente_aceite", "aceito", "rejeitado", "pendente_revisao")
+            **{status: 0 for status in ("em_preenchimento", "pendente_aceite", "aceito", "rejeitado")},
+            **dict(db.query(Checklist.status, func.count(Checklist.id)).group_by(Checklist.status).all()),
         },
     }

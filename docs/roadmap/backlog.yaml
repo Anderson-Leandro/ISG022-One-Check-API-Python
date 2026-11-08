@@ -4743,7 +4743,7 @@ items:
   priority: should
   rank: 294
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -4770,10 +4770,12 @@ items:
     status: ready
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 3ae459c359d336bc
-      remote_at: '2026-11-08T14:48:36Z'
+      hash: 3c00ab03330b4ecb
+      remote_at: '2026-11-08T16:16:37Z'
 - id: DEBT-016
   type: debt
   title: Declarar no OpenAPI os tipos de agendamento (inicial e encerramento)

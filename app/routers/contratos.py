@@ -331,12 +331,18 @@ def create_checklist(
     if not vistoriador:
         return fail("Vistoriador não encontrado", status_code=404)
 
-    existing = (
-        db.query(Checklist)
-        .filter(Checklist.contrato_id == contrato_id, Checklist.tipo == body.tipo)
+    # Uma vistoria inicial vigente por contrato. A rejeitada fica como registro e não conta, para o contrato
+    # não travar depois de uma rejeição (ADR-0012). Lista dos status que bloqueiam, e não dos que liberam:
+    # um status antigo ou desconhecido não trava o contrato
+    if body.tipo == "inicial" and (
+        db.query(Checklist.id)
+        .filter(
+            Checklist.contrato_id == contrato_id,
+            Checklist.tipo == "inicial",
+            Checklist.status.in_(("em_preenchimento", "pendente_aceite", "aceito")),
+        )
         .first()
-    )
-    if existing and body.tipo == "inicial":
+    ):
         return fail("Este contrato já possui vistoria inicial", status_code=409)
 
     ck = Checklist(

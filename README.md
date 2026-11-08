@@ -220,7 +220,7 @@ DELETE /api/v1/agendamentos/{id}           # Cancelar/excluir agendamento (admin
 ```http
 GET    /api/v1/itens-vistoria              # Catálogo de itens inspecionáveis
 GET    /api/v1/contratos/{id}/checklists   # Listar checklists do contrato
-POST   /api/v1/contratos/{id}/checklists   # Iniciar vistoria; vistoriador_id com perfil vistoriador, contrato ativo (admin, gestor)
+POST   /api/v1/contratos/{id}/checklists   # Iniciar vistoria; vistoriador_id com perfil vistoriador, contrato ativo; uma inicial por contrato, salvo se a anterior foi rejeitada (admin, gestor)
 GET    /api/v1/checklists/{id}             # Detalhes do checklist
 DELETE /api/v1/checklists/{id}             # Exclusão lógica; só em preenchimento, 409 caso contrário (admin, gestor)
 POST   /api/v1/checklists/{id}/itens       # Adicionar item (vistoriador do checklist, admin)
