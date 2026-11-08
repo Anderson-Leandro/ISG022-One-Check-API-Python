@@ -3212,7 +3212,7 @@ items:
   priority: should
   rank: 180
   estimate: 1
-  status: review
+  status: done
   sprint: 12
   phase: F0
   depends_on: []
@@ -3228,7 +3228,9 @@ items:
     gh_issue: 82
     prs:
     - '#168'
-  evidence: []
+  evidence:
+  - 'PR #168 (merge 359a5d1): LICENSE MIT na raiz, titular Equipe One Check, e seção Licença no README'
+  - decisão do usuário em 2026-11-08
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -3240,10 +3242,12 @@ items:
     status: in_progress
   - date: '2026-11-08'
     status: review
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: cca0a03e2660bbb4
-      remote_at: '2026-11-08T17:33:57Z'
+      hash: 314a703e913d7fd4
+      remote_at: '2026-11-08T17:39:10Z'
 - id: DEBT-007
   type: debt
   title: CHANGELOG e release v0.1.0
