@@ -4138,7 +4138,7 @@ items:
   priority: should
   rank: 146
   estimate: 3
-  status: in_progress
+  status: review
   sprint: 12
   phase: F5
   depends_on: []
@@ -4153,7 +4153,8 @@ items:
   links:
     trello_card: null
     gh_issue: 108
-    prs: []
+    prs:
+    - '#131'
   evidence: []
   created: '2026-11-02'
   updated: '2026-11-08'
@@ -4164,10 +4165,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: review
   sync:
     github:
-      hash: 92ac1fc15f46c6a4
-      remote_at: '2026-11-08T04:12:52Z'
+      hash: 5a944c2d86c27b4d
+      remote_at: '2026-11-08T04:45:40Z'
 - id: DEBT-013
   type: debt
   title: Mensagem de erro específica para token de verificação usado no setup-login e no activate-login
