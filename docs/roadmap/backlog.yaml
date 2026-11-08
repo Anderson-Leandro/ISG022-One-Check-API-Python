@@ -3922,7 +3922,7 @@ items:
   priority: must
   rank: 36
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F5
   depends_on: []
@@ -3947,10 +3947,12 @@ items:
     status: backlog
   - date: '2026-11-07'
     status: in_sprint
+  - date: '2026-11-07'
+    status: in_progress
   sync:
     github:
-      hash: d1005c1a1e08774c
-      remote_at: '2026-11-07T16:15:08Z'
+      hash: b2922f27995c97c1
+      remote_at: '2026-11-08T01:34:32Z'
 - id: SEC-033
   type: security
   title: Testes das travas do checklist depois do envio para aceite
