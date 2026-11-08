@@ -14,15 +14,13 @@
 ## 1. Sumário executivo
 A mudança principal (DEBT-014) **não altera quem pode fazer o quê**: só troca o status HTTP das respostas de erro. Ela melhora a detecção de abuso, porque login falho, MFA errado e acesso negado deixam de aparecer como 200 nos logs (A09:2021).
 
-O único efeito colateral relevante está **no front**: o interceptor de 401 repete o login recusado, e cada erro conta em dobro no limite de tentativas (SEC-035, baixa). A correção é de uma linha no `client.ts` e já está descrita no item 30 do `MUDANCAS_API_PARA_FRONT.md`.
-
-As ferramentas novas do processo não abrem superfície de ataque. Não há dependência vulnerável nem segredo novo.
+As ferramentas novas do processo não abrem superfície de ataque. Não há dependência vulnerável nem segredo novo. Os três achados são informativos.
 
 | Crítica | Alta | Média | Baixa | Info |
 |---|---|---|---|---|
-| 0 | 0 | 0 | 1 | 3 |
+| 0 | 0 | 0 | 0 | 3 |
 
-Scanners: 15 resultados brutos → 1 confirmado (SEC-036, como info), 14 descartados, 0 suprimidos.
+Scanners: 15 resultados brutos → 1 confirmado (SEC-035, como info), 14 descartados, 0 suprimidos.
 
 | Resultados descartados | Qtd. | Motivo |
 |---|---|---|
@@ -30,14 +28,14 @@ Scanners: 15 resultados brutos → 1 confirmado (SEC-036, como info), 14 descart
 | gitleaks `.env:11` | 1 | o `.env` local não é versionado (nenhum arquivo sensível no índice) e está fora do diff |
 | gitleaks em `tests/integration/test_seguranca_seed_credenciais.py:137,165` | 2 | valores fictícios de teste, em arquivo fora do diff (já existia) |
 | trivy DS026 (`HEALTHCHECK` no `Dockerfile`) | 1 | fora do diff e já conhecido |
-| semgrep e bandit SHA-1, mesmo local | 1 | duplicado do SEC-036 |
+| semgrep e bandit SHA-1, mesmo local | 1 | duplicado do SEC-035 |
 
 ## 2. Pilares de segurança
 | Pilar | Achados | Avaliação |
 |---|---|---|
-| Confidencialidade | SEC-037, SEC-038 | ok: nenhuma informação nova exposta; as mensagens genéricas de autenticação foram mantidas |
-| Integridade | SEC-036 | ok |
-| Disponibilidade | SEC-035 | atenção: o front reduz o limite efetivo de tentativas para o próprio usuário |
+| Confidencialidade | SEC-036, SEC-037 | ok: nenhuma informação nova exposta; as mensagens genéricas de autenticação foram mantidas |
+| Integridade | SEC-035 | ok |
+| Disponibilidade | — | ok: o limite de tentativas não mudou |
 | Autenticidade | — | ok: login, MFA e refresh continuam com as mesmas checagens; só o status mudou |
 | Não-repúdio / Auditoria | — | melhorou: 401, 403 e 429 ficam visíveis nos logs de acesso |
 
@@ -46,10 +44,10 @@ Scanners: 15 resultados brutos → 1 confirmado (SEC-036, como info), 14 descart
 |---|---|---|
 | Menor privilégio | — | sem mudança |
 | Secure by default | — | `fail()` sem status responde 400, nunca 2xx |
-| Fail secure | SEC-035, SEC-038 | `fail()` recusa status < 400 (`ValueError`); o teste de contrato na suíte barra regressões |
+| Fail secure | SEC-037 | `fail()` recusa status < 400 (`ValueError`); o teste de contrato na suíte barra regressões |
 | Mediação completa | — | sem mudança nas checagens de acesso |
-| Defesa em profundidade | SEC-037 | o hook se soma ao `.gitignore` e às regras, mas não é controle de segurança |
-| Superfície de ataque mínima | SEC-036 | ok |
+| Defesa em profundidade | SEC-036 | o hook se soma ao `.gitignore` e às regras, mas não é controle de segurança |
+| Superfície de ataque mínima | SEC-035 | ok |
 
 ## 4. STRIDE
 | Categoria | Ameaças identificadas | Mitigadas | Achados |
@@ -57,36 +55,15 @@ Scanners: 15 resultados brutos → 1 confirmado (SEC-036, como info), 14 descart
 | S — Spoofing | enumeração de contas pela resposta do login | sim: mesma resposta (status e corpo) para e-mail existente e inexistente, com teste em `test_status_http_erros.py` | — |
 | T — Tampering | — | — | — |
 | R — Repudiation | abuso invisível no monitoramento (200 em falha) | sim, pelo ADR-0003 | — |
-| I — Information disclosure | existência de recurso por 403 × 404 | parcial: já existia pela mensagem; IDs são UUID | SEC-038 |
-| D — Denial of service | bloqueio antecipado da própria conta | não: depende do front | SEC-035 |
+| I — Information disclosure | existência de recurso por 403 × 404 | parcial: já existia pela mensagem; IDs são UUID | SEC-037 |
+| D — Denial of service | — | — | — |
 | E — Elevation of privilege | — | — | — |
 
 Detalhes no [modelo de ameaças](threat-model.md).
 
 ## 5. Achados
 
-### SEC-035 — Login e MFA recusados com 401 são repetidos pelo interceptor do front · Baixa
-| | |
-|---|---|
-| **Pilar** | Disponibilidade |
-| **Princípio violado** | Fail secure |
-| **STRIDE** | D |
-| **CWE / OWASP** | CWE-799 / API4:2023 |
-| **Local** | `app/routers/auth_router.py:59`, `app/routers/auth_router.py:106`, `../front-react/src/api/client.ts:94` |
-| **Fonte** | Claude |
-
-**Evidência**
-```ts
-if (response.status !== 401 || request.url.endsWith(ROTA_DE_REFRESH)) return response;
-if (!armazenamentoDeTokens.obterRefreshToken()) return response;
-// ... renova a sessão e reenvia a requisição original
-return fetch(novaTentativa);
-```
-**Cenário de exploração:** com um refresh token ainda guardado, o usuário erra a senha. A API responde 401, o front renova a sessão e reenvia o mesmo login errado, e a conta recebe duas falhas.
-**Impacto:** o bloqueio de 15 minutos chega depois de 3 erros em vez de 5, e o mesmo vale para o código MFA. Um atacante não ganha nada com isso. A severidade é baixa porque depende de token guardado e não expõe dados.
-**Correção recomendada:** no `client.ts`, ignorar `/auth/login` e `/auth/mfa/*` como já é feito com `/auth/refresh` (item 30 do `MUDANCAS_API_PARA_FRONT.md`).
-
-### SEC-036 — SHA-1 usado só para IDs estáveis no gerador da collection · Info
+### SEC-035 — SHA-1 usado só para IDs estáveis no gerador da collection · Info
 | | |
 |---|---|
 | **Pilar** | Integridade |
@@ -104,14 +81,14 @@ return prefixo + "_" + hashlib.sha1("|".join(partes).encode()).hexdigest()[:24]
 **Impacto:** nenhum. É ruído nos scanners.
 **Correção recomendada:** `hashlib.sha1(..., usedforsecurity=False)`.
 
-### SEC-037 — O hook `guarda.py` é contornável por ofuscação · Info
+### SEC-036 — O hook `guarda.py` é contornável por ofuscação · Info
 | | |
 |---|---|
 | **Pilar** | Confidencialidade |
 | **Princípio violado** | Defesa em profundidade (limitação conhecida) |
 | **STRIDE** | I |
 | **CWE / OWASP** | CWE-184 / A05:2021 |
-| **Local** | `.claude/hooks/guarda.py:18` |
+| **Local** | `.claude/hooks/guarda.py:21` |
 | **Fonte** | Claude |
 
 **Evidência**
@@ -122,7 +99,7 @@ ENV = re.compile(r"(?<![\w.-])\.env(?![\w.-])")
 **Impacto:** o hook evita erros do agente, mas não segura quem quer contornar. A proteção real continua sendo o `.gitignore` e as regras.
 **Correção recomendada:** não tratar o hook como controle de segurança. Opcionalmente, negar `Read(.env)` em `permissions.deny`.
 
-### SEC-038 — 403 e 404 distinguem contrato inexistente de contrato alheio · Info
+### SEC-037 — 403 e 404 distinguem contrato inexistente de contrato alheio · Info
 | | |
 |---|---|
 | **Pilar** | Confidencialidade |
@@ -148,19 +125,17 @@ Nenhum pacote vulnerável (trivy + osv-scanner sobre `requirements.lock`).
 ## 7. Pontos positivos
 - `fail()` recusa status abaixo de 400, e a suíte inteira barra `sucesso:false` com 2xx (`tests/conftest.py`). Uma regressão ao padrão antigo quebra o CI.
 - A resposta do login é idêntica, em status e corpo, para e-mail existente e inexistente, e há teste para isso.
-- Reautenticação recusada com sessão válida responde 403, para não disparar a renovação de sessão nem repetir a tentativa.
+- Reautenticação recusada com sessão válida responde 403, e não 401, para o cliente não tratar o erro como sessão expirada.
 - O hook do projeto bloqueia commit e push direto na `dev` e na `main` e o `git add` das notas locais.
 - O `dod_check.py` só lê: chama `git` e `gh` com argumentos fixos, sem shell.
 
 ## 8. Limitações
 - Modo diff: rotas que não mudaram não foram revisadas.
-- O front (`front-react`) foi lido só no trecho do interceptor e não foi escaneado.
 - Análise estática: não substitui teste dinâmico (DAST) nem pentest.
 
 ## 9. Plano de ação sugerido
 1. **Imediato (Crítica/Alta):** nada.
-2. **Curto prazo:** ajuste do interceptor no front (SEC-035).
-3. **Melhoria contínua:**
-   - `usedforsecurity=False` no gerador (SEC-036);
-   - a decisão 403 × 404 no ADR-0003 (SEC-038);
-   - opcionalmente, `permissions.deny` para o `.env` (SEC-037).
+2. **Melhoria contínua:**
+   - `usedforsecurity=False` no gerador (SEC-035);
+   - a decisão 403 × 404 no ADR-0003 (SEC-037);
+   - opcionalmente, `permissions.deny` para o `.env` (SEC-036).

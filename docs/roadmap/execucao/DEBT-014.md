@@ -8,7 +8,7 @@
 ## Entrega
 - ADR-0003 (#115): o envelope continua e o status acompanha o resultado.
 - `fail()` devolve `JSONResponse` com status de erro (padrão 400) e recusa status < 400; as 122 chamadas foram classificadas pela tabela do ADR (#116).
-- Critérios de aceite: `fail()` nunca 2xx → `tests/unit/test_schemas.py`; guarda na suíte → `tests/conftest.py`; checklists alheios → 403 em `test_contratos.py`; 401 × 403 → `test_status_http_erros.py`; README e collection atualizados; item 30 no `MUDANCAS_API_PARA_FRONT.md`.
+- Critérios de aceite: `fail()` nunca 2xx → `tests/unit/test_schemas.py`; guarda na suíte → `tests/conftest.py`; checklists alheios → 403 em `test_contratos.py`; 401 × 403 → `test_status_http_erros.py`; README e collection atualizados.
 
 ## Testes
 - Novo: `tests/integration/test_status_http_erros.py` (uma amostra de cada linha da tabela, incluindo senha atual errada → 403 sem alterar a senha).
@@ -17,9 +17,8 @@
 - #118: 838 passaram, 3 pulados, cobertura 96%; CI verde.
 
 ## Segurança
-- `/security-audit diff ed36a41` em 2026-11-07 ([relatório](../../security/relatorio-2026-11-07.md)): os 7 scanners com status `ok`; **0 crítico, 0 alto, 0 médio, 1 baixo, 3 info**.
-- SEC-035 (baixo): o interceptor de 401 do front repete login e MFA recusados → item SEC-035 no backlog, fora da sprint (correção no `front-react`).
-- SEC-036 a SEC-038 (info): SHA-1 só para IDs da collection; o hook é barreira de conveniência; 403 × 404 já distinguia pela mensagem. Registrados no relatório, sem item.
+- `/security-audit diff ed36a41` em 2026-11-07 ([relatório](../../security/relatorio-2026-11-07.md)): os 7 scanners com status `ok`; **0 crítico, 0 alto, 0 médio, 0 baixo, 3 info**.
+- SEC-035 a SEC-037 (info): SHA-1 só para IDs da collection; o hook é barreira de conveniência; 403 × 404 já distinguia pela mensagem. Registrados no relatório, sem item.
 - A mudança não altera quem pode fazer o quê e melhora a detecção (A09:2021, CWE-393).
 
 ## Testes existentes alterados
@@ -38,4 +37,4 @@
 Aprovado por: Anderson Mendes Leandro em 2026-11-07 (relatório do #116 e correção do #118)
 
 ## Documentação
-- README "Respostas" com a tabela nova; ADR-0003; collection do Insomnia regenerada (157/157 e 00a 11/11); `MUDANCAS_API_PARA_FRONT.md` item 30 (local).
+- README "Respostas" com a tabela nova; ADR-0003; collection do Insomnia regenerada (157/157 e 00a 11/11).

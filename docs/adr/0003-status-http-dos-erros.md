@@ -27,12 +27,11 @@ Problemas do 200 com erro dentro:
    - Contras: todos os problemas acima continuam.
 2. **Status adequado e o mesmo envelope.**
    - Prós:
-     - o front atual continua funcionando: `front-react/src/api/client.ts:128` já trata `!response.ok || !corpo.sucesso` como erro e lê a mensagem em `erro`;
-     - o corpo não muda para quem já lê o envelope.
+     - o corpo não muda: quem já lê o envelope (`sucesso` e `erro`) continua funcionando.
    - Contras: revisar 46 handlers e os testes que conferem 200 em falha.
 3. **Status adequado e corpo `application/problem+json` (RFC 9457).**
    - Prós: é o padrão mais recente.
-   - Contras: troca o formato do corpo; exige mudança no front e na documentação, sem ganho de segurança sobre a opção 2.
+   - Contras: troca o formato do corpo; exige mudança em todos os clientes e na documentação, sem ganho de segurança sobre a opção 2.
 
 ## Decisão
 Vamos usar a **opção 2**. O envelope `{sucesso, dados, erro, erros}` continua, e o status HTTP passa a acompanhar o resultado.
@@ -51,9 +50,7 @@ Vamos usar a **opção 2**. O envelope `{sucesso, dados, erro, erros}` continua,
   | Limite de tentativas | 429 (já existe) |
 
 - **Mensagens:** as mensagens de autenticação continuam genéricas, sem dizer se o e-mail existe nem o que falhou no token.
-- **401 só para quem está sem sessão válida.** O front, ao receber 401, tenta renovar o token e **repete a requisição** (`client.ts:94`). Por isso:
-  - uma senha atual errada em rota autenticada (desligar o MFA, trocar a senha) responde **403**, para não renovar a sessão nem repetir a tentativa, o que contaria em dobro no limitador;
-  - o login e as rotas de MFA do login respondem 401, e o front deve ignorar essas rotas no interceptador, assim como já ignora `/auth/refresh`.
+- **401 só para quem está sem sessão válida.** É comum o cliente HTTP tratar o 401 como "sessão expirada": renova o token e repete a requisição. Por isso uma senha atual errada em rota autenticada (desligar o MFA, trocar a senha) responde **403**: a sessão é válida, e repetir a tentativa contaria em dobro no limitador.
 
 ## Consequências
 - **Positivas:**
@@ -63,8 +60,5 @@ Vamos usar a **opção 2**. O envelope `{sucesso, dados, erro, erros}` continua,
 - **Negativas / custos:**
   - testes de falha que conferem `status_code == 200` mudam junto (DEBT-014);
   - a collection do Insomnia é gerada de novo;
-  - o `README.md` e a tabela de status entregue ao front são atualizados.
-- **Front:**
-  - nenhuma mudança obrigatória para ler os erros;
-  - o interceptador de 401 deve pular `/auth/login` e `/auth/mfa/*`.
+  - o `README.md` é atualizado.
 - **Segurança:** melhora a detecção de abuso (A09) sem mudar quem pode fazer o quê. Os testes de negação passam a conferir o status exato (DEBT-012).
