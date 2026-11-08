@@ -53,6 +53,7 @@
 | 2026-11-08 | SEC-035 concluído (#180): QR do setup de MFA gerado pela própria API, sem enviar o segredo TOTP a terceiros (1081 testes, cobertura 96%) | — | dependência nova segno==1.6.6 (puro Python, BSD-3) |
 | 2026-11-08 | SEC-018 concluído (#182): GET /logs só do admin; o gestor recebe 403 (1082 testes, cobertura 96%) | — | decisão do PO: só o admin (descartadas a visão reduzida e o risco aceito); testes ajustados com aprovação |
 | 2026-11-08 | SEC-027 concluído (#184): reuso de refresh trocado encerra todas as sessões; rotação atômica (1090 testes, cobertura 96%) | — | R-011 mitigado; contrapartida (refresh repetido pelo próprio cliente) no ADR-0004 |
+| 2026-11-08 | BUG-001 concluído (#186): cômodo em uso responde 409 em vez de 500, inclusive com referência em registro excluído (1096 testes, cobertura 96%) | — | rede de segurança do IntegrityError (achado da revisão) |
 
 ## Sprint Review
 - **Incremento demonstrável:**
