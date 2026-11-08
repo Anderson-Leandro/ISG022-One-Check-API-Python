@@ -243,8 +243,6 @@ sprints:
   status: active
   capacity: 40.0
   committed:
-  - TK-002
-  - TK-003
   - TK-017
   - DEBT-007
   - DEBT-006
@@ -268,7 +266,7 @@ sprints:
   - US-019
   - US-020
   - DEBT-016
-  committed_points: 54.0
+  committed_points: 52.0
   completed_points: null
   completed: []
   carried_over: []
@@ -293,7 +291,9 @@ sprints:
   - SEC-027
   - TK-005
   - SEC-031
-  committed_points: 36.0
+  - TK-002
+  - TK-003
+  committed_points: 38.0
   completed_points: null
   completed: []
   carried_over: []

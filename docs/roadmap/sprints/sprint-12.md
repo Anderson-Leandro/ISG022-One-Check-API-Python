@@ -2,7 +2,7 @@
 
 - **Período:** 2026-11-04 → 2026-11-17
 - **Sprint Goal:** Release v0.1.0, produção segura e escopo da F4 fechado
-- **Capacidade:** 40 pts (era 32, pelo prazo final de 11/12; ampliada em 2026-11-07 para incluir os itens da avaliação dos testes) · **Comprometido:** 54 pts (DEBT-014 em 2026-11-07; os seis itens dos spikes em 2026-11-08)
+- **Capacidade:** 40 pts (era 32, pelo prazo final de 11/12; ampliada em 2026-11-07 para incluir os itens da avaliação dos testes) · **Comprometido:** 52 pts (DEBT-014 em 2026-11-07; os seis itens dos spikes em 2026-11-08; TK-002 e TK-003 foram para a Sprint 13 em 2026-11-08)
 - **Time:** sem ausências; sem feriado em dia útil (15/11 é domingo)
 
 > **Sprint Goal** é o "porquê" da sprint: se algum item não couber, o goal ajuda a decidir o que
@@ -11,8 +11,6 @@
 ## Itens comprometidos
 | ID | Título | Est. | Seg. | Status final |
 |---|---|---|---|---|
-| TK-002 | Recriar o ambiente de produção sem credenciais de demonstração | 1 | high | in_sprint |
-| TK-003 | Configurar CORS_ORIGINS e conferir SEED_SECRET no Render | 1 | medium | in_sprint |
 | TK-017 | Proteger a branch main: merge só por PR e com CI verde | 1 | low | in_sprint |
 | DEBT-007 | CHANGELOG e release v0.1.0 | 2 | none | in_sprint |
 | DEBT-006 | Definir a licença do repositório público | 1 | none | in_sprint |
@@ -72,6 +70,7 @@
 | 2026-11-08 | US-019 concluído (#159): o locatário dono comenta no próprio problema enquanto não estiver resolvido ou fechado (1064 testes, cobertura 96%) | — | dois testes existentes ajustados, com aprovação do usuário |
 | 2026-11-08 | US-020 concluído (#161): nova vistoria inicial depois de uma rejeição, com a rejeitada intacta; pendente_revisao fora do domínio (1072 testes, cobertura 96%) | — | trava por lista de status que bloqueiam (achado da revisão) |
 | 2026-11-08 | DEBT-016 concluído (#163): tipos de agendamento declarados como enum no OpenAPI (1076 testes, cobertura 96%) | — | fim dos itens de código da sprint; restam TK-002, TK-003, DEBT-006 e DEBT-007 |
+| 2026-11-08 | TK-002 e TK-003 (2 pts) passam para a Sprint 13, a pedido do usuário; comprometido de 54 para 52 pts. Restam 3 pts: DEBT-006 e DEBT-007 | o ambiente de produção será tratado depois pelo usuário | a parte "produção segura" do goal da Sprint 12 fica para a Sprint 13 |
 
 ## Sprint Review
 - **Incremento demonstrável:**

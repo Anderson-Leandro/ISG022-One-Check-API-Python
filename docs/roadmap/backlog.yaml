@@ -2258,8 +2258,8 @@ items:
   priority: must
   rank: 20
   estimate: 1
-  status: in_sprint
-  sprint: 12
+  status: ready
+  sprint: 13
   phase: F6
   depends_on: []
   security:
@@ -2283,10 +2283,12 @@ items:
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: ready
   sync:
     github:
-      hash: 26a0542d1d38d50e
-      remote_at: '2026-11-08T14:48:24Z'
+      hash: 84f020e2b80b964e
+      remote_at: '2026-11-08T17:24:25Z'
 - id: TK-003
   type: task
   title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render
@@ -2300,8 +2302,8 @@ items:
   priority: must
   rank: 30
   estimate: 1
-  status: in_sprint
-  sprint: 12
+  status: ready
+  sprint: 13
   phase: F6
   depends_on: []
   security:
@@ -2319,16 +2321,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: ready
   sync:
     github:
-      hash: 06f5c97e0d98ede3
-      remote_at: '2026-11-03T01:16:26Z'
+      hash: 2f355213aaee810b
+      remote_at: '2026-11-08T17:24:26Z'
 - id: TK-004
   type: task
   title: Agendar a limpeza de dados vencidos no Render
