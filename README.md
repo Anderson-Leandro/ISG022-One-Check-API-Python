@@ -430,3 +430,9 @@ A collection em [`docs/insomnia/`](docs/insomnia/README.md) tem 168 requisiçõe
     ├── unit/                    # Testes unitários (auth, config, pdf, geocoding, schemas, serializers)
     └── integration/             # Testes de integração de todas as rotas da API
 ```
+
+## 📄 Licença
+
+Distribuído sob a licença **MIT**: o código pode ser usado, copiado, modificado e distribuído, inclusive para fins comerciais, desde que o aviso de copyright e a licença acompanhem as cópias. O software é fornecido sem garantia. Texto completo em [`LICENSE`](LICENSE).
+
+Copyright (c) 2026 Equipe One Check.
