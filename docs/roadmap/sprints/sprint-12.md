@@ -113,9 +113,20 @@ _Feita em 2026-11-08._
   - R-007 foi aceito (ADR-0010).
 - **Feedback do cliente/PO:** satisfeito com o incremento; seguir para a release e para a Sprint 13 sem ajustes.
 
-## Retrospectiva
+## Retrospectiva (2026-11-08)
+Proposta a partir dos dados da sprint e confirmada pelo usuário, que escolheu as ações.
+
 | Funcionou bem | Melhorar | Ação (vira item no backlog) |
 |---|---|---|
+| `sprint-executor` com `dod_check`: 23 itens com a DoD conferida por script e um registro de execução cada | A revisão de código achou defeitos reais **depois** de o item estar pronto em quase todos os itens (token emitido para perfil inválido, MFA sem efeito, nota interna exposta ao locatário, status final esquecido), e cada um custou uma nova rodada de testes | **TK-019**: checklist de autorização e exposição no registro, preenchida antes do `/code-review` |
+| Protocolo de testes alterados: 4 aprovações explícitas, nenhum teste enfraquecido sem o usuário saber | Ferramentas frágeis: a limpeza do scratchpad apagou o venv e o executor da collection do Insomnia, que não era versionado, com retrabalho para recriar | **TK-020**: versionar o executor e um comando que roda a collection do zero |
+| Prova de mutação em cada item de teste: os testes novos pegam o defeito que a suíte antiga deixava passar | O `dod_check` acusou falhas indevidas (PR da release na lista de PRs, intervalo "SPK-001 a SPK-004", caminhos curtos no relatório) | **DEBT-018**: corrigir os três casos no `dod_check`, com testes |
+| Modo contínuo com paradas só onde importa (6 itens seguidos); decisões de PO viraram ADRs no mesmo dia | O escopo cresceu de 32 para 52 pts durante a sprint (avaliação dos testes, DEBT-014, itens dos spikes) e a capacidade planejada deixou de valer; a `main` recebeu um commit direto que não está na `dev`, e a versão do Python diverge do `render.yaml` | Sem item: o usuário não escolheu essas ações. Ficam como pontos de atenção para o planejamento da Sprint 13 |
+
+**Ações da retrospectiva anterior (Sprint 11):**
+- **TK-017** (PR e CI obrigatórios na `main`): **feita** (#123; ruleset na `main` e na `dev`, sem aprovação obrigatória).
+- **Planejar no primeiro dia e registrar com `track`:** **feita**. A Sprint 12 foi planejada em 02/11 e tem acompanhamento por sessão.
+- **PR para a `main` a cada item ou grupo de itens:** **não feita.** A integração passou a ser na `dev` a cada item, mas a `main` só recebeu tudo no fim, num PR de 131 commits (#172).
 
 ## Métricas
 - Velocity: — pts (comprometido 32)

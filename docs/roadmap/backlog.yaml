@@ -4903,3 +4903,135 @@ items:
     github:
       hash: bae06e90dc8a8a7a
       remote_at: '2026-11-08T16:41:00Z'
+- id: TK-019
+  type: task
+  title: Checklist de autorização e exposição no registro de execução, antes da revisão de código
+  epic: EP-007
+  story: ''
+  description: 'Ação da retrospectiva da Sprint 12: a revisão de código achou defeitos reais depois de o item estar
+    pronto em quase todos os itens (token emitido para perfil inválido, MFA sem efeito, nota interna exposta ao
+    locatário, status final esquecido). Uma checklist feita antes da revisão pega esses casos mais cedo.'
+  acceptance_criteria:
+  - 'docs/roadmap/execucao/_modelo.md tem a seção ''Checklist antes da revisão'' com: campos que o perfil que ganha
+    acesso passa a ver; todos os status finais tratados; autorização antes de ler o corpo; login, refresh e tokens
+    para o caso novo; perfis proibidos barrados antes da busca por ID.'
+  - scripts/dod_check.py falha quando a seção existe no registro e tem itens sem resposta.
+  - O SKILL.md do sprint-executor manda preencher a checklist antes do /code-review.
+  priority: should
+  rank: 1550
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API1:2023
+    - OWASP API3:2023
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 12
+  links:
+    trello_card: null
+    gh_issue: 174
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: b62eaf94714d172a
+      remote_at: '2026-11-08T18:51:45Z'
+- id: TK-020
+  type: task
+  title: Versionar o executor da collection do Insomnia com um comando que roda tudo do zero
+  epic: EP-007
+  story: ''
+  description: 'Ação da retrospectiva da Sprint 12: o executor da collection (executar.mjs) e o passo a passo de
+    subir a API, rodar o seed e montar as variáveis ficavam no scratchpad e se perderam numa limpeza do /tmp, com
+    retrabalho para recriar.'
+  acceptance_criteria:
+  - 'O executor fica versionado (ex.: docs/insomnia/executar.mjs) e roda a exportação v4 reproduzindo os scripts
+    insomnia.*.'
+  - 'Um script (ex.: scripts/rodar_collection.sh) sobe a API numa porta livre com banco SQLite temporário, roda
+    o seed de desenvolvimento, monta as variáveis sem gravar segredos em arquivo versionado, executa a collection
+    e para a API, inclusive quando falha.'
+  - Nunca usa a porta 8000 do docker compose do usuário nem o arquivo de segredos local.
+  - docs/insomnia/README.md documenta o comando; rodar do zero passa com todos os testes, exceto a pasta 00a, que
+    é documentada.
+  priority: should
+  rank: 1560
+  estimate: 2
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-798
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 12
+  links:
+    trello_card: null
+    gh_issue: 175
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: 6c15c4c01735e663
+      remote_at: '2026-11-08T18:51:46Z'
+- id: DEBT-018
+  type: debt
+  title: 'dod_check sem falhas indevidas: PR de release, intervalos de IDs e caminhos curtos'
+  epic: EP-007
+  story: ''
+  description: 'Ação da retrospectiva da Sprint 12: o dod_check acusou falhas que não eram falhas da DoD. O PR da
+    release (dev → main) listado em links.prs era tratado como PR de implementação; ''SPK-001 a SPK-004'' no acompanhamento
+    não contava como citação do SPK-002; o relatório de testes alterados exigia o caminho completo de cada arquivo.'
+  acceptance_criteria:
+  - PRs com base main (release) em links.prs não passam pelas checagens de PR de implementação.
+  - 'Um intervalo de IDs no acompanhamento da sprint (ex.: ''SPK-001 a SPK-004'') conta como citação de cada ID
+    do intervalo.'
+  - O relatório de testes alterados aceita o nome do arquivo de teste sem o caminho completo, desde que seja único.
+  - Existem testes do dod_check cobrindo os três casos.
+  priority: should
+  rank: 1570
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 12
+  links:
+    trello_card: null
+    gh_issue: 176
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: c75ff5a2a9d45577
+      remote_at: '2026-11-08T18:51:46Z'
