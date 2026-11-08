@@ -15,7 +15,7 @@ Quatro regras ficaram em aberto desde a conversão da API em PHP (itens 5, 7, 8 
 ### 1. O locatário vê os agendamentos do próprio contrato (item 5, US-018)
 - **Antes:** `GET /contratos/{id}/agendamentos` respondia 403 para o locatário, que já via as vistorias e os problemas do mesmo contrato.
 - **Opções:** liberar a leitura no contrato dele, ou manter o 403.
-- **Decisão:** liberar **só a leitura e só no próprio contrato**. Criar, alterar e excluir continuam com admin e gestor. Saber a data da vistoria não expõe nada que ele já não veja.
+- **Decisão:** liberar **só a leitura e só no próprio contrato**. Criar, alterar e excluir continuam com admin e gestor. O locatário vê o tipo e a data; a `observacao`, nota interna da equipe, não vai na resposta para ele (ajuste feito na revisão de código do US-018). Saber a data da vistoria não expõe nada que ele já não veja.
 
 ### 2. O locatário comenta no próprio problema (item 7, US-019)
 - **Antes:** só admin e gestor criavam atualizações.

@@ -230,8 +230,8 @@ def list_agendamentos(
     if not ct:
         return fail("Contrato não encontrado", status_code=404)
 
-    if user.role == "locatario":
-        raise HTTPException(status_code=403, detail="Você não tem acesso aos agendamentos deste contrato")
+    # Locatário: só os do próprio contrato (assert_acesso_contrato). A escrita continua bloqueada pelo
+    # require_roles das rotas POST/PUT/DELETE, não por esta checagem (ADR-0012)
     assert_acesso_contrato(db, ct, user)
 
     rows = (
@@ -240,7 +240,12 @@ def list_agendamentos(
         .order_by(AgendamentoVistoria.created_at)
         .all()
     )
-    return ok([serialize_agendamento(r) for r in rows])
+    dados = [serialize_agendamento(r) for r in rows]
+    if user.role == "locatario":
+        # A observação é nota interna da equipe; o locatário vê a data e o tipo (ADR-0012)
+        for d in dados:
+            d.pop("observacao", None)
+    return ok(dados)
 
 
 @router.post("/{contrato_id}/agendamentos")

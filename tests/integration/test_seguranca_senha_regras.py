@@ -157,7 +157,7 @@ class TestDashboardPorPerfil:
 
     def test_locatario_so_o_proprio_contrato(self, client, cenario, token_locatario):
         assert _dashboard(client, token_locatario) == {
-            "imoveis_locados": 1, "checklists_pendentes": 1, "problemas_abertos": 1, "vistorias_agendadas": None,
+            "imoveis_locados": 1, "checklists_pendentes": 1, "problemas_abertos": 1, "vistorias_agendadas": 2,
         }
 
     def test_vistoriador_so_onde_atua(self, client, cenario, token_vistoriador):
