@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.config import MAX_UPLOAD_MB
 from app.database import get_db
 from app.deps import assert_acesso_problemas, get_current_user, require_roles
+from app.exclusao import marcar_excluido
 from app.models import AtualizacaoProblema, Contrato, Problema, Usuario
 from app.notification_service import notificar_usuario
 from app.serializers import log_operacao, serialize_atualizacao_problema, serialize_problema
@@ -51,6 +52,27 @@ def get_problema_by_id(
         return _fail(e.detail, status_code=e.status_code)
 
     return _ok(serialize_problema(pb))
+
+
+@router.delete("/problemas/{problema_id}")
+def excluir_problema(
+    problema_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    """Exclusão lógica (ADR-0008): só para problema ainda aberto e sem atualizações."""
+    pb = db.query(Problema).filter(Problema.id == problema_id).first()
+    if not pb:
+        return _fail("Problema não encontrado", status_code=404)
+    if pb.status != "aberto":
+        return _fail(f"Não é possível excluir um problema com status '{pb.status}'", status_code=409)
+    if db.query(AtualizacaoProblema.id).filter(AtualizacaoProblema.problema_id == problema_id).first():
+        return _fail("Não é possível excluir um problema que já tem atualizações", status_code=409)
+
+    marcar_excluido(pb, user)
+    db.commit()
+    log_operacao(db, user.id, "delete", "problema", problema_id)
+    return _ok(None)
 
 
 @router.patch("/problemas/{problema_id}/status")

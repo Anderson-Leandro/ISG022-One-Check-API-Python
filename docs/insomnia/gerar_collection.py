@@ -45,7 +45,7 @@ VARS_AUTO = [
     "sufixo", "hoje", "daqui_1_ano", "ontem", "daqui_7_dias",
     "imovel_id", "comodo_id", "comodo_extra_id", "contrato_id", "agendamento_id",
     "item_vistoria_id", "checklist_id", "checklist_item_id", "foto_id",
-    "checklist2_id", "checklist2_item_id", "problema_id",
+    "checklist2_id", "checklist2_item_id", "problema_id", "checklist_engano_id",
 ]
 
 # Calcula o código TOTP (RFC 6238, SHA-1, 6 dígitos, 30 s) a partir de mfa_secret, sem dependências.
@@ -529,6 +529,18 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
         Caso("❌ Excluir imóvel com contrato ativo", "DELETE", "/imoveis/{{ _.imovel_id }}", status=409, auth="token_admin", sucesso=False, erro="contrato ativo"),
         Caso("❌ Excluir foto de checklist aceito (trava)", "DELETE", "/checklists/{{ _.checklist_id }}/itens/{{ _.checklist_item_id }}/fotos/{{ _.foto_id }}", status=409,
              auth="token_vistoriador", sucesso=False, erro="Não é possível excluir fotos"),
+        Caso("✅ Gestor cria uma vistoria por engano", "POST", "/contratos/{{ _.contrato_id }}/checklists", auth="token_gestor",
+             corpo={"tipo": "encerramento", "vistoriador_id": "{{ _.vistoriador_id }}"}, sucesso=True, salvar={"checklist_engano_id": "b.dados.id"}),
+        Caso("❌ Vistoriador não exclui checklist → 403", "DELETE", "/checklists/{{ _.checklist_engano_id }}", auth="token_vistoriador", status=403),
+        Caso("✅ Gestor exclui a vistoria criada por engano", "DELETE", "/checklists/{{ _.checklist_engano_id }}", auth="token_gestor", sucesso=True,
+             descricao="Exclusão lógica (ADR-0008): some das leituras e fica na trilha de auditoria."),
+        Caso("❌ Checklist excluído não aparece mais → 404", "GET", "/checklists/{{ _.checklist_engano_id }}", auth="token_admin", status=404),
+        Caso("❌ Excluir checklist aceito (evidência) → 409", "DELETE", "/checklists/{{ _.checklist_id }}", auth="token_admin", status=409,
+             sucesso=False, erro="Não é possível excluir um checklist"),
+        Caso("❌ Excluir contrato com checklists → 409", "DELETE", "/contratos/{{ _.contrato_id }}", auth="token_admin", status=409,
+             sucesso=False, erro="Exclua antes os checklists"),
+        Caso("❌ Excluir problema já em tratamento → 409", "DELETE", "/problemas/{{ _.problema_id }}", auth="token_admin", status=409,
+             sucesso=False, erro="Não é possível excluir um problema"),
         Caso("❌ Locatário não encerra contrato → 403", "PATCH", "/contratos/{{ _.contrato_id }}/encerrar", auth="token_locatario_a", status=403),
         Caso("✅ Admin encerra o contrato", "PATCH", "/contratos/{{ _.contrato_id }}/encerrar", auth="token_admin", sucesso=True,
              testes="insomnia.test('status encerrado', () => insomnia.expect(b.dados.status).to.equal('encerrado'));"),

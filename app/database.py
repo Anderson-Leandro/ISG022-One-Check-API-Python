@@ -67,6 +67,23 @@ def ensure_schema_updates() -> None:
             if "foto_url" not in cols:
                 conn.execute(text("ALTER TABLE problemas ADD COLUMN foto_url VARCHAR(500)"))
 
+        # Exclusão lógica (US-015, ADR-0008)
+        exclusao = {
+            "contratos": ("ALTER TABLE contratos ADD COLUMN excluido_em TIMESTAMP",
+                          "ALTER TABLE contratos ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)"),
+            "checklists": ("ALTER TABLE checklists ADD COLUMN excluido_em TIMESTAMP",
+                           "ALTER TABLE checklists ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)"),
+            "problemas": ("ALTER TABLE problemas ADD COLUMN excluido_em TIMESTAMP",
+                          "ALTER TABLE problemas ADD COLUMN excluido_por VARCHAR(36) REFERENCES usuarios(id)"),
+        }
+        for tabela, (add_em, add_por) in exclusao.items():
+            if tabela in tables:
+                cols = {c["name"] for c in insp.get_columns(tabela)}
+                if "excluido_em" not in cols:
+                    conn.execute(text(add_em))
+                if "excluido_por" not in cols:
+                    conn.execute(text(add_por))
+
         if "log_operacao" in tables:
             cols = {c["name"] for c in insp.get_columns("log_operacao")}
             if "payload" not in cols:

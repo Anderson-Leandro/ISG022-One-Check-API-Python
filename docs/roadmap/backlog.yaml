@@ -2854,7 +2854,7 @@ items:
   priority: could
   rank: 270
   estimate: 5
-  status: in_sprint
+  status: in_progress
   sprint: 12
   phase: F4
   depends_on: []
@@ -2872,16 +2872,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-08'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-02'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 26c70d918718a34f
-      remote_at: '2026-11-03T01:16:32Z'
+      hash: 582e511618a1cb81
+      remote_at: '2026-11-08T12:39:55Z'
 - id: US-016
   type: story
   title: Anexos e assinatura de contrato
@@ -4409,3 +4411,47 @@ items:
     github:
       hash: 868cf03be0d5c060
       remote_at: '2026-11-08T12:03:45Z'
+- id: BUG-001
+  type: bug
+  title: Excluir cômodo referenciado por checklist ou problema responde 500
+  epic: EP-002
+  story: ''
+  description: Encontrado na revisão de código do US-015. DELETE /imoveis/{id}/comodos/{cid} (app/routers/imoveis.py,
+    delete_comodo) apaga o cômodo sem conferir se algum item de checklist (checklist_itens.comodo_id) ou problema
+    (problemas.comodo_id) o referencia. No PostgreSQL, a chave estrangeira recusa e a rota responde 500. Com a exclusão
+    lógica (ADR-0008), a referência pode estar num checklist ou problema excluído, invisível para quem chama.
+  acceptance_criteria:
+  - Dado um cômodo usado por um item de checklist ou por um problema (excluído ou não), quando o admin ou o gestor
+    tentar excluí-lo, então a API responde 409 com mensagem clara e nada é apagado.
+  - Dado um cômodo sem referências, quando excluído, então continua funcionando como hoje.
+  - Existe teste para os dois casos.
+  priority: should
+  rank: 1530
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-755
+    - STRIDE:D
+    risk_id: null
+  source:
+    kind: code-review
+    file: app/routers/imoveis.py
+  links:
+    trello_card: null
+    gh_issue: 140
+    prs: []
+  evidence: []
+  created: '2026-11-08'
+  updated: '2026-11-08'
+  history:
+  - date: '2026-11-08'
+    status: backlog
+  sync:
+    github:
+      hash: bd57660755d62016
+      remote_at: '2026-11-08T12:39:56Z'

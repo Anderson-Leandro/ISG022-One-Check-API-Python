@@ -57,6 +57,7 @@ ROTAS_RESTRITAS = [
     ("PUT", "/imoveis/{imovel_id}/comodos/{comodo_id}", ADMIN_GESTOR),
     ("DELETE", "/imoveis/{imovel_id}/comodos/{comodo_id}", ADMIN_GESTOR),
     ("POST", "/contratos", ADMIN_GESTOR),
+    ("DELETE", "/contratos/{contrato_id}", ADMIN_GESTOR),
     ("POST", "/contratos/{contrato_id}/encerrar", ADMIN_GESTOR),
     ("PATCH", "/contratos/{contrato_id}/encerrar", ADMIN_GESTOR),
     ("POST", "/contratos/{contrato_id}/cancelar", ADMIN_GESTOR),
@@ -65,7 +66,9 @@ ROTAS_RESTRITAS = [
     ("POST", "/contratos/{contrato_id}/checklists", ADMIN_GESTOR),
     ("PUT", "/agendamentos/{agendamento_id}", ADMIN_GESTOR),
     ("DELETE", "/agendamentos/{agendamento_id}", ADMIN_GESTOR),
+    ("DELETE", "/checklists/{checklist_id}", ADMIN_GESTOR),
     ("PATCH", "/checklists/{checklist_id}/enviar-para-aceite", ADMIN_GESTOR),
+    ("DELETE", "/problemas/{problema_id}", ADMIN_GESTOR),
     ("PATCH", "/problemas/{problema_id}/status", ADMIN_GESTOR),
     ("POST", "/problemas/{problema_id}/atualizacoes", ADMIN_GESTOR),
     ("GET", "/logs", ADMIN_GESTOR),
@@ -121,8 +124,8 @@ def test_lista_confere_com_a_api(client):
 
 
 def test_combinacoes_cobertas():
-    """97 combinações, o número da matriz da avaliação SPK-005."""
-    assert len(COMBINACOES_PROIBIDAS) == 97
+    """97 combinações da matriz da avaliação SPK-005, mais 9 das exclusões do US-015 (3 rotas × 3 perfis)."""
+    assert len(COMBINACOES_PROIBIDAS) == 97 + 9
 
 
 # ── 2. Cada perfil proibido recebe 403 e nada é gravado ─────────────────────────

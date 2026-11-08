@@ -29,6 +29,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
   - Vínculo de imóvel a locatário com validação de datas e disponibilidade.
   - Consulta individual restrita por perfil: o locatário vê só os próprios contratos, e o vistoriador só aqueles em que tem vistoria.
   - Encerramento (`/encerrar`) e cancelamento (`/cancelar`) com liberação atômica do status do imóvel para `disponivel`.
+  - Exclusão lógica de contrato, checklist e problema criados por engano (admin, gestor), só antes de virarem evidência: checklist em preenchimento, contrato sem checklist nem problema, problema aberto e sem atualizações ([ADR-0008](docs/adr/0008-exclusao-logica-de-registros.md)).
 
 - **📅 Agendamentos de Vistoria**:
   - Agendamento de vistorias iniciais e de encerramento vinculadas a contratos ativos.
@@ -205,6 +206,7 @@ DELETE /api/v1/imoveis/{id}/comodos/{cid}  # Excluir cômodo (admin, gestor)
 GET    /api/v1/contratos                   # Listar contratos
 POST   /api/v1/contratos                   # Criar contrato de locação (admin, gestor)
 GET    /api/v1/contratos/{id}              # Detalhes do contrato
+DELETE /api/v1/contratos/{id}              # Exclusão lógica; só sem checklist nem problema, 409 caso contrário (admin, gestor)
 PATCH  /api/v1/contratos/{id}/encerrar     # Encerrar e liberar o imóvel; também POST (admin, gestor)
 PATCH  /api/v1/contratos/{id}/cancelar     # Cancelar e liberar o imóvel; também POST (admin, gestor)
 GET    /api/v1/contratos/{id}/agendamentos # Agendamentos do contrato (exceto locatário)
@@ -219,6 +221,7 @@ GET    /api/v1/itens-vistoria              # Catálogo de itens inspecionáveis
 GET    /api/v1/contratos/{id}/checklists   # Listar checklists do contrato
 POST   /api/v1/contratos/{id}/checklists   # Iniciar vistoria; vistoriador_id com perfil vistoriador, contrato ativo (admin, gestor)
 GET    /api/v1/checklists/{id}             # Detalhes do checklist
+DELETE /api/v1/checklists/{id}             # Exclusão lógica; só em preenchimento, 409 caso contrário (admin, gestor)
 POST   /api/v1/checklists/{id}/itens       # Adicionar item (vistoriador do checklist, admin)
 PUT    /api/v1/checklists/{id}/itens/{iid} # Atualizar estado/observação do item (vistoriador do checklist, admin)
 POST   /api/v1/checklists/{id}/itens/{iid}/fotos # Upload da foto, multipart campo "foto" (vistoriador do checklist, admin)
@@ -235,6 +238,7 @@ GET    /api/v1/checklists/{id}/download    # Laudo em PDF; também /pdf e /downl
 GET    /api/v1/contratos/{id}/problemas    # Listar problemas (admin, gestor, locatário do contrato)
 POST   /api/v1/contratos/{id}/problemas    # Registrar ocorrência, JSON ou multipart com foto (admin, gestor, locatário do contrato); nasce "aberto", outro status dá 422
 GET    /api/v1/problemas/{id}              # Detalhes da ocorrência (admin, gestor, locatário do contrato)
+DELETE /api/v1/problemas/{id}              # Exclusão lógica; só aberto e sem atualizações, 409 caso contrário (admin, gestor)
 PATCH  /api/v1/problemas/{id}/status       # Atualizar status (admin, gestor)
 GET    /api/v1/problemas/{id}/atualizacoes # Linha do tempo (admin, gestor, locatário do contrato)
 POST   /api/v1/problemas/{id}/atualizacoes # Adicionar atualização com foto (admin, gestor)

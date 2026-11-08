@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import MAX_UPLOAD_MB
 from app.database import get_db
 from app.deps import assert_acesso_contrato, assert_acesso_problemas, get_current_user, require_roles
+from app.exclusao import marcar_excluido
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -178,6 +179,31 @@ def cancelar_contrato(
     db.refresh(ct)
     log_operacao(db, user.id, "update", "contrato", ct.id, "cancelar")
     return ok(serialize_contrato(ct))
+
+
+@router.delete("/{contrato_id}")
+def excluir_contrato(
+    contrato_id: str,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(require_roles("admin", "gestor")),
+):
+    """Exclusão lógica (ADR-0008): só para contrato sem checklist nem problema (exclua-os antes)."""
+    ct = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+    if not ct:
+        return fail("Contrato não encontrado", status_code=404)
+    if db.query(Checklist.id).filter(Checklist.contrato_id == contrato_id).first():
+        return fail("Exclua antes os checklists deste contrato", status_code=409)
+    if db.query(Problema.id).filter(Problema.contrato_id == contrato_id).first():
+        return fail("Exclua antes os problemas deste contrato", status_code=409)
+
+    if ct.status == "ativo":
+        imovel = db.query(Imovel).filter(Imovel.id == ct.imovel_id).first()
+        if imovel:
+            imovel.status = "disponivel"
+    marcar_excluido(ct, user)
+    db.commit()
+    log_operacao(db, user.id, "delete", "contrato", contrato_id)
+    return ok(None)
 
 
 def _parse_datetime(dt_val) -> datetime:
