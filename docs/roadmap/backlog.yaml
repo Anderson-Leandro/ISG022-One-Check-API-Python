@@ -3260,7 +3260,7 @@ items:
   priority: must
   rank: 10
   estimate: 2
-  status: review
+  status: done
   sprint: 12
   phase: F3
   depends_on: []
@@ -3276,7 +3276,10 @@ items:
     gh_issue: 83
     prs:
     - '#170'
-  evidence: []
+  evidence:
+  - 'PR #170: CHANGELOG.md da versão 0.1.0'
+  - 'PR #172 (merge 10cb306 na main, CI verde): release dev → main'
+  - tag anotada v0.1.0 em 10cb306
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -3288,10 +3291,12 @@ items:
     status: in_progress
   - date: '2026-11-08'
     status: review
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 15e161e7256aaf1d
-      remote_at: '2026-11-08T17:47:23Z'
+      hash: d88f9bbe02d4d3c5
+      remote_at: '2026-11-08T18:39:00Z'
 - id: DEBT-008
   type: debt
   title: Conventional Commits em pelo menos 70% dos commits
