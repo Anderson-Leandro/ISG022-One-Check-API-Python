@@ -2854,7 +2854,7 @@ items:
   priority: could
   rank: 270
   estimate: 5
-  status: in_progress
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -2869,8 +2869,14 @@ items:
   links:
     trello_card: null
     gh_issue: 74
-    prs: []
-  evidence: []
+    prs:
+    - '#141'
+  evidence:
+  - 'PR #141 (merge 2815be5): DELETE de checklist, contrato e problema com exclusão lógica (ADR-0008); 25 testes
+    em tests/integration/test_exclusao_registros.py'
+  - 'decisões do PO em 2026-11-08: exclusão lógica, admin e gestor, regra estrita'
+  - teste existente alterado (lista de rotas restritas) aprovado pelo usuário em 2026-11-08
+  - collection do Insomnia 164/164 contra a API local; security-audit diff dev sem achado novo
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -2880,10 +2886,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 582e511618a1cb81
-      remote_at: '2026-11-08T12:39:55Z'
+      hash: e0cec57d52e754d0
+      remote_at: '2026-11-08T13:02:55Z'
 - id: US-016
   type: story
   title: Anexos e assinatura de contrato
