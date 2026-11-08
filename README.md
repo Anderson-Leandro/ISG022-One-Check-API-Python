@@ -24,6 +24,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
   - Geocoding automático de latitude e longitude via **OpenStreetMap / Nominatim** e busca de CEP via **ViaCEP**.
   - CRUD completo e isolamento de cômodos (`/imoveis/{id}/comodos`).
   - Soft delete protegido (bloqueio de exclusão para imóveis com locação ativa).
+  - Histórico do imóvel (`/imoveis/{id}/historico`): contratos, vistorias e problemas em ordem cronológica; cada perfil vê só o que já acessa pelas listagens.
 
 - **📄 Contratos de Locação & Ciclo de Vida**:
   - Vínculo de imóvel a locatário com validação de datas e disponibilidade.
@@ -191,6 +192,7 @@ Gestor não age sobre contas `admin`/`gestor`. Toda mudança de credencial feita
 GET    /api/v1/imoveis                     # Listar imóveis; ?com_endereco=true
 POST   /api/v1/imoveis                     # Criar imóvel com endereço e geocoding (admin, gestor)
 GET    /api/v1/imoveis/{id}                # Detalhes do imóvel
+GET    /api/v1/imoveis/{id}/historico      # Contratos, vistorias e problemas em ordem cronológica, no recorte de cada perfil
 PUT    /api/v1/imoveis/{id}                # Atualizar imóvel e endereço (admin, gestor)
 DELETE /api/v1/imoveis/{id}                # Excluir imóvel, soft delete (admin, gestor)
 GET    /api/v1/imoveis/{id}/endereco       # Consultar endereço
