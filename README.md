@@ -199,7 +199,7 @@ POST   /api/v1/imoveis/{id}/endereco       # Salvar endereço com geocoding; tam
 GET    /api/v1/imoveis/{id}/comodos        # Listar cômodos
 POST   /api/v1/imoveis/{id}/comodos        # Adicionar cômodo (admin, gestor)
 PUT    /api/v1/imoveis/{id}/comodos/{cid}  # Atualizar cômodo (admin, gestor)
-DELETE /api/v1/imoveis/{id}/comodos/{cid}  # Excluir cômodo (admin, gestor)
+DELETE /api/v1/imoveis/{id}/comodos/{cid}  # Excluir cômodo; 409 se usado em vistoria ou problema (admin, gestor)
 ```
 
 ### 📄 Contratos & Agendamentos

@@ -4551,7 +4551,7 @@ items:
   priority: should
   rank: 85
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -4576,10 +4576,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 1fced2f43dc062c9
-      remote_at: '2026-11-08T19:13:46Z'
+      hash: 8ee47d5950f5a763
+      remote_at: '2026-11-08T20:17:33Z'
 - id: DEBT-015
   type: debt
   title: Remover o perfil visualizador e recusar perfis desconhecidos
