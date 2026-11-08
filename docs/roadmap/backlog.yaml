@@ -3984,7 +3984,7 @@ items:
   priority: should
   rank: 37
   estimate: 2
-  status: review
+  status: done
   sprint: 12
   phase: F5
   depends_on: []
@@ -4002,7 +4002,11 @@ items:
     gh_issue: 105
     prs:
     - '#127'
-  evidence: []
+  evidence:
+  - 'PR #127 (merge 6ca4129): 15 testes em tests/integration/test_seguranca_travas_checklist.py'
+  - 'mutação: desligar cada uma das cinco travas sobrevive à suíte antiga (889 passam) e derruba de 2 a 4 testes
+    novos (docs/roadmap/execucao/SEC-033.md)'
+  - 'security-audit diff dev (2026-11-08): nenhum achado novo'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -4014,10 +4018,12 @@ items:
     status: in_progress
   - date: '2026-11-08'
     status: review
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 9b8591f4ce2018d2
-      remote_at: '2026-11-08T03:34:15Z'
+      hash: 78de21d2da24fa31
+      remote_at: '2026-11-08T03:41:00Z'
 - id: SEC-034
   type: security
   title: Testes de sessão revogada no setup de MFA e do teto de chaves do limitador
