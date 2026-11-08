@@ -49,6 +49,7 @@
 | 2026-11-02 | SPK-005 em andamento: relatório `docs/quality/avaliacao-testes-2026-11-02.md` (ramos 83,7%, matriz de autorização, mutação 96,6% nos módulos críticos). Novos itens SEC-032 a SEC-034, DEBT-011 e DEBT-012; DEBT-010 refinado | o mutmut não muta handlers com decorador | itens novos ficam fora da sprint (decidir no refinamento) |
 | 2026-11-07 | SEC-032, SEC-033, SEC-034, DEBT-011 e DEBT-012 (13 pts) entram na sprint; comprometido passa de 27 para 40 pts | carga acima da capacidade de 32 | decisão do time: priorizar os testes de negação nesta sprint |
 | 2026-11-07 | SPK-005 concluído (#109, #113). Collection do Insomnia para testes manuais (#110, 168 requisições). DEBT-013 registrado fora da sprint (#111, issue #112). DEBT-014 entra na sprint (5 pts, comprometido 45) e é concluído no mesmo dia: erros de negócio com status HTTP adequado (#115, #116; 836 testes, cobertura 95%). Restam 37 pts | TK-002 e TK-003 dependem de acesso ao Render (só o TL). | ADR-0003: status HTTP dos erros de negócio; 401 só sem sessão válida, reautenticação recusada responde 403 |
+| 2026-11-07 | TK-017 concluído (#123): ruleset ativo em main e dev, com merge só por PR, checks `test` e `dependencias` obrigatórios, sem force-push e sem exceções; push direto recusado no teste (GH013). Primeiro item executado pelo `sprint-executor`. Restam 36 pts | — | escopo ampliado para a dev (aprovado pelo usuário); no modo confirmar cada item, o merge é do usuário |
 
 ## Sprint Review
 - **Incremento demonstrável:**

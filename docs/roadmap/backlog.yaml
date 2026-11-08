@@ -3806,7 +3806,7 @@ items:
   priority: must
   rank: 15
   estimate: 1
-  status: review
+  status: done
   sprint: 12
   phase: F0
   depends_on: []
@@ -3823,7 +3823,10 @@ items:
     gh_issue: 98
     prs:
     - '#123'
-  evidence: []
+  evidence:
+  - 'PR #123 (merge b225c31): ruleset 26780877 ativo em main e dev, versionado em .github/rulesets/protecao-branches.json'
+  - 'cenário negado: push direto numa branch descartável incluída na regra recusado com GH013 (docs/roadmap/execucao/TK-017.md)'
+  - 'security-audit diff dev (2026-11-07): nenhum achado novo'
   created: '2026-11-02'
   updated: '2026-11-07'
   history:
@@ -3835,10 +3838,12 @@ items:
     status: in_progress
   - date: '2026-11-07'
     status: review
+  - date: '2026-11-07'
+    status: done
   sync:
     github:
-      hash: f50e34231332f48b
-      remote_at: '2026-11-08T01:24:35Z'
+      hash: 0b43d52c88f96df3
+      remote_at: '2026-11-08T01:33:51Z'
 - id: SPK-005
   type: spike
   title: Avaliar a qualidade e a cobertura real da suíte de testes
