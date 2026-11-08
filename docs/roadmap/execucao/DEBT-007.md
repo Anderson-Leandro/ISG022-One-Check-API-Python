@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 12 · **Issue:** #83 · **Branch:** `chore/DEBT-007-changelog-v0.1.0` · **PR:** #<n>
+- **Sprint:** 12 · **Issue:** #83 · **Branch:** `chore/DEBT-007-changelog-v0.1.0` · **PR:** #170
 
 ## Entrega
 - `CHANGELOG.md` na raiz, no formato Keep a Changelog. A versão **0.1.0** reúne a migração da API em PHP, as correções da auditoria de segurança e as Sprints 11 e 12, em Adicionado, Alterado, Removido e Segurança. Foi montado a partir dos commits (`git log`) e dos relatórios `docs/security/correcao-*.md`, com links para os ADRs.
