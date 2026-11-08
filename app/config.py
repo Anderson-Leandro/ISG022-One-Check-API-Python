@@ -5,7 +5,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# ONECHECK_SEM_DOTENV=1 ignora o arquivo de configuração local: execuções descartáveis (testes, collection)
+# não herdam limites nem segredos da máquina (TK-020)
+if os.getenv("ONECHECK_SEM_DOTENV") != "1":
+    load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
