@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #165 · **Branch:** `refactor/DEBT-017-acesso-nega-por-padrao` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #165 · **Branch:** `refactor/DEBT-017-acesso-nega-por-padrao` · **PR:** #188
 
 ## Entrega
 - `app/deps.py` ganha `PERFIS_GESTAO` (a mesma lista de `PRIVILEGED_ROLES`) e `negar_perfil_desconhecido`, que responde 403 a qualquer perfil fora de `ROLES`. A lista de perfis continua sendo uma só, a de `app.auth`.
