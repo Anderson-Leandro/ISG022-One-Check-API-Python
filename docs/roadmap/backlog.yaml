@@ -4226,12 +4226,15 @@ items:
     prs:
     - '#115'
     - '#116'
+    - '#118'
   evidence:
   - 'ADR-0003 (docs/adr/0003-status-http-dos-erros.md, PR #115)'
   - 'PR #116 (merge 1f602f1): fail() com status de erro, 122 chamadas classificadas'
   - tests/integration/test_status_http_erros.py e guarda em tests/conftest.py; 836 testes, cobertura 95%
   - 'collection do Insomnia regenerada: 157/157 e 00a 11/11'
   - MUDANCAS_API_PARA_FRONT.md item 30 (ajuste do interceptor de 401 no front)
+  - 'PR #118 (merge efd0363): testes de refresh do seed com resultado fixo'
+  - 'security-audit diff ed36a41 (2026-11-07): 0 altos, SEC-035 baixo no backlog'
   created: '2026-11-07'
   updated: '2026-11-07'
   history:
@@ -4243,3 +4246,48 @@ items:
     github:
       hash: 725aaa9d4fa60313
       remote_at: '2026-11-07T23:32:27Z'
+- id: SEC-035
+  type: security
+  title: Interceptor de 401 do front repete login e MFA recusados (conta em dobro no limite de tentativas)
+  epic: EP-006
+  story: ''
+  description: 'Achado SEC-035 da auditoria diff de 2026-11-07 (docs/security/relatorio-2026-11-07.md). Depois do
+    ADR-0003, login e MFA recusados respondem 401; o interceptor do front (front-react/src/api/client.ts:94) renova
+    a sessão e reenvia a requisição quando há refresh token guardado, e cada erro conta duas falhas. A correção
+    é no repositório front-react: ignorar /auth/login e /auth/mfa/* como já é feito com /auth/refresh (item 30 do
+    MUDANCAS_API_PARA_FRONT.md).'
+  acceptance_criteria:
+  - Dado um refresh token guardado, quando o login responde 401, então o front não renova a sessão nem reenvia o
+    login.
+  - Dado um código MFA errado no login, quando /auth/mfa/verify responde 401, então o front mostra o erro sem reenviar.
+  - Dado um access token expirado numa rota comum, quando a API responde 401, então o front continua renovando e
+    repetindo a requisição uma vez (sem regressão).
+  - Há teste no front para os três cenários.
+  priority: should
+  rank: 200
+  estimate: 1
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on:
+  - DEBT-014
+  security:
+    impact: low
+    refs:
+    - CWE-799
+    - OWASP API4:2023
+    risk_id: null
+  source:
+    kind: security-audit
+    file: docs/security/findings-2026-11-07.json
+    ref: 2026-11-07:SEC-035
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-07'
+  updated: '2026-11-07'
+  history:
+  - date: '2026-11-07'
+    status: backlog
