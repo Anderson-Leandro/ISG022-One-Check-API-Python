@@ -3281,7 +3281,7 @@ items:
   priority: should
   rank: 170
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 12
   phase: F2
   depends_on: []
@@ -3295,8 +3295,12 @@ items:
   links:
     trello_card: null
     gh_issue: 85
-    prs: []
-  evidence: []
+    prs:
+    - '#134'
+  evidence:
+  - 'PR #134 (merge 387b881): ADR-0004 (sessão JWT, refresh rotativo, token_version), ADR-0005 (MFA TOTP por perfil),
+    ADR-0006 (uploads em disco local), ADR-0007 (Render com 1 worker)'
+  - 'achados registrados fora da sprint: SEC-035 e TK-018 (risco R-017)'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -3306,10 +3310,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 4f50627f61324cee
-      remote_at: '2026-11-08T11:54:55Z'
+      hash: 52593870a8cde593
+      remote_at: '2026-11-08T12:03:44Z'
 - id: DEBT-010
   type: debt
   title: Cobrir os ramos não testados de agendamentos, geocoding e database
@@ -4337,7 +4343,7 @@ items:
     file: docs/adr/0005-mfa-totp-obrigatorio-por-perfil.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 135
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4345,6 +4351,10 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  sync:
+    github:
+      hash: a11aaa6d1fcae116
+      remote_at: '2026-11-08T12:03:45Z'
 - id: TK-018
   type: task
   title: 'Fotos em disco efêmero no Render: confirmar e dar armazenamento durável'
@@ -4378,7 +4388,7 @@ items:
     file: docs/adr/0006-uploads-em-disco-local.md
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 136
     prs: []
   evidence: []
   created: '2026-11-08'
@@ -4386,3 +4396,7 @@ items:
   history:
   - date: '2026-11-08'
     status: backlog
+  sync:
+    github:
+      hash: 868cf03be0d5c060
+      remote_at: '2026-11-08T12:03:45Z'
