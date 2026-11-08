@@ -4515,7 +4515,7 @@ items:
   priority: should
   rank: 290
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 12
   phase: F4
   depends_on: []
@@ -4532,8 +4532,14 @@ items:
   links:
     trello_card: null
     gh_issue: 146
-    prs: []
-  evidence: []
+    prs:
+    - '#153'
+  evidence:
+  - 'PR #153 (merge 7bb575a): perfil visualizador removido (ADR-0009); fail secure em get_current_user, login e
+    refresh'
+  - 25 testes em tests/integration/test_seguranca_perfis_validos.py; testes existentes alterados aprovados pelo
+    usuário em 2026-11-08
+  - collection do Insomnia 161/161; security-audit diff dev sem achado novo
   created: '2026-11-08'
   updated: '2026-11-08'
   history:
@@ -4545,10 +4551,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: aafa999316af3b3d
-      remote_at: '2026-11-08T14:54:55Z'
+      hash: 369ee954f906d7a5
+      remote_at: '2026-11-08T15:11:22Z'
 - id: SEC-036
   type: security
   title: Respeitar o MFA opcional ligado pelo próprio usuário
