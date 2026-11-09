@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #77 · **Branch:** `refactor/DEBT-001-corpos-problemas-openapi` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #77 · **Branch:** `refactor/DEBT-001-corpos-problemas-openapi` · **PR:** #203
 
 ## Entrega
 - As três rotas leem o corpo à mão. As de criação aceitam JSON ou multipart com a foto, e todas autorizam antes de ler o corpo (assim quem não pode agir não chega a enviar arquivo). Por isso o OpenAPI não mostrava o corpo.
