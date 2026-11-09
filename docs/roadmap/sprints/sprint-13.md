@@ -65,6 +65,7 @@
 | 2026-11-08 | SEC-019 concluído (PR #205): login falho sem o texto digitado no log (id da conta ou HMAC); registros antigos limpos |
 | 2026-11-08 | SEC-020 concluído (PR #207): filtro de data inválido em /logs responde 422; sai o B110 |
 | 2026-11-08 | SEC-031 concluído (PR #209): CPF cifrado em repouso com a chave fora do banco e rotação por script; R-014 mitigado |
+| 2026-11-08 | DEBT-002 concluído (PR #212): envelope e modelos de resposta no OpenAPI das rotas principais; DEBT-020 criado para unificar os erros |
 
 ## Sprint Review
 - **Incremento demonstrável:**
