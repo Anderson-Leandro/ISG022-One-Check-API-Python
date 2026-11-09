@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import Annotated, Any, Generic, TypeVar
 
 from fastapi.responses import JSONResponse
-from pydantic import AfterValidator, BaseModel, Field
+from pydantic import AfterValidator, BaseModel, Field, WithJsonSchema
 
 from app.cpf import validar_cpf
 from app.senhas import validar_senha
@@ -15,6 +15,17 @@ Cpf = Annotated[str | None, AfterValidator(validar_cpf)]
 # Só documenta os valores no OpenAPI; a validação fica nas rotas, com a mensagem de campo (ADR-0012)
 TIPOS_AGENDAMENTO = ("inicial", "encerramento")
 TipoAgendamento = Annotated[str, Field(json_schema_extra={"enum": list(TIPOS_AGENDAMENTO)})]
+# Problemas (DEBT-001): os valores aceitos, usados pelas rotas e documentados no OpenAPI da mesma forma
+PRIORIDADES_PROBLEMA = ("normal", "alta", "urgente")
+STATUS_PROBLEMA = ("aberto", "em_andamento", "em_analise", "resolvido", "fechado")
+# Status finais: o locatário não comenta mais (ADR-0012)
+STATUS_PROBLEMA_ENCERRADOS = frozenset({"resolvido", "fechado"})
+PrioridadeProblema = Annotated[str, Field(json_schema_extra={"enum": list(PRIORIDADES_PROBLEMA)})]
+StatusProblema = Annotated[str, Field(json_schema_extra={"enum": list(STATUS_PROBLEMA)})]
+# Na criação, o problema nasce aberto: o andamento muda só por PATCH /problemas/{id}/status
+StatusInicialProblema = Annotated[str, Field(json_schema_extra={"enum": ["aberto"]})]
+# Arquivo de um envio multipart, como o OpenAPI o descreve
+Arquivo = Annotated[bytes | None, WithJsonSchema({"type": "string", "format": "binary"})]
 
 
 class Paginacao(BaseModel):
@@ -374,9 +385,25 @@ class ItemVistoriaOut(BaseModel):
 # --- Problemas ---
 
 
-class AtualizacaoProblemaCreate(BaseModel):
-    descricao: str
-    foto_url: str | None = None
+class _AtualizacaoProblemaBase(BaseModel):
+    descricao: str = Field(
+        description="Pelo menos 5 caracteres, sem contar os espaços nas pontas",
+        json_schema_extra={"minLength": 5},
+    )
+
+
+class AtualizacaoProblemaCreate(_AtualizacaoProblemaBase):
+    foto_url: str | None = Field(None, description="Uma foto já enviada pelo upload da API")
+
+
+class AtualizacaoProblemaForm(_AtualizacaoProblemaBase):
+    """O mesmo corpo em multipart/form-data, com a foto no próprio envio."""
+
+    foto: Arquivo = Field(None, description="JPEG, PNG ou WebP")
+
+
+class ProblemaStatusUpdate(BaseModel):
+    status: StatusProblema
 
 
 class AtualizacaoProblemaOut(BaseModel):
@@ -390,13 +417,41 @@ class AtualizacaoProblemaOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class ProblemaCreate(BaseModel):
+class _ProblemaBase(BaseModel):
     titulo: str
     descricao: str | None = None
     comodo_id: str | None = None
-    foto_url: str | None = None
-    prioridade: str = "normal"
-    status: str = "aberto"
+    prioridade: PrioridadeProblema = "normal"
+    status: StatusInicialProblema = "aberto"
+
+
+class ProblemaCreate(_ProblemaBase):
+    foto_url: str | None = Field(None, description="Uma foto já enviada pelo upload da API")
+
+
+class ProblemaForm(_ProblemaBase):
+    """O mesmo corpo em multipart/form-data, com a foto no próprio envio."""
+
+    foto: Arquivo = Field(None, description="JPEG, PNG ou WebP")
+
+
+def corpo_no_openapi(json: type[BaseModel], multipart: type[BaseModel] | None = None) -> dict:
+    """openapi_extra com o requestBody da rota, a partir dos modelos.
+
+    Para as rotas que leem o corpo à mão (JSON ou multipart, e só depois da autorização): o OpenAPI mostra o
+    corpo, e a leitura e as mensagens de erro continuam as da rota."""
+
+    def esquema(modelo: type[BaseModel]) -> dict:
+        schema = modelo.model_json_schema()
+        # Um modelo aninhado geraria $defs com referências que não resolvem dentro do OpenAPI da rota
+        if "$defs" in schema:
+            raise ValueError(f"{modelo.__name__}: modelo aninhado não cabe no corpo documentado à mão")
+        return schema
+
+    conteudo = {"application/json": {"schema": esquema(json)}}
+    if multipart:
+        conteudo["multipart/form-data"] = {"schema": esquema(multipart)}
+    return {"requestBody": {"required": True, "content": conteudo}}
 
 
 class ProblemaOut(BaseModel):

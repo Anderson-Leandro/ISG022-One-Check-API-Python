@@ -3059,7 +3059,7 @@ items:
   priority: should
   rank: 160
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -3083,10 +3083,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 75a4a7e16a3f8d2b
-      remote_at: '2026-11-08T19:13:34Z'
+      hash: 0865f7d95128244f
+      remote_at: '2026-11-09T00:27:56Z'
 - id: DEBT-002
   type: debt
   title: response_model e nomes consistentes no OpenAPI

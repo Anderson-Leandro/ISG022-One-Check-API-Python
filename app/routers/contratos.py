@@ -25,10 +25,14 @@ from app.models import (
 )
 from app.notification_service import notificar_admins
 from app.schemas import (
+    PRIORIDADES_PROBLEMA,
     TIPOS_AGENDAMENTO,
     AgendamentoCreate,
     ChecklistCreate,
     ContratoCreate,
+    ProblemaCreate,
+    ProblemaForm,
+    corpo_no_openapi,
     fail,
     ok,
 )
@@ -393,7 +397,7 @@ def create_checklist(
     return ok(serialize_checklist(ck))
 
 
-@router.post("/{contrato_id}/problemas")
+@router.post("/{contrato_id}/problemas", openapi_extra=corpo_no_openapi(ProblemaCreate, ProblemaForm))
 async def create_problema(
     contrato_id: str,
     request: Request,
@@ -457,6 +461,8 @@ async def create_problema(
             body = await request.json()
         except Exception:
             body = {}
+        if not isinstance(body, dict):
+            body = {}
         titulo = str(body.get("titulo") or "").strip()
         descricao = body.get("descricao")
         if descricao is not None:
@@ -489,7 +495,7 @@ async def create_problema(
         if not comodo:
             return JSONResponse(status_code=404, content={"sucesso": False, "erro": "Cômodo não encontrado"})
 
-    if prioridade not in ("normal", "alta", "urgente"):
+    if prioridade not in PRIORIDADES_PROBLEMA:
         return JSONResponse(
             status_code=422,
             content={"sucesso": False, "erro": "Prioridade inválida", "erros": {"prioridade": "Prioridade inválida"}},
