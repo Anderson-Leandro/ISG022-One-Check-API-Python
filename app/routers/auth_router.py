@@ -30,6 +30,7 @@ from app.database import get_db
 from app.deps import get_current_user, require_roles
 from app.models import Usuario
 from app.rate_limit import Tentativas
+from app.respostas import LoginResposta, TokensResposta, documentar
 from app.schemas import (
     LoginRequest,
     MfaActivateLoginRequest,
@@ -46,7 +47,7 @@ from app.serializers import log_operacao
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/login")
+@router.post("/login", responses=documentar(LoginResposta, erros=(401, 422, 429)))
 def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     # Verificado antes da senha: durante o bloqueio nem a senha correta é aceita
     tentativas = Tentativas(request, "login", body.email.strip().lower())
@@ -97,7 +98,7 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/mfa/verify")
+@router.post("/mfa/verify", responses=documentar(LoginResposta, erros=(401, 422, 429)))
 def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
     if not payload or payload.get("type") != "mfa":
@@ -298,7 +299,7 @@ def mfa_desabilitar(
     return ok({"mensagem": "MFA desativado com sucesso", "sessao": nova_sessao(db, user)})
 
 
-@router.post("/refresh")
+@router.post("/refresh", responses=documentar(TokensResposta, erros=(401, 422)))
 def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
     # A troca marca o token antes de emitir o par novo, de forma atômica: só um pedido vence (SEC-027)
     resultado, user = trocar_refresh_token(db, body.refresh_token)

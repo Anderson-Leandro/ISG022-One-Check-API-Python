@@ -10,6 +10,7 @@ from app.deps import assert_acesso_problemas, get_current_user, require_roles
 from app.exclusao import marcar_excluido
 from app.models import AtualizacaoProblema, Contrato, Problema, Usuario
 from app.notification_service import notificar_admins, notificar_usuario
+from app.respostas import ProblemaResposta, documentar
 from app.schemas import (
     STATUS_PROBLEMA,
     STATUS_PROBLEMA_ENCERRADOS,
@@ -46,7 +47,7 @@ def _assert_pode_acessar_problema(pb: Problema, user: Usuario, db: Session) -> C
     return contrato
 
 
-@router.get("/problemas/{problema_id}")
+@router.get("/problemas/{problema_id}", responses=documentar(ProblemaResposta, erros=(401, 403, 404)))
 def get_problema_by_id(
     problema_id: str,
     db: Session = Depends(get_db),
