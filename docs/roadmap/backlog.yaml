@@ -1331,7 +1331,7 @@ items:
   priority: could
   rank: 190
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -1349,8 +1349,12 @@ items:
   links:
     trello_card: null
     gh_issue: 38
-    prs: []
-  evidence: []
+    prs:
+    - '#205'
+  evidence:
+  - 'PR #205 (merge ae97dd7): PR #205: login_falho grava o id da conta ou um HMAC do e-mail, nunca o texto digitado;
+    limpeza dos registros antigos'
+  - 'tests/integration/test_seguranca_log_login_falho.py: 11 testes novos; suíte 1254 passaram, cobertura 96%'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -1360,10 +1364,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 63a9aea09bf3b5de
-      remote_at: '2026-11-09T00:42:39Z'
+      hash: 59f9400f6ef0fb04
+      remote_at: '2026-11-09T02:45:25Z'
 - id: SEC-020
   type: security
   title: Filtros de data inválidos em /logs são ignorados em silêncio
