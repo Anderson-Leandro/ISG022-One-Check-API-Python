@@ -1387,7 +1387,7 @@ items:
   priority: could
   rank: 200
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -1405,8 +1405,13 @@ items:
   links:
     trello_card: null
     gh_issue: 39
-    prs: []
-  evidence: []
+    prs:
+    - '#207'
+  evidence:
+  - 'PR #207 (merge 5235884): PR #207: GET /logs responde 422 para data inválida em de/ate; ate só com a data inclui
+    o dia inteiro; fuso convertido para UTC'
+  - 'tests/integration/test_seguranca_logs_filtro_data.py: 26 testes novos; suíte 1280 passaram, cobertura 96%;
+    collection 166/166'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -1416,10 +1421,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 62a90f323c58b34c
-      remote_at: '2026-11-09T02:48:29Z'
+      hash: 725cf45b49046124
+      remote_at: '2026-11-09T03:00:06Z'
 - id: US-001
   type: story
   title: Autenticar identidade com JWT e refresh
