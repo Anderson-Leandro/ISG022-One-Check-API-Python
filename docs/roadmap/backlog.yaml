@@ -3139,7 +3139,7 @@ items:
   priority: should
   rank: 150
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -3155,8 +3155,13 @@ items:
   links:
     trello_card: null
     gh_issue: 79
-    prs: []
-  evidence: []
+    prs:
+    - '#201'
+  evidence:
+  - 'PR #201 (merge fa6816e): PR #201: uma rota canônica por operação de MFA (ADR-0013); aliases obsoletos até 2027-01-31
+    com Deprecation, Sunset e Link; GET /auth/mfa/setup removido'
+  - 'tests/integration/test_rotas_mfa_canonicas.py: 42 testes novos; suíte 1221 passaram, cobertura 96%; collection
+    166/166; 3 testes existentes alterados com aprovação de Anderson em 2026-11-08'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -3166,10 +3171,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: f5781dff43917b5a
-      remote_at: '2026-11-08T23:51:28Z'
+      hash: f5276e2ecf8f8334
+      remote_at: '2026-11-09T00:23:54Z'
 - id: DEBT-004
   type: debt
   title: Lint e formatação (ruff) no CI
