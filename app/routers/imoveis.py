@@ -16,6 +16,7 @@ from app.deps import (
 )
 from app.geocoding import buscar_coordenadas
 from app.models import Checklist, ChecklistItem, Contrato, Endereco, Imovel, ImovelComodo, Problema, Usuario
+from app.respostas import ComodoResposta, ImovelResposta, documentar
 from app.schemas import (
     ComodoCreate,
     ComodoUpdate,
@@ -84,7 +85,7 @@ def _apply_endereco(end: Endereco, body: EnderecoCreate, *, is_new: bool) -> Non
         end.longitude = lon
 
 
-@router.get("")
+@router.get("", responses=documentar(ImovelResposta, lista=True, erros=(401,)))
 def list_imoveis(
     pagina: int = Query(1, ge=1),
     por_pagina: int = Query(20, ge=1, le=100),
@@ -115,7 +116,7 @@ def list_imoveis(
     return ok([serialize_imovel(i, include_endereco=com_endereco) for i in items], pag)
 
 
-@router.post("")
+@router.post("", responses=documentar(ImovelResposta, erros=(401, 403, 422)))
 def create_imovel(
     body: ImovelCreate,
     db: Session = Depends(get_db),
@@ -147,7 +148,7 @@ def create_imovel(
     return ok(serialize_imovel(im, include_endereco=bool(body.endereco)))
 
 
-@router.get("/{imovel_id}")
+@router.get("/{imovel_id}", responses=documentar(ImovelResposta, erros=(401, 403, 404)))
 def get_imovel(
     imovel_id: str,
     db: Session = Depends(get_db),
@@ -342,7 +343,7 @@ def upsert_endereco(
 # ── Cômodos ───────────────────────────────────────────────────────────────────────
 
 
-@router.get("/{imovel_id}/comodos")
+@router.get("/{imovel_id}/comodos", responses=documentar(ComodoResposta, lista=True, erros=(401, 403, 404)))
 def list_comodos(
     imovel_id: str,
     db: Session = Depends(get_db),

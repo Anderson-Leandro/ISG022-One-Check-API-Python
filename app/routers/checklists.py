@@ -20,6 +20,7 @@ from app.models import (
     Usuario,
 )
 from app.pdf_generator import gerar_pdf_checklist
+from app.respostas import ChecklistResposta, documentar
 from app.schemas import (
     AddChecklistItemRequest,
     ItemUpdateRequest,
@@ -93,7 +94,7 @@ def _assert_pode_ver_checklist(checklist: Checklist, user: Usuario, db: Session)
     raise HTTPException(status_code=403, detail="Sem permissão para ver esta vistoria")
 
 
-@router.get("/checklists/{checklist_id}")
+@router.get("/checklists/{checklist_id}", responses=documentar(ChecklistResposta, erros=(401, 403, 404)))
 def get_checklist(
     checklist_id: str,
     db: Session = Depends(get_db),

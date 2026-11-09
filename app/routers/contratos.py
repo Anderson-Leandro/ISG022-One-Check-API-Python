@@ -24,6 +24,7 @@ from app.models import (
     Usuario,
 )
 from app.notification_service import notificar_admins
+from app.respostas import AgendamentoResposta, ChecklistResposta, ContratoResposta, ProblemaResposta, documentar
 from app.schemas import (
     PRIORIDADES_PROBLEMA,
     TIPOS_AGENDAMENTO,
@@ -49,7 +50,7 @@ from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 router = APIRouter(prefix="/contratos", tags=["contratos"])
 
 
-@router.get("")
+@router.get("", responses=documentar(ContratoResposta, lista=True, erros=(401,)))
 def list_contratos(
     pagina: int = Query(1, ge=1),
     por_pagina: int = Query(20, ge=1, le=100),
@@ -77,7 +78,7 @@ def list_contratos(
     return ok([serialize_contrato(c) for c in items], pag)
 
 
-@router.post("")
+@router.post("", responses=documentar(ContratoResposta, erros=(400, 401, 403, 404, 409, 422)))
 def create_contrato(
     body: ContratoCreate,
     db: Session = Depends(get_db),
@@ -128,7 +129,7 @@ def create_contrato(
     return ok(serialize_contrato(ct))
 
 
-@router.get("/{contrato_id}")
+@router.get("/{contrato_id}", responses=documentar(ContratoResposta, erros=(401, 403, 404)))
 def get_contrato(
     contrato_id: str,
     db: Session = Depends(get_db),
@@ -232,7 +233,7 @@ def _parse_datetime(dt_val) -> datetime:
     raise ValueError("Formato de data inválido")
 
 
-@router.get("/{contrato_id}/agendamentos")
+@router.get("/{contrato_id}/agendamentos", responses=documentar(AgendamentoResposta, lista=True, erros=(401, 403, 404)))
 def list_agendamentos(
     contrato_id: str,
     db: Session = Depends(get_db),
@@ -311,7 +312,7 @@ def create_agendamento(
     return ok(serialize_agendamento(ag))
 
 
-@router.get("/{contrato_id}/checklists")
+@router.get("/{contrato_id}/checklists", responses=documentar(ChecklistResposta, lista=True, erros=(401, 403, 404)))
 def list_checklists(
     contrato_id: str,
     db: Session = Depends(get_db),
@@ -331,7 +332,7 @@ def list_checklists(
     return ok([serialize_checklist(c) for c in rows])
 
 
-@router.post("/{contrato_id}/checklists")
+@router.post("/{contrato_id}/checklists", responses=documentar(ChecklistResposta, erros=(401, 403, 404, 409, 422)))
 def create_checklist(
     contrato_id: str,
     body: ChecklistCreate,
@@ -397,7 +398,12 @@ def create_checklist(
     return ok(serialize_checklist(ck))
 
 
-@router.post("/{contrato_id}/problemas", openapi_extra=corpo_no_openapi(ProblemaCreate, ProblemaForm))
+@router.post(
+    "/{contrato_id}/problemas",
+    status_code=201,
+    openapi_extra=corpo_no_openapi(ProblemaCreate, ProblemaForm),
+    responses=documentar(ProblemaResposta, status=201, erros=(401, 403, 404, 409, 422)),
+)
 async def create_problema(
     contrato_id: str,
     request: Request,
@@ -540,7 +546,7 @@ async def create_problema(
     return JSONResponse(status_code=201, content={"sucesso": True, "dados": serialize_problema(pb)})
 
 
-@router.get("/{contrato_id}/problemas")
+@router.get("/{contrato_id}/problemas", responses=documentar(ProblemaResposta, lista=True, erros=(401, 403, 404)))
 def list_problemas(
     contrato_id: str,
     db: Session = Depends(get_db),

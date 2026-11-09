@@ -3133,7 +3133,7 @@ items:
   priority: could
   rank: 300
   estimate: 5
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -3151,16 +3151,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-08'
+  updated: '2026-11-09'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-09'
+    status: in_progress
   sync:
     github:
-      hash: ed7965411f1b52aa
-      remote_at: '2026-11-08T19:13:35Z'
+      hash: aba1bb514dc9e2fa
+      remote_at: '2026-11-09T03:34:52Z'
 - id: DEBT-003
   type: debt
   title: Consolidar as rotas duplicadas de MFA e remover GET /auth/mfa/setup
@@ -5249,3 +5251,48 @@ items:
     github:
       hash: 5911ac3c37af511d
       remote_at: '2026-11-08T22:29:25Z'
+- id: DEBT-020
+  type: debt
+  title: Erros de autenticação, perfil e validação no mesmo envelope {sucesso, erro, erros}
+  epic: EP-007
+  story: ''
+  description: 'Achado do DEBT-002. As regras de negócio respondem no envelope {sucesso, erro, erros} (ADR-0003),
+    mas o 401 de token, o 403 de perfil (HTTPException das dependências) e o 422 de corpo fora do schema (RequestValidationError
+    do FastAPI) respondem {"detail": ...}. O OpenAPI documenta os dois formatos (DetalheErro). Unificar exige handlers
+    de exceção globais e muda o corpo desses erros para quem consome a API; 35 asserções de testes existentes leem
+    detail.'
+  acceptance_criteria:
+  - 'Dado um 401 de token, um 403 de perfil ou um 422 de corpo fora do schema, quando a API responder, então o corpo
+    é {sucesso: false, erro, erros}, com o mesmo status.'
+  - O 422 de corpo fora do schema traz em erros a mensagem por campo.
+  - O OpenAPI deixa de declarar DetalheErro.
+  - Os testes existentes que leem detail são atualizados com relatório e aprovação.
+  priority: should
+  rank: 1540
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - ADR-0003
+    risk_id: null
+  source:
+    kind: review
+    ref: DEBT-002
+  links:
+    trello_card: null
+    gh_issue: 211
+    prs: []
+  evidence: []
+  created: '2026-11-09'
+  updated: '2026-11-09'
+  history:
+  - date: '2026-11-09'
+    status: backlog
+  sync:
+    github:
+      hash: 75d408e4b0713b90
+      remote_at: '2026-11-09T03:39:53Z'

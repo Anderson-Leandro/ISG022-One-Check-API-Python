@@ -22,6 +22,7 @@ from app.database import get_db
 from app.deps import get_current_user, require_roles
 from app.models import Usuario
 from app.rate_limit import Tentativas
+from app.respostas import UsuarioResposta, documentar
 from app.schemas import (
     AlterarSenhaRequest,
     MfaDisableSelfRequest,
@@ -50,7 +51,7 @@ def _assert_pode_atribuir(current: Usuario, role: str) -> None:
         raise HTTPException(status_code=403, detail="Só administradores atribuem este perfil")
 
 
-@router.get("/me")
+@router.get("/me", responses=documentar(UsuarioResposta, erros=(401,)))
 def me(user: Usuario = Depends(get_current_user)):
     return ok(serialize_usuario(user, cpf_completo=True))
 
@@ -170,7 +171,7 @@ def mfa_disable_me(
     return ok({**serialize_usuario(user, cpf_completo=True), "sessao": nova_sessao(db, user)})
 
 
-@router.get("")
+@router.get("", responses=documentar(UsuarioResposta, lista=True, erros=(401, 403)))
 def list_usuarios(
     pagina: int = Query(1, ge=1),
     por_pagina: int = Query(20, ge=1, le=100),
@@ -186,7 +187,7 @@ def list_usuarios(
     return ok([serialize_usuario(u) for u in items], pag)
 
 
-@router.get("/{usuario_id}")
+@router.get("/{usuario_id}", responses=documentar(UsuarioResposta, erros=(401, 403, 404)))
 def get_usuario(
     usuario_id: str,
     db: Session = Depends(get_db),
@@ -323,7 +324,7 @@ def mfa_reset_usuario(
     return ok(serialize_usuario(user))
 
 
-@router.post("")
+@router.post("", responses=documentar(UsuarioResposta, erros=(401, 403, 409, 422)))
 def create_usuario(
     body: UsuarioCreate,
     db: Session = Depends(get_db),
