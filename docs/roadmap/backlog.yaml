@@ -3512,7 +3512,7 @@ items:
   priority: could
   rank: 310
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -3524,8 +3524,12 @@ items:
   links:
     trello_card: null
     gh_issue: 86
-    prs: []
-  evidence: []
+    prs:
+    - '#215'
+  evidence:
+  - 'PR #215 (merge 4282f48): PR #215: ramos das rotas e migrações cobertos; agendamentos, contratos, imóveis e
+    problemas acima de 90%; total de ramos 92,3%'
+  - 56 testes novos; suíte 1372 passaram; BUG-002 criado
   created: '2026-11-02'
   updated: '2026-11-09'
   history:
@@ -3535,10 +3539,12 @@ items:
     status: in_sprint
   - date: '2026-11-09'
     status: in_progress
+  - date: '2026-11-09'
+    status: done
   sync:
     github:
-      hash: 94bfa2ee75912b07
-      remote_at: '2026-11-09T10:42:26Z'
+      hash: 4cf1226fde34d844
+      remote_at: '2026-11-09T10:56:40Z'
 - id: TK-006
   type: task
   title: Auditoria de segurança completa antes da release candidata
