@@ -61,6 +61,7 @@
 | 2026-11-08 | DEBT-005 concluído (PR #197): Dependabot para pip e GitHub Actions contra a dev; o CI barra o PR sem o lock regenerado; DEBT-019 criado fora da sprint |
 | 2026-11-08 | DEBT-004 concluído (PR #199): ruff no CI e base sem avisos; 58 arquivos de teste reformatados com aprovação |
 | 2026-11-08 | DEBT-003 concluído (PR #201): rotas canônicas de MFA, aliases obsoletos até 2027-01-31 e GET /auth/mfa/setup removido |
+| 2026-11-08 | DEBT-001 concluído (PR #203): corpos das rotas de problemas no OpenAPI; corpo que não é objeto dá 422 |
 
 ## Sprint Review
 - **Incremento demonstrável:**

@@ -3059,7 +3059,7 @@ items:
   priority: should
   rank: 160
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -3074,8 +3074,12 @@ items:
   links:
     trello_card: null
     gh_issue: 77
-    prs: []
-  evidence: []
+    prs:
+    - '#203'
+  evidence:
+  - 'PR #203 (merge 25131bb): PR #203: requestBody no OpenAPI das três rotas de problemas, a partir dos modelos;
+    corpo fora do formato dá 422 em vez de 500'
+  - 'tests/integration/test_openapi_corpos_problemas.py: 22 testes novos; suíte 1243 passaram, cobertura 96%'
   created: '2026-11-02'
   updated: '2026-11-08'
   history:
@@ -3085,10 +3089,12 @@ items:
     status: in_sprint
   - date: '2026-11-08'
     status: in_progress
+  - date: '2026-11-08'
+    status: done
   sync:
     github:
-      hash: 0865f7d95128244f
-      remote_at: '2026-11-09T00:27:56Z'
+      hash: 6c9e612d264a7a37
+      remote_at: '2026-11-09T00:39:17Z'
 - id: DEBT-002
   type: debt
   title: response_model e nomes consistentes no OpenAPI
