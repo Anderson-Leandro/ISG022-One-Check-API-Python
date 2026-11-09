@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #86 · **Branch:** `test/DEBT-010-cobertura-ramos` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #86 · **Branch:** `test/DEBT-010-cobertura-ramos` · **PR:** #215
 
 ## Entrega
 Só testes, sem mudar o código de produção. Os ramos que faltavam, apontados pela avaliação do SPK-005 (`docs/quality/avaliacao-testes-2026-11-02.md`), passam a ter teste que confere a resposta:
