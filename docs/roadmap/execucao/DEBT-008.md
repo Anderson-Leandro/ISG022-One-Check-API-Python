@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #84 · **Branch:** `chore/DEBT-008-conventional-commits` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #84 · **Branch:** `chore/DEBT-008-conventional-commits` · **PR:** #217
 
 ## Entrega
 Diagnóstico: o `diagnose.py` mostrava **58%** sobre os últimos 300 commits. Os commits de autoria já estavam em 90% (165 de 183). O que puxava a medida para baixo eram os 103 commits de merge do GitHub, com o assunto padrão "Merge pull request #N from ...". O histórico publicado não é reescrito (regra do projeto).
