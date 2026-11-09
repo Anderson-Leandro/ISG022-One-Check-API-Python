@@ -17,7 +17,6 @@ Regras verificadas:
 import time
 
 import pyotp
-import pytest
 
 from app.auth import create_temp_token
 from app.models import Usuario
@@ -52,16 +51,15 @@ def _login_mfa_ok(client, user) -> bool:
 
 
 class TestSetupNaoSobrescreve:
-    @pytest.mark.parametrize("metodo", ["get", "post"])
-    def test_setup_preserva_segredo_ativo(self, client, db, user_admin, token_admin, metodo):
-        r = getattr(client, metodo)(f"{AUTH}/mfa/setup", headers=auth(token_admin))
+    def test_setup_preserva_segredo_ativo(self, client, db, user_admin, token_admin):
+        r = client.post(f"{AUTH}/mfa/setup", headers=auth(token_admin))
         assert r.json()["sucesso"] is True
         u = _recarregar(db, user_admin)
         assert u.mfa_secret == MFA_TEST_SECRET
         assert u.mfa_secret_pendente == r.json()["dados"]["secret"]
 
     def test_setup_abandonado_nao_tranca_o_usuario(self, client, user_admin, token_admin):
-        client.get(f"{AUTH}/mfa/setup", headers=auth(token_admin))
+        client.post(f"{AUTH}/mfa/setup", headers=auth(token_admin))
         assert _login_mfa_ok(client, user_admin)
 
 

@@ -190,7 +190,6 @@ def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session 
 
 
 @router.post("/mfa/setup")
-@router.get("/mfa/setup", deprecated=True)
 def mfa_setup(user: Usuario = Depends(get_current_user), db: Session = Depends(get_db)):
     # O segredo fica pendente até o /mfa/activate confirmar o código: abandonar o setup
     # não invalida o autenticador em uso
