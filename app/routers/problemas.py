@@ -10,6 +10,14 @@ from app.deps import assert_acesso_problemas, get_current_user, require_roles
 from app.exclusao import marcar_excluido
 from app.models import AtualizacaoProblema, Contrato, Problema, Usuario
 from app.notification_service import notificar_admins, notificar_usuario
+from app.schemas import (
+    STATUS_PROBLEMA,
+    STATUS_PROBLEMA_ENCERRADOS,
+    AtualizacaoProblemaCreate,
+    AtualizacaoProblemaForm,
+    ProblemaStatusUpdate,
+    corpo_no_openapi,
+)
 from app.serializers import log_operacao, serialize_atualizacao_problema, serialize_problema
 from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
 
@@ -28,10 +36,6 @@ def _fail(erro: str, status_code: int = 400, erros: dict | None = None) -> JSONR
     if erros:
         res["erros"] = erros
     return JSONResponse(status_code=status_code, content=res)
-
-
-# Status em que o locatário não comenta mais (ADR-0012)
-_STATUS_ENCERRADOS = {"resolvido", "fechado"}
 
 
 def _assert_pode_acessar_problema(pb: Problema, user: Usuario, db: Session) -> Contrato:
@@ -81,7 +85,7 @@ def excluir_problema(
     return _ok(None)
 
 
-@router.patch("/problemas/{problema_id}/status")
+@router.patch("/problemas/{problema_id}/status", openapi_extra=corpo_no_openapi(ProblemaStatusUpdate))
 async def atualizar_status_problema(
     problema_id: str,
     request: Request,
@@ -96,10 +100,10 @@ async def atualizar_status_problema(
         body = await request.json()
     except Exception:
         body = {}
-
-    novo_status = (body.get("status") or "").strip()
-    status_permitidos = {"aberto", "em_andamento", "em_analise", "resolvido", "fechado"}
-    if not novo_status or novo_status not in status_permitidos:
+    # Um corpo que não é objeto, ou um status que não é texto, é tratado como status ausente (422)
+    novo_status = body.get("status") if isinstance(body, dict) else None
+    novo_status = novo_status.strip() if isinstance(novo_status, str) else ""
+    if not novo_status or novo_status not in STATUS_PROBLEMA:
         return _fail("Status inválido", status_code=422, erros={"status": "Status inválido"})
 
     status_ant = pb.status
@@ -119,7 +123,10 @@ async def atualizar_status_problema(
     return _ok(serialize_problema(pb))
 
 
-@router.post("/problemas/{problema_id}/atualizacoes")
+@router.post(
+    "/problemas/{problema_id}/atualizacoes",
+    openapi_extra=corpo_no_openapi(AtualizacaoProblemaCreate, AtualizacaoProblemaForm),
+)
 async def criar_atualizacao(
     problema_id: str,
     request: Request,
@@ -136,7 +143,7 @@ async def criar_atualizacao(
         contrato = _assert_pode_acessar_problema(pb, user, db)
     except HTTPException as e:
         return _fail(e.detail, status_code=e.status_code)
-    if user.role == "locatario" and pb.status in _STATUS_ENCERRADOS:
+    if user.role == "locatario" and pb.status in STATUS_PROBLEMA_ENCERRADOS:
         return _fail("Não é possível comentar num problema resolvido", status_code=409)
 
     content_type = request.headers.get("content-type", "")
@@ -165,6 +172,8 @@ async def criar_atualizacao(
             body = await request.json()
         except Exception:
             body = {}
+        if not isinstance(body, dict):
+            body = {}
         descricao = str(body.get("descricao") or "")
         if body.get("foto_url"):
             foto_chave = nome_de_upload_existente(body.get("foto_url"))
@@ -181,7 +190,7 @@ async def criar_atualizacao(
 
     # O status pode ter mudado durante o upload: confere de novo antes de gravar
     db.refresh(pb)
-    if user.role == "locatario" and pb.status in _STATUS_ENCERRADOS:
+    if user.role == "locatario" and pb.status in STATUS_PROBLEMA_ENCERRADOS:
         return _fail("Não é possível comentar num problema resolvido", status_code=409)
 
     atualizacao = AtualizacaoProblema(
