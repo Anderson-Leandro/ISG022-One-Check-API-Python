@@ -9,6 +9,7 @@ from app.cabecalhos import CabecalhosSegurancaMiddleware
 from app.config import CORS_ORIGINS, DOCS_ENABLED, IS_DEV, UPLOAD_DIR
 from app.database import SessionLocal, ensure_schema_updates
 from app.limite_corpo import LimiteCorpoMiddleware
+from app.obsoletas import RotasObsoletasMiddleware, marcar_no_openapi
 from app.routers import (
     admin,
     agendamentos,
@@ -67,12 +68,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     # Lidos pelo front: espera do limite de tentativas e nome do PDF do laudo
-    expose_headers=["Retry-After", "Content-Disposition"],
+    # e o aviso das rotas obsoletas (app/obsoletas.py)
+    expose_headers=["Retry-After", "Content-Disposition", "Deprecation", "Sunset", "Link"],
 )
 # IP de origem para a trilha de auditoria (log_operacao)
 app.add_middleware(IpRequisicaoMiddleware)
 # Adicionado depois do CORS para ficar por fora: recusa corpos grandes antes de qualquer leitura
 app.add_middleware(LimiteCorpoMiddleware)
+# Aviso de rota obsoleta (Deprecation, Sunset, Link) em toda resposta delas, inclusive 401 e 403
+app.add_middleware(RotasObsoletasMiddleware)
 # O mais externo: os cabeçalhos valem também para as respostas 413 e 400 do limite de corpo
 app.add_middleware(CabecalhosSegurancaMiddleware)
 
@@ -88,6 +92,8 @@ app.include_router(checklists.router, prefix=prefix)
 app.include_router(problemas.router, prefix=prefix)
 app.include_router(dashboard.router, prefix=prefix)
 app.include_router(admin.router, prefix=prefix)
+# Rotas obsoletas (ADR-0013): deprecated e a data de remoção no OpenAPI, a partir da tabela de app/obsoletas.py
+marcar_no_openapi(app)
 
 
 @app.get("/")

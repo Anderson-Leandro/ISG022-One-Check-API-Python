@@ -355,8 +355,8 @@ class TestMfaExtended:
         assert data_act["dados"]["usuario"]["email"] == "admin_setup@test.com"
 
     def test_mfa_setup_e_activate_autenticado(self, client, token_locatario):
-        # 1. GET /auth/mfa/setup
-        r_setup = client.get("/api/v1/auth/mfa/setup", headers=auth(token_locatario))
+        # 1. POST /auth/mfa/setup
+        r_setup = client.post("/api/v1/auth/mfa/setup", headers=auth(token_locatario))
         data_setup = r_setup.json()
         assert data_setup["sucesso"] is True
         secret = data_setup["dados"]["secret"]

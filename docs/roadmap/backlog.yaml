@@ -3139,7 +3139,7 @@ items:
   priority: should
   rank: 150
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -3164,10 +3164,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 77176cc7f0b836b8
-      remote_at: '2026-11-08T19:13:37Z'
+      hash: f5781dff43917b5a
+      remote_at: '2026-11-08T23:51:28Z'
 - id: DEBT-004
   type: debt
   title: Lint e formatação (ruff) no CI

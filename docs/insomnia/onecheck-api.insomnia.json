@@ -1244,19 +1244,11 @@
       "parentId": "fld_bc2c069b9308f7fa67af30cb",
       "name": "❌ Admin não reseta o próprio MFA → 403",
       "description": "",
-      "method": "POST",
-      "url": "{{ _.base_url }}/auth/mfa/disable",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/usuarios/{{ _.admin_id }}/mfa",
       "parameters": [],
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"usuario_id\": \"{{ _.admin_id }}\"\n}"
-      },
+      "headers": [],
+      "body": {},
       "authentication": {
         "type": "bearer",
         "token": "{{ _.token_admin }}",
@@ -1264,7 +1256,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 403', () => insomnia.expect(r.code).to.equal(403));\ninsomnia.test(\"mensagem contém: próprio MFA\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"próprio MFA\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 403', () => insomnia.expect(r.code).to.equal(403));\ninsomnia.test(\"mensagem contém: própria conta\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"própria conta\"));",
       "metaSortKey": 3016,
       "isPrivate": false,
       "settingStoreCookies": false,

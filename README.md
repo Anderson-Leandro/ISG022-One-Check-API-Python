@@ -159,28 +159,29 @@ POST   /api/v1/auth/mfa/activate-login     # Ativa o MFA do primeiro acesso e em
 POST   /api/v1/auth/refresh                # Renova o access token e troca o refresh token (público)
 POST   /api/v1/auth/logout                 # Revoga o refresh token enviado
 POST   /api/v1/auth/mfa/setup              # Novo segredo pendente (o autenticador atual continua valendo)
-GET    /api/v1/auth/mfa/setup              # Obsoleto: use o POST
 POST   /api/v1/auth/mfa/activate           # Confirma o segredo pendente; {codigo, codigo_atual} — devolve dados.sessao
 POST   /api/v1/auth/mfa/habilitar          # Liga o MFA; o autenticador é configurado no próximo login
 POST   /api/v1/auth/mfa/desabilitar        # Desliga o próprio MFA; {senha, codigo} — 403 em perfis obrigatórios; devolve dados.sessao
-POST   /api/v1/auth/mfa/disable            # Reset do MFA de outro usuário; {usuario_id} (admin)
+POST   /api/v1/auth/mfa/disable            # Obsoleta até 2027-01-31: use DELETE /usuarios/{id}/mfa
 ```
+
+Rotas obsoletas (ADR-0013) continuam funcionando até a data indicada e respondem com os cabeçalhos `Deprecation` e `Sunset`, e com `Link` (a URL da rota que as substitui; o método está no OpenAPI), menos no `/auth/mfa/disable`, cuja sucessora depende do corpo.
 
 ### 👥 Usuários
 ```http
 GET    /api/v1/usuarios/me                 # Dados do usuário logado
 PATCH  /api/v1/usuarios/me                 # Atualizar dados próprios; com senha_nova exige senha_atual e devolve dados.sessao
 PUT    /api/v1/usuarios/me/senha           # Alteração de senha; {senha_atual, nova_senha} — devolve dados.sessao
-POST   /api/v1/usuarios/me/mfa/setup       # Gera um segredo e o QR code
-POST   /api/v1/usuarios/me/mfa/enable      # Ativa/troca o autenticador; {secret, codigo, codigo_atual} — devolve dados.sessao
-DELETE /api/v1/usuarios/me/mfa             # Desliga o próprio MFA; {senha, codigo} — devolve dados.sessao
+POST   /api/v1/usuarios/me/mfa/setup       # Obsoleta até 2027-01-31: use POST /auth/mfa/setup
+POST   /api/v1/usuarios/me/mfa/enable      # Obsoleta até 2027-01-31: use POST /auth/mfa/activate
+DELETE /api/v1/usuarios/me/mfa             # Obsoleta até 2027-01-31: use POST /auth/mfa/desabilitar
 GET    /api/v1/usuarios                    # Listar usuários; ?role= (admin, gestor)
 POST   /api/v1/usuarios                    # Criar usuário (admin, gestor; só admin cria admin/gestor)
 GET    /api/v1/usuarios/{id}               # Detalhes de usuário (admin, gestor)
 PUT    /api/v1/usuarios/{id}               # Atualizar usuário; não aceita o próprio id (admin, gestor)
 DELETE /api/v1/usuarios/{id}               # Exclusão lógica (admin, gestor)
-POST   /api/v1/usuarios/{id}/mfa/enable    # Exige o MFA; o usuário configura o autenticador no próximo login; também /habilitar (admin, gestor)
-DELETE /api/v1/usuarios/{id}/mfa           # Reset do MFA; também POST /desabilitar (admin, gestor)
+POST   /api/v1/usuarios/{id}/mfa/enable    # Exige o MFA; o usuário configura o autenticador no próximo login (admin, gestor); /habilitar é obsoleta até 2027-01-31
+DELETE /api/v1/usuarios/{id}/mfa           # Reset do MFA (admin, gestor); POST /desabilitar é obsoleta até 2027-01-31
 ```
 Gestor não age sobre contas `admin`/`gestor`. Toda mudança de credencial feita aqui encerra as sessões do usuário afetado.
 - **MFA de outro usuário:** admin e gestor só exigem ou resetam o MFA. O segredo é gerado no login do próprio usuário (`mfa_setup_required`); enviar `secret` ou `codigo` em `/{id}/mfa/enable` dá `422`.
