@@ -32,6 +32,7 @@ Por enquanto, Anderson Mendes Leandro é o responsável por todos os itens do ba
 - `main` sempre implantável e protegida; trabalho em branches curtas: `tipo/ID-descricao`
   (ex.: `feat/US-012-login`, `fix/BUG-004-timeout`, `sec/SEC-003-rate-limit`).
 - Commits pequenos no padrão **Conventional Commits**, citando o ID: `feat(auth): login com MFA (US-012)`.
+- O título do PR segue o mesmo padrão, e o merge usa esse título como assunto: `gh pr merge <n> --merge --subject "<título do PR> (#<n>)"`, em vez do "Merge pull request #N from ..." padrão do GitHub (DEBT-008). O `diagnose.py` mede a proporção sem os commits de merge.
 - Todo merge na `main` passa por **Pull Request** com o template preenchido (DoD).
 - Todo merge passa por PR, mas **não exige aprovação de outra pessoa**: antes de mergear, o próprio autor lê o diff inteiro e confere o CI verde. Revisão de outra pessoa ou `/code-review` é recomendada para mudanças de segurança, sem ser obrigatória.
 - Releases com tag SemVer (`v0.1.0`) ao fim de cada marco; CHANGELOG atualizado.
