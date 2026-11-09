@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #79 · **Branch:** `refactor/DEBT-003-rotas-mfa-canonicas` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #79 · **Branch:** `refactor/DEBT-003-rotas-mfa-canonicas` · **PR:** #201
 
 ## Entrega
 Decisão do usuário (PO) em 2026-11-08, registrada no ADR-0013: as rotas se separam pelo ator, e os aliases saem em 2027-01-31.
