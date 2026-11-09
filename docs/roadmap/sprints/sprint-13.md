@@ -64,6 +64,7 @@
 | 2026-11-08 | DEBT-001 concluído (PR #203): corpos das rotas de problemas no OpenAPI; corpo que não é objeto dá 422 |
 | 2026-11-08 | SEC-019 concluído (PR #205): login falho sem o texto digitado no log (id da conta ou HMAC); registros antigos limpos |
 | 2026-11-08 | SEC-020 concluído (PR #207): filtro de data inválido em /logs responde 422; sai o B110 |
+| 2026-11-08 | SEC-031 concluído (PR #209): CPF cifrado em repouso com a chave fora do banco e rotação por script; R-014 mitigado |
 
 ## Sprint Review
 - **Incremento demonstrável:**
