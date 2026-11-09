@@ -66,6 +66,7 @@
 | 2026-11-08 | SEC-020 concluído (PR #207): filtro de data inválido em /logs responde 422; sai o B110 |
 | 2026-11-08 | SEC-031 concluído (PR #209): CPF cifrado em repouso com a chave fora do banco e rotação por script; R-014 mitigado |
 | 2026-11-08 | DEBT-002 concluído (PR #212): envelope e modelos de resposta no OpenAPI das rotas principais; DEBT-020 criado para unificar os erros |
+| 2026-11-09 | DEBT-010 concluído (PR #215): cobertura de ramos total de 86,6% para 92,3%; BUG-002 criado fora da sprint |
 
 ## Sprint Review
 - **Incremento demonstrável:**
