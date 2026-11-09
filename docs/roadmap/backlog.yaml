@@ -2714,7 +2714,7 @@ items:
   priority: could
   rank: 240
   estimate: 5
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -2731,8 +2731,13 @@ items:
   links:
     trello_card: null
     gh_issue: 69
-    prs: []
-  evidence: []
+    prs:
+    - '#209'
+  evidence:
+  - 'PR #209 (merge d5f7f5b): PR #209: CPF cifrado em repouso (Fernet), chave em CPF_CHAVES fora do banco, rotação
+    por script (ADR-0014)'
+  - 20 testes novos; suíte 1299 passaram, cobertura 96%; collection 166/166; alteração no tests/conftest.py aprovada
+    por Anderson em 2026-11-09
   created: '2026-11-02'
   updated: '2026-11-09'
   history:
@@ -2742,10 +2747,12 @@ items:
     status: in_sprint
   - date: '2026-11-09'
     status: in_progress
+  - date: '2026-11-09'
+    status: done
   sync:
     github:
-      hash: d95ee323e2b9f07f
-      remote_at: '2026-11-09T03:04:13Z'
+      hash: 7f096a3d7b554bf8
+      remote_at: '2026-11-09T03:30:46Z'
 - id: SPK-001
   type: spike
   title: Definir o alcance do perfil visualizador
