@@ -5097,11 +5097,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_13e4820a11633ee5a1cead44",
+      "_id": "req_9ace74cf1adc3fe168be1815",
       "_type": "request",
       "parentId": "fld_9838fe9fc0175411d152934c",
-      "name": "⚠️ Filtro de data inválido é ignorado (comportamento atual, ver SEC-020)",
-      "description": "Hoje a data inválida é descartada sem aviso. O SEC-020 propõe responder 422.",
+      "name": "❌ Filtro de data inválido → 422",
+      "description": "SEC-020: a data inválida não é ignorada; use AAAA-MM-DD ou AAAA-MM-DDTHH:MM:SS.",
       "method": "GET",
       "url": "{{ _.base_url }}/logs",
       "parameters": [
@@ -5120,7 +5120,7 @@
         "disabled": false
       },
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 200', () => insomnia.expect(r.code).to.equal(200));\ninsomnia.test('sucesso = true', () => insomnia.expect(b.sucesso).to.equal(true));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 422', () => insomnia.expect(r.code).to.equal(422));\ninsomnia.test(\"mensagem contém: Filtro de data inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Filtro de data inválido\"));",
       "metaSortKey": 9008,
       "isPrivate": false,
       "settingStoreCookies": false,

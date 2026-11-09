@@ -1387,7 +1387,7 @@ items:
   priority: could
   rank: 200
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F6
   depends_on: []
@@ -1414,10 +1414,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: bdf4876e1baeac96
-      remote_at: '2026-11-08T19:13:27Z'
+      hash: 62a90f323c58b34c
+      remote_at: '2026-11-09T02:48:29Z'
 - id: US-001
   type: story
   title: Autenticar identidade com JWT e refresh

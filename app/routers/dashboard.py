@@ -1,4 +1,5 @@
-from datetime import datetime
+import re
+from datetime import UTC, date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -14,7 +15,7 @@ from app.models import (
     Problema,
     Usuario,
 )
-from app.schemas import ok
+from app.schemas import fail, ok
 from app.serializers import paginate
 
 router = APIRouter(tags=["dashboard"])
@@ -76,6 +77,36 @@ def dashboard(db: Session = Depends(get_db), user: Usuario = Depends(get_current
     )
 
 
+_MSG_DATA = "Use uma data ISO 8601: AAAA-MM-DD ou AAAA-MM-DDTHH:MM:SS (fuso opcional, ex.: Z ou -03:00)"
+_SO_DATA = re.compile(r"\d{4}-\d{2}-\d{2}")
+_DATA_E_HORA = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?(Z|[+-]\d{2}:\d{2})?")
+
+
+def _instante(valor: str | None, fim_do_dia: bool = False) -> datetime | None:
+    """Data ou data e hora ISO 8601 (só as duas formas da mensagem), em UTC sem fuso; None se vazia ou inválida.
+
+    O created_at é gravado sem fuso pelo banco, em UTC (o padrão do Postgres do Render e do SQLite).
+    Só a data, no fim do intervalo (`ate`), vale o dia inteiro: devolve o início do dia seguinte, que a
+    consulta usa como limite exclusivo."""
+    if not valor:
+        return None
+    texto = valor.strip()
+    try:
+        if _SO_DATA.fullmatch(texto):
+            dia = date.fromisoformat(texto)
+            inicio = datetime(dia.year, dia.month, dia.day)
+            return inicio + timedelta(days=1) if fim_do_dia else inicio
+        if not _DATA_E_HORA.fullmatch(texto):
+            return None
+        instante = datetime.fromisoformat(texto)
+        if instante.tzinfo:
+            instante = instante.astimezone(UTC).replace(tzinfo=None)
+        # Com hora, o fim é inclusivo: o limite exclusivo fica um microssegundo depois
+        return instante + timedelta(microseconds=1) if fim_do_dia else instante
+    except (ValueError, OverflowError):  # data inexistente, ou nos limites do calendário (9999-12-31)
+        return None
+
+
 @router.get("/logs")
 def logs(
     pagina: int = Query(1, ge=1),
@@ -97,18 +128,21 @@ def logs(
         q = q.filter(LogOperacao.entidade == entidade)
     if usuario_id:
         q = q.filter(LogOperacao.usuario_id == usuario_id)
-    if de:
-        try:
-            de_dt = datetime.fromisoformat(de)
-            q = q.filter(LogOperacao.created_at >= de_dt)
-        except Exception:
-            pass
-    if ate:
-        try:
-            ate_dt = datetime.fromisoformat(f"{ate}T23:59:59") if "T" not in ate else datetime.fromisoformat(ate)
-            q = q.filter(LogOperacao.created_at <= ate_dt)
-        except Exception:
-            pass
+    # Data inválida responde 422 (SEC-020): ignorá-la devolveria o período todo a quem pediu um recorte
+    erros = {}
+    de_dt, ate_dt = _instante(de), _instante(ate, fim_do_dia=True)
+    if de and de_dt is None:
+        erros["de"] = _MSG_DATA
+    if ate and ate_dt is None:
+        erros["ate"] = _MSG_DATA
+    if not erros and de_dt and ate_dt and de_dt >= ate_dt:
+        erros["ate"] = "A data final não pode ser anterior à inicial"
+    if erros:
+        return fail("Filtro de data inválido", status_code=422, erros=erros)
+    if de_dt:
+        q = q.filter(LogOperacao.created_at >= de_dt)
+    if ate_dt:
+        q = q.filter(LogOperacao.created_at < ate_dt)
 
     q = q.order_by(LogOperacao.created_at.desc())
     items, pag = paginate(q, pagina, por_pagina)
