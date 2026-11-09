@@ -16,6 +16,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.cpf_cifrado import CpfCifrado
 from app.database import Base
 
 
@@ -32,7 +33,8 @@ class Usuario(Base):
     senha_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     # Sem padrão: todo usuário nasce com um perfil explícito (ADR-0009)
     role: Mapped[str] = mapped_column(String(50), nullable=False)
-    cpf: Mapped[str | None] = mapped_column(String(14))
+    # Cifrado em repouso (SEC-031, ADR-0014): a ORM cifra ao gravar e decifra ao ler
+    cpf: Mapped[str | None] = mapped_column(CpfCifrado)
     mfa_secret: Mapped[str | None] = mapped_column(String(64))
     # Segredo gerado no setup; só vira mfa_secret depois que um código válido confirmar
     mfa_secret_pendente: Mapped[str | None] = mapped_column(String(64))

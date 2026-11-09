@@ -304,6 +304,8 @@ APP_ENV=development
 # Obrigatório em produção, 32+ caracteres. Gere com:
 #   python -c "import secrets; print(secrets.token_urlsafe(48))"
 JWT_SECRET=
+# Chave do CPF em repouso: obrigatória em produção, 32+ caracteres (mesmo comando). Ver "CPF cifrado"
+CPF_CHAVES=
 # Docker Compose: obrigatório (sem valor padrão)
 POSTGRES_PASSWORD=
 # Origens do front, separadas por vírgula (ex.: https://onecheck-web.onrender.com).
@@ -335,6 +337,17 @@ SEED_SECRET=
 No Render, defina `CORS_ORIGINS` com a URL do front (o `render.yaml` deixa o valor para o painel).
 
 A cada start, o `start.sh` apaga os refresh tokens vencidos e os eventos de `log_operacao` com mais de `LOG_RETENCAO_DIAS` dias. Se a instância fica muito tempo no ar sem reiniciar, agende também `python scripts/limpar_dados_vencidos.py` (Render Cron Job ou cron do host).
+
+
+#### CPF cifrado (SEC-031, ADR-0014)
+O CPF fica cifrado no banco (Fernet): quem lê o banco ou um backup não vê o número, e as respostas da API não mudam. A chave vem de `CPF_CHAVES` e **não pode ficar no banco nem no backup**: sem ela, os CPFs gravados não podem ser lidos.
+- **Primeira subida:** a inicialização cifra os CPFs que ainda estão em texto (e, no PostgreSQL, alarga a coluna). Ela não decifra nada, então um CPF ilegível não derruba a API: só a leitura dele dá erro.
+- **Rotação da chave** (`scripts/rotacionar_chave_cpf.py`). O Render troca as instâncias aos poucos, então a nova chave entra primeiro só para leitura:
+  1. `CPF_CHAVES=<antiga>,<nova>` e deploy: todas as instâncias passam a ler as duas.
+  2. `CPF_CHAVES=<nova>,<antiga>` e deploy: o que for gravado daqui em diante usa a nova.
+  3. `python scripts/rotacionar_chave_cpf.py --aplicar`, com o mesmo `CPF_CHAVES` e o `DATABASE_URL` do banco: recifra os CPFs com a nova.
+  4. `python scripts/rotacionar_chave_cpf.py` precisa mostrar 0 com outra chave e 0 ilegíveis. Só então `CPF_CHAVES=<nova>` e deploy.
+- Em desenvolvimento e teste, sem valor, vale uma chave pública fixa: nunca use esse banco com dados reais.
 
 ### Dados de demonstração (seed)
 - Em `APP_ENV=development`, o `start.sh` popula o banco vazio com as contas `@onecheck.local` e credenciais fixas, exibidas pelo `python scripts/seed.py`.

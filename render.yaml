@@ -14,6 +14,10 @@ services:
       # Obrigatório fora de APP_ENV=development/test: a API não sobe sem um valor de 32+ caracteres
       - key: JWT_SECRET
         generateValue: true
+      # Chave do CPF em repouso (SEC-031, ADR-0014). Gerada uma vez: trocar o valor sem rotacionar
+      # (nova chave na frente, a antiga depois da vírgula) deixa os CPFs gravados ilegíveis
+      - key: CPF_CHAVES
+        generateValue: true
       # O IP do cliente vem do X-Forwarded-For do proxy do Render (usado no limite de tentativas)
       - key: FORWARDED_ALLOW_IPS
         value: "*"

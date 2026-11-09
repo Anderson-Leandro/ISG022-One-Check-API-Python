@@ -32,6 +32,8 @@ os.environ["DATABASE_URL"] = _raw_url
 os.environ.setdefault("APP_ENV", "test")
 # Os testes gravam e, ao final, apagam UPLOAD_DIR: nunca apontar para o uploads/ real do projeto
 os.environ["UPLOAD_DIR"] = tempfile.mkdtemp(prefix="onecheck-test-uploads-")
+# Chave do CPF (SEC-031) só para os testes; os que sobem a API em modo produção num subprocesso a herdam
+os.environ.setdefault("CPF_CHAVES", "chave-do-cpf-so-para-testes-0123456789abcdef")
 
 # Importações da app somente após definir DATABASE_URL
 from app.auth import create_access_token  # noqa: E402
