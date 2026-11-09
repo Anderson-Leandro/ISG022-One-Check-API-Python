@@ -1,7 +1,10 @@
+import logging
+
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config import DATABASE_URL
+from app.cpf_cifrado import TAMANHO_COLUNA, cifrar_cpfs_em_texto
 
 _connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
@@ -41,6 +44,19 @@ def ensure_schema_updates() -> None:
                 conn.execute(text("ALTER TABLE usuarios ADD COLUMN mfa_secret_pendente VARCHAR(64)"))
             if "token_version" not in cols:
                 conn.execute(text("ALTER TABLE usuarios ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0"))
+            # SEC-031: o CPF cifrado não cabe em VARCHAR(14). O SQLite não confere o tamanho
+            tamanho = next(
+                (getattr(c["type"], "length", None) for c in insp.get_columns("usuarios") if c["name"] == "cpf"), None
+            )
+            if tamanho and tamanho < TAMANHO_COLUNA:
+                if engine.dialect.name == "postgresql":
+                    conn.execute(text(f"ALTER TABLE usuarios ALTER COLUMN cpf TYPE VARCHAR({TAMANHO_COLUNA})"))
+                elif engine.dialect.name == "mysql":
+                    conn.execute(text(f"ALTER TABLE usuarios MODIFY cpf VARCHAR({TAMANHO_COLUNA})"))
+            # Cifra o que ainda está em texto; a troca de chave é feita pelo scripts/rotacionar_chave_cpf.py
+            cifrados = cifrar_cpfs_em_texto(conn)
+            if cifrados:
+                logging.getLogger(__name__).info("CPF: %d registro(s) em texto cifrado(s)", cifrados)
 
         if "enderecos" in tables:
             cols = {c["name"] for c in insp.get_columns("enderecos")}

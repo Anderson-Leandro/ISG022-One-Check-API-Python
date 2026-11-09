@@ -2714,7 +2714,7 @@ items:
   priority: could
   rank: 240
   estimate: 5
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F6
   depends_on: []
@@ -2734,16 +2734,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-08'
+  updated: '2026-11-09'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-09'
+    status: in_progress
   sync:
     github:
-      hash: 2c2e751db5783d46
-      remote_at: '2026-11-08T19:13:33Z'
+      hash: d95ee323e2b9f07f
+      remote_at: '2026-11-09T03:04:13Z'
 - id: SPK-001
   type: spike
   title: Definir o alcance do perfil visualizador

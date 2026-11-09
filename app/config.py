@@ -48,6 +48,31 @@ def _jwt_secret() -> str:
 
 
 JWT_SECRET = _jwt_secret()
+
+# Chaves do CPF em repouso (SEC-031, ADR-0014), separadas por vírgula: a primeira cifra, todas decifram.
+# Para rotacionar, ver o scripts/rotacionar_chave_cpf.py (a nova entra primeiro só para leitura).
+# Em desenvolvimento e teste, sem valor, vale uma chave fixa e pública (o banco local continua legível
+# entre reinícios); fora deles, a API não sobe sem uma chave de 32+ caracteres.
+_CPF_CHAVE_DEV = "onecheck-chave-de-desenvolvimento-do-cpf-publica"
+
+
+def _cpf_chaves() -> list[str]:
+    chaves = [c.strip() for c in os.getenv("CPF_CHAVES", "").split(",") if c.strip()]
+    if IS_DEV:
+        if not chaves:
+            logging.getLogger(__name__).warning("CPF_CHAVES ausente: usando a chave pública de desenvolvimento")
+            return [_CPF_CHAVE_DEV]
+        return chaves
+    if not chaves or chaves[0] == _CPF_CHAVE_DEV or any(len(c) < MIN_SECRET_LEN for c in chaves):
+        raise RuntimeError(
+            f"CPF_CHAVES ausente, pública ou com chave de menos de {MIN_SECRET_LEN} caracteres. "
+            'Gere uma com: python -c "import secrets; print(secrets.token_urlsafe(48))" '
+            "(ou use APP_ENV=development localmente)."
+        )
+    return chaves
+
+
+CPF_CHAVES = _cpf_chaves()
 JWT_ALGORITHM = "HS256"
 JWT_ACCESS_MINUTES = int(os.getenv("JWT_ACCESS_MINUTES", "60"))
 JWT_REFRESH_DAYS = int(os.getenv("JWT_REFRESH_DAYS", "30"))
