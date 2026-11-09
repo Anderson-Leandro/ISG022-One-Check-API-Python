@@ -86,8 +86,8 @@ def logs(
     de: str | None = None,
     ate: str | None = None,
     db: Session = Depends(get_db),
-    # Só o admin: a trilha traz IP e horário de login de todas as contas e e-mails digitados em logins
-    # falhos (SEC-018, decisão do PO em 2026-11-08)
+    # Só o admin: a trilha traz IP e horário de login de todas as contas e as tentativas de login contra
+    # elas (SEC-018, decisão do PO em 2026-11-08)
     _: Usuario = Depends(require_roles("admin")),
 ):
     q = db.query(LogOperacao)

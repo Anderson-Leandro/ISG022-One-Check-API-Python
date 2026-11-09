@@ -5,9 +5,13 @@ precisem repassar o Request a cada chamada de log_operacao. Atrás do proxy do
 Render, o uvicorn já troca o client pelo X-Forwarded-For (FORWARDED_ALLOW_IPS).
 """
 
+import hashlib
+import hmac
 from contextvars import ContextVar
 
 from sqlalchemy import inspect
+
+from app.config import JWT_SECRET
 
 _ip_requisicao: ContextVar[str | None] = ContextVar("ip_requisicao", default=None)
 
@@ -15,6 +19,16 @@ _ip_requisicao: ContextVar[str | None] = ContextVar("ip_requisicao", default=Non
 def ip_atual() -> str | None:
     """IP do cliente da requisição em andamento; None fora de uma requisição (scripts, seed)."""
     return _ip_requisicao.get()
+
+
+def email_para_log(digitado: str) -> str:
+    """Identificador do e-mail digitado num login falho, sem o texto (SEC-019).
+
+    O campo pode trazer uma senha digitada no lugar errado, e até uma parte dela (o "domínio" de
+    "Joao@Casa.net") seria vazamento. Um HMAC com o segredo do servidor não se reverte por dicionário
+    sem a chave, e ainda junta as tentativas com o mesmo e-mail."""
+    normalizado = digitado.strip().lower().encode()
+    return hmac.new(JWT_SECRET.encode(), b"login_falho:" + normalizado, hashlib.sha256).hexdigest()[:16]
 
 
 def campos_alterados(*objetos) -> list[str]:

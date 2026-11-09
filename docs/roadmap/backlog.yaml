@@ -1331,7 +1331,7 @@ items:
   priority: could
   rank: 190
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F6
   depends_on: []
@@ -1358,10 +1358,12 @@ items:
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-08'
+    status: in_progress
   sync:
     github:
-      hash: 2f205d13af03888a
-      remote_at: '2026-11-08T19:13:26Z'
+      hash: 63a9aea09bf3b5de
+      remote_at: '2026-11-09T00:42:39Z'
 - id: SEC-020
   type: security
   title: Filtros de data inválidos em /logs são ignorados em silêncio
