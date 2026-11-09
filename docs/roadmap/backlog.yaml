@@ -3423,7 +3423,7 @@ items:
   priority: could
   rank: 320
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F0
   depends_on: []
@@ -3440,16 +3440,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-08'
+  updated: '2026-11-09'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-09'
+    status: in_progress
   sync:
     github:
-      hash: 4d98889f6ed39e4f
-      remote_at: '2026-11-08T19:13:40Z'
+      hash: 8b59ba7171b9ad56
+      remote_at: '2026-11-09T11:04:01Z'
 - id: DEBT-009
   type: debt
   title: ADRs retroativos das decisões principais
