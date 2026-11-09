@@ -3423,7 +3423,7 @@ items:
   priority: could
   rank: 320
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F0
   depends_on: []
@@ -3437,8 +3437,12 @@ items:
   links:
     trello_card: null
     gh_issue: 84
-    prs: []
-  evidence: []
+    prs:
+    - '#217'
+  evidence:
+  - 'PR #217 (merge 44f671b): PR #217: merges com assunto no padrão (--subject) no sprint-executor e no working-agreement;
+    diagnose.py sem os merges'
+  - 'diagnose.py: Conventional Commits 90%; os 10 últimos commits de autoria no padrão'
   created: '2026-11-02'
   updated: '2026-11-09'
   history:
@@ -3448,10 +3452,12 @@ items:
     status: in_sprint
   - date: '2026-11-09'
     status: in_progress
+  - date: '2026-11-09'
+    status: done
   sync:
     github:
-      hash: 8b59ba7171b9ad56
-      remote_at: '2026-11-09T11:04:01Z'
+      hash: 96db61870d8331c0
+      remote_at: '2026-11-09T11:08:34Z'
 - id: DEBT-009
   type: debt
   title: ADRs retroativos das decisões principais
