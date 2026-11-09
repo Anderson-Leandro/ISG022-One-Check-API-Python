@@ -3133,7 +3133,7 @@ items:
   priority: could
   rank: 300
   estimate: 5
-  status: in_progress
+  status: done
   sprint: 13
   phase: F5
   depends_on: []
@@ -3148,8 +3148,13 @@ items:
   links:
     trello_card: null
     gh_issue: 78
-    prs: []
-  evidence: []
+    prs:
+    - '#212'
+  evidence:
+  - 'PR #212 (merge 3412663): PR #212: envelope, modelos de resposta e erros reais de 21 rotas principais no OpenAPI;
+    role e campos de MFA descritos'
+  - 'tests/integration/test_openapi_respostas.py: 17 testes novos (contrato); suíte 1316 passaram, cobertura 96%;
+    DEBT-020 criado'
   created: '2026-11-02'
   updated: '2026-11-09'
   history:
@@ -3159,10 +3164,12 @@ items:
     status: in_sprint
   - date: '2026-11-09'
     status: in_progress
+  - date: '2026-11-09'
+    status: done
   sync:
     github:
-      hash: aba1bb514dc9e2fa
-      remote_at: '2026-11-09T03:34:52Z'
+      hash: bacfe66481692370
+      remote_at: '2026-11-09T03:50:48Z'
 - id: DEBT-003
   type: debt
   title: Consolidar as rotas duplicadas de MFA e remover GET /auth/mfa/setup
