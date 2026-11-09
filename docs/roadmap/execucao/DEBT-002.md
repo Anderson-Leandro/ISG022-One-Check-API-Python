@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 13 · **Issue:** #78 · **Branch:** `chore/DEBT-002-envelope-openapi` · **PR:** #<n>
+- **Sprint:** 13 · **Issue:** #78 · **Branch:** `chore/DEBT-002-envelope-openapi` · **PR:** #212
 
 ## Entrega
 - **`app/respostas.py` (novo):** os modelos das respostas, a partir dos serializadores: `Envelope[T]` (`sucesso`, `dados`, `paginacao`), `ErroResposta` (`sucesso`, `erro`, `erros`), `DetalheErro` e um modelo por recurso (usuário, imóvel, cômodo, contrato, agendamento, vistoria, problema, login e tokens).
