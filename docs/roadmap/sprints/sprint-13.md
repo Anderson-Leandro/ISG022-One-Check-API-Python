@@ -63,6 +63,7 @@
 | 2026-11-08 | DEBT-003 concluído (PR #201): rotas canônicas de MFA, aliases obsoletos até 2027-01-31 e GET /auth/mfa/setup removido |
 | 2026-11-08 | DEBT-001 concluído (PR #203): corpos das rotas de problemas no OpenAPI; corpo que não é objeto dá 422 |
 | 2026-11-08 | SEC-019 concluído (PR #205): login falho sem o texto digitado no log (id da conta ou HMAC); registros antigos limpos |
+| 2026-11-08 | SEC-020 concluído (PR #207): filtro de data inválido em /logs responde 422; sai o B110 |
 
 ## Sprint Review
 - **Incremento demonstrável:**
