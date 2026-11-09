@@ -102,3 +102,7 @@ def ensure_schema_updates() -> None:
                 conn.execute(text("ALTER TABLE log_operacao ADD COLUMN payload JSON"))
             if "ip" not in cols:
                 conn.execute(text("ALTER TABLE log_operacao ADD COLUMN ip VARCHAR(45)"))
+            # SEC-019: os logins falhos antigos guardavam o texto digitado no campo e-mail (às vezes uma senha)
+            conn.execute(
+                text("UPDATE log_operacao SET detalhes = NULL WHERE acao = 'login_falho' AND detalhes LIKE 'email:%'")
+            )

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
+from app.auditoria import email_para_log
 from app.auth import (
     MFA_REQUIRED_ROLES,
     conferir_credenciais,
@@ -51,10 +52,16 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     tentativas = Tentativas(request, "login", body.email.strip().lower())
     tentativas.verificar()
 
-    user = db.query(Usuario).filter(Usuario.email == body.email, Usuario.ativo == True).first()
+    # Uma consulta só, ativa ou não: o tempo não muda entre conta ativa, desativada e inexistente
+    conta = db.query(Usuario).filter(Usuario.email == body.email).first()
+    user = conta if conta and conta.ativo else None
     if not conferir_credenciais(user, body.senha):
         tentativas.falhou()
-        log_operacao(db, None, "login_falho", "usuario", None, f"email: {body.email}")
+        # Nada do texto digitado vai para o log (SEC-019): a conta, se existe, ou um HMAC do e-mail
+        if conta:
+            log_operacao(db, conta.id, "login_falho", "usuario", conta.id)
+        else:
+            log_operacao(db, None, "login_falho", "usuario", None, f"email_hmac: {email_para_log(body.email)}")
         return fail("Credenciais inválidas", status_code=401)
     tentativas.sucesso()
 
