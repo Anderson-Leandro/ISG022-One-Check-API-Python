@@ -3512,7 +3512,7 @@ items:
   priority: could
   rank: 310
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 13
   phase: F5
   depends_on: []
@@ -3527,16 +3527,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-08'
+  updated: '2026-11-09'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-09'
+    status: in_progress
   sync:
     github:
-      hash: cf956c952e4813e5
-      remote_at: '2026-11-08T19:13:41Z'
+      hash: 94bfa2ee75912b07
+      remote_at: '2026-11-09T10:42:26Z'
 - id: TK-006
   type: task
   title: Auditoria de segurança completa antes da release candidata
@@ -5303,3 +5305,47 @@ items:
     github:
       hash: 75d408e4b0713b90
       remote_at: '2026-11-09T03:39:53Z'
+- id: BUG-002
+  type: bug
+  title: Foto enviada fica órfã no disco quando o pedido é recusado depois do upload
+  epic: EP-007
+  story: ''
+  description: Achado do /code-review do DEBT-010. Em POST /contratos/{id}/problemas e POST /problemas/{id}/atualizacoes
+    (multipart), a foto é gravada em UPLOAD_DIR antes das validações seguintes (título, cômodo, prioridade, status;
+    descrição com 5+ caracteres; status encerrado conferido de novo). Se uma delas recusa o pedido (404, 409 ou
+    422), o arquivo fica no disco sem registro que aponte para ele; repetido, ocupa o disco.
+  acceptance_criteria:
+  - Dado um multipart com foto válida e um campo inválido (título vazio, prioridade ou cômodo inválido, descrição
+    curta), quando a API responder 404, 409 ou 422, então nenhum arquivo novo fica em UPLOAD_DIR.
+  - Dado um pedido aceito, quando a API responder 201, então a foto continua gravada e referenciada.
+  - Existe teste para cada rota, conferindo o diretório de uploads antes e depois.
+  priority: should
+  rank: 1550
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-400
+    - OWASP API4:2023
+    risk_id: null
+  source:
+    kind: review
+    ref: code-review do DEBT-010
+  links:
+    trello_card: null
+    gh_issue: 214
+    prs: []
+  evidence: []
+  created: '2026-11-09'
+  updated: '2026-11-09'
+  history:
+  - date: '2026-11-09'
+    status: backlog
+  sync:
+    github:
+      hash: aa5a24916fd5a705
+      remote_at: '2026-11-09T10:52:44Z'
