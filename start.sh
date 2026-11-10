@@ -15,4 +15,6 @@ esac
 # Refresh tokens vencidos e logs além de LOG_RETENCAO_DIAS (SEC-014). Uma falha não impede o start
 python scripts/limpar_dados_vencidos.py || echo "Aviso: limpeza de dados vencidos falhou" >&2
 
-exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT"
+# --no-proxy-headers: o uvicorn não troca o client pelo primeiro item do X-Forwarded-For, que o
+# cliente controla. O IP real sai do item do proxy, no app/ip_cliente.py (SEC-017, PROXY_SALTOS)
+exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --no-proxy-headers

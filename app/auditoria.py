@@ -2,7 +2,8 @@
 
 O IP vem de uma ContextVar preenchida por middleware, para que as rotas não
 precisem repassar o Request a cada chamada de log_operacao. Atrás do proxy do
-Render, o uvicorn já troca o client pelo X-Forwarded-For (FORWARDED_ALLOW_IPS).
+Render, o IpClienteMiddleware (app/ip_cliente.py) já trocou o client pelo IP que o
+proxy informou no X-Forwarded-For (SEC-017).
 """
 
 import hashlib

@@ -8,4 +8,5 @@ if (-not (Test-Path "onecheck.db")) {
 }
 Write-Host "API em http://localhost:8000"
 Write-Host "Docs:  http://localhost:8000/docs"
-py -3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+# --no-proxy-headers: o IP do cliente sai do app/ip_cliente.py (SEC-017), como no start.sh
+py -3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --no-proxy-headers

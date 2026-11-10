@@ -1206,11 +1206,12 @@ items:
   epic: EP-006
   story: ''
   description: |-
-    Severidade: low
+    Severidade: medium (era low; confirmado em 2026-11-10)
     Locais: render.yaml:18, app/rate_limit.py:74, app/auditoria.py:41
     Cenário: Se o proxy do Render acrescenta o IP real ao X-Forwarded-For enviado pelo cliente (em vez de sobrescrever), o cliente manda 'X-Forwarded-For: <IP aleatório>' a cada tentativa: o limite por IP (20 falhas/15 min) nunca dispara e log_operacao grava o IP forjado.
     Impacto: Contorna a camada por IP do limite de tentativas (o limite por conta continua) e torna o IP da trilha de auditoria (SEC-010) inconfiável. Baixa porque depende do comportamento do proxy, não verificado; vira Média se confirmado.
     Recomendação: Conferir no Render (enviar X-Forwarded-For forjado e ver o ip gravado em /logs). Se for acrescentado, usar o último item do cabeçalho (o que o proxy do Render adiciona) num middleware próprio, ou restringir FORWARDED_ALLOW_IPS à rede do proxy.
+    Resultado (2026-11-10): login falho enviado ao Render com X-Forwarded-For: 203.0.113.9 gravou ip 203.0.113.9 no log_operacao. O proxy acrescenta, e o IP forjado era aceito.
   acceptance_criteria:
   - 'Dado um login falho com ''X-Forwarded-For: 203.0.113.9'' enviado ao Render, quando consultar GET /logs, então
     fica registrado se o IP gravado é o forjado (resultado anotado no item).'
@@ -1222,12 +1223,12 @@ items:
   priority: should
   rank: 40
   estimate: 3
-  status: in_sprint
+  status: review
   sprint: 13
   phase: F6
   depends_on: []
   security:
-    impact: low
+    impact: medium
     refs:
     - OWASP API4:2023
     - CWE-348
@@ -1241,19 +1242,24 @@ items:
   links:
     trello_card: null
     gh_issue: 36
-    prs: []
+    prs:
+    - '#223'
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-08'
+  updated: '2026-11-10'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-10'
+    status: in_progress
+  - date: '2026-11-10'
+    status: review
   sync:
     github:
-      hash: 2d171d4d3b6455ae
-      remote_at: '2026-11-08T19:13:24Z'
+      hash: ca06e9a461f324aa
+      remote_at: '2026-11-10T11:44:46Z'
 - id: SEC-018
   type: security
   title: Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas
