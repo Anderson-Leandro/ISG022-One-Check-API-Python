@@ -8,6 +8,7 @@ from app.auditoria import IpRequisicaoMiddleware
 from app.cabecalhos import CabecalhosSegurancaMiddleware
 from app.config import CORS_ORIGINS, DOCS_ENABLED, IS_DEV, UPLOAD_DIR
 from app.database import SessionLocal, ensure_schema_updates
+from app.ip_cliente import IpClienteMiddleware
 from app.limite_corpo import LimiteCorpoMiddleware
 from app.obsoletas import RotasObsoletasMiddleware, marcar_no_openapi
 from app.routers import (
@@ -77,8 +78,10 @@ app.add_middleware(IpRequisicaoMiddleware)
 app.add_middleware(LimiteCorpoMiddleware)
 # Aviso de rota obsoleta (Deprecation, Sunset, Link) em toda resposta delas, inclusive 401 e 403
 app.add_middleware(RotasObsoletasMiddleware)
-# O mais externo: os cabeçalhos valem também para as respostas 413 e 400 do limite de corpo
+# Os cabeçalhos de segurança valem também para as respostas 413 e 400 do limite de corpo
 app.add_middleware(CabecalhosSegurancaMiddleware)
+# O mais externo: o IP do cliente atrás do proxy (SEC-017) vale para o limite de tentativas e a auditoria
+app.add_middleware(IpClienteMiddleware)
 
 prefix = "/api/v1"
 

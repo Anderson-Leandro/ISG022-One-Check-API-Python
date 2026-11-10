@@ -18,9 +18,10 @@ services:
       # (nova chave na frente, a antiga depois da vírgula) deixa os CPFs gravados ilegíveis
       - key: CPF_CHAVES
         generateValue: true
-      # O IP do cliente vem do X-Forwarded-For do proxy do Render (usado no limite de tentativas)
-      - key: FORWARDED_ALLOW_IPS
-        value: "*"
+      # O proxy do Render acrescenta o IP real ao X-Forwarded-For enviado pelo cliente: a API usa
+      # o último item, o do proxy (SEC-017, ADR-0015). O uvicorn sobe com --no-proxy-headers
+      - key: PROXY_SALTOS
+        value: "1"
       - key: PUBLIC_BASE_URL
         sync: false
       # Deixe vazio para desabilitar /admin/*; com valor, as rotas também exigem token de admin

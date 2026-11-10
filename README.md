@@ -135,6 +135,8 @@ Vale para senhas novas: `POST /usuarios`, `PUT /usuarios/{id}` (`senha`), `PUT /
 ### Limite de tentativas
 5 falhas por conta ou 20 por IP em 15 minutos → `429`. Vale para login, MFA (`verify`, `activate-login`, `activate`, `desabilitar`) e para as rotas de `/usuarios/me` que pedem senha ou código.
 
+O IP é o mesmo da auditoria. Atrás de proxy, ele sai do `X-Forwarded-For`, mas só do item que o proxy acrescentou (o `PROXY_SALTOS`-ésimo a partir da direita): um IP escrito pelo cliente à esquerda não conta (SEC-017, ADR-0015).
+
 ### Uploads
 - Multipart, um arquivo por requisição. Só JPEG, PNG e WebP, verificados pelo conteúdo, até 10 MB (`MAX_UPLOAD_MB`) e 50 megapixels.
 - O arquivo é gravado com nome aleatório; use a URL devolvida (`/api/v1/uploads/<nome>`). `foto_url` em JSON só aceita um upload existente desta API.
@@ -327,6 +329,9 @@ SEED_SECRET=
 # RATE_LIMIT_FALHAS_CONTA=5
 # RATE_LIMIT_FALHAS_IP=20
 # RATE_LIMIT_JANELA_MIN=15
+# Proxies na frente da API que acrescentam o IP real ao X-Forwarded-For. 0 (padrão): o cabeçalho é
+# ignorado. No Render, 1 (render.yaml)
+# PROXY_SALTOS=0
 # Tamanho máximo do corpo: uploads (MB) e demais requisições, como JSON (KB)
 # MAX_UPLOAD_MB=10
 # MAX_BODY_KB=1024
@@ -335,6 +340,8 @@ SEED_SECRET=
 ```
 
 No Render, defina `CORS_ORIGINS` com a URL do front (o `render.yaml` deixa o valor para o painel).
+
+No Render, `PROXY_SALTOS=1`. Depois de qualquer mudança de infraestrutura na frente da API, faça um login falho com `X-Forwarded-For: 203.0.113.9` e confira em `GET /logs` que o IP gravado é o seu IP público, e não o forjado nem o de um proxy (ADR-0015). A variável `FORWARDED_ALLOW_IPS` não é mais usada: o `start.sh` sobe o uvicorn com `--no-proxy-headers`.
 
 A cada start, o `start.sh` apaga os refresh tokens vencidos e os eventos de `log_operacao` com mais de `LOG_RETENCAO_DIAS` dias. Se a instância fica muito tempo no ar sem reiniciar, agende também `python scripts/limpar_dados_vencidos.py` (Render Cron Job ou cron do host).
 
@@ -419,6 +426,7 @@ A collection em [`docs/insomnia/`](docs/insomnia/README.md) tem 168 requisiçõe
 │   ├── database.py              # Conexão SQLAlchemy e migração incremental
 │   ├── deps.py                  # Autenticação, roles (RBAC) e regras de acesso por recurso
 │   ├── geocoding.py             # Módulo de integração OpenStreetMap e ViaCEP
+│   ├── ip_cliente.py            # IP do cliente pelo item do proxy no X-Forwarded-For
 │   ├── limite_corpo.py          # Limite de tamanho do corpo antes do roteamento
 │   ├── main.py                  # Inicialização da aplicação FastAPI, CORS e middlewares
 │   ├── models.py                # Modelagem ORM relacional do banco de dados

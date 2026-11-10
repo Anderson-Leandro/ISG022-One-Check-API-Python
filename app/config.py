@@ -110,6 +110,12 @@ RATE_LIMIT_FALHAS_CONTA = int(os.getenv("RATE_LIMIT_FALHAS_CONTA", "5"))
 RATE_LIMIT_FALHAS_IP = int(os.getenv("RATE_LIMIT_FALHAS_IP", "20"))
 RATE_LIMIT_JANELA_MIN = int(os.getenv("RATE_LIMIT_JANELA_MIN", "15"))
 
+# Proxies confiáveis na frente da API que acrescentam o IP de quem os chamou ao X-Forwarded-For
+# (SEC-017, ADR-0015). 0, o padrão: o cabeçalho é ignorado e vale o IP da conexão. No Render, 1
+PROXY_SALTOS = int(os.getenv("PROXY_SALTOS", "0"))
+if PROXY_SALTOS < 0:
+    raise RuntimeError("PROXY_SALTOS não pode ser negativo.")
+
 # Retenção do log_operacao (tem IP e e-mail). O Marco Civil (art. 15) exige guardar
 # registros de acesso por 6 meses, então o mínimo é 180 dias
 LOG_RETENCAO_MIN_DIAS = 180
