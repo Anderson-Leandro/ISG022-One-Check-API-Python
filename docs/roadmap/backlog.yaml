@@ -1223,7 +1223,7 @@ items:
   priority: should
   rank: 40
   estimate: 3
-  status: in_progress
+  status: review
   sprint: 13
   phase: F6
   depends_on: []
@@ -1242,7 +1242,8 @@ items:
   links:
     trello_card: null
     gh_issue: 36
-    prs: []
+    prs:
+    - '#223'
   evidence: []
   created: '2026-11-02'
   updated: '2026-11-10'
@@ -1253,10 +1254,12 @@ items:
     status: in_sprint
   - date: '2026-11-10'
     status: in_progress
+  - date: '2026-11-10'
+    status: review
   sync:
     github:
-      hash: ebf32e8309911ceb
-      remote_at: '2026-11-10T11:39:57Z'
+      hash: ca06e9a461f324aa
+      remote_at: '2026-11-10T11:44:46Z'
 - id: SEC-018
   type: security
   title: Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas
