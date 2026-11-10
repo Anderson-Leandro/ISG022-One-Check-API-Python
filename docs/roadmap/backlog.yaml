@@ -2346,7 +2346,7 @@ items:
   priority: must
   rank: 30
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -2362,8 +2362,12 @@ items:
   links:
     trello_card: null
     gh_issue: 60
-    prs: []
-  evidence: []
+    prs:
+    - '#221'
+  evidence:
+  - 'PR #221 (merge 8328a15): CORS_ORIGINS só com as origens autorizadas no Render'
+  - preflight com origem fora da lista sem Access-Control-Allow-Origin
+  - 'SEED_SECRET vazio: rota do seed em 404'
   created: '2026-11-02'
   updated: '2026-11-10'
   history:
@@ -2377,10 +2381,12 @@ items:
     status: in_sprint
   - date: '2026-11-10'
     status: in_progress
+  - date: '2026-11-10'
+    status: done
   sync:
     github:
-      hash: 07ca2b8f18f78ed2
-      remote_at: '2026-11-10T03:41:12Z'
+      hash: 2dc38d4c675de253
+      remote_at: '2026-11-10T03:44:33Z'
 - id: TK-004
   type: task
   title: Agendar a limpeza de dados vencidos no Render

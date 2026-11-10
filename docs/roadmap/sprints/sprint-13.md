@@ -69,6 +69,7 @@
 | 2026-11-09 | DEBT-010 concluído (PR #215): cobertura de ramos total de 86,6% para 92,3%; BUG-002 criado fora da sprint |
 | 2026-11-09 | DEBT-008 concluído (PR #217): merges no padrão Conventional Commits; diagnose.py mostra 90% sem os merges |
 | 2026-11-10 | TK-002: produção recriada e carregada pelo seed atual; sem o alerta de credenciais públicas depois do reinício (PR #219) |
+| 2026-11-10 | TK-003: CORS_ORIGINS restrito às origens autorizadas (origem de fora bloqueada) e SEED_SECRET vazio no Render (PR #221) |
 
 ## Sprint Review
 - **Incremento demonstrável:**
