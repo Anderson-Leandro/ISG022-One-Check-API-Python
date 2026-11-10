@@ -2292,7 +2292,7 @@ items:
   priority: must
   rank: 20
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -2308,8 +2308,12 @@ items:
   links:
     trello_card: null
     gh_issue: 59
-    prs: []
-  evidence: []
+    prs:
+    - '#219'
+  evidence:
+  - 'PR #219 (merge 46d6bd7): banco de produção recriado e carregado pelo seed atual, com senhas aleatórias'
+  - 'sem o alerta SEGURANÇA: no log do Render depois do reinício (2026-11-10)'
+  - senhas guardadas fora do repositório
   created: '2026-11-02'
   updated: '2026-11-10'
   history:
@@ -2323,10 +2327,12 @@ items:
     status: in_sprint
   - date: '2026-11-10'
     status: in_progress
+  - date: '2026-11-10'
+    status: done
   sync:
     github:
-      hash: 89621cdb578275f8
-      remote_at: '2026-11-10T03:33:38Z'
+      hash: c36a4c08ca392dfd
+      remote_at: '2026-11-10T03:37:36Z'
 - id: TK-003
   type: task
   title: Configurar CORS_ORIGINS e conferir SEED_SECRET no Render

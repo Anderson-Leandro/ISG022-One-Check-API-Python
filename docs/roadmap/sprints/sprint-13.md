@@ -68,6 +68,7 @@
 | 2026-11-08 | DEBT-002 concluído (PR #212): envelope e modelos de resposta no OpenAPI das rotas principais; DEBT-020 criado para unificar os erros |
 | 2026-11-09 | DEBT-010 concluído (PR #215): cobertura de ramos total de 86,6% para 92,3%; BUG-002 criado fora da sprint |
 | 2026-11-09 | DEBT-008 concluído (PR #217): merges no padrão Conventional Commits; diagnose.py mostra 90% sem os merges |
+| 2026-11-10 | TK-002: produção recriada e carregada pelo seed atual; sem o alerta de credenciais públicas depois do reinício (PR #219) |
 
 ## Sprint Review
 - **Incremento demonstrável:**
