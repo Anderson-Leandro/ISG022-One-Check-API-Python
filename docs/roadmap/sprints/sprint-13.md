@@ -110,9 +110,15 @@ Feita em 2026-11-10.
   - **Próxima auditoria:** a completa, com relatório, fica para o TK-006 (Sprint 14), antes da release candidata.
 - **Feedback do cliente/PO:** o incremento está de acordo. Nada muda de prioridade por enquanto. O PO concorda com o goal atingido, com a ressalva do risco aceito.
 
-## Retrospectiva
+## Retrospectiva (2026-11-11)
+Proposta a partir dos dados da sprint e confirmada pelo usuário, que escolheu as ações. As três ações da retro da Sprint 12 foram feitas nesta sprint: TK-019, TK-020 e DEBT-018.
+
 | Funcionou bem | Melhorar | Ação (vira item no backlog) |
 |---|---|---|
+| `dod_check` e registro por item: os 21 itens foram conferidos pelo script, e a checklist antes da revisão (TK-019) foi usada em todos | Desde o DEBT-008, os merges feitos pela interface do GitHub (#223, #224 e #226) saíram com "Merge pull request #… from …", porque o padrão do repositório continua o antigo. O fechamento do SEC-017 não achou os commits | **TK-021**: merge pela interface já com o título do PR (#n), com a configuração conferida |
+| A conferência em produção junto com o usuário: o SEC-017 foi confirmado com um único teste, e a contagem de proxies saiu de dados reais, registrada no ADR-0015 | O `PROXY_SALTOS=1` foi suposto, sem ver a cadeia real (Cloudflare, proxy do Render e rede interna). Foram 3 rodadas de deploy até chegar ao valor certo | Sem item: regra nova no passo 3 do `sprint-executor`. Item que depende da infraestrutura começa por um teste em produção, antes de fixar um valor |
+| A revisão de código pegou defeitos reais antes do merge, como o `X-Forwarded-Proto` que deixaria os redirects em `http`, e o protocolo de testes alterados teve 4 aprovações explícitas, sem nenhum teste mais fraco | A limpeza do scratchpad apagou várias vezes o venv e os comandos de fechamento, e o ambiente de testes foi recriado à mão a cada vez | **TK-022**: script versionado que roda a suíte numa cópia sem o arquivo de segredos, do zero |
+| Decisões de PO registradas no mesmo dia: R-015 aceito, com o gatilho de revisão, e as rotas de MFA no ADR-0013 | As datas da sprint no `sprints.yaml` (18/11 a 01/12) não batem com a execução (08/11 a 10/11), e o burndown saiu vazio | Sem item: as datas são corrigidas no `close` |
 
 ## Métricas
 - Velocity: — pts (comprometido 47)

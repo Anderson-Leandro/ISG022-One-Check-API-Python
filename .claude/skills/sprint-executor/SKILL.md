@@ -70,6 +70,10 @@ Pare, explique e espere o usuário quando:
 
 ### 3. Implementar
 - Leia o código envolvido antes de mudar. Siga os critérios de aceite, nada além.
+- **Item que depende da infraestrutura** (proxy, provedor, painel do Render, serviço externo): antes de fixar um
+  valor no código ou no `render.yaml`, peça ao usuário um teste em produção que mostre o comportamento real e
+  registre o resultado no item. Não suponha o valor. Na Sprint 13, o `PROXY_SALTOS=1` foi suposto, e a cadeia
+  real tinha 3 proxies: custou três deploys.
 - Escreva primeiro o teste do cenário negado ou do critério, veja-o falhar, depois implemente.
 - Rode `TESTES` (suíte completa). A cobertura não pode cair abaixo da anterior.
 
