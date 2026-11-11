@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import MFA_REQUIRED_ROLES, encerrar_sessoes, hash_password, reset_mfa, verify_password
 from app.config import IS_DEV
+from app.log_append_only import exclusao_autorizada
 from app.models import (
     AgendamentoVistoria,
     Checklist,
@@ -98,7 +99,9 @@ def _clear_all(db: Session) -> None:
     db.query(ImovelComodo).delete()
     db.query(Imovel).delete()
     db.query(ItemVistoria).delete()
-    db.query(LogOperacao).delete()
+    # SEC-025: só o seed com force (que apaga também os usuários) apaga o log, por causa da chave estrangeira
+    with exclusao_autorizada(db, "seed destrutivo com force"):
+        db.query(LogOperacao).delete()
     db.query(RefreshToken).delete()
     db.query(Usuario).delete()
     db.commit()
@@ -204,7 +207,7 @@ def _clear_data_keep_users(db: Session) -> None:
     db.query(ImovelComodo).delete()
     db.query(Imovel).delete()
     db.query(ItemVistoria).delete()
-    db.query(LogOperacao).delete()
+    # O log de auditoria fica (SEC-025): os usuários continuam, e a trilha do que eles fizeram também
     db.query(RefreshToken).delete()
     db.commit()
 

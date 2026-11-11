@@ -33,6 +33,9 @@ def get_db():
 
 def ensure_schema_updates() -> None:
     """Cria tabelas e adiciona colunas novas em bancos já existentes."""
+    # Importado aqui: app.log_append_only importa app.models, que importa este módulo
+    from app.log_append_only import exclusao_autorizada, instalar
+
     Base.metadata.create_all(bind=engine)
     insp = inspect(engine)
     tables = set(insp.get_table_names())
@@ -118,7 +121,13 @@ def ensure_schema_updates() -> None:
                 conn.execute(text("ALTER TABLE log_operacao ADD COLUMN payload JSON"))
             if "ip" not in cols:
                 conn.execute(text("ALTER TABLE log_operacao ADD COLUMN ip VARCHAR(45)"))
-            # SEC-019: os logins falhos antigos guardavam o texto digitado no campo e-mail (às vezes uma senha)
-            conn.execute(
-                text("UPDATE log_operacao SET detalhes = NULL WHERE acao = 'login_falho' AND detalhes LIKE 'email:%'")
-            )
+            # SEC-025: os triggers append-only, também em bancos criados antes deles (idempotente)
+            instalar(conn)
+            # SEC-019: os logins falhos antigos guardavam o texto digitado no campo e-mail (às vezes uma senha).
+            # É a única alteração autorizada fora da retenção
+            with exclusao_autorizada(conn, "migracao SEC-019"):
+                conn.execute(
+                    text(
+                        "UPDATE log_operacao SET detalhes = NULL WHERE acao = 'login_falho' AND detalhes LIKE 'email:%'"
+                    )
+                )
