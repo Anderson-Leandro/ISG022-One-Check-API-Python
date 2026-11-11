@@ -132,9 +132,13 @@ def db(setup_database):
     yield session
     app.dependency_overrides.pop(get_db, None)
     session.close()
-    with test_engine.begin() as conn:
+    # log_operacao é append-only (SEC-025): a limpeza entre testes usa a mesma autorização da retenção
+    from app.log_append_only import exclusao_autorizada
+
+    with test_engine.begin() as conn, exclusao_autorizada(conn, "limpeza dos testes"):
         for table in reversed(Base.metadata.sorted_tables):
-            conn.execute(table.delete())
+            if table.name != "log_operacao_liberacao":
+                conn.execute(table.delete())
 
 
 class ClienteComContratoDeErro(TestClient):

@@ -265,5 +265,17 @@ class LogOperacao(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
+class LiberacaoLog(Base):
+    """Autorização, só dentro da transação que a grava, para apagar logs (SEC-025, app/log_append_only.py)."""
+
+    __tablename__ = "log_operacao_liberacao"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    motivo: Mapped[str] = mapped_column(String(100), nullable=False)
+
+
 # Registra o filtro de exclusão lógica em toda sessão (US-015). Fica no fim: app.exclusao importa estas classes.
 import app.exclusao  # noqa: E402,F401
+
+# Triggers append-only de log_operacao, criados junto com a tabela (SEC-025)
+import app.log_append_only  # noqa: E402,F401

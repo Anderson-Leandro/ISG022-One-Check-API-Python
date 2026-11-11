@@ -2490,14 +2490,14 @@ items:
     Resto do antigo SEC-003 do product-backlog: IP e campos alterados já existem (SEC-010); falta a integridade do log.
     Decisão do PO em 2026-11-11: trigger no banco. Ele recusa UPDATE e DELETE em log_operacao, salvo numa transação marcada pela rotina de retenção (Marco Civil, LOG_RETENCAO_DIAS). É criado pela migração da inicialização (PostgreSQL; SQLite com trigger equivalente nos testes) e testado no Postgres do CI. A limitação vai para o ADR: o dono do banco ainda consegue desligar o trigger. Descartados: papéis no banco (exigiria papéis e outra DATABASE_URL no Render) e o controle só na aplicação.
   acceptance_criteria:
-  - Dado um usuário do banco da aplicação, quando tentar UPDATE ou DELETE em log_operacao, então a operação é negada
-    (papel só com INSERT/SELECT) — exceto a rotina de retenção, com papel próprio.
+  - Dado uma conexão da aplicação com o banco, quando tentar UPDATE ou DELETE em log_operacao, então o banco recusa
+    (trigger, decisão do PO em 2026-11-11), exceto a rotina de retenção, com a autorização da própria transação.
   - Não existe rota de edição ou exclusão de logs.
   - A decisão está num ADR.
   priority: should
   rank: 110
   estimate: 5
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F6
   depends_on: []
@@ -2525,10 +2525,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: fa5c8e09cd6f3339
-      remote_at: '2026-11-11T03:39:50Z'
+      hash: 6c9a61a07f12c7cd
+      remote_at: '2026-11-11T12:07:56Z'
 - id: SEC-026
   type: security
   title: Fotos de vistoria com URL assinada e expiração

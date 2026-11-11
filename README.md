@@ -51,7 +51,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 
 - **📊 Dashboard & Auditoria Avançada**:
   - Métricas agregadas em tempo real (`/dashboard`): imóveis locados, checklists pendentes, problemas abertos e vistorias agendadas, com o mesmo recorte por perfil das listagens. O valor vem `null` quando o perfil não acessa aquele dado (problemas para vistoriador e visualizador; agendamentos para locatário).
-  - Central de auditoria (`GET /logs`) com IP de origem, usuário, ação, entidade e payload JSON sanitizado (senhas e segredos são automaticamente ocultados). Nas edições, o payload traz `{"campos": [...]}` com os nomes dos campos alterados, sem os valores.
+  - Central de auditoria (`GET /logs`) com IP de origem, usuário, ação, entidade e payload JSON sanitizado (senhas e segredos são automaticamente ocultados). Nas edições, o payload traz `{"campos": [...]}` com os nomes dos campos alterados, sem os valores. O log é **append-only**: um trigger no banco recusa UPDATE e DELETE, salvo a retenção e o seed destrutivo (SEC-025, ADR-0016).
   - Filtros avançados por data (`de`, `ate`), entidade e usuário.
 
 ---
