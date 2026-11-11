@@ -5372,7 +5372,7 @@ items:
   priority: should
   rank: 1540
   estimate: 5
-  status: in_progress
+  status: done
   sprint: 14
   phase: F5
   depends_on: []
@@ -5387,8 +5387,13 @@ items:
   links:
     trello_card: null
     gh_issue: 211
-    prs: []
-  evidence: []
+    prs:
+    - '#240'
+  evidence:
+  - 'PR #240 (merge 7724e3c): todo erro da API no envelope {sucesso, erro, erros}, com o mesmo status e cabeçalhos;
+    OpenAPI só com ErroResposta'
+  - 'tests/integration/test_erros_no_envelope.py: 18 testes; 1432 na suíte, cobertura de branches em 97%'
+  - testes que liam detail atualizados com relatório aprovado pelo usuário em 2026-11-11
   created: '2026-11-09'
   updated: '2026-11-11'
   history:
@@ -5400,10 +5405,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-11'
+    status: done
   sync:
     github:
-      hash: 0e9a3d125ada6996
-      remote_at: '2026-11-11T11:43:48Z'
+      hash: f50f8e25a6d69988
+      remote_at: '2026-11-11T12:02:43Z'
 - id: BUG-002
   type: bug
   title: Foto enviada fica órfã no disco quando o pedido é recusado depois do upload
