@@ -1,6 +1,6 @@
 # Sprint 13
 
-- **Período:** 2026-11-18 → 2026-12-01
+- **Período:** 2026-11-08 → 2026-11-11. O calendário planejado era 18/11 a 01/12, e foi ajustado no `close` para as datas da execução, por decisão do PO.
 - **Sprint Goal:** Produção recriada com segurança, falhas abertas corrigidas e qualidade verificada no CI
 - **Capacidade:** 50 pts, combinada com o usuário (a média do script era 39,3 por causa da Sprint 8, retroativa e com 2 pts; o ritmo das Sprints 11 e 12 foi de 64 e 52) · **Comprometido:** 47 pts (94%)
 
@@ -121,5 +121,10 @@ Proposta a partir dos dados da sprint e confirmada pelo usuário, que escolheu a
 | Decisões de PO registradas no mesmo dia: R-015 aceito, com o gatilho de revisão, e as rotas de MFA no ADR-0013 | As datas da sprint no `sprints.yaml` (18/11 a 01/12) não batem com a execução (08/11 a 10/11), e o burndown saiu vazio | Sem item: as datas são corrigidas no `close` |
 
 ## Métricas
-- Velocity: — pts (comprometido 47)
-- Itens que voltaram ao backlog:
+Sprint fechada em 2026-11-11.
+
+- **Velocity:** 44 pts de 47 comprometidos (94%), em 21 itens. As três últimas sprints fecharam com 64, 52 e 44 pts, o que dá uma capacidade sugerida de 53,3 pts.
+- **Itens que voltaram ao backlog:** TK-005 (3 pts, backup e restauração do Postgres). Volta como `ready` e sem sprint, porque o PO aceitou o risco R-015 até o primeiro dado real em produção.
+- **Escopo:** nenhum item entrou durante a sprint. Os itens novos descobertos (DEBT-019, DEBT-020 e BUG-002) e as ações da retro (TK-021 e TK-022) ficaram fora dela.
+- **Burndown:** 47 → 22 (08/11) → 8 (09/11) → 3 (10/11 e 11/11).
+- **Qualidade:** suíte de 1081 para 1398 testes, cobertura de branches em 97%; 44 PRs mesclados, todos com o CI verde.
