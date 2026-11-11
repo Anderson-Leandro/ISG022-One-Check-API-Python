@@ -5396,3 +5396,82 @@ items:
     github:
       hash: aa5a24916fd5a705
       remote_at: '2026-11-09T10:52:44Z'
+- id: TK-021
+  type: task
+  title: Merge pela interface do GitHub já com o título do PR (#n)
+  epic: EP-007
+  story: ''
+  description: 'Ação da retrospectiva da Sprint 13. Depois do DEBT-008, os merges feitos pela interface do GitHub
+    (#223, #224, #226) saíram com ''Merge pull request #n from ...'', porque o padrão do repositório continua o
+    antigo. O fechamento do SEC-017 não achou os commits pelo título.'
+  acceptance_criteria:
+  - Dado o repositório configurado, quando um PR é mesclado pela interface com o botão de merge, então o título
+    do commit de merge é o título do PR seguido de (#n), sem editar à mão.
+  - A configuração fica versionada ou documentada (comando gh api e valor esperado), e um teste ou o dod_check confere
+    que o repositório está com ela.
+  - O working-agreement e o sprint-executor dizem que o merge pela interface já sai no padrão.
+  priority: should
+  rank: 1560
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-11'
+  updated: '2026-11-11'
+  history:
+  - date: '2026-11-11'
+    status: ready
+- id: TK-022
+  type: task
+  title: Script versionado que roda a suíte numa cópia sem o arquivo de segredos, do zero
+  epic: EP-007
+  story: ''
+  description: Ação da retrospectiva da Sprint 13. A limpeza do scratchpad apagou várias vezes o venv e os comandos
+    que montavam a cópia, e a cada item o ambiente de testes foi recriado à mão (o TK-020 resolveu só a collection
+    do Insomnia).
+  acceptance_criteria:
+  - 'Um script (ex.: scripts/testes_na_copia.sh) recebe um diretório de trabalho, cria a cópia do projeto sem .env,
+    .venv, .git, uploads, *.db, __pycache__, MUDANCAS_API_PARA_FRONT.md e PENDENCIAS_API.md, cria o venv com requirements.txt
+    e requirements-test.txt e roda a suíte completa com cobertura.'
+  - Dado um diretório vazio, quando o script roda, então tudo é criado do zero; dado um venv já existente, ele é
+    reaproveitado.
+  - Um teste confere que a cópia não leva o arquivo de segredos nem as notas locais (cenário negado).
+  - O sprint-executor passa a usar o script na definição de TESTES.
+  priority: should
+  rank: 1570
+  estimate: 2
+  status: ready
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - CWE-538
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-11'
+  updated: '2026-11-11'
+  history:
+  - date: '2026-11-11'
+    status: ready
