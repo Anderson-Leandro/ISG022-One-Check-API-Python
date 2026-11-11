@@ -2414,7 +2414,7 @@ items:
   priority: could
   rank: 260
   estimate: 1
-  status: backlog
+  status: ready
   sprint: 14
   phase: F7
   depends_on: []
@@ -2429,10 +2429,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 41dac48b39820e29
@@ -2494,7 +2496,7 @@ items:
   priority: should
   rank: 110
   estimate: 5
-  status: backlog
+  status: ready
   sprint: 14
   phase: F6
   depends_on: []
@@ -2514,10 +2516,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 4ece98b97e77acb1
@@ -2536,7 +2540,7 @@ items:
   priority: could
   rank: 250
   estimate: 8
-  status: backlog
+  status: ready
   sprint: 14
   phase: F6
   depends_on:
@@ -2557,10 +2561,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 555d091bec0eec6a
@@ -2630,7 +2636,7 @@ items:
   priority: should
   rank: 120
   estimate: 5
-  status: backlog
+  status: ready
   sprint: 14
   phase: F6
   depends_on: []
@@ -2649,10 +2655,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 163a76643762a059
@@ -2669,7 +2677,7 @@ items:
   priority: could
   rank: 220
   estimate: 3
-  status: backlog
+  status: ready
   sprint: 14
   phase: F6
   depends_on: []
@@ -2688,10 +2696,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 574d9476fce1aa57
@@ -2708,7 +2718,7 @@ items:
   priority: could
   rank: 230
   estimate: 3
-  status: backlog
+  status: ready
   sprint: 14
   phase: F6
   depends_on: []
@@ -2728,10 +2738,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 83d3288be8e11290
@@ -3029,7 +3041,7 @@ items:
   priority: could
   rank: 290
   estimate: 8
-  status: backlog
+  status: ready
   sprint: null
   phase: F4
   depends_on: []
@@ -3047,7 +3059,7 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -3055,6 +3067,8 @@ items:
     status: in_sprint
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 6762c8422cfddf2b
@@ -3600,7 +3614,7 @@ items:
   priority: should
   rank: 65
   estimate: 2
-  status: backlog
+  status: ready
   sprint: 14
   phase: F6
   depends_on: []
@@ -3618,10 +3632,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: f390ad12d85ffe2d
@@ -3970,7 +3986,7 @@ items:
   priority: should
   rank: 66
   estimate: 1
-  status: backlog
+  status: ready
   sprint: 14
   phase: F6
   depends_on: []
@@ -3987,10 +4003,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: fc3b50634590ed00
@@ -4008,7 +4026,7 @@ items:
   priority: must
   rank: 255
   estimate: 3
-  status: backlog
+  status: ready
   sprint: 14
   phase: F7
   depends_on: []
@@ -4025,10 +4043,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-02'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: d3adbf9b3d77ef90
@@ -4458,7 +4478,7 @@ items:
   priority: could
   rank: 155
   estimate: 2
-  status: backlog
+  status: ready
   sprint: null
   phase: F5
   depends_on: []
@@ -4478,10 +4498,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-07'
-  updated: '2026-11-07'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-07'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 99c7fe683048f68c
@@ -4626,7 +4648,7 @@ items:
   priority: should
   rank: 1520
   estimate: 3
-  status: backlog
+  status: ready
   sprint: null
   phase: F6
   depends_on: []
@@ -4645,10 +4667,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-08'
-  updated: '2026-11-08'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 01df3e7e13d3c5f2
@@ -5268,22 +5292,20 @@ items:
       remote_at: '2026-11-08T22:18:54Z'
 - id: DEBT-019
   type: debt
-  title: Lock que o Dependabot regenera sozinho, com as transitivas e a imagem base
+  title: Lock que o Dependabot regenera sozinho, com as transitivas
   epic: EP-007
   story: ''
-  description: 'Achado do /code-review do DEBT-005. O requirements.lock é gerado por uv pip compile a partir de
-    um .txt, sem cabeçalho, e o Dependabot pip não o reconhece: cada PR do pip precisa de alguém para regenerar
-    o lock na branch, e depois de um push humano o Dependabot para de rebasear o PR. As transitivas, que só existem
-    no lock, não ganham PR de atualização (só o pip-audit aponta as vulneráveis). A imagem base do Dockerfile segue
-    numa tag móvel, sem o ecossistema docker no dependabot.yml (pendência do SEC-008).'
+  description: |-
+    Achado do /code-review do DEBT-005. O requirements.lock é gerado por uv pip compile a partir de um .txt, sem cabeçalho, e o Dependabot pip não o reconhece: cada PR do pip precisa de alguém para regenerar o lock na branch, e depois de um push humano o Dependabot para de rebasear o PR. As transitivas, que só existem no lock, não ganham PR de atualização (só o pip-audit aponta as vulneráveis). A imagem base do Dockerfile segue numa tag móvel, sem o ecossistema docker no dependabot.yml (pendência do SEC-008).
+    Refinado em 2026-11-11: a imagem base do Docker foi para o DEBT-021, que não tem incerteza. A solução do lock só se confirma num PR real do Dependabot.
   acceptance_criteria:
   - Um PR do Dependabot que muda uma dependência direta já traz o lock regenerado, com hashes, sem passo manual.
   - As dependências transitivas do lock recebem PRs de atualização.
-  - O dependabot.yml cobre o ecossistema docker e o Dockerfile fixa a imagem base por digest.
+  - O build do Render (pip install --require-hashes) e o CI continuam passando com o novo formato do lock.
   priority: could
   rank: 1530
-  estimate: null
-  status: backlog
+  estimate: 3
+  status: ready
   sprint: null
   phase: F5
   depends_on: []
@@ -5301,10 +5323,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-08'
-  updated: '2026-11-08'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-08'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 5911ac3c37af511d
@@ -5327,8 +5351,8 @@ items:
   - Os testes existentes que leem detail são atualizados com relatório e aprovação.
   priority: should
   rank: 1540
-  estimate: null
-  status: backlog
+  estimate: 5
+  status: ready
   sprint: null
   phase: F5
   depends_on: []
@@ -5346,10 +5370,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-09'
-  updated: '2026-11-09'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-09'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: 75d408e4b0713b90
@@ -5370,8 +5396,8 @@ items:
   - Existe teste para cada rota, conferindo o diretório de uploads antes e depois.
   priority: should
   rank: 1550
-  estimate: null
-  status: backlog
+  estimate: 2
+  status: ready
   sprint: null
   phase: F5
   depends_on: []
@@ -5390,10 +5416,12 @@ items:
     prs: []
   evidence: []
   created: '2026-11-09'
-  updated: '2026-11-09'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-09'
     status: backlog
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
       hash: aa5a24916fd5a705
@@ -5485,3 +5513,42 @@ items:
     github:
       hash: b2e8e272e408497f
       remote_at: '2026-11-11T03:12:15Z'
+- id: DEBT-021
+  type: debt
+  title: Imagem base do Dockerfile fixada por digest e coberta pelo Dependabot
+  epic: EP-007
+  story: ''
+  description: Separado do DEBT-019 no refinamento de 2026-11-11 (pendência do SEC-008). A imagem base do Dockerfile
+    segue numa tag móvel, e o dependabot.yml não tem o ecossistema docker.
+  acceptance_criteria:
+  - O Dockerfile fixa a imagem base por digest (tag e @sha256), e um teste confere que não há FROM sem digest.
+  - O dependabot.yml cobre o ecossistema docker, com base dev e o mesmo cooldown dos outros ecossistemas.
+  - O docker compose local continua subindo com a imagem fixada.
+  priority: could
+  rank: 1580
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP A06:2021
+    - CWE-1357
+    risk_id: null
+  source:
+    kind: refine
+    ref: DEBT-019
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-11'
+  updated: '2026-11-11'
+  history:
+  - date: '2026-11-11'
+    status: backlog
+  - date: '2026-11-11'
+    status: ready
