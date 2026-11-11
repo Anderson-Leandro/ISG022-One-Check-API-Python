@@ -2486,8 +2486,9 @@ items:
   title: Log de auditoria append-only
   epic: EP-006
   story: ''
-  description: 'Resto do antigo SEC-003 do product-backlog: IP e campos alterados já existem (SEC-010); falta a
-    integridade do log.'
+  description: |-
+    Resto do antigo SEC-003 do product-backlog: IP e campos alterados já existem (SEC-010); falta a integridade do log.
+    Decisão do PO em 2026-11-11: trigger no banco. Ele recusa UPDATE e DELETE em log_operacao, salvo numa transação marcada pela rotina de retenção (Marco Civil, LOG_RETENCAO_DIAS). É criado pela migração da inicialização (PostgreSQL; SQLite com trigger equivalente nos testes) e testado no Postgres do CI. A limitação vai para o ADR: o dono do banco ainda consegue desligar o trigger. Descartados: papéis no banco (exigiria papéis e outra DATABASE_URL no Render) e o controle só na aplicação.
   acceptance_criteria:
   - Dado um usuário do banco da aplicação, quando tentar UPDATE ou DELETE em log_operacao, então a operação é negada
     (papel só com INSERT/SELECT) — exceto a rotina de retenção, com papel próprio.
@@ -2629,7 +2630,9 @@ items:
   title: 'Direitos do titular (LGPD): exportar e anonimizar os próprios dados'
   epic: EP-006
   story: ''
-  description: LGPD art. 18. Hoje a exclusão é lógica e mantém nome, e-mail e CPF.
+  description: |-
+    LGPD art. 18. Hoje a exclusão é lógica e mantém nome, e-mail e CPF.
+    Decisão do PO em 2026-11-11: autoatendimento. Exportação: GET /usuarios/me/dados, em JSON, só com os próprios dados. Exclusão: o próprio usuário pede, com reautenticação (senha e código do MFA, se tiver). Na hora, o nome vira 'Usuário removido', o e-mail vira um valor único inválido e o CPF é apagado; a conta é desativada e as sessões são revogadas. Laudos e logs ficam (os logs guardam só o id), e um laudo gerado depois mostra 'Usuário removido'. O último admin ativo não pode se anonimizar. A decisão vai para um ADR.
   acceptance_criteria:
   - Dado um usuário autenticado, quando pedir a exportação, então recebe só os próprios dados pessoais.
   - Dado um pedido de exclusão aprovado, quando for executado, então nome, e-mail e CPF são anonimizados e os laudos
@@ -2674,7 +2677,9 @@ items:
   title: Forçar a troca das senhas fracas cadastradas antes da política
   epic: EP-001
   story: ''
-  description: Risco residual do SEC-011.
+  description: |-
+    Risco residual do SEC-011.
+    Decisão do PO em 2026-11-11: conferir no login. Com a senha correta, se ela não passa na política atual, a conta é marcada com senha_expirada e o token só permite trocar a senha. Senhas fortes não são afetadas. A senha dos testes (TEST_SENHA = senha123 e 10 ocorrências) passa a ser uma senha forte: troca mecânica, com relatório e aprovação.
   acceptance_criteria:
   - Dado um usuário marcado com senha_expirada, quando fizer login, então só consegue trocar a senha.
   - Contas com senha forte não são afetadas.
@@ -2717,7 +2722,10 @@ items:
   title: Recusar senhas que aparecem em vazamentos conhecidos
   epic: EP-001
   story: ''
-  description: ''
+  description: 'Decisão do PO em 2026-11-11: Have I Been Pwned por k-anonymity (só os 5 primeiros caracteres do
+    SHA-1 saem da API), com timeout de cerca de 2 s. Se o serviço não responder, a senha é aceita e o fato vai para
+    o log (fail open). Nos testes, a consulta fica desligada pela conftest e é simulada (alteração com relatório
+    e aprovação).'
   acceptance_criteria:
   - Dado uma senha nova presente na base de vazadas, quando cadastrar, então recebe 422.
   - A consulta usa k-anonymity (só o prefixo do hash sai da API) e tem timeout com fallback.
