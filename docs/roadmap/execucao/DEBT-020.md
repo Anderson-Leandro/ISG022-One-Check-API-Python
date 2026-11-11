@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 14 · **Issue:** #211 · **Branch:** `refactor/DEBT-020-erros-no-envelope` · **PR:** #<n>
+- **Sprint:** 14 · **Issue:** #211 · **Branch:** `refactor/DEBT-020-erros-no-envelope` · **PR:** #240
 
 ## Entrega
 Achado do DEBT-002. As regras de negócio respondiam no envelope (ADR-0003), mas os erros levantados pelo framework respondiam `{"detail": ...}`.
