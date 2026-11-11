@@ -5467,7 +5467,7 @@ items:
   priority: should
   rank: 1560
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 14
   phase: F5
   depends_on: []
@@ -5481,8 +5481,13 @@ items:
   links:
     trello_card: null
     gh_issue: 229
-    prs: []
-  evidence: []
+    prs:
+    - '#236'
+  evidence:
+  - 'PR #236 (merge 6de7276): .github/repositorio.json com merge_commit_title=PR_TITLE e corpo vazio, aplicado no
+    GitHub'
+  - dod_check confere a configuração do repositório em todo item
+  - 'TestConfiguracaoDoMerge: 5 testes'
   created: '2026-11-11'
   updated: '2026-11-11'
   history:
@@ -5492,10 +5497,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-11'
+    status: done
   sync:
     github:
-      hash: 5e1c0e46de4ca976
-      remote_at: '2026-11-11T11:12:06Z'
+      hash: 16d66c9a0aefb5c1
+      remote_at: '2026-11-11T11:19:53Z'
 - id: TK-022
   type: task
   title: Script versionado que roda a suíte numa cópia sem o arquivo de segredos, do zero
