@@ -2497,7 +2497,7 @@ items:
   priority: should
   rank: 110
   estimate: 5
-  status: in_progress
+  status: done
   sprint: 14
   phase: F6
   depends_on: []
@@ -2514,8 +2514,13 @@ items:
   links:
     trello_card: null
     gh_issue: 63
-    prs: []
-  evidence: []
+    prs:
+    - '#242'
+  evidence:
+  - 'PR #242 (merge 9278174): log_operacao append-only por trigger (UPDATE, DELETE e TRUNCATE recusados), com exceção
+    só na transação autorizada; ADR-0016'
+  - 'tests/integration/test_seguranca_log_append_only.py: 14 testes; SQLite 1444 e PostgreSQL 16 temporário 1447'
+  - conftest com a mesma autorização, aprovada pelo usuário em 2026-11-11
   created: '2026-11-02'
   updated: '2026-11-11'
   history:
@@ -2527,10 +2532,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-11'
+    status: done
   sync:
     github:
-      hash: 6c9a61a07f12c7cd
-      remote_at: '2026-11-11T12:07:56Z'
+      hash: abe137fc321a7f91
+      remote_at: '2026-11-11T12:35:03Z'
 - id: SEC-026
   type: security
   title: Fotos de vistoria com URL assinada e expiração
