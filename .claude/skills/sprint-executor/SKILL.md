@@ -12,10 +12,10 @@ verde. Se o script não passar, o item não está pronto.
 - `BL` = `python3 ~/.claude/skills/_roadmap-shared/scripts/backlog.py --root .`
 - `SP` = `python3 ~/.claude/skills/_roadmap-shared/scripts/sprint.py --root .`
 - `GH` = `python3 ~/.claude/skills/board-sync/scripts/github_sync.py --root .`
-- `TESTES` = rodar o pytest numa cópia do projeto no scratchpad, sem `.env`, `.venv`, `.git`, `uploads`,
-  `*.db`, `__pycache__`, `MUDANCAS_API_PARA_FRONT.md` e `PENDENCIAS_API.md`:
-  `rsync -a --delete --exclude .env ... ./ <scratchpad>/proj/` e `python -m pytest -q -p no:cacheprovider`
-  com um venv do scratchpad (`pip install -r requirements-test.txt`).
+- `TESTES` = `bash scripts/testes_na_copia.sh <scratchpad>/testes [argumentos do pytest]` (TK-022). O script copia
+  o projeto sem `.env`, `.venv`, `.git`, `uploads`, `*.db`, `__pycache__`, `MUDANCAS_API_PARA_FRONT.md` e
+  `PENDENCIAS_API.md`, cria o venv só na primeira vez (ou quando os requisitos mudam) e roda o pytest na cópia.
+  Se a limpeza do scratchpad apagar o diretório, o mesmo comando recria tudo.
 
 Argumento: `$ARGUMENTS`. Vazio ou `proximo` → próximo item; um ID → esse item; `status` → só mostra a fila.
 A flag `--continuo` (também aceite `--contínuo` ou `continuo`) pode vir sozinha ou junto com um ID
