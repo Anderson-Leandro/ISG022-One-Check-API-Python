@@ -74,11 +74,41 @@
 | 2026-11-10 | Decisão do PO: risco R-015 (sem backup do banco) aceito até o primeiro dado real em produção; TK-005 sai da sprint no close e volta ao backlog |
 
 ## Sprint Review
+Feita em 2026-11-10.
+
 - **Incremento demonstrável:**
-- **Goal atingido?** sim / parcial / não — por quê:
-- **Evidências** (PRs, testes, prints, relatórios):
-- **Checagem de segurança** (`/security-audit diff`, segredos, riscos novos):
-- **Feedback do cliente/PO:**
+  - **Produção:**
+    - **Recriação:** banco recriado e carregado pelo seed, com senhas aleatórias (TK-002).
+    - **Configuração:** `CORS_ORIGINS` restrito e `SEED_SECRET` vazio (TK-003).
+    - **IP do cliente:** o IP forjado no `X-Forwarded-For` deixou de ser aceito, e o real foi conferido no Render, atrás de 3 proxies (SEC-017, ADR-0015).
+  - **Falhas corrigidas:**
+    - **MFA:** QR do MFA gerado pela própria API (SEC-035).
+    - **Logs:** `GET /logs` só do admin (SEC-018). O login falho grava o HMAC do e-mail, e não o e-mail digitado (SEC-019). O filtro de data inválido responde `422` (SEC-020).
+    - **CPF:** cifrado em repouso (SEC-031, ADR-0014).
+    - **Outras correções:** SEC-027, BUG-001 e DEBT-017.
+  - **Qualidade e CI:**
+    - **Lint:** ruff no CI (DEBT-004).
+    - **Respostas:** documentadas, com teste de contrato (DEBT-002).
+    - **MFA:** uma rota canônica por operação (DEBT-003, ADR-0013).
+    - **Processo:** merges no padrão Conventional Commits (DEBT-008) e checklist antes da revisão (TK-019). O `dod_check` deixou de falhar sem motivo (DEBT-018).
+    - **Outros itens:** DEBT-001, DEBT-005, DEBT-010 e TK-020.
+- **Goal atingido? Sim, com uma ressalva.** Produção recriada e conferida, as falhas abertas do escopo corrigidas e a qualidade verificada no CI. A ressalva é o backup do banco (TK-005): ficou adiado porque o PO aceitou o risco R-015 até o primeiro dado real em produção. Volta ao backlog no `close`.
+- **Evidências:**
+  - 44 PRs mesclados na `dev` (#180 a #226) e 115 commits desde o planejamento (`e91f9d3`);
+  - `python3 scripts/dod_check.py` verde nos 21 itens `done`;
+  - suíte com 1398 testes (1081 no começo da sprint) e cobertura de branches em 97%;
+  - registros em `docs/roadmap/execucao/` e ADRs 0013, 0014 e 0015.
+- **Checagem de segurança:**
+  - **Scanners:** rodados no diff completo da sprint (`e91f9d3..dev`), os 7 com status `ok`. **Nenhum achado novo** e nenhuma dependência vulnerável.
+  - **Apontamentos conferidos no código:**
+    - os segredos do gitleaks são o arquivo local fora do git e os valores fictícios dos testes;
+    - o SQL do `ALTER TABLE` é montado com uma constante;
+    - `gAAAAA` é o prefixo do token Fernet;
+    - o `MFA_SECRET_DEV` é o segredo público de desenvolvimento, usado para detectar as contas antigas;
+    - o `logger` do `app/config.py` não registra o segredo.
+  - **Riscos:** R-006 e R-008 mitigados, R-015 aceito.
+  - **Próxima auditoria:** a completa, com relatório, fica para o TK-006 (Sprint 14), antes da release candidata.
+- **Feedback do cliente/PO:** o incremento está de acordo. Nada muda de prioridade por enquanto. O PO concorda com o goal atingido, com a ressalva do risco aceito.
 
 ## Retrospectiva
 | Funcionou bem | Melhorar | Ação (vira item no backlog) |
