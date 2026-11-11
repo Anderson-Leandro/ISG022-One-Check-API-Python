@@ -25,7 +25,7 @@ O projeto é acadêmico, mantido por um time pequeno e sem orçamento. Precisa d
 Vamos usar a **opção 1**:
 - **Processo:** `start.sh` sobe `uvicorn app.main:app` **sem `--workers`**, ou seja, um processo só, numa instância.
 - **Build:** `pip install --require-hashes -r requirements.lock`; health check em `/api/v1/health`.
-- **Configuração:** `JWT_SECRET` gerado pelo Render; `SEED_SECRET`, `CORS_ORIGINS` e `PUBLIC_BASE_URL` definidos no painel (`sync: false`); o IP do cliente vem do item que o proxy do Render acrescenta ao `X-Forwarded-For` (`PROXY_SALTOS=1`). Até 2026-11-10 era `FORWARDED_ALLOW_IPS="*"`, que aceitava o IP escrito pelo cliente (SEC-017, ADR-0015).
+- **Configuração:** `JWT_SECRET` gerado pelo Render; `SEED_SECRET`, `CORS_ORIGINS` e `PUBLIC_BASE_URL` definidos no painel (`sync: false`); o IP do cliente vem do item que o proxy do Render acrescenta ao `X-Forwarded-For` (`PROXY_SALTOS=3`). Até 2026-11-10 era `FORWARDED_ALLOW_IPS="*"`, que aceitava o IP escrito pelo cliente (SEC-017, ADR-0015).
 - **Estado em memória permitido.** Com um processo só, o **limite de tentativas** de login, MFA e reautenticação fica na memória (`app/rate_limit.py`), sem Redis nem tabela. O teto de 10.000 chaves descarta as expiradas para a memória não crescer sem limite (SEC-034).
 
 ## Consequências

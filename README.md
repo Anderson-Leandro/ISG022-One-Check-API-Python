@@ -330,7 +330,7 @@ SEED_SECRET=
 # RATE_LIMIT_FALHAS_IP=20
 # RATE_LIMIT_JANELA_MIN=15
 # Proxies na frente da API que acrescentam o IP real ao X-Forwarded-For. 0 (padrão): o cabeçalho é
-# ignorado. No Render, 1 (render.yaml)
+# ignorado. No Render, 3 (render.yaml, ADR-0015)
 # PROXY_SALTOS=0
 # Tamanho máximo do corpo: uploads (MB) e demais requisições, como JSON (KB)
 # MAX_UPLOAD_MB=10
@@ -341,7 +341,7 @@ SEED_SECRET=
 
 No Render, defina `CORS_ORIGINS` com a URL do front (o `render.yaml` deixa o valor para o painel).
 
-No Render, `PROXY_SALTOS=1`. Depois de qualquer mudança de infraestrutura na frente da API, faça um login falho com `X-Forwarded-For: 203.0.113.9` e confira em `GET /logs` que o IP gravado é o seu IP público, e não o forjado nem o de um proxy (ADR-0015). A variável `FORWARDED_ALLOW_IPS` não é mais usada: o `start.sh` sobe o uvicorn com `--no-proxy-headers`.
+No Render, `PROXY_SALTOS=3`: Cloudflare, o proxy do Render e a rede interna acrescentam um item cada. Depois de qualquer mudança de infraestrutura na frente da API, faça um login falho com `X-Forwarded-For: 203.0.113.9` e confira em `GET /logs` que o IP gravado é o seu IP público, e não o forjado nem o de um proxy (ADR-0015). A variável `FORWARDED_ALLOW_IPS` não é mais usada: o `start.sh` sobe o uvicorn com `--no-proxy-headers`.
 
 A cada start, o `start.sh` apaga os refresh tokens vencidos e os eventos de `log_operacao` com mais de `LOG_RETENCAO_DIAS` dias. Se a instância fica muito tempo no ar sem reiniciar, agende também `python scripts/limpar_dados_vencidos.py` (Render Cron Job ou cron do host).
 

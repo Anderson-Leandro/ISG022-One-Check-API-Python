@@ -147,7 +147,8 @@ class TestImplantacao:
     def test_render_nao_confia_em_todo_ip(self):
         envs = {e["key"]: e for e in yaml.safe_load((RAIZ / "render.yaml").read_text())["services"][0]["envVars"]}
         assert envs.get("FORWARDED_ALLOW_IPS", {}).get("value") != "*"
-        assert envs["PROXY_SALTOS"]["value"] == "1"
+        # Cloudflare, proxy do Render e rede interna: conferido em produção (ADR-0015)
+        assert envs["PROXY_SALTOS"]["value"] == "3"
 
     def test_uvicorn_sobe_sem_ler_cabecalhos_de_proxy(self, tmp_path):
         # mesmo com FORWARDED_ALLOW_IPS="*" ainda no painel, o uvicorn não troca o client
