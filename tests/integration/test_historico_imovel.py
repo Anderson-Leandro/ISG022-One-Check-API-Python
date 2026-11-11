@@ -174,7 +174,7 @@ def test_locatario_sem_contrato_no_imovel_recebe_403(client, db, imovel, histori
         f"{API}/imoveis/{imovel.id}/historico", headers=auth(create_access_token(estranho.id, estranho.role))
     )
     assert r.status_code == 403, r.text
-    assert r.json()["detail"] == "Você não tem acesso a este imóvel"
+    assert r.json()["erro"] == "Você não tem acesso a este imóvel"
 
 
 def test_eventos_com_a_mesma_data_tem_ordem_estavel(client, db, imovel, contrato, historico, token_admin):

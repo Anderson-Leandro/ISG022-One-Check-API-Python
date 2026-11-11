@@ -5372,7 +5372,7 @@ items:
   priority: should
   rank: 1540
   estimate: 5
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F5
   depends_on: []
@@ -5398,10 +5398,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: df404a1088508291
-      remote_at: '2026-11-11T03:40:08Z'
+      hash: 0e9a3d125ada6996
+      remote_at: '2026-11-11T11:43:48Z'
 - id: BUG-002
   type: bug
   title: Foto enviada fica órfã no disco quando o pedido é recusado depois do upload

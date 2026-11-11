@@ -64,7 +64,7 @@ def test_locatario_nao_lista_os_de_outro_contrato(client, contrato_alheio, token
     r = client.get(f"{API}/contratos/{contrato_alheio.id}/agendamentos", headers=auth(token_locatario))
 
     assert r.status_code == 403, r.text
-    assert r.json()["detail"] == "Você não tem acesso a este contrato"
+    assert r.json()["erro"] == "Você não tem acesso a este contrato"
     assert "dados" not in r.json()
 
 

@@ -63,7 +63,7 @@ class TestPerfilForaDaListaNaoAcessaNada:
         u = conta_com_perfil_fora_da_lista
         r = client.get(f"{API}{rota}", headers=auth(create_access_token(u.id, u.role)))
         assert r.status_code == 401, r.text
-        assert r.json()["detail"] == "Perfil de acesso inválido"
+        assert r.json()["erro"] == "Perfil de acesso inválido"
         assert "dados" not in r.json()
 
     def test_token_com_perfil_valido_nao_contorna_o_banco(self, client, conta_com_perfil_fora_da_lista):

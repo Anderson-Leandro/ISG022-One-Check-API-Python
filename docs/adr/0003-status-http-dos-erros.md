@@ -62,3 +62,9 @@ Vamos usar a **opção 2**. O envelope `{sucesso, dados, erro, erros}` continua,
   - a collection do Insomnia é gerada de novo;
   - o `README.md` é atualizado.
 - **Segurança:** melhora a detecção de abuso (A09) sem mudar quem pode fazer o quê. Os testes de negação passam a conferir o status exato (DEBT-012).
+
+## Complemento (2026-11-11, DEBT-020)
+Os erros levantados pelo framework também passam ao envelope: o 401 de token e o 403 de perfil das dependências, o 404 e o 405 do roteador, o 422 de corpo, consulta ou caminho fora do schema, o 429 do limite de tentativas e o 400 e o 413 do limite de corpo.
+- Handlers globais em `app/erros.py` mantêm o status e os cabeçalhos da exceção (`Retry-After`, `Allow`) e trocam só o corpo.
+- No 422 de schema, `erros` traz a mensagem por campo (nome aninhado com ponto, como `endereco.rua`; `corpo` para JSON inválido ou corpo ausente), e `erro` é a primeira mensagem.
+- O OpenAPI declara `ErroResposta` em toda resposta 4xx e 5xx, e o formato `{"detail": ...}` (`DetalheErro`, `HTTPValidationError`) sai da API.

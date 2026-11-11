@@ -55,7 +55,7 @@ class TestListContratos:
     def test_sem_autenticacao_retorna_401(self, client):
         r = client.get(BASE)
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
 
 
 # ── POST /contratos ───────────────────────────────────────────────────────────────
@@ -154,7 +154,7 @@ class TestCreateContrato:
             },
         )
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -181,7 +181,7 @@ class TestListAgendamentos:
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/agendamentos")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
 
 
 # ── GET /contratos/{id}/checklists ────────────────────────────────────────────────
@@ -237,7 +237,7 @@ class TestListChecklists:
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/checklists")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
 
 
 # ── POST /contratos/{id}/checklists ───────────────────────────────────────────────
@@ -321,7 +321,7 @@ class TestCreateChecklist:
             },
         )
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -405,7 +405,7 @@ class TestCreateProblema:
         banco_antes = foto_do_banco(db)
         r = client.post(f"{BASE}/{contrato.id}/problemas", json={"titulo": "X"})
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -438,7 +438,7 @@ class TestListProblemas:
     def test_sem_autenticacao_retorna_401(self, client, contrato):
         r = client.get(f"{BASE}/{contrato.id}/problemas")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
 
 
 # ── GET /contratos/{id} ───────────────────────────────────────────────────────────
@@ -470,7 +470,7 @@ class TestGetContrato:
 
         r = client.get(f"{BASE}/{contrato.id}", headers=auth(token2))
         assert r.status_code == 403
-        assert r.json()["detail"] == "Você não tem acesso a este contrato"
+        assert r.json()["erro"] == "Você não tem acesso a este contrato"
 
     def test_contrato_inexistente_retorna_falha(self, client, token_admin):
         r = client.get(f"{BASE}/00000000-0000-0000-0000-000000000000", headers=auth(token_admin))
@@ -540,7 +540,7 @@ class TestCicloVidaContrato:
         banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{contrato.id}/encerrar", headers=auth(token_locatario))
         assert r.status_code == 403
-        assert r.json()["detail"] == "Permissão negada"
+        assert r.json()["erro"] == "Permissão negada"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 

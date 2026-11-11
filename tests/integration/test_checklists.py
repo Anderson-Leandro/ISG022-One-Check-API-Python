@@ -62,7 +62,7 @@ class TestListItensVistoria:
     def test_sem_autenticacao_retorna_401(self, client):
         r = client.get(ITENS_BASE)
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
 
 
 # ── GET /checklists/{id} ──────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ class TestGetChecklist:
     def test_sem_autenticacao_retorna_401(self, client, checklist):
         r = client.get(f"{BASE}/{checklist.id}")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
 
 
 # ── POST /checklists/{id}/itens ───────────────────────────────────────────────────
@@ -185,7 +185,7 @@ class TestAddItem:
             headers=auth(token_locatario),
         )
         assert r.status_code == 403
-        assert r.json()["detail"] == "Vistoriador não autorizado neste checklist"
+        assert r.json()["erro"] == "Vistoriador não autorizado neste checklist"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_checklist_inexistente_retorna_falha(self, client, item_vistoria, token_admin):
@@ -212,7 +212,7 @@ class TestAddItem:
             },
         )
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -278,7 +278,7 @@ class TestUpdateItem:
         banco_antes = foto_do_banco(db)
         r = client.put(f"{BASE}/{checklist.id}/itens/{item.id}", json={"estado": "bom"})
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -353,7 +353,7 @@ class TestUploadFoto:
             files={"foto": ("test.jpg", small_image_bytes(), "image/jpeg")},
         )
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -399,7 +399,7 @@ class TestDeleteFoto:
         banco_antes = foto_do_banco(db)
         r = client.delete(f"{BASE}/{checklist.id}/itens/{item.id}/fotos/qualquer-id")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -438,7 +438,7 @@ class TestSubmeterChecklist:
         banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{checklist.id}/submeter", headers=auth(token_gestor))
         assert r.status_code == 403
-        assert r.json()["detail"] == "Vistoriador não autorizado neste checklist"
+        assert r.json()["erro"] == "Vistoriador não autorizado neste checklist"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_checklist_inexistente_retorna_falha(self, client, token_admin):
@@ -450,7 +450,7 @@ class TestSubmeterChecklist:
         banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{checklist.id}/submeter")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -492,7 +492,7 @@ class TestAceitarChecklist:
         banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{checklist.id}/aceitar", headers=auth(token_vistoriador))
         assert r.status_code == 403
-        assert r.json()["detail"] == "O vistoriador não pode aceitar ou rejeitar a própria vistoria"
+        assert r.json()["erro"] == "O vistoriador não pode aceitar ou rejeitar a própria vistoria"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_nao_pendente_retorna_falha(self, client, checklist, token_admin):
@@ -506,7 +506,7 @@ class TestAceitarChecklist:
         banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{checklist.id}/aceitar")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -546,7 +546,7 @@ class TestRejeitarChecklist:
         banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{checklist.id}/rejeitar", headers=auth(token_vistoriador))
         assert r.status_code == 403
-        assert r.json()["detail"] == "O vistoriador não pode aceitar ou rejeitar a própria vistoria"
+        assert r.json()["erro"] == "O vistoriador não pode aceitar ou rejeitar a própria vistoria"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
     def test_nao_pendente_retorna_falha(self, client, checklist, token_admin):
@@ -558,7 +558,7 @@ class TestRejeitarChecklist:
         banco_antes = foto_do_banco(db)
         r = client.patch(f"{BASE}/{checklist.id}/rejeitar")
         assert r.status_code == 401
-        assert r.json()["detail"] == "Token ausente"
+        assert r.json()["erro"] == "Token ausente"
         assert foto_do_banco(db) == banco_antes, "a requisição negada gravou no banco"
 
 
@@ -658,9 +658,9 @@ class TestDownloadPdf:
 
         r = client.get(f"{BASE}/{checklist.id}/download", headers=auth(token_outro))
         assert r.status_code == 403
-        assert r.json()["detail"] == "Você não tem permissão para baixar o PDF deste checklist"
+        assert r.json()["erro"] == "Você não tem permissão para baixar o PDF deste checklist"
 
     def test_vistoriador_nao_tem_acesso_ao_pdf_e_recebe_403(self, client, checklist, token_vistoriador):
         r = client.get(f"{BASE}/{checklist.id}/download", headers=auth(token_vistoriador))
         assert r.status_code == 403
-        assert r.json()["detail"] == "Vistoriadores não têm acesso ao PDF do checklist"
+        assert r.json()["erro"] == "Vistoriadores não têm acesso ao PDF do checklist"

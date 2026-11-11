@@ -117,11 +117,11 @@ def _negado(r):
 class TestVerChecklist:
     def test_locatario_de_outro_contrato_recebe_403_sem_dados(self, client, checklist, item, token_outro_locatario):
         corpo = _negado(client.get(f"{API}/checklists/{checklist.id}", headers=auth(token_outro_locatario)))
-        assert corpo["detail"] == "Sem permissão para ver esta vistoria"
+        assert corpo["erro"] == "Sem permissão para ver esta vistoria"
 
     def test_outro_vistoriador_recebe_403_sem_dados(self, client, checklist, item, token_outro_vistoriador):
         corpo = _negado(client.get(f"{API}/checklists/{checklist.id}", headers=auth(token_outro_vistoriador)))
-        assert corpo["detail"] == "Sem permissão para ver esta vistoria"
+        assert corpo["erro"] == "Sem permissão para ver esta vistoria"
 
     def test_locatario_dono_ve_o_checklist(self, client, checklist, item, token_locatario):
         r = client.get(f"{API}/checklists/{checklist.id}", headers=auth(token_locatario))
@@ -208,7 +208,7 @@ class TestLocatarioDeOutroContratoNaoDecide:
             headers=auth(token_outro_locatario),
         )
         corpo = _negado(r)
-        assert corpo["detail"] == "Sem permissão para aceitar ou rejeitar esta vistoria"
+        assert corpo["erro"] == "Sem permissão para aceitar ou rejeitar esta vistoria"
         assert _recarregar(db, Checklist, checklist_pendente.id).status == "pendente_aceite"
         assert db.query(AceiteChecklist).filter(AceiteChecklist.checklist_id == checklist_pendente.id).count() == 0
 
@@ -232,5 +232,5 @@ class TestPdfDoChecklist:
     def test_locatario_de_outro_contrato_recebe_403(self, client, checklist, item, token_outro_locatario, rota):
         r = client.get(f"{API}/checklists/{checklist.id}/{rota}", headers=auth(token_outro_locatario))
         assert r.status_code == 403
-        assert r.json()["detail"] == "Você não tem permissão para baixar o PDF deste checklist"
+        assert r.json()["erro"] == "Você não tem permissão para baixar o PDF deste checklist"
         assert not r.content.startswith(b"%PDF")

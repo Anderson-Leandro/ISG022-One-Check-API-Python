@@ -192,7 +192,7 @@ def test_perfil_proibido_recebe_403(client, db, ids, tokens, metodo, rota, perfi
     r = client.request(metodo, f"{API}{rota.format(**ids)}", **kwargs)
 
     assert r.status_code == 403, r.text
-    assert r.json()["detail"] == "Permissão negada"
+    assert r.json()["erro"] == "Permissão negada"
     assert _foto_do_banco(db) == antes
 
 
@@ -230,7 +230,7 @@ def test_gestor_nao_le_os_logs(client, db, user_admin, token_gestor, token_admin
     r = client.get(f"{API}/logs", headers=auth(token_gestor))
 
     assert r.status_code == 403, r.text
-    assert r.json()["detail"] == "Permissão negada"
+    assert r.json()["erro"] == "Permissão negada"
     assert "203.0.113.7" not in r.text
     admin = client.get(f"{API}/logs", headers=auth(token_admin))
     assert admin.status_code == 200, admin.text

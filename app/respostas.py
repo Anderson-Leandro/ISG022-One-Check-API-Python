@@ -38,19 +38,13 @@ class Envelope(_Modelo, Generic[T]):
 
 
 class ErroResposta(_Modelo):
-    """O envelope de erro das regras de negócio: o status HTTP acompanha o resultado (ADR-0003)."""
+    """O envelope de todo erro da API: o status HTTP acompanha o resultado (ADR-0003, DEBT-020)."""
 
     sucesso: Literal[False] = Field(description="Sempre false")
     erro: str = Field(description="Mensagem para mostrar ao usuário")
-    erros: dict[str, Any] | list[str] | None = Field(None, description="Mensagem por campo, nos 422")
-
-
-class DetalheErro(_Modelo):
-    """O formato do FastAPI, ainda usado por parte dos erros (DEBT-020 unifica no envelope):
-    - 401 de token ausente, inválido ou de sessão encerrada, e 403 de perfil: `detail` é o texto;
-    - 422 de corpo fora do schema (campo obrigatório ausente, tipo errado): `detail` é a lista do Pydantic."""
-
-    detail: str | list[dict[str, Any]]
+    erros: dict[str, Any] | list[str] | None = Field(
+        None, description="Mensagem por campo, nos 422 (o nome aninhado vem com ponto: endereco.rua)"
+    )
 
 
 class UsuarioResposta(_Modelo):
@@ -215,22 +209,22 @@ class TokensResposta(_Modelo):
 
 
 _ERROS = {
-    400: "Regra da rota violada, como datas incoerentes (envelope)",
-    401: "Sem token, token inválido ou sessão encerrada (`detail`), ou credenciais inválidas no login (envelope)",
-    403: "O perfil (`detail`) ou o dono do registro (envelope ou `detail`) não permite a operação",
-    404: "Registro não encontrado (envelope)",
-    409: "Conflito com o estado atual, como um registro em uso ou duplicado (envelope)",
-    422: "Dados inválidos: regra da rota no envelope, com `erros` por campo; corpo fora do schema em `detail`",
-    429: "Tentativas demais: espere o tempo do cabeçalho Retry-After (`detail`)",
+    400: "Regra da rota violada, como datas incoerentes",
+    401: "Sem token, token inválido ou sessão encerrada, ou credenciais inválidas no login",
+    403: "O perfil ou o dono do registro não permite a operação",
+    404: "Registro não encontrado",
+    409: "Conflito com o estado atual, como um registro em uso ou duplicado",
+    422: "Dados inválidos, com a mensagem por campo em `erros` (regra da rota ou corpo fora do schema)",
+    429: "Tentativas demais: espere o tempo do cabeçalho Retry-After",
 }
 
 
 def documentar(modelo: type[BaseModel], *, erros: tuple[int, ...], lista: bool = False, status: int = 200) -> dict:
     """`responses` de uma rota: o envelope com `dados` do modelo (ou lista dele) e os erros que ela devolve.
 
-    Cada erro aceita os dois formatos que a API usa hoje (`ErroResposta` ou `DetalheErro`, até o DEBT-020)."""
+    Todo erro usa o envelope `ErroResposta` (DEBT-020)."""
     dados = list[modelo] if lista else modelo
     respostas: dict[int | str, dict] = {status: {"model": Envelope[dados], "description": "Sucesso"}}
     for codigo in erros:
-        respostas[codigo] = {"model": ErroResposta | DetalheErro, "description": _ERROS[codigo]}
+        respostas[codigo] = {"model": ErroResposta, "description": _ERROS[codigo]}
     return respostas
