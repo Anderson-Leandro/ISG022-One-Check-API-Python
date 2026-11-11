@@ -5456,8 +5456,8 @@ items:
   epic: EP-007
   story: ''
   description: 'Ação da retrospectiva da Sprint 13. Depois do DEBT-008, os merges feitos pela interface do GitHub
-    (#223, #224, #226) saíram com ''Merge pull request #n from ...'', porque o padrão do repositório continua o
-    antigo. O fechamento do SEC-017 não achou os commits pelo título.'
+    (#223, #224, #226, #228) saíram com ''Merge pull request #n from ...'', porque o padrão do repositório continua
+    o antigo. O fechamento do SEC-017 não achou os commits pelo título.'
   acceptance_criteria:
   - Dado o repositório configurado, quando um PR é mesclado pela interface com o botão de merge, então o título
     do commit de merge é o título do PR seguido de (#n), sem editar à mão.
@@ -5467,7 +5467,7 @@ items:
   priority: should
   rank: 1560
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F5
   depends_on: []
@@ -5490,10 +5490,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: 6fc93cc819b2fb63
-      remote_at: '2026-11-11T03:40:12Z'
+      hash: 5e1c0e46de4ca976
+      remote_at: '2026-11-11T11:12:06Z'
 - id: TK-022
   type: task
   title: Script versionado que roda a suíte numa cópia sem o arquivo de segredos, do zero

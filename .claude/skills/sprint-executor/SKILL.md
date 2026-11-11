@@ -110,7 +110,8 @@ num teste existente sem tirar nenhuma não conta como alteração.
 - `gh pr checks <n> --watch`. Falhou → corrija; segunda falha → parada 4.
 - Com o CI verde, `python3 scripts/dod_check.py <ID> --antes-do-merge` precisa passar. Depois:
   - modo `contínuo`: `gh pr merge <n> --merge --subject "<título do PR> (#<n>)"` e siga para o passo 8. O título
-    do PR já segue o Conventional Commits, então o commit de merge também segue (DEBT-008);
+    do PR já segue o Conventional Commits, então o commit de merge também segue (DEBT-008). O merge pela interface
+    do GitHub sai igual, porque o repositório segue `.github/repositorio.json` (TK-021);
   - modo `confirmar cada item`: **não faça o merge.** Na mesma branch, `BL update <ID> --json '{"status": "review",
     "prs_add": ["#<n>"]}'`, `GH push --ids <ID>` (dry-run e `--apply`), commit e push no mesmo PR; espere o CI
     verde de novo e vá para o passo 9.

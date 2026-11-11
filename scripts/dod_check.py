@@ -15,9 +15,12 @@ Sem --antes-do-merge (padrão, depois do merge), confere:
      incluindo o resultado da security-audit;
   7. a issue do item está fechada;
   8. a sprint do item tem uma linha de acompanhamento citando o ID;
-  9. o backlog valida sem erros.
+  9. o backlog valida sem erros;
+ 10. o repositório no GitHub segue .github/repositorio.json: o merge pela interface sai com o título
+     do PR (#n) (TK-021).
 
-Com --antes-do-merge, confere o PR aberto da branch atual (itens 3 a 6) antes de pedir o merge.
+Com --antes-do-merge, confere o PR aberto da branch atual (itens 3 a 6), o backlog (9) e a configuração
+do repositório (10) antes de pedir o merge.
 Sai com 1 se alguma verificação falhar.
 """
 
@@ -180,6 +183,20 @@ _CHECKLIST = re.compile(r"^## Checklist antes da revis[ãa]o\s*$", re.M)
 _CAIXA = re.compile(r"^\s*(?:[-*+]|\d+\.)\s*\[(?P<marca>[^\]]*)\]\s*(?P<texto>.*)$")
 
 
+def configuracao_esperada() -> dict:
+    """Configuração de merge do repositório versionada em .github/repositorio.json (TK-021)."""
+    return json.loads((RAIZ / ".github/repositorio.json").read_text(encoding="utf-8"))
+
+
+def divergencias_do_merge(atual: dict, esperado: dict) -> list[str]:
+    """Campos da configuração do repositório diferentes do esperado; um campo ausente também diverge."""
+    return [
+        f"{campo}: {atual[campo] if campo in atual else 'ausente'} (esperado {valor})"
+        for campo, valor in esperado.items()
+        if atual.get(campo) != valor
+    ]
+
+
 def checklist_pendente(registro: str) -> list[str] | None:
     """Linhas da 'Checklist antes da revisão' sem resposta; None se o registro não tem a seção (registros antigos).
 
@@ -269,6 +286,17 @@ def main() -> int:
         text=True,
     )
     ok(validar.returncode == 0, "backlog valida sem erros")
+
+    # uma falha do gh ou do arquivo vira check reprovado, sem perder o relatório dos demais
+    try:
+        divergencias = divergencias_do_merge(gh_json("api", "repos/{owner}/{repo}"), configuracao_esperada())
+    except (RuntimeError, OSError, ValueError) as e:
+        divergencias = [f"não foi possível conferir: {e}"]
+    ok(
+        not divergencias,
+        "repositório com o merge no padrão de .github/repositorio.json"
+        + (f" ({'; '.join(divergencias)})" if divergencias else ""),
+    )
     return relatorio(iid)
 
 

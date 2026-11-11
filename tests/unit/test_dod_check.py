@@ -204,3 +204,35 @@ class TestSecaoSeguranca:
         assert dod_check.secao(registro, "Testes existentes alterados").strip() == "- a"
         assert dod_check.secao(registro, "Segurança").strip() == "- b"
         assert dod_check.secao(registro, "Testes") is None
+
+
+class TestConfiguracaoDoMerge:
+    """TK-021: o merge pela interface do GitHub sai com o título do PR (#n), como o do executor (DEBT-008)."""
+
+    ESPERADO = {"merge_commit_title": "PR_TITLE", "merge_commit_message": "BLANK"}
+
+    def test_arquivo_versionado_pede_o_titulo_do_pr(self):
+        # só os campos obrigatórios: o arquivo pode ganhar outros sem quebrar o teste
+        assert self.ESPERADO.items() <= dod_check.configuracao_esperada().items()
+
+    def test_repositorio_no_padrao_nao_tem_divergencia(self):
+        atual = {**self.ESPERADO, "allow_merge_commit": True, "name": "repo"}
+        assert dod_check.divergencias_do_merge(atual, self.ESPERADO) == []
+
+    def test_padrao_antigo_do_github_e_apontado(self):
+        atual = {"merge_commit_title": "MERGE_MESSAGE", "merge_commit_message": "PR_TITLE"}
+        assert dod_check.divergencias_do_merge(atual, self.ESPERADO) == [
+            "merge_commit_title: MERGE_MESSAGE (esperado PR_TITLE)",
+            "merge_commit_message: PR_TITLE (esperado BLANK)",
+        ]
+
+    def test_campo_ausente_na_resposta_e_divergencia(self):
+        # sem permissão de leitura das configurações, a API omite os campos: não pode passar calado
+        assert dod_check.divergencias_do_merge({}, self.ESPERADO) == [
+            "merge_commit_title: ausente (esperado PR_TITLE)",
+            "merge_commit_message: ausente (esperado BLANK)",
+        ]
+
+    def test_valor_vazio_aparece_como_ele_mesmo(self):
+        atual = {"merge_commit_title": "", "merge_commit_message": "BLANK"}
+        assert dod_check.divergencias_do_merge(atual, self.ESPERADO) == ["merge_commit_title:  (esperado PR_TITLE)"]
