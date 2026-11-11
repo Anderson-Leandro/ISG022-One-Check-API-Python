@@ -36,6 +36,7 @@
 |---|---|---|---|
 | 2026-11-11 | Sprint planejada: 11 itens, 32 pts, capacidade 53,3 | — | duas sprints até o prazo de 11/12; o TK-018 sai da 14 (depende do Render); nenhuma ausência no período |
 | 2026-11-11 | Decisões do PO antes da execução, registradas nos itens | — | SEC-025: trigger no banco; SEC-028: autoatendimento com reautenticação; SEC-029: conferir no login; SEC-030: HIBP com k-anonymity, aceita se o serviço cair (→ ADRs do SEC-025 e do SEC-028) |
+| 2026-11-11 | TK-021: merge pela interface do GitHub já com o título do PR (#n); configuração versionada e conferida pelo dod_check (PR #236) | — | — |
 
 ## Sprint Review
 - **Incremento demonstrável:**
