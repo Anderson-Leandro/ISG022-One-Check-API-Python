@@ -144,6 +144,13 @@ class UsuarioUpdateMe(BaseModel):
     senha_nova: SenhaNova | None = None
 
 
+class AnonimizarMeRequest(BaseModel):
+    """Reautenticação para anonimizar a própria conta (SEC-028): senha e, com autenticador, o código."""
+
+    senha: str
+    codigo: str | None = None
+
+
 class AlterarSenhaRequest(BaseModel):
     senha_atual: str
     nova_senha: SenhaNova
