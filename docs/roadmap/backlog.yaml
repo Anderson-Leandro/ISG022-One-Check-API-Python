@@ -2650,7 +2650,7 @@ items:
   priority: should
   rank: 120
   estimate: 5
-  status: in_progress
+  status: done
   sprint: 14
   phase: F6
   depends_on: []
@@ -2666,8 +2666,13 @@ items:
   links:
     trello_card: null
     gh_issue: 66
-    prs: []
-  evidence: []
+    prs:
+    - '#244'
+  evidence:
+  - 'PR #244 (merge d5d13f3): GET /usuarios/me/dados e POST /usuarios/me/anonimizar em autoatendimento, com reautenticação;
+    ADR-0017'
+  - 'tests/integration/test_seguranca_lgpd_titular.py: 15 testes; 1459 na suíte'
+  - log sem o e-mail no login, na criação e na desativação; DEBT-022 para contas já desativadas
   created: '2026-11-02'
   updated: '2026-11-11'
   history:
@@ -2679,10 +2684,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-11'
+    status: done
   sync:
     github:
-      hash: 0e0c646dd41b62f8
-      remote_at: '2026-11-11T12:39:51Z'
+      hash: 2f8ea576ea923a35
+      remote_at: '2026-11-11T12:57:07Z'
 - id: SEC-029
   type: security
   title: Forçar a troca das senhas fracas cadastradas antes da política
