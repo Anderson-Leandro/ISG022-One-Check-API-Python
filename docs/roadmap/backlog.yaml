@@ -2442,7 +2442,9 @@ items:
   title: Backup e restauração do Postgres
   epic: EP-008
   story: ''
-  description: Evidência de saída da F6 (backup/restauração).
+  description: |-
+    Evidência de saída da F6 (backup/restauração).
+    Adiado: risco R-015 aceito pelo PO em 2026-11-10, porque produção só tem dados do seed. Rever antes do primeiro dado real em produção. Sai da Sprint 13 no close.
   acceptance_criteria:
   - Existe rotina de backup do banco de produção com retenção definida.
   - Dado um backup, quando restaurar num banco vazio, então a API sobe e os dados conferem (teste documentado).
@@ -2465,7 +2467,7 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-08'
+  updated: '2026-11-10'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -2473,8 +2475,8 @@ items:
     status: in_sprint
   sync:
     github:
-      hash: 40abb13fd7898df3
-      remote_at: '2026-11-08T19:13:31Z'
+      hash: a424316eec6f02a8
+      remote_at: '2026-11-11T02:31:34Z'
 - id: SEC-025
   type: security
   title: Log de auditoria append-only
