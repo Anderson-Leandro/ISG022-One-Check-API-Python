@@ -70,6 +70,7 @@
 | 2026-11-09 | DEBT-008 concluído (PR #217): merges no padrão Conventional Commits; diagnose.py mostra 90% sem os merges |
 | 2026-11-10 | TK-002: produção recriada e carregada pelo seed atual; sem o alerta de credenciais públicas depois do reinício (PR #219) |
 | 2026-11-10 | TK-003: CORS_ORIGINS restrito às origens autorizadas (origem de fora bloqueada) e SEED_SECRET vazio no Render (PR #221) |
+| 2026-11-10 | SEC-017: IP forjado no X-Forwarded-For confirmado no Render e corrigido (IP pelo item do proxy, PROXY_SALTOS=3 conferido em produção; PRs #223 e #224) |
 
 ## Sprint Review
 - **Incremento demonstrável:**

@@ -1223,7 +1223,7 @@ items:
   priority: should
   rank: 40
   estimate: 3
-  status: review
+  status: done
   sprint: 13
   phase: F6
   depends_on: []
@@ -1245,7 +1245,13 @@ items:
     prs:
     - '#223'
     - '#224'
-  evidence: []
+  evidence:
+  - 'PR #223 (merge ddf3fc6): IP do cliente pelo item do proxy no X-Forwarded-For, uvicorn com --no-proxy-headers,
+    ADR-0015'
+  - 'PR #224 (merge a5d1009): PROXY_SALTOS=3 (Cloudflare, proxy do Render e rede interna)'
+  - 'Render, 2026-11-10: login falho com X-Forwarded-For forjado grava o IP público de quem testou; redirect em
+    https'
+  - 'tests/integration/test_seguranca_ip_proxy.py: 26 testes'
   created: '2026-11-02'
   updated: '2026-11-10'
   history:
@@ -1257,10 +1263,12 @@ items:
     status: in_progress
   - date: '2026-11-10'
     status: review
+  - date: '2026-11-10'
+    status: done
   sync:
     github:
-      hash: ca06e9a461f324aa
-      remote_at: '2026-11-10T11:44:46Z'
+      hash: 215af6c02b0ab7c0
+      remote_at: '2026-11-11T01:40:18Z'
 - id: SEC-018
   type: security
   title: Gestor lê toda a trilha de auditoria, com IP e e-mails de todas as contas
