@@ -2415,7 +2415,7 @@ items:
   rank: 260
   estimate: 1
   status: ready
-  sprint: 14
+  sprint: null
   phase: F7
   depends_on: []
   security:
@@ -2437,8 +2437,8 @@ items:
     status: ready
   sync:
     github:
-      hash: 41dac48b39820e29
-      remote_at: '2026-11-03T00:34:03Z'
+      hash: 832b09bf1a935517
+      remote_at: '2026-11-11T03:39:49Z'
 - id: TK-005
   type: task
   title: Backup e restauração do Postgres
@@ -2496,7 +2496,7 @@ items:
   priority: should
   rank: 110
   estimate: 5
-  status: ready
+  status: in_sprint
   sprint: 14
   phase: F6
   depends_on: []
@@ -2522,10 +2522,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 4ece98b97e77acb1
-      remote_at: '2026-11-03T00:34:05Z'
+      hash: fa5c8e09cd6f3339
+      remote_at: '2026-11-11T03:39:50Z'
 - id: SEC-026
   type: security
   title: Fotos de vistoria com URL assinada e expiração
@@ -2541,7 +2543,7 @@ items:
   rank: 250
   estimate: 8
   status: ready
-  sprint: 14
+  sprint: null
   phase: F6
   depends_on:
   - SPK-002
@@ -2569,8 +2571,8 @@ items:
     status: ready
   sync:
     github:
-      hash: 555d091bec0eec6a
-      remote_at: '2026-11-03T00:34:06Z'
+      hash: 3b8e492a4bf7a181
+      remote_at: '2026-11-11T03:39:51Z'
 - id: SEC-027
   type: security
   title: Encerrar a sessão quando um refresh token já trocado for reutilizado
@@ -2636,7 +2638,7 @@ items:
   priority: should
   rank: 120
   estimate: 5
-  status: ready
+  status: in_sprint
   sprint: 14
   phase: F6
   depends_on: []
@@ -2661,10 +2663,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 163a76643762a059
-      remote_at: '2026-11-03T00:34:08Z'
+      hash: 7c36c66a852d7f25
+      remote_at: '2026-11-11T03:39:53Z'
 - id: SEC-029
   type: security
   title: Forçar a troca das senhas fracas cadastradas antes da política
@@ -2677,7 +2681,7 @@ items:
   priority: could
   rank: 220
   estimate: 3
-  status: ready
+  status: in_sprint
   sprint: 14
   phase: F6
   depends_on: []
@@ -2702,10 +2706,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 574d9476fce1aa57
-      remote_at: '2026-11-03T00:34:09Z'
+      hash: 655f057547184268
+      remote_at: '2026-11-11T03:39:54Z'
 - id: SEC-030
   type: security
   title: Recusar senhas que aparecem em vazamentos conhecidos
@@ -2718,7 +2724,7 @@ items:
   priority: could
   rank: 230
   estimate: 3
-  status: ready
+  status: in_sprint
   sprint: 14
   phase: F6
   depends_on: []
@@ -2744,10 +2750,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 83d3288be8e11290
-      remote_at: '2026-11-03T00:34:10Z'
+      hash: 638ac75d262e1cf0
+      remote_at: '2026-11-11T03:39:55Z'
 - id: SEC-031
   type: security
   title: Cifrar o CPF em repouso
@@ -3071,8 +3079,8 @@ items:
     status: ready
   sync:
     github:
-      hash: 6762c8422cfddf2b
-      remote_at: '2026-11-03T01:46:56Z'
+      hash: 8a49f1473eb02de7
+      remote_at: '2026-11-11T03:39:56Z'
 - id: US-017
   type: story
   title: Histórico do imóvel
@@ -3615,7 +3623,7 @@ items:
   rank: 65
   estimate: 2
   status: ready
-  sprint: 14
+  sprint: null
   phase: F6
   depends_on: []
   security:
@@ -3640,8 +3648,8 @@ items:
     status: ready
   sync:
     github:
-      hash: f390ad12d85ffe2d
-      remote_at: '2026-11-03T00:34:32Z'
+      hash: d9413f64c39f2591
+      remote_at: '2026-11-11T03:39:57Z'
 - id: TK-007
   type: task
   title: Primeira versão da API em FastAPI
@@ -3987,7 +3995,7 @@ items:
   rank: 66
   estimate: 1
   status: ready
-  sprint: 14
+  sprint: null
   phase: F6
   depends_on: []
   security:
@@ -4011,8 +4019,8 @@ items:
     status: ready
   sync:
     github:
-      hash: fc3b50634590ed00
-      remote_at: '2026-11-03T00:34:53Z'
+      hash: af5e086f56206edf
+      remote_at: '2026-11-11T03:39:59Z'
 - id: TK-016
   type: task
   title: Relatório final, roteiro de demonstração e release v1.0.0
@@ -4027,7 +4035,7 @@ items:
   rank: 255
   estimate: 3
   status: ready
-  sprint: 14
+  sprint: null
   phase: F7
   depends_on: []
   security:
@@ -4051,8 +4059,8 @@ items:
     status: ready
   sync:
     github:
-      hash: d3adbf9b3d77ef90
-      remote_at: '2026-11-03T00:34:54Z'
+      hash: bc834e39a68ab61b
+      remote_at: '2026-11-11T03:40:00Z'
 - id: TK-017
   type: task
   title: 'Proteger as branches main e dev: merge só por PR e com CI verde'
@@ -4478,8 +4486,8 @@ items:
   priority: could
   rank: 155
   estimate: 2
-  status: ready
-  sprint: null
+  status: in_sprint
+  sprint: 14
   phase: F5
   depends_on: []
   security:
@@ -4504,10 +4512,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 99c7fe683048f68c
-      remote_at: '2026-11-08T18:59:55Z'
+      hash: 4c046087e2430f02
+      remote_at: '2026-11-11T03:40:02Z'
 - id: DEBT-014
   type: debt
   title: Erros de negócio respondem com o status HTTP adequado em vez de 200
@@ -4675,8 +4685,8 @@ items:
     status: ready
   sync:
     github:
-      hash: 01df3e7e13d3c5f2
-      remote_at: '2026-11-08T19:13:44Z'
+      hash: 1cd0f284aa298028
+      remote_at: '2026-11-11T03:40:03Z'
 - id: BUG-001
   type: bug
   title: Excluir cômodo referenciado por checklist ou problema responde 500
@@ -5305,8 +5315,8 @@ items:
   priority: could
   rank: 1530
   estimate: 3
-  status: ready
-  sprint: null
+  status: in_sprint
+  sprint: 14
   phase: F5
   depends_on: []
   security:
@@ -5329,10 +5339,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 5911ac3c37af511d
-      remote_at: '2026-11-08T22:29:25Z'
+      hash: 302ac3b07cf1854a
+      remote_at: '2026-11-11T03:40:05Z'
 - id: DEBT-020
   type: debt
   title: Erros de autenticação, perfil e validação no mesmo envelope {sucesso, erro, erros}
@@ -5352,8 +5364,8 @@ items:
   priority: should
   rank: 1540
   estimate: 5
-  status: ready
-  sprint: null
+  status: in_sprint
+  sprint: 14
   phase: F5
   depends_on: []
   security:
@@ -5376,10 +5388,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 75d408e4b0713b90
-      remote_at: '2026-11-09T03:39:53Z'
+      hash: df404a1088508291
+      remote_at: '2026-11-11T03:40:08Z'
 - id: BUG-002
   type: bug
   title: Foto enviada fica órfã no disco quando o pedido é recusado depois do upload
@@ -5397,8 +5411,8 @@ items:
   priority: should
   rank: 1550
   estimate: 2
-  status: ready
-  sprint: null
+  status: in_sprint
+  sprint: 14
   phase: F5
   depends_on: []
   security:
@@ -5422,10 +5436,12 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: aa5a24916fd5a705
-      remote_at: '2026-11-09T10:52:44Z'
+      hash: 8de4b2f1987c1f77
+      remote_at: '2026-11-11T03:40:10Z'
 - id: TK-021
   type: task
   title: Merge pela interface do GitHub já com o título do PR (#n)
@@ -5443,8 +5459,8 @@ items:
   priority: should
   rank: 1560
   estimate: 1
-  status: ready
-  sprint: null
+  status: in_sprint
+  sprint: 14
   phase: F5
   depends_on: []
   security:
@@ -5464,10 +5480,12 @@ items:
   history:
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: 4ba748f66dc92a60
-      remote_at: '2026-11-11T03:12:14Z'
+      hash: 6fc93cc819b2fb63
+      remote_at: '2026-11-11T03:40:12Z'
 - id: TK-022
   type: task
   title: Script versionado que roda a suíte numa cópia sem o arquivo de segredos, do zero
@@ -5487,8 +5505,8 @@ items:
   priority: should
   rank: 1570
   estimate: 2
-  status: ready
-  sprint: null
+  status: in_sprint
+  sprint: 14
   phase: F5
   depends_on: []
   security:
@@ -5509,10 +5527,12 @@ items:
   history:
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
   sync:
     github:
-      hash: b2e8e272e408497f
-      remote_at: '2026-11-11T03:12:15Z'
+      hash: cfd2eeb718bdebe1
+      remote_at: '2026-11-11T03:40:14Z'
 - id: DEBT-021
   type: debt
   title: Imagem base do Dockerfile fixada por digest e coberta pelo Dependabot
@@ -5527,8 +5547,8 @@ items:
   priority: could
   rank: 1580
   estimate: 1
-  status: ready
-  sprint: null
+  status: in_sprint
+  sprint: 14
   phase: F5
   depends_on: []
   security:
@@ -5542,7 +5562,7 @@ items:
     ref: DEBT-019
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 233
     prs: []
   evidence: []
   created: '2026-11-11'
@@ -5552,3 +5572,9 @@ items:
     status: backlog
   - date: '2026-11-11'
     status: ready
+  - date: '2026-11-11'
+    status: in_sprint
+  sync:
+    github:
+      hash: ace500f4fba49a3f
+      remote_at: '2026-11-11T03:40:16Z'

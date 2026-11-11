@@ -351,22 +351,24 @@ sprints:
   - TK-005
   closed_on: '2026-11-11'
 - number: 14
-  goal: Conformidade, release candidata v0.9.0 e entrega final v1.0.0
-  start: '2026-12-02'
-  end: '2026-12-11'
-  status: planned
-  capacity: 31.0
+  goal: Dados pessoais sob controle do titular, trilha de auditoria íntegra e erros da API num formato único
+  start: '2026-11-12'
+  end: '2026-11-25'
+  status: active
+  capacity: 53.3
   committed:
+  - TK-021
+  - TK-022
   - SEC-025
   - SEC-028
+  - DEBT-020
   - SEC-029
   - SEC-030
-  - SEC-026
-  - TK-006
-  - TK-015
-  - TK-004
-  - TK-016
-  committed_points: 31.0
+  - DEBT-013
+  - BUG-002
+  - DEBT-019
+  - DEBT-021
+  committed_points: 32.0
   completed_points: null
   completed: []
   carried_over: []
