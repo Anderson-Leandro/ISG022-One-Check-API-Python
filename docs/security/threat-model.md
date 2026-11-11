@@ -87,7 +87,7 @@ flowchart LR
 | T-21 | Repositório | I | Banco e seed publicados no GitHub | Confidencialidade | `onecheck.db` fora do índice (o histórico só tem dados de seed); credenciais do seed só em desenvolvimento | Mitigada (falta a rotação em produção) | SEC-001, SEC-009 |
 | T-22 | Navegador | I | Site de terceiro lê respostas da API (CORS `*`) | Confidencialidade | auth por Bearer (sem cookie); CORS só para `CORS_ORIGINS`, sem credenciais; `/docs` desligado em produção; `no-store`, `nosniff`, HSTS | Mitigada (depende de `CORS_ORIGINS` no Render) | SEC-007 |
 | T-23 | Container / CI | E | Código executado como root; action repontada | Integridade | `USER app`, `--only-binary`, `permissions: contents: read`, actions por SHA; compose com `cap_drop: ALL` e `no-new-privileges` | Mitigada | SEC-008 |
-| T-25 | Proxy / IP de origem | S/R | Cliente forja o `X-Forwarded-For` para escapar do limite por IP e gravar IP falso na auditoria | Não-repúdio, Disponibilidade | limite por conta independe do IP; `FORWARDED_ALLOW_IPS=*` usa o primeiro item do cabeçalho (`render.yaml:18`) | **Aberta** (a confirmar no Render) | SEC-017 |
+| T-25 | Proxy / IP de origem | S/R | Cliente forja o `X-Forwarded-For` para escapar do limite por IP e gravar IP falso na auditoria | Não-repúdio, Disponibilidade | IP pelo item do proxy (`app/ip_cliente.py`, `PROXY_SALTOS=3`), uvicorn com `--no-proxy-headers`; conferido no Render em 2026-11-10 (ADR-0015) | Mitigada | SEC-017 ✓ |
 | T-26 | Auditoria (`GET /logs`) | I | Gestor consulta IP e padrão de acesso de todas as contas, inclusive admins | Confidencialidade (LGPD) | rota só do admin desde o SEC-018 (2026-11-08); retenção de `LOG_RETENCAO_DIAS` | **Parcial**: falta o SEC-019 (e-mail digitado no login falho) | SEC-018 ✓, SEC-019 |
 | T-27 | Monitoramento | R | Falhas de login, MFA e acesso negado invisíveis nos logs por responderem 200 | Não-repúdio | status de erro em todo `fail()` e guarda na suíte (ADR-0003, `tests/conftest.py`) | Mitigada | — |
 
@@ -97,10 +97,11 @@ Status: **Mitigada** · **Parcial** · **Aberta** · **Aceita**
 _Seção mantida manualmente pela equipe — preservar entre execuções._
 | ID | Risco | Justificativa | Responsável | Revisar em |
 |---|---|---|---|---|
+| R-015 | Perda do banco de produção sem backup: laudos, aceites e usuários sem recuperação | Decisão do PO em 2026-11-10: produção só tem os dados do seed, e o backup (TK-005) fica no backlog | Anderson Mendes Leandro | **antes do primeiro dado real em produção** |
 
 ## 8. Premissas
 - TLS é terminado pelo proxy do Render, e o banco gerenciado não fica exposto à internet.
 - O deploy roda com **uma instância e um worker**; o limite de tentativas em memória depende disso.
-- O proxy do Render sobrescreve o `X-Forwarded-For` (não verificado). Com `FORWARDED_ALLOW_IPS=*`, o uvicorn usa o **primeiro** item do cabeçalho; se o proxy só acrescentar, o cliente escolhe o IP (T-25, SEC-017).
+- Na frente da API há três proxies, Cloudflare, o proxy do Render e a rede interna, e cada um acrescenta um item ao `X-Forwarded-For`. Isso foi conferido em 2026-11-10. O IP do cliente é o 3º item a partir da direita (`PROXY_SALTOS=3`, ADR-0015). Uma mudança nessa cadeia muda a contagem (T-25).
 - A autenticação do front é só por header Bearer; não há cookies de sessão.
 - O perfil `visualizador` foi removido (ADR-0009); `get_current_user` recusa qualquer perfil fora da lista (fail secure).
