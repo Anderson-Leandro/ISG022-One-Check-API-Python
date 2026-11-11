@@ -5522,7 +5522,7 @@ items:
   priority: should
   rank: 1570
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 14
   phase: F5
   depends_on: []
@@ -5537,8 +5537,13 @@ items:
   links:
     trello_card: null
     gh_issue: 230
-    prs: []
-  evidence: []
+    prs:
+    - '#238'
+  evidence:
+  - 'PR #238 (merge e38590b): scripts/testes_na_copia.sh: cópia sem o arquivo de segredos, venv do lock reaproveitado
+    e pytest com ONECHECK_SEM_DOTENV=1'
+  - 'tests/unit/test_testes_na_copia.py: 11 testes'
+  - 'suíte real pelo script: 1414 passaram, cobertura de branches em 97%'
   created: '2026-11-11'
   updated: '2026-11-11'
   history:
@@ -5548,10 +5553,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-11'
+    status: done
   sync:
     github:
-      hash: 1a3e3f135ec3edcc
-      remote_at: '2026-11-11T11:23:57Z'
+      hash: 63c71def0270c3a4
+      remote_at: '2026-11-11T11:37:24Z'
 - id: DEBT-021
   type: debt
   title: Imagem base do Dockerfile fixada por digest e coberta pelo Dependabot
