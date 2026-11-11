@@ -58,7 +58,7 @@ class TestSetupLoginComTokenAntigo:
         r = client.get(f"{API}/auth/mfa/setup-login", params={"temp_token": token_antigo})
 
         assert r.status_code == 401, r.text
-        assert r.json()["detail"] == "Token MFA inválido ou expirado"
+        assert r.json()["erro"] == "Token MFA inválido ou expirado"
         u = _usuario(db, novo_vistoriador.id)
         assert (u.mfa_secret_pendente, u.mfa_secret) == (None, None)
 

@@ -10,6 +10,7 @@ import json
 from starlette.exceptions import HTTPException
 
 from app.config import MAX_BODY_KB, MAX_UPLOAD_MB
+from app.erros import corpo_de_erro
 
 # Folga para os demais campos e cabeçalhos das partes do multipart
 LIMITE_MULTIPART = (MAX_UPLOAD_MB + 1) * 1024 * 1024
@@ -77,9 +78,9 @@ async def _responder_413(send, limite: int) -> None:
     await _responder(send, 413, _mensagem_413(limite))
 
 
-async def _responder(send, status: int, detail: str) -> None:
-    # Mesmo formato das HTTPException da API (401, 403, 429)
-    corpo = json.dumps({"detail": detail}, ensure_ascii=False).encode()
+async def _responder(send, status: int, erro: str) -> None:
+    # Mesmo envelope dos demais erros da API (DEBT-020)
+    corpo = json.dumps(corpo_de_erro(erro), ensure_ascii=False).encode()
     await send(
         {
             "type": "http.response.start",

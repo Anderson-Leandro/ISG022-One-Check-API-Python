@@ -11,7 +11,7 @@ import pytest
 from pydantic import TypeAdapter
 
 from app.models import AtualizacaoProblema, Problema
-from app.respostas import DetalheErro, Envelope, ErroResposta, UsuarioResposta
+from app.respostas import Envelope, ErroResposta, UsuarioResposta
 from tests.conftest import TEST_SENHA, auth, totp_now
 
 API = "/api/v1"
@@ -130,8 +130,8 @@ def test_login_com_mfa_tem_a_outra_forma(client, openapi, user_admin):
     [
         ("GET", "/contratos/00000000-0000-0000-0000-000000000000", 404, ErroResposta),
         ("POST", "/auth/login", 401, ErroResposta),  # credenciais inválidas
-        ("GET", "/usuarios/me", 401, DetalheErro),  # sem token
-        ("POST", "/auth/login", 422, DetalheErro),  # corpo fora do schema
+        ("GET", "/usuarios/me", 401, ErroResposta),  # sem token
+        ("POST", "/auth/login", 422, ErroResposta),  # corpo fora do schema
     ],
 )
 def test_erros_seguem_um_dos_formatos_documentados(client, token_admin, metodo, rota, status, formato):
@@ -143,10 +143,9 @@ def test_erros_seguem_um_dos_formatos_documentados(client, token_admin, metodo, 
 
 
 def test_formatos_de_erro_estao_nos_componentes(openapi):
-    assert {"ErroResposta", "DetalheErro"} <= set(openapi["components"]["schemas"])
+    assert "ErroResposta" in openapi["components"]["schemas"]
     erro_401 = openapi["paths"][API + "/usuarios/me"]["get"]["responses"]["401"]["content"]["application/json"]
-    refs = {item["$ref"].rsplit("/", 1)[-1] for item in erro_401["schema"]["anyOf"]}
-    assert refs == {"ErroResposta", "DetalheErro"}
+    assert erro_401["schema"]["$ref"].rsplit("/", 1)[-1] == "ErroResposta"
 
 
 def test_rotas_principais_declaram_envelope_e_erros(openapi):
@@ -159,10 +158,8 @@ def test_rotas_principais_declaram_envelope_e_erros(openapi):
     assert len(declaradas) >= 18
     for caminho, metodo, op in declaradas:
         erros = [v for cod, v in op["responses"].items() if str(cod)[0] in "45"]
-        # O 422 de parâmetro inválido que o próprio FastAPI acrescenta (HTTPValidationError) também é `detail`
-        assert erros and all(
-            ("ErroResposta" in str(v) and "DetalheErro" in str(v)) or "HTTPValidationError" in str(v) for v in erros
-        ), (caminho, metodo)
+        # Todo erro, inclusive o 422 que o próprio FastAPI acrescenta, é o envelope (DEBT-020)
+        assert erros and all("ErroResposta" in str(v) for v in erros), (caminho, metodo)
 
 
 def test_campos_do_mfa_explicados_no_schema(openapi):

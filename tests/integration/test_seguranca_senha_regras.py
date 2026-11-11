@@ -97,7 +97,7 @@ class TestRotasDeSenha:
             json={"senha_atual": TEST_SENHA, "nova_senha": "curta"},
             headers=auth(token_locatario),
         )
-        assert "pelo menos 10 caracteres" in r.json()["detail"][0]["msg"]
+        assert "pelo menos 10 caracteres" in r.json()["erros"]["nova_senha"]
 
     def test_login_aceita_senha_antiga_fora_da_politica(self, client, user_locatario):
         # TEST_SENHA ("senha123") não passaria na política, mas já está cadastrada

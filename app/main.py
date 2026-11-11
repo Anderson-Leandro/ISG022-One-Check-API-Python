@@ -8,6 +8,7 @@ from app.auditoria import IpRequisicaoMiddleware
 from app.cabecalhos import CabecalhosSegurancaMiddleware
 from app.config import CORS_ORIGINS, DOCS_ENABLED, IS_DEV, UPLOAD_DIR
 from app.database import SessionLocal, ensure_schema_updates
+from app.erros import erros_no_openapi, registrar
 from app.ip_cliente import IpClienteMiddleware
 from app.limite_corpo import LimiteCorpoMiddleware
 from app.obsoletas import RotasObsoletasMiddleware, marcar_no_openapi
@@ -97,6 +98,9 @@ app.include_router(dashboard.router, prefix=prefix)
 app.include_router(admin.router, prefix=prefix)
 # Rotas obsoletas (ADR-0013): deprecated e a data de remoção no OpenAPI, a partir da tabela de app/obsoletas.py
 marcar_no_openapi(app)
+# Todo erro no envelope {sucesso, erro, erros}, nas respostas e no OpenAPI (DEBT-020)
+registrar(app)
+erros_no_openapi(app)
 
 
 @app.get("/")

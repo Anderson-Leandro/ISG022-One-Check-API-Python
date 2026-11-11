@@ -101,7 +101,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 ### Respostas
 - Sucesso e erros de regra de negócio usam o envelope `{"sucesso": bool, "dados": ..., "erro": "mensagem" | null}`. Nos erros de validação de campo vem também `erros: {campo: mensagem}`.
 - **O status HTTP acompanha o resultado** ([ADR-0003](docs/adr/0003-status-http-dos-erros.md)): um erro nunca responde `2xx`. O cliente pode confiar no status e ler a mensagem em `erro`.
-- Falhas de acesso e de protocolo levantadas pelo framework usam `{"detail": "mensagem"}`.
+- Os erros levantados pelo framework seguem o mesmo envelope `{"sucesso": false, "erro": "mensagem", "erros": ...}`: token ausente ou inválido, perfil sem permissão, rota inexistente, método não permitido, limite de tentativas, corpo grande demais e corpo fora do schema (DEBT-020). No `422` de schema, `erros` traz a mensagem por campo (aninhado com ponto: `endereco.rua`).
 
 | Status | Quando |
 |---|---|
@@ -130,7 +130,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 Vale para senhas novas: `POST /usuarios`, `PUT /usuarios/{id}` (`senha`), `PUT /usuarios/me/senha` (`nova_senha`) e `PATCH /usuarios/me` (`senha_nova`).
 - Pelo menos 10 caracteres e no máximo 72 bytes (o limite do bcrypt; acentos ocupam 2 bytes).
 - Recusa senhas só com números e símbolos, senhas comuns mesmo com números e símbolos em volta (`Senha@2024`, `qwertyuiop`) e senhas com menos de 5 caracteres distintos.
-- Fora da regra → `422` no formato do FastAPI, com a mensagem em `detail[0].msg`. O login continua aceitando senhas cadastradas antes da política.
+- Fora da regra → `422`, com a mensagem em `erro` e em `erros.<campo>` (por exemplo, `erros.nova_senha`). O login continua aceitando senhas cadastradas antes da política.
 
 ### Limite de tentativas
 5 falhas por conta ou 20 por IP em 15 minutos → `429`. Vale para login, MFA (`verify`, `activate-login`, `activate`, `desabilitar`) e para as rotas de `/usuarios/me` que pedem senha ou código.
