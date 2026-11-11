@@ -2650,7 +2650,7 @@ items:
   priority: should
   rank: 120
   estimate: 5
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F6
   depends_on: []
@@ -2677,10 +2677,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: 7c36c66a852d7f25
-      remote_at: '2026-11-11T03:39:53Z'
+      hash: 0e0c646dd41b62f8
+      remote_at: '2026-11-11T12:39:51Z'
 - id: SEC-029
   type: security
   title: Forçar a troca das senhas fracas cadastradas antes da política
@@ -5622,3 +5624,43 @@ items:
     github:
       hash: ace500f4fba49a3f
       remote_at: '2026-11-11T03:40:16Z'
+- id: DEBT-022
+  type: debt
+  title: Direitos do titular para uma conta já desativada por um admin
+  epic: EP-006
+  story: ''
+  description: 'Achado do /code-review do SEC-028. A exportação e a anonimização são em autoatendimento (ADR-0017),
+    mas uma conta desativada por um admin não consegue mais entrar e, portanto, não exerce esses direitos. Falta
+    definir com o PO o caminho: rota de admin que anonimiza ou exporta a pedido, com registro do pedido, ou outro
+    procedimento.'
+  acceptance_criteria:
+  - Dado o pedido de um titular cuja conta foi desativada, quando o caminho definido pelo PO for usado, então os
+    dados dele são exportados ou anonimizados com o mesmo resultado do SEC-028.
+  - Um usuário sem permissão não exporta nem anonimiza a conta de outra pessoa por esse caminho (teste negado).
+  - O pedido e quem o atendeu ficam no log de auditoria, sem dados pessoais.
+  priority: should
+  rank: 1590
+  estimate: null
+  status: backlog
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: medium
+    refs:
+    - LGPD art. 18
+    - OWASP API1:2023
+    risk_id: R-016
+  source:
+    kind: code-review
+    ref: SEC-028
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-11'
+  updated: '2026-11-11'
+  history:
+  - date: '2026-11-11'
+    status: backlog

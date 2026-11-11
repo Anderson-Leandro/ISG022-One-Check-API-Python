@@ -25,6 +25,7 @@ from app.rate_limit import Tentativas
 from app.respostas import UsuarioResposta, documentar
 from app.schemas import (
     AlterarSenhaRequest,
+    AnonimizarMeRequest,
     MfaDisableSelfRequest,
     MfaEnableRequest,
     UsuarioCreate,
@@ -34,6 +35,7 @@ from app.schemas import (
     ok,
 )
 from app.serializers import log_operacao, paginate, serialize_usuario
+from app.titular import anonimizar, e_ultimo_admin, exportar
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
@@ -112,6 +114,38 @@ def alterar_senha_me(
     db.refresh(user)
     log_operacao(db, user.id, "update", "usuario", user.id, "alteracao_de_senha")
     return ok({"mensagem": "Senha alterada com sucesso", "sessao": nova_sessao(db, user)})
+
+
+@router.get("/me/dados")
+def exportar_meus_dados(db: Session = Depends(get_db), user: Usuario = Depends(get_current_user)):
+    """Os próprios dados pessoais, em JSON (LGPD, art. 18, II e V; SEC-028). Só do usuário autenticado."""
+    dados = exportar(db, user)
+    log_operacao(db, user.id, "exportacao_de_dados", "usuario", user.id)
+    return ok(dados)
+
+
+@router.post("/me/anonimizar")
+def anonimizar_me(
+    body: AnonimizarMeRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: Usuario = Depends(get_current_user),
+):
+    """Anonimiza a própria conta e a desativa (LGPD, art. 18, IV e VI; SEC-028, ADR-0017). Não tem volta."""
+    tentativas = Tentativas(request, "reauth", user.id)
+    tentativas.verificar()
+    erro = mfa_self_disable_error(user, body.senha, body.codigo)
+    if erro:
+        tentativas.falhou()
+        return fail(erro, status_code=403)
+    tentativas.sucesso()
+    if e_ultimo_admin(db, user):
+        return fail("O último admin ativo não pode anonimizar a própria conta", status_code=409)
+
+    anonimizar(db, user)
+    # O log entra no mesmo commit da anonimização, que não tem volta. Sem dados pessoais: só o id
+    log_operacao(db, user.id, "anonimizacao", "usuario", user.id)
+    return ok({"mensagem": "Dados anonimizados e conta desativada"})
 
 
 @router.post("/me/mfa/setup")
@@ -274,7 +308,7 @@ def delete_usuario(
     user.ativo = False
     encerrar_sessoes(db, user)
     db.commit()
-    log_operacao(db, current.id, "delete", "usuario", user.id, f"email: {user.email}")
+    log_operacao(db, current.id, "delete", "usuario", user.id)  # sem o e-mail (SEC-028)
     return ok(None)
 
 
@@ -347,5 +381,5 @@ def create_usuario(
     db.add(user)
     db.commit()
     db.refresh(user)
-    log_operacao(db, current.id, "create", "usuario", user.id, body.email)
+    log_operacao(db, current.id, "create", "usuario", user.id)  # sem o e-mail (SEC-028)
     return ok(serialize_usuario(user))

@@ -88,7 +88,8 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
 
     access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
-    log_operacao(db, user.id, "login", "usuario", user.id, f"email: {user.email}")
+    # Sem o e-mail: o id já identifica a conta, e o log append-only não acompanharia a anonimização (SEC-028)
+    log_operacao(db, user.id, "login", "usuario", user.id)
     return ok(
         {
             "access_token": access,

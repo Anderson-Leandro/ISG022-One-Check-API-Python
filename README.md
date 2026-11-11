@@ -174,6 +174,8 @@ Rotas obsoletas (ADR-0013) continuam funcionando até a data indicada e responde
 GET    /api/v1/usuarios/me                 # Dados do usuário logado
 PATCH  /api/v1/usuarios/me                 # Atualizar dados próprios; com senha_nova exige senha_atual e devolve dados.sessao
 PUT    /api/v1/usuarios/me/senha           # Alteração de senha; {senha_atual, nova_senha} — devolve dados.sessao
+GET    /api/v1/usuarios/me/dados           # LGPD: exporta os próprios dados (perfil, contratos, vistorias, aceites, atualizações e logs)
+POST   /api/v1/usuarios/me/anonimizar      # LGPD: anonimiza e desativa a própria conta; {senha, codigo?}. Último admin ativo → 409
 POST   /api/v1/usuarios/me/mfa/setup       # Obsoleta até 2027-01-31: use POST /auth/mfa/setup
 POST   /api/v1/usuarios/me/mfa/enable      # Obsoleta até 2027-01-31: use POST /auth/mfa/activate
 DELETE /api/v1/usuarios/me/mfa             # Obsoleta até 2027-01-31: use POST /auth/mfa/desabilitar
