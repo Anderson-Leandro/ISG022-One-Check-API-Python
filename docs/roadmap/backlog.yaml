@@ -2452,8 +2452,8 @@ items:
   priority: should
   rank: 60
   estimate: 3
-  status: in_sprint
-  sprint: 13
+  status: ready
+  sprint: null
   phase: F6
   depends_on: []
   security:
@@ -2467,16 +2467,18 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-10'
+  updated: '2026-11-11'
   history:
   - date: '2026-11-02'
     status: backlog
   - date: '2026-11-08'
     status: in_sprint
+  - date: '2026-11-11'
+    status: ready
   sync:
     github:
-      hash: a424316eec6f02a8
-      remote_at: '2026-11-11T02:31:34Z'
+      hash: f2bbabd928475844
+      remote_at: '2026-11-11T03:12:13Z'
 - id: SEC-025
   type: security
   title: Log de auditoria append-only
@@ -5426,7 +5428,7 @@ items:
     ref: Sprint 13
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 229
     prs: []
   evidence: []
   created: '2026-11-11'
@@ -5434,6 +5436,10 @@ items:
   history:
   - date: '2026-11-11'
     status: ready
+  sync:
+    github:
+      hash: 4ba748f66dc92a60
+      remote_at: '2026-11-11T03:12:14Z'
 - id: TK-022
   type: task
   title: Script versionado que roda a suíte numa cópia sem o arquivo de segredos, do zero
@@ -5467,7 +5473,7 @@ items:
     ref: Sprint 13
   links:
     trello_card: null
-    gh_issue: null
+    gh_issue: 230
     prs: []
   evidence: []
   created: '2026-11-11'
@@ -5475,3 +5481,7 @@ items:
   history:
   - date: '2026-11-11'
     status: ready
+  sync:
+    github:
+      hash: b2e8e272e408497f
+      remote_at: '2026-11-11T03:12:15Z'

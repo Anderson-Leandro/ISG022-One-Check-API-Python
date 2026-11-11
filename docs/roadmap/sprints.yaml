@@ -296,9 +296,9 @@ sprints:
   closed_on: '2026-11-08'
 - number: 13
   goal: Produção recriada com segurança, falhas abertas corrigidas e qualidade verificada no CI
-  start: '2026-11-18'
-  end: '2026-12-01'
-  status: active
+  start: '2026-11-08'
+  end: '2026-11-11'
+  status: closed
   capacity: 50.0
   committed:
   - TK-002
@@ -324,9 +324,32 @@ sprints:
   - DEBT-010
   - DEBT-008
   committed_points: 47.0
-  completed_points: null
-  completed: []
-  carried_over: []
+  completed_points: 44.0
+  completed:
+  - SEC-017
+  - SEC-018
+  - SEC-019
+  - SEC-020
+  - TK-002
+  - TK-003
+  - SEC-027
+  - SEC-031
+  - DEBT-001
+  - DEBT-002
+  - DEBT-003
+  - DEBT-004
+  - DEBT-005
+  - DEBT-008
+  - DEBT-010
+  - SEC-035
+  - BUG-001
+  - DEBT-017
+  - TK-019
+  - TK-020
+  - DEBT-018
+  carried_over:
+  - TK-005
+  closed_on: '2026-11-11'
 - number: 14
   goal: Conformidade, release candidata v0.9.0 e entrega final v1.0.0
   start: '2026-12-02'
