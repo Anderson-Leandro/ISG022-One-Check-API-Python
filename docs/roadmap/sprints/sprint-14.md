@@ -45,6 +45,7 @@
 | 2026-11-11 | DEBT-013: mensagem própria para o token de verificação no primeiro acesso do MFA (PR #248) | — | — |
 | 2026-11-11 | DEBT-021: imagem base do Dockerfile fixada por digest e coberta pelo Dependabot (PR #250) | — | — |
 | 2026-11-12 | SEC-030: senha nova que aparece em vazamentos conhecidos recebe 422 (Have I Been Pwned, k-anonymity, fail open) (PR #252) | — | — |
+| 2026-11-12 | SEC-029: senha antiga fora da política força a troca no login; prazo da consulta de senhas vazadas em 3 s (PR #254) | — | — |
 
 ## Sprint Review
 - **Incremento demonstrável:**
