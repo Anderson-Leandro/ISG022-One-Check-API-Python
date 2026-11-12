@@ -2704,7 +2704,7 @@ items:
   priority: could
   rank: 220
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 14
   phase: F6
   depends_on: []
@@ -2720,8 +2720,14 @@ items:
   links:
     trello_card: null
     gh_issue: 67
-    prs: []
-  evidence: []
+    prs:
+    - '#254'
+  evidence:
+  - 'PR #254 (merge 8b37f1e): login marca senha_expirada quando a senha não passa na política (com MFA, depois do
+    código); até a troca, só perfil, troca de senha e logout; em desenvolvimento não marca'
+  - 'tests/integration/test_seguranca_senha_expirada.py: 14 testes; 1521 na suíte; collection 169/169'
+  - testes existentes alterados com aprovação do usuário em 2026-11-12; prazo da consulta de senhas vazadas em 3
+    s
   created: '2026-11-02'
   updated: '2026-11-12'
   history:
@@ -2733,10 +2739,12 @@ items:
     status: in_sprint
   - date: '2026-11-12'
     status: in_progress
+  - date: '2026-11-12'
+    status: done
   sync:
     github:
-      hash: cbf6093f045af051
-      remote_at: '2026-11-12T03:13:28Z'
+      hash: 3e344d3291f03e8d
+      remote_at: '2026-11-12T03:41:11Z'
 - id: SEC-030
   type: security
   title: Recusar senhas que aparecem em vazamentos conhecidos
