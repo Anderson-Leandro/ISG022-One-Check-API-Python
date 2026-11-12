@@ -45,7 +45,7 @@ from app.serializers import (
     serialize_contrato,
     serialize_problema,
 )
-from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
+from app.uploads import UploadInvalido, foto_pendente, nome_de_upload_existente, validar_imagem
 
 router = APIRouter(prefix="/contratos", tags=["contratos"])
 
@@ -424,6 +424,8 @@ async def create_problema(
 
     content_type = request.headers.get("content-type", "")
     foto_chave = None
+    # A foto só é gravada depois de todas as validações (BUG-002): aqui só fica o conteúdo já conferido
+    foto_conteudo = foto_extensao = None
     titulo = ""
     descricao = None
     comodo_id = None
@@ -457,11 +459,12 @@ async def create_problema(
                     },
                 )
             try:
-                foto_chave = salvar_imagem(content)
+                foto_extensao = validar_imagem(content)
             except UploadInvalido as e:
                 return JSONResponse(
                     status_code=422, content={"sucesso": False, "erro": str(e), "erros": {"foto": str(e)}}
                 )
+            foto_conteudo = content
     else:
         try:
             body = await request.json()
@@ -515,16 +518,18 @@ async def create_problema(
     if erros:
         return JSONResponse(status_code=422, content={"sucesso": False, "erro": "Dados inválidos", "erros": erros})
 
-    pb = Problema(
-        contrato_id=contrato_id,
-        comodo_id=comodo_id,
-        titulo=titulo,
-        descricao=descricao,
-        foto_url=foto_chave,
-        prioridade=prioridade,
-        status=status_val,
-    )
-    db.add(pb)
+    with foto_pendente(foto_conteudo, foto_extensao) as gravada:
+        pb = Problema(
+            contrato_id=contrato_id,
+            comodo_id=comodo_id,
+            titulo=titulo,
+            descricao=descricao,
+            foto_url=gravada or foto_chave,
+            prioridade=prioridade,
+            status=status_val,
+        )
+        db.add(pb)
+        db.flush()
     db.commit()
     db.refresh(pb)
 
