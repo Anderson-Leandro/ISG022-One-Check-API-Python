@@ -44,6 +44,7 @@
 | 2026-11-11 | BUG-002: pedido recusado não deixa foto órfã no disco; fotos antigas do checklist só saem depois do commit (PR #246) | — | — |
 | 2026-11-11 | DEBT-013: mensagem própria para o token de verificação no primeiro acesso do MFA (PR #248) | — | — |
 | 2026-11-11 | DEBT-021: imagem base do Dockerfile fixada por digest e coberta pelo Dependabot (PR #250) | — | — |
+| 2026-11-12 | SEC-030: senha nova que aparece em vazamentos conhecidos recebe 422 (Have I Been Pwned, k-anonymity, fail open) (PR #252) | — | — |
 
 ## Sprint Review
 - **Incremento demonstrável:**
