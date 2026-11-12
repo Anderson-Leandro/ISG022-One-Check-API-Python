@@ -34,6 +34,7 @@ from app.schemas import (
     fail,
     ok,
 )
+from app.senhas_vazadas import exigir_senha_nao_vazada
 from app.serializers import log_operacao, paginate, serialize_usuario
 from app.titular import anonimizar, e_ultimo_admin, exportar
 
@@ -80,6 +81,8 @@ def update_me(
             tentativas.falhou()
             return fail("Senha atual incorreta", status_code=403)
         tentativas.sucesso()
+        if vazada := exigir_senha_nao_vazada(body.senha_nova, "senha_nova"):
+            return vazada
         user.senha_hash = hash_password(body.senha_nova)
     alterados = campos_alterados(user)
     if body.senha_nova:
@@ -107,6 +110,8 @@ def alterar_senha_me(
         tentativas.falhou()
         return fail("Senha atual incorreta", status_code=403)
     tentativas.sucesso()
+    if vazada := exigir_senha_nao_vazada(body.nova_senha, "nova_senha"):
+        return vazada
 
     user.senha_hash = hash_password(body.nova_senha)
     encerrar_sessoes(db, user)
@@ -244,6 +249,8 @@ def update_usuario(
     if not user:
         return fail("Usuário não encontrado", status_code=404)
     _assert_pode_gerenciar(current, user)
+    if vazada := exigir_senha_nao_vazada(body.senha, "senha"):
+        return vazada
 
     novo_role = user.role
     if body.role is not None:
@@ -369,6 +376,8 @@ def create_usuario(
     _assert_pode_atribuir(current, body.role)
     if db.query(Usuario).filter(Usuario.email == body.email).first():
         return fail("E-mail já cadastrado", status_code=409)
+    if vazada := exigir_senha_nao_vazada(body.senha, "senha"):
+        return vazada
 
     user = Usuario(
         nome=body.nome,

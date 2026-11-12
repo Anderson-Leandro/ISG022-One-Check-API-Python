@@ -616,6 +616,26 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
                 descricao="O perfil foi removido (ADR-0009).",
             ),
             Caso(
+                "❌ Senha que aparece em vazamentos conhecidos → 422 (precisa de internet)",
+                "POST",
+                "/usuarios",
+                auth="token_admin",
+                antes=email_unico("email_senha_vazada", "senha.vazada"),
+                corpo={
+                    "nome": "Senha vazada (Insomnia)",
+                    "email": "{{ _.email_senha_vazada }}",
+                    "senha": "Princesa@123",
+                    "role": "locatario",
+                },
+                status=422,
+                sucesso=False,
+                erro="vazamentos conhecidos",
+                testes="insomnia.test('mensagem no campo senha', () => insomnia.expect(b.erros.senha).to.include('vazamentos'));",
+                descricao="Princesa@123 passa na política de senha, mas está na base do Have I Been Pwned (SEC-030). "
+                "A API manda só os 5 primeiros caracteres do SHA-1 da senha. Precisa de internet: sem resposta do "
+                "serviço em 2 s, ou com SENHA_VAZADA_CONSULTA=false, a senha é aceita (fail open) e este caso falha.",
+            ),
+            Caso(
                 "✅ Login locatário A (sem MFA)",
                 "POST",
                 "/auth/login",

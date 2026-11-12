@@ -10,6 +10,8 @@ from app.senhas import validar_senha
 T = TypeVar("T")
 
 # Senha nova (criação e troca). O login aceita a senha já cadastrada, mesmo fora da política
+# Política (SEC-011). A base de senhas vazadas (SEC-030) é consultada na rota, fora do event loop e depois
+# da autorização: app/senhas_vazadas.py
 SenhaNova = Annotated[str, AfterValidator(validar_senha)]
 Cpf = Annotated[str | None, AfterValidator(validar_cpf)]
 # Só documenta os valores no OpenAPI; a validação fica nas rotas, com a mensagem de campo (ADR-0012)
