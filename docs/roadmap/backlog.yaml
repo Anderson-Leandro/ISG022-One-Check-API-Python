@@ -4512,7 +4512,7 @@ items:
   priority: could
   rank: 155
   estimate: 2
-  status: in_progress
+  status: done
   sprint: 14
   phase: F5
   depends_on: []
@@ -4529,8 +4529,12 @@ items:
   links:
     trello_card: null
     gh_issue: 112
-    prs: []
-  evidence: []
+    prs:
+    - '#248'
+  evidence:
+  - 'PR #248 (merge 662b6fc): setup-login e activate-login recusam o token de verificação com a mensagem que aponta
+    para /api/v1/auth/mfa/verify, antes de consultar o banco'
+  - 'tests/integration/test_mfa_mensagem_token_verificacao.py: 11 testes; collection 168/168'
   created: '2026-11-07'
   updated: '2026-11-11'
   history:
@@ -4542,10 +4546,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-11'
+    status: done
   sync:
     github:
-      hash: 58f9342e779382e5
-      remote_at: '2026-11-12T01:34:48Z'
+      hash: 0221f074096656db
+      remote_at: '2026-11-12T01:46:04Z'
 - id: DEBT-014
   type: debt
   title: Erros de negócio respondem com o status HTTP adequado em vez de 200
