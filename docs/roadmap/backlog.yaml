@@ -5615,7 +5615,7 @@ items:
   priority: could
   rank: 1580
   estimate: 1
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F5
   depends_on: []
@@ -5642,10 +5642,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: ace500f4fba49a3f
-      remote_at: '2026-11-11T03:40:16Z'
+      hash: 4ac0a42eda645324
+      remote_at: '2026-11-12T01:50:17Z'
 - id: DEBT-022
   type: debt
   title: Direitos do titular para uma conta já desativada por um admin

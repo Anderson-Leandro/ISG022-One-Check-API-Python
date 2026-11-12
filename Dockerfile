@@ -1,4 +1,6 @@
-FROM python:3.12-slim
+# Tag e digest juntos (DEBT-021): a tag diz a versão, o digest garante a mesma imagem em todo build.
+# O Dependabot (ecossistema docker) troca os dois no mesmo PR
+FROM python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
 
 WORKDIR /app
 

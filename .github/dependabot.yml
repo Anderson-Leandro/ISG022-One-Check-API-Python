@@ -8,6 +8,8 @@
 #   cabeçalho de requirements.lock e faça push do lock. As transitivas, que só existem no lock, não
 #   ganham PR: o job dependencias (pip-audit) do CI aponta as que tiverem vulnerabilidade.
 # - github-actions: o Dependabot troca o SHA fixado e o comentário de versão juntos.
+# - docker: a imagem base do Dockerfile fica fixada por tag e digest (DEBT-021); o Dependabot troca o digest
+#   quando a tag recebe uma imagem nova, e a tag numa versão nova do Python, no mesmo PR.
 # - cooldown: só propõe versões publicadas há pelo menos 7 dias, para um pacote malicioso ou quebrado
 #   recém-publicado ter tempo de ser retirado. Vale para estas atualizações de versão; as "security
 #   updates" do Dependabot são outra função, ligada nas configurações do repositório (hoje desligada),
@@ -48,3 +50,15 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    target-branch: "dev"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore(deps)"
