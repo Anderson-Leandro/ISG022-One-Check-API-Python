@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session, joinedload
 
 from app.auditoria import campos_alterados
-from app.config import MAX_UPLOAD_MB, UPLOAD_DIR
+from app.config import MAX_UPLOAD_MB
 from app.database import get_db
 from app.deps import get_current_user, negar_perfil_desconhecido, require_roles
 from app.exclusao import marcar_excluido
@@ -40,7 +40,7 @@ from app.serializers import (
     serialize_item,
     serialize_usuario,
 )
-from app.uploads import UploadInvalido, salvar_imagem
+from app.uploads import UploadInvalido, foto_pendente, remover_upload, validar_imagem
 
 router = APIRouter(tags=["checklists"])
 
@@ -267,19 +267,22 @@ async def upload_foto(
         return fail(f"Arquivo excede {MAX_UPLOAD_MB}MB", status_code=413)
 
     try:
-        filename = salvar_imagem(content)
+        extensao = validar_imagem(content)
     except UploadInvalido as e:
         return fail(str(e), erros={"foto": str(e)}, status_code=422)
 
-    for old in list(item.fotos):
-        old_path = UPLOAD_DIR / old.arquivo
-        if old_path.exists():
-            old_path.unlink(missing_ok=True)
-        db.delete(old)
-
-    foto_row = ChecklistItemFoto(item_id=item.id, arquivo=filename)
-    db.add(foto_row)
+    # A foto nova sai se o registro dela não for criado; as antigas só saem do disco depois do commit, para um
+    # commit que falhe não deixar os registros antigos apontando para arquivos apagados (BUG-002)
+    antigas = [old.arquivo for old in item.fotos]
+    with foto_pendente(content, extensao) as filename:
+        for old in list(item.fotos):
+            db.delete(old)
+        foto_row = ChecklistItemFoto(item_id=item.id, arquivo=filename)
+        db.add(foto_row)
+        db.flush()
     db.commit()
+    for nome in antigas:
+        remover_upload(nome)
     db.refresh(foto_row)
     log_operacao(db, user.id, "upload", "checklist_foto", foto_row.id)
 
@@ -315,11 +318,11 @@ def delete_foto(
     if not foto_row:
         return fail("Foto não encontrada", status_code=404)
 
-    old_path = UPLOAD_DIR / foto_row.arquivo
-    if old_path.exists():
-        old_path.unlink(missing_ok=True)
+    arquivo = foto_row.arquivo
     db.delete(foto_row)
     db.commit()
+    # Depois do commit: um commit que falhe não deixa o registro apontando para um arquivo apagado
+    remover_upload(arquivo)
     log_operacao(db, user.id, "delete", "checklist_foto", foto_id)
     return ok(None)
 

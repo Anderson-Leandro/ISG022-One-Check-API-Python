@@ -3,6 +3,8 @@
 import io
 import re
 import uuid
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 from PIL import Image
@@ -29,8 +31,8 @@ def _assinatura_aceita(content: bytes) -> bool:
     return content.startswith(_ASSINATURAS) or (content[:4] == b"RIFF" and content[8:12] == b"WEBP")
 
 
-def salvar_imagem(content: bytes) -> str:
-    """Valida que o conteúdo é JPEG, PNG ou WebP e grava com nome aleatório e extensão do tipo detectado."""
+def validar_imagem(content: bytes) -> str:
+    """Confere que o conteúdo é JPEG, PNG ou WebP, sem gravar nada. Devolve a extensão do tipo detectado."""
     if not _assinatura_aceita(content):
         raise UploadInvalido("Envie uma imagem JPEG, PNG ou WebP")
     try:
@@ -42,11 +44,47 @@ def salvar_imagem(content: bytes) -> str:
     extensao = _EXTENSAO_POR_FORMATO.get(formato)
     if not extensao:
         raise UploadInvalido("Envie uma imagem JPEG, PNG ou WebP")
+    return extensao
 
+
+def gravar_imagem(content: bytes, extensao: str) -> str:
+    """Grava um conteúdo já validado (validar_imagem) com nome aleatório. Uma gravação interrompida não fica."""
     nome = f"{uuid.uuid4().hex}{extensao}"
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-    (UPLOAD_DIR / nome).write_bytes(content)
+    try:
+        (UPLOAD_DIR / nome).write_bytes(content)
+    except BaseException:
+        remover_upload(nome)
+        raise
     return nome
+
+
+def salvar_imagem(content: bytes) -> str:
+    """Valida que o conteúdo é JPEG, PNG ou WebP e grava com nome aleatório e extensão do tipo detectado."""
+    return gravar_imagem(content, validar_imagem(content))
+
+
+def remover_upload(nome: str | None) -> None:
+    """Apaga um arquivo de UPLOAD_DIR (sem erro se ele já não existir)."""
+    if nome:
+        (UPLOAD_DIR / nome).unlink(missing_ok=True)
+
+
+@contextmanager
+def foto_pendente(content: bytes | None, extensao: str | None) -> Iterator[str | None]:
+    """Grava a foto, já validada, e a apaga se o bloco falhar antes de o registro que aponta para ela existir.
+
+    Use depois de todas as validações do pedido (BUG-002) e faça o commit fora do bloco: se o commit falhar
+    depois de o banco ter gravado, apagar a foto deixaria o registro apontando para um arquivo inexistente."""
+    if content is None or extensao is None:
+        yield None
+        return
+    nome = gravar_imagem(content, extensao)
+    try:
+        yield nome
+    except BaseException:
+        remover_upload(nome)
+        raise
 
 
 def nome_de_upload_existente(valor) -> str | None:

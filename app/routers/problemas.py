@@ -20,7 +20,7 @@ from app.schemas import (
     corpo_no_openapi,
 )
 from app.serializers import log_operacao, serialize_atualizacao_problema, serialize_problema
-from app.uploads import UploadInvalido, nome_de_upload_existente, salvar_imagem
+from app.uploads import UploadInvalido, foto_pendente, nome_de_upload_existente, validar_imagem
 
 router = APIRouter(tags=["problemas"])
 
@@ -150,6 +150,8 @@ async def criar_atualizacao(
     content_type = request.headers.get("content-type", "")
     descricao = ""
     foto_chave = None
+    # A foto só é gravada depois de todas as validações (BUG-002): aqui só fica o conteúdo já conferido
+    foto_conteudo = foto_extensao = None
 
     if "multipart/form-data" in content_type:
         form = await request.form(max_files=1, max_fields=10)
@@ -165,9 +167,10 @@ async def criar_atualizacao(
                 )
 
             try:
-                foto_chave = salvar_imagem(content)
+                foto_extensao = validar_imagem(content)
             except UploadInvalido as e:
                 return _fail(str(e), status_code=422, erros={"foto": str(e)})
+            foto_conteudo = content
     else:
         try:
             body = await request.json()
@@ -194,13 +197,15 @@ async def criar_atualizacao(
     if user.role == "locatario" and pb.status in STATUS_PROBLEMA_ENCERRADOS:
         return _fail("Não é possível comentar num problema resolvido", status_code=409)
 
-    atualizacao = AtualizacaoProblema(
-        problema_id=problema_id,
-        autor_id=user.id,
-        descricao=descricao,
-        foto_url=foto_chave,
-    )
-    db.add(atualizacao)
+    with foto_pendente(foto_conteudo, foto_extensao) as gravada:
+        atualizacao = AtualizacaoProblema(
+            problema_id=problema_id,
+            autor_id=user.id,
+            descricao=descricao,
+            foto_url=gravada or foto_chave,
+        )
+        db.add(atualizacao)
+        db.flush()
     db.commit()
     db.refresh(atualizacao)
 

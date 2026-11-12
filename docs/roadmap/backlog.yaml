@@ -5446,7 +5446,7 @@ items:
   priority: should
   rank: 1550
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F5
   depends_on: []
@@ -5473,10 +5473,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: 8de4b2f1987c1f77
-      remote_at: '2026-11-11T03:40:10Z'
+      hash: 1732240686ae4a5f
+      remote_at: '2026-11-12T01:10:04Z'
 - id: TK-021
   type: task
   title: Merge pela interface do GitHub já com o título do PR (#n)
