@@ -26,8 +26,9 @@ from app.auth import (
     verify_totp,
     verify_totp_code,
 )
+from app.config import MARCAR_SENHA_FRACA
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import get_current_user, require_roles, usuario_mesmo_com_senha_expirada
 from app.models import Usuario
 from app.rate_limit import Tentativas
 from app.respostas import LoginResposta, TokensResposta, documentar
@@ -42,6 +43,7 @@ from app.schemas import (
     fail,
     ok,
 )
+from app.senhas import validar_senha
 from app.serializers import log_operacao
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -50,6 +52,24 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # que aponta o lugar certo. A conferência é só sobre o token, antes de qualquer consulta ao banco
 TOKEN_DE_VERIFICACAO = "Este token é de verificação: use-o em POST /api/v1/auth/mfa/verify com o código do autenticador"
 TOKEN_MFA_INVALIDO = "Token MFA inválido ou expirado"
+
+
+def _senha_fraca(user: Usuario, senha: str) -> bool:
+    """SEC-029: a senha correta não passa na política atual (só no login a senha está em texto: o banco guarda o
+    hash, então a conferência não pode ser feita por script). Em desenvolvimento, nunca."""
+    if not MARCAR_SENHA_FRACA or user.senha_expirada:
+        return False
+    try:
+        validar_senha(senha)
+    except ValueError:
+        return True
+    return False
+
+
+def _marcar_senha_expirada(db: Session, user: Usuario) -> None:
+    """Marca a conta. A marca e o log entram no mesmo commit (log_operacao confirma os dois)."""
+    user.senha_expirada = True
+    log_operacao(db, user.id, "senha_expirada", "usuario", user.id)
 
 
 def _erro_do_token_de_primeiro_acesso(payload: dict | None) -> str | None:
@@ -78,9 +98,11 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
             log_operacao(db, None, "login_falho", "usuario", None, f"email_hmac: {email_para_log(body.email)}")
         return fail("Credenciais inválidas", status_code=401)
     tentativas.sucesso()
+    # Com MFA, a marca só é posta depois do código confirmado: quem sabe só a senha não trava a conta de ninguém
+    senha_fraca = _senha_fraca(user, body.senha)
 
     if needs_mfa(user):
-        temp = create_temp_token(user.id, user.token_version)
+        temp = create_temp_token(user.id, user.token_version, senha_fraca)
         return ok(
             {
                 "mfa_required": True,
@@ -90,7 +112,7 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
         )
 
     if mfa_setup_required(user):
-        temp = create_mfa_setup_token(user.id, user.token_version)
+        temp = create_mfa_setup_token(user.id, user.token_version, senha_fraca)
         return ok(
             {
                 "mfa_setup_required": True,
@@ -99,6 +121,8 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
             }
         )
 
+    if senha_fraca:
+        _marcar_senha_expirada(db, user)
     access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
     # Sem o e-mail: o id já identifica a conta, e o log append-only não acompanharia a anonimização (SEC-028)
@@ -132,6 +156,8 @@ def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(g
         log_operacao(db, user.id, "mfa_falho", "usuario", user.id, "via: mfa")
         return fail("Código MFA inválido", status_code=401)
     tentativas.sucesso()
+    if payload.get("senha_fraca") and MARCAR_SENHA_FRACA:
+        _marcar_senha_expirada(db, user)
 
     access = create_access_token(user.id, user.role, user.token_version)
     refresh = create_refresh_token(db, user.id)
@@ -198,6 +224,8 @@ def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session 
     user.mfa_secret = user.mfa_secret_pendente
     user.mfa_secret_pendente = None
     user.mfa_enabled = True
+    if payload.get("senha_fraca") and MARCAR_SENHA_FRACA:
+        user.senha_expirada = True  # SEC-029: só depois do primeiro código confirmado
     db.commit()
     db.refresh(user)
 
@@ -336,7 +364,8 @@ def refresh(body: RefreshRequest, db: Session = Depends(get_db)):
 @router.post("/logout")
 def logout(
     db: Session = Depends(get_db),
-    user: Usuario = Depends(get_current_user),
+    # Liberada com a senha expirada (SEC-029)
+    user: Usuario = Depends(usuario_mesmo_com_senha_expirada),
     body: RefreshRequest | None = None,
 ):
     if body is not None and body.refresh_token:

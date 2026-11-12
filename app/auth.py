@@ -50,20 +50,23 @@ def create_access_token(usuario_id: str, role: str, versao: int = 0) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def _create_short_token(usuario_id: str, token_type: str, versao: int) -> str:
+def _create_short_token(usuario_id: str, token_type: str, versao: int, senha_fraca: bool = False) -> str:
     expire = datetime.now(UTC) + timedelta(minutes=10)
     payload = {"sub": usuario_id, "type": token_type, "ver": versao, "exp": expire}
+    if senha_fraca:
+        # SEC-029: a senha do login não passa na política; a conta só é marcada depois do MFA confirmado
+        payload["senha_fraca"] = True
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def create_temp_token(usuario_id: str, versao: int = 0) -> str:
+def create_temp_token(usuario_id: str, versao: int = 0, senha_fraca: bool = False) -> str:
     """Token do passo de verificação MFA (usuário já tem autenticador)."""
-    return _create_short_token(usuario_id, "mfa", versao)
+    return _create_short_token(usuario_id, "mfa", versao, senha_fraca)
 
 
-def create_mfa_setup_token(usuario_id: str, versao: int = 0) -> str:
+def create_mfa_setup_token(usuario_id: str, versao: int = 0, senha_fraca: bool = False) -> str:
     """Token do primeiro acesso, para configurar o autenticador. Não serve para /mfa/verify."""
-    return _create_short_token(usuario_id, "mfa_setup", versao)
+    return _create_short_token(usuario_id, "mfa_setup", versao, senha_fraca)
 
 
 def sessao_vigente(payload: dict, user: Usuario) -> bool:
@@ -224,4 +227,5 @@ def usuario_to_dict(user: Usuario) -> dict:
         "nome": user.nome,
         "email": user.email,
         "role": user.role,
+        "senha_expirada": bool(user.senha_expirada),
     }

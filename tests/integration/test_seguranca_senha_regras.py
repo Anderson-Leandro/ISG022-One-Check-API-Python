@@ -17,6 +17,7 @@ Regras verificadas:
 
 from datetime import date
 
+import bcrypt
 import pytest
 
 from app.models import AgendamentoVistoria, Checklist, Contrato, Imovel, Problema, Usuario
@@ -99,9 +100,11 @@ class TestRotasDeSenha:
         )
         assert "pelo menos 10 caracteres" in r.json()["erros"]["nova_senha"]
 
-    def test_login_aceita_senha_antiga_fora_da_politica(self, client, user_locatario):
-        # TEST_SENHA ("senha123") não passaria na política, mas já está cadastrada
-        r = client.post("/api/v1/auth/login", json={"email": user_locatario.email, "senha": TEST_SENHA})
+    def test_login_aceita_senha_antiga_fora_da_politica(self, client, db, user_locatario):
+        # "senha123" não passaria na política, mas já está cadastrada: o login aceita (e marca a troca, SEC-029)
+        user_locatario.senha_hash = bcrypt.hashpw(b"senha123", bcrypt.gensalt(rounds=4)).decode()
+        db.commit()
+        r = client.post("/api/v1/auth/login", json={"email": user_locatario.email, "senha": "senha123"})
         assert r.json()["sucesso"] is True
 
 

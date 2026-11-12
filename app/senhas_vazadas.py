@@ -5,7 +5,7 @@ Decisão do PO em 2026-11-11:
   esse começo, e a comparação é feita aqui. A senha e o hash completo nunca saem.
 - Add-Padding: o serviço completa a resposta com sufixos falsos (contagem 0), para o tamanho dela não indicar
   o prefixo consultado. Linhas com contagem 0 não contam como vazamento.
-- Prazo total de 2 s (inclusive o DNS) e fail open: se o serviço não responder no prazo, ou responder algo
+- Prazo total de 3 s (inclusive o DNS) e fail open: se o serviço não responder no prazo, ou responder algo
   inesperado, a senha é aceita e o fato vai para o log, sem a senha nem o hash.
 - SENHA_VAZADA_CONSULTA=false desliga a consulta (a conftest dos testes desliga; não há rede no CI).
 
@@ -25,7 +25,9 @@ from app.config import SENHA_VAZADA_CONSULTA
 from app.schemas import fail
 
 URL = "https://api.pwnedpasswords.com/range/"
-TIMEOUT_S = 2
+# 3 s a pedido do PO em 2026-11-12: com 2 s, a primeira consulta de um processo (DNS e TLS frios) às vezes
+# passava do prazo e caía no fail open
+TIMEOUT_S = 3
 # A resposta tem cerca de 2 mil linhas de 40 bytes; bem mais que isso é uma resposta estranha
 LIMITE_RESPOSTA = 256 * 1024
 MENSAGEM = "Esta senha aparece em vazamentos conhecidos; escolha outra"

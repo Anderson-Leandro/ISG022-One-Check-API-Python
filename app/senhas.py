@@ -1,7 +1,7 @@
 """Política de senha, aplicada ao criar usuário e ao trocar senha.
 
-O login continua aceitando a senha já cadastrada, mesmo fora da política: ela só
-vale para senhas novas. A lista não substitui uma base de senhas vazadas, mas
+Vale para senhas novas. A senha já cadastrada fora da política continua entrando, mas o login
+marca a conta com senha_expirada (SEC-029), e até a troca o token só serve para trocar a senha. A lista não substitui uma base de senhas vazadas, mas
 recusa os padrões mais usados em credential stuffing.
 """
 

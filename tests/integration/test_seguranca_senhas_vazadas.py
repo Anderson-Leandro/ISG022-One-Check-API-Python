@@ -7,7 +7,7 @@ comuns, mas aceitava senhas fortes no formato que já circulam em vazamentos, us
 Regras verificadas (decisão do PO em 2026-11-11):
   - senha nova presente na base do Have I Been Pwned → 422, com a mensagem em erros.<campo>
   - k-anonymity: só os 5 primeiros caracteres do SHA-1 saem da API; o restante é comparado localmente
-  - prazo total de 2 s; serviço lento, fora do ar ou com resposta estranha → a senha é aceita e o fato vai
+  - prazo total de 3 s; serviço lento, fora do ar ou com resposta estranha → a senha é aceita e o fato vai
     para o log, sem a senha nem o hash (fail open)
   - a consulta acontece na rota, depois da conferência da senha atual: senha atual errada → 403, sem consulta
   - as linhas de preenchimento (contagem 0) do Add-Padding não contam como vazamento
@@ -105,7 +105,7 @@ class TestKAnonymity:
         senhas_vazadas._consultar_faixa("ABCDE")
         assert capturado["url"] == "https://api.pwnedpasswords.com/range/ABCDE"
         assert capturado["headers"].get("Add-padding") == "true"
-        assert capturado["timeout"] <= 2
+        assert capturado["timeout"] <= 3
 
     def test_prefixo_fora_do_formato_nao_chega_a_rede(self, monkeypatch):
         monkeypatch.setattr(senhas_vazadas.urllib.request, "urlopen", lambda *a, **k: pytest.fail("chamou a rede"))

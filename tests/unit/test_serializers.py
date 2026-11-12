@@ -201,6 +201,7 @@ def test_serialize_usuario_contem_todos_campos():
         "mfa_enabled",
         "mfa_configurado",
         "mfa_ativo",
+        "senha_expirada",
         "created_at",
     }
 
