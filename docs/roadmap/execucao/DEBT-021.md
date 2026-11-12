@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 14 · **Issue:** #233 · **Branch:** `chore/DEBT-021-imagem-por-digest` · **PR:** #<n>
+- **Sprint:** 14 · **Issue:** #233 · **Branch:** `chore/DEBT-021-imagem-por-digest` · **PR:** #250
 
 ## Entrega
 Separado do DEBT-019 no refinamento de 2026-11-11. É a pendência do SEC-008: a imagem base seguia numa tag móvel, e o Dependabot não cobria o Docker.
