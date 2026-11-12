@@ -21,12 +21,12 @@ def _atualizacao(ecossistema):
     return u
 
 
-def test_versao_2_com_pip_e_github_actions():
+def test_versao_2_com_pip_github_actions_e_docker():
     assert CONFIG["version"] == 2
-    assert {u["package-ecosystem"] for u in CONFIG["updates"]} == {"pip", "github-actions"}
+    assert {u["package-ecosystem"] for u in CONFIG["updates"]} == {"pip", "github-actions", "docker"}
 
 
-@pytest.mark.parametrize("ecossistema", ["pip", "github-actions"])
+@pytest.mark.parametrize("ecossistema", ["pip", "github-actions", "docker"])
 def test_prs_contra_a_dev_na_raiz_com_agenda(ecossistema):
     u = _atualizacao(ecossistema)
     assert u["target-branch"] == "dev"
@@ -34,7 +34,7 @@ def test_prs_contra_a_dev_na_raiz_com_agenda(ecossistema):
     assert u["schedule"]["interval"] in {"daily", "weekly", "monthly"}
 
 
-@pytest.mark.parametrize("ecossistema", ["pip", "github-actions"])
+@pytest.mark.parametrize("ecossistema", ["pip", "github-actions", "docker"])
 def test_cooldown_contra_versao_recem_publicada(ecossistema):
     assert _atualizacao(ecossistema)["cooldown"]["default-days"] >= 7
 
@@ -62,3 +62,9 @@ def test_actions_fixadas_por_sha_com_comentario_de_versao():
     for acao, resto in usos:
         assert re.fullmatch(r"[\w.-]+/[\w.-]+@[0-9a-f]{40}", acao), acao
         assert re.search(r"#\s*v\d", resto), acao
+
+
+def test_docker_com_o_mesmo_prefixo_de_commit():
+    # DEBT-021: os PRs do Dependabot para a imagem base seguem o padrão dos outros ecossistemas
+    u = _atualizacao("docker")
+    assert u["commit-message"]["prefix"] == "chore(deps)"

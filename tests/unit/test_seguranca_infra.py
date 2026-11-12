@@ -51,6 +51,11 @@ class TestContainer:
     def test_sem_ferramentas_de_compilacao(self):
         assert not re.search(r"\b(gcc|build-essential|-dev)\b", _dockerfile())
 
+    def test_imagem_base_fixada_por_digest(self):
+        # DEBT-021: a tag (python:3.12-slim) é móvel; o digest garante a mesma imagem em todo build
+        bases = re.findall(r"^FROM\s+(\S+)", _dockerfile(), re.M)
+        assert bases and all(re.fullmatch(r"[\w./-]+:[\w.-]+@sha256:[0-9a-f]{64}", b) for b in bases), bases
+
     def test_so_instala_pacotes_binarios_com_hash(self):
         instalacao = [l for l in _dockerfile().splitlines() if "pip install" in l]
         assert instalacao and all("--require-hashes" in l and "--only-binary" in l for l in instalacao)
