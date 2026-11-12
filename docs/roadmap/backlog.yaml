@@ -2750,7 +2750,7 @@ items:
   priority: could
   rank: 230
   estimate: 3
-  status: in_progress
+  status: done
   sprint: 14
   phase: F6
   depends_on: []
@@ -2767,10 +2767,15 @@ items:
   links:
     trello_card: null
     gh_issue: 68
-    prs: []
-  evidence: []
+    prs:
+    - '#252'
+  evidence:
+  - 'PR #252 (merge 4eba6cf): senha nova vazada recebe 422, pela consulta k-anonymity ao Have I Been Pwned, na rota
+    e fora do event loop, com prazo de 2 s e fail open'
+  - 'tests/integration/test_seguranca_senhas_vazadas.py: 21 testes; collection 169/169 com a consulta real'
+  - conftest com a consulta desligada, aprovada pelo usuário em 2026-11-11
   created: '2026-11-02'
-  updated: '2026-11-11'
+  updated: '2026-11-12'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -2780,10 +2785,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-12'
+    status: done
   sync:
     github:
-      hash: b1e4d98fcbad03ce
-      remote_at: '2026-11-12T02:18:31Z'
+      hash: 4329b0957b4364e6
+      remote_at: '2026-11-12T03:03:56Z'
 - id: SEC-031
   type: security
   title: Cifrar o CPF em repouso
