@@ -41,6 +41,7 @@
 | 2026-11-11 | DEBT-020: todo erro da API no envelope {sucesso, erro, erros}; testes que liam detail atualizados com aprovação (PR #240) | — | — |
 | 2026-11-11 | SEC-025: log de auditoria append-only por trigger no banco; R-005 mitigado (PR #242) | — | — |
 | 2026-11-11 | SEC-028: exportação e anonimização dos próprios dados (LGPD art. 18); R-016 mitigado; DEBT-022 criado (PR #244) | — | — |
+| 2026-11-11 | BUG-002: pedido recusado não deixa foto órfã no disco; fotos antigas do checklist só saem depois do commit (PR #246) | — | — |
 
 ## Sprint Review
 - **Incremento demonstrável:**
