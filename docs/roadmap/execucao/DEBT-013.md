@@ -4,7 +4,7 @@
 > (branch, testes, segurança, documentação). O `scripts/dod_check.py <ID>` confere cada seção contra o
 > git e o GitHub; a Sprint Review usa o mesmo arquivo.
 
-- **Sprint:** 14 · **Issue:** #112 · **Branch:** `fix/DEBT-013-mensagem-token-verificacao` · **PR:** #<n>
+- **Sprint:** 14 · **Issue:** #112 · **Branch:** `fix/DEBT-013-mensagem-token-verificacao` · **PR:** #248
 
 ## Entrega
 `GET /auth/mfa/setup-login` e `POST /auth/mfa/activate-login` respondiam "Token MFA inválido ou expirado" tanto para um token ilegível ou expirado quanto para um token válido do tipo `mfa`, que é emitido para quem já tem autenticador. A recusa continua igual (falha N1, SEC-021). Só a mensagem desse caso passa a apontar o caminho certo.
