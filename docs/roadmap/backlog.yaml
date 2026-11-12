@@ -5615,7 +5615,7 @@ items:
   priority: could
   rank: 1580
   estimate: 1
-  status: in_progress
+  status: done
   sprint: 14
   phase: F5
   depends_on: []
@@ -5631,8 +5631,12 @@ items:
   links:
     trello_card: null
     gh_issue: 233
-    prs: []
-  evidence: []
+    prs:
+    - '#250'
+  evidence:
+  - 'PR #250 (merge 949c014): Dockerfile com python:3.12-slim fixada por digest; ecossistema docker no dependabot.yml'
+  - teste do digest e casos docker nos testes do Dependabot (alteração aprovada pelo usuário em 2026-11-11); docker
+    build com a imagem fixada
   created: '2026-11-11'
   updated: '2026-11-11'
   history:
@@ -5644,10 +5648,12 @@ items:
     status: in_sprint
   - date: '2026-11-11'
     status: in_progress
+  - date: '2026-11-11'
+    status: done
   sync:
     github:
-      hash: 4ac0a42eda645324
-      remote_at: '2026-11-12T01:50:17Z'
+      hash: ea02c490469ae516
+      remote_at: '2026-11-12T02:14:06Z'
 - id: DEBT-022
   type: debt
   title: Direitos do titular para uma conta já desativada por um admin
