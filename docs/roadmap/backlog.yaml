@@ -4512,7 +4512,7 @@ items:
   priority: could
   rank: 155
   estimate: 2
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F5
   depends_on: []
@@ -4540,10 +4540,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: 4c046087e2430f02
-      remote_at: '2026-11-11T03:40:02Z'
+      hash: 58f9342e779382e5
+      remote_at: '2026-11-12T01:34:48Z'
 - id: DEBT-014
   type: debt
   title: Erros de negócio respondem com o status HTTP adequado em vez de 200

@@ -46,6 +46,19 @@ from app.serializers import log_operacao
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+# DEBT-013: o token de verificação (tipo "mfa") é recusado no primeiro acesso, como antes, mas com uma mensagem
+# que aponta o lugar certo. A conferência é só sobre o token, antes de qualquer consulta ao banco
+TOKEN_DE_VERIFICACAO = "Este token é de verificação: use-o em POST /api/v1/auth/mfa/verify com o código do autenticador"
+TOKEN_MFA_INVALIDO = "Token MFA inválido ou expirado"
+
+
+def _erro_do_token_de_primeiro_acesso(payload: dict | None) -> str | None:
+    """Mensagem de recusa de um token que não é de primeiro acesso (mfa_setup); None se ele é."""
+    tipo = (payload or {}).get("type")
+    if tipo == "mfa_setup":
+        return None
+    return TOKEN_DE_VERIFICACAO if tipo == "mfa" else TOKEN_MFA_INVALIDO
+
 
 @router.post("/login", responses=documentar(LoginResposta, erros=(401, 422, 429)))
 def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
@@ -103,13 +116,13 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
 def mfa_verify(body: MfaVerifyRequest, request: Request, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
     if not payload or payload.get("type") != "mfa":
-        return fail("Token MFA inválido ou expirado", status_code=401)
+        return fail(TOKEN_MFA_INVALIDO, status_code=401)
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado", status_code=401)
     if not sessao_vigente(payload, user):
-        return fail("Token MFA inválido ou expirado", status_code=401)
+        return fail(TOKEN_MFA_INVALIDO, status_code=401)
 
     # A conta (e não o temp_token) é a chave: um novo login não zera as tentativas
     tentativas = Tentativas(request, "mfa", user.id)
@@ -137,14 +150,15 @@ def setup_login(temp_token: str = Query(...), db: Session = Depends(get_db)):
     # Só o token de primeiro acesso serve aqui; o de verificação (type "mfa") é emitido
     # para quem já tem autenticador, e aceitá-lo permitiria trocar o segredo só com a senha
     payload = decode_token(temp_token)
-    if not payload or payload.get("type") != "mfa_setup":
-        raise HTTPException(status_code=401, detail="Token MFA inválido ou expirado")
+    erro = _erro_do_token_de_primeiro_acesso(payload)
+    if erro:
+        raise HTTPException(status_code=401, detail=erro)
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
     if not sessao_vigente(payload, user):
-        raise HTTPException(status_code=401, detail="Token MFA inválido ou expirado")
+        raise HTTPException(status_code=401, detail=TOKEN_MFA_INVALIDO)
 
     # Revalida no momento da chamada: o token vale 10 min e pode ser reutilizado após a ativação
     if not mfa_setup_required(user):
@@ -160,14 +174,15 @@ def setup_login(temp_token: str = Query(...), db: Session = Depends(get_db)):
 @router.post("/mfa/activate-login")
 def activate_login(body: MfaActivateLoginRequest, request: Request, db: Session = Depends(get_db)):
     payload = decode_token(body.temp_token)
-    if not payload or payload.get("type") != "mfa_setup":
-        return fail("Token MFA inválido ou expirado", status_code=401)
+    erro = _erro_do_token_de_primeiro_acesso(payload)
+    if erro:
+        return fail(erro, status_code=401)
 
     user = db.query(Usuario).filter(Usuario.id == payload["sub"], Usuario.ativo == True).first()
     if not user:
         return fail("Usuário não encontrado", status_code=401)
     if not sessao_vigente(payload, user):
-        return fail("Token MFA inválido ou expirado", status_code=401)
+        return fail(TOKEN_MFA_INVALIDO, status_code=401)
 
     if not mfa_setup_required(user):
         return fail("MFA já configurado para este usuário", status_code=409)
