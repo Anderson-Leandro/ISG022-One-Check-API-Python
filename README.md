@@ -130,8 +130,9 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 Vale para senhas novas: `POST /usuarios`, `PUT /usuarios/{id}` (`senha`), `PUT /usuarios/me/senha` (`nova_senha`) e `PATCH /usuarios/me` (`senha_nova`).
 - Pelo menos 10 caracteres e no máximo 72 bytes (o limite do bcrypt; acentos ocupam 2 bytes).
 - Recusa senhas só com números e símbolos, senhas comuns mesmo com números e símbolos em volta (`Senha@2024`, `qwertyuiop`) e senhas com menos de 5 caracteres distintos.
-- Recusa também a senha que aparece em vazamentos conhecidos (Have I Been Pwned, SEC-030). Só os 5 primeiros caracteres do SHA-1 saem da API (k-anonymity), com timeout de 2 s. Se o serviço não responder, a senha é aceita e o fato vai para o log. `SENHA_VAZADA_CONSULTA=false` desliga a consulta.
-- Fora da regra → `422`, com a mensagem em `erro` e em `erros.<campo>` (por exemplo, `erros.nova_senha`). O login continua aceitando senhas cadastradas antes da política.
+- Recusa também a senha que aparece em vazamentos conhecidos (Have I Been Pwned, SEC-030). Só os 5 primeiros caracteres do SHA-1 saem da API (k-anonymity), com prazo total de 3 s. Se o serviço não responder, a senha é aceita e o fato vai para o log. `SENHA_VAZADA_CONSULTA=false` desliga a consulta.
+- Fora da regra → `422`, com a mensagem em `erro` e em `erros.<campo>` (por exemplo, `erros.nova_senha`).
+- **Senha antiga fora da política (SEC-029):** o login com uma senha cadastrada antes da política continua funcionando, mas marca a conta com `senha_expirada` (o campo vem em `dados.usuario` do login e em `/usuarios/me`). Até a troca, o token só serve para `GET /usuarios/me`, `PUT /usuarios/me/senha` e `POST /auth/logout`, e as outras rotas respondem `403`. Em `APP_ENV=development`, a marca não é posta: as contas do seed usam senhas públicas por desenho.
 
 ### Limite de tentativas
 5 falhas por conta ou 20 por IP em 15 minutos → `429`. Vale para login, MFA (`verify`, `activate-login`, `activate`, `desabilitar`) e para as rotas de `/usuarios/me` que pedem senha ou código.

@@ -2704,7 +2704,7 @@ items:
   priority: could
   rank: 220
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F6
   depends_on: []
@@ -2723,7 +2723,7 @@ items:
     prs: []
   evidence: []
   created: '2026-11-02'
-  updated: '2026-11-11'
+  updated: '2026-11-12'
   history:
   - date: '2026-11-02'
     status: backlog
@@ -2731,10 +2731,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-12'
+    status: in_progress
   sync:
     github:
-      hash: 655f057547184268
-      remote_at: '2026-11-11T03:39:54Z'
+      hash: cbf6093f045af051
+      remote_at: '2026-11-12T03:13:28Z'
 - id: SEC-030
   type: security
   title: Recusar senhas que aparecem em vazamentos conhecidos

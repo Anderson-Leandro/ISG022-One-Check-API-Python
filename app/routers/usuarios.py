@@ -19,7 +19,7 @@ from app.auth import (
     verify_totp_code,
 )
 from app.database import get_db
-from app.deps import get_current_user, require_roles
+from app.deps import get_current_user, require_roles, usuario_mesmo_com_senha_expirada
 from app.models import Usuario
 from app.rate_limit import Tentativas
 from app.respostas import UsuarioResposta, documentar
@@ -55,7 +55,7 @@ def _assert_pode_atribuir(current: Usuario, role: str) -> None:
 
 
 @router.get("/me", responses=documentar(UsuarioResposta, erros=(401,)))
-def me(user: Usuario = Depends(get_current_user)):
+def me(user: Usuario = Depends(usuario_mesmo_com_senha_expirada)):  # liberada com a senha expirada (SEC-029)
     return ok(serialize_usuario(user, cpf_completo=True))
 
 
@@ -102,7 +102,8 @@ def alterar_senha_me(
     body: AlterarSenhaRequest,
     request: Request,
     db: Session = Depends(get_db),
-    user: Usuario = Depends(get_current_user),
+    # Liberada com a senha expirada (SEC-029): é a saída da marca
+    user: Usuario = Depends(usuario_mesmo_com_senha_expirada),
 ):
     tentativas = Tentativas(request, "reauth", user.id)
     tentativas.verificar()
@@ -114,6 +115,7 @@ def alterar_senha_me(
         return vazada
 
     user.senha_hash = hash_password(body.nova_senha)
+    user.senha_expirada = False  # SEC-029: a senha nova já passou na política
     encerrar_sessoes(db, user)
     db.commit()
     db.refresh(user)
@@ -287,6 +289,7 @@ def update_usuario(
             user.mfa_secret = None
     if body.senha:
         user.senha_hash = hash_password(body.senha)
+        user.senha_expirada = False  # SEC-029
         credencial_alterada = True
     alterados = campos_alterados(user)
     if credencial_alterada:

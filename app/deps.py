@@ -9,10 +9,33 @@ from app.models import Checklist, Contrato, Usuario
 security = HTTPBearer(auto_error=False)
 
 
+SENHA_EXPIRADA = "Sua senha não atende à política atual: troque-a em PUT /api/v1/usuarios/me/senha"
+
+
+def usuario_mesmo_com_senha_expirada(
+    creds: HTTPAuthorizationCredentials | None = Depends(security),
+    db: Session = Depends(get_db),
+) -> Usuario:
+    """O usuário do token, mesmo com senha_expirada (SEC-029). Só para ver o próprio perfil, trocar a senha e sair."""
+    return usuario_autenticado(creds, db)
+
+
 def get_current_user(
     creds: HTTPAuthorizationCredentials | None = Depends(security),
     db: Session = Depends(get_db),
 ) -> Usuario:
+    """O usuário do token. Com senha_expirada, 403: até trocar a senha, as outras rotas ficam fechadas (SEC-029)."""
+    return exigir_senha_em_dia(usuario_autenticado(creds, db))
+
+
+def exigir_senha_em_dia(user: Usuario) -> Usuario:
+    if user.senha_expirada:
+        raise HTTPException(status_code=403, detail=SENHA_EXPIRADA)
+    return user
+
+
+def usuario_autenticado(creds: HTTPAuthorizationCredentials | None, db: Session) -> Usuario:
+    """O usuário do token de acesso, sem a restrição da senha expirada (a rota do seed usa só esta parte)."""
     if not creds or not creds.credentials:
         raise HTTPException(status_code=401, detail="Token ausente")
     payload = decode_token(creds.credentials)

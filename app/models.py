@@ -12,6 +12,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    false,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -42,6 +43,8 @@ class Usuario(Base):
     # Vai nos JWT ("ver"); incrementar invalida todos os tokens já emitidos para o usuário
     token_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
     ativo: Mapped[bool] = mapped_column(Boolean, default=True)
+    # SEC-029: a senha usada no login não passa na política atual; até a troca, o token só serve para trocá-la
+    senha_expirada: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=false())
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="usuario")

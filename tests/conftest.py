@@ -56,7 +56,8 @@ from app.models import (  # noqa: E402
 # ── Constantes de teste ─────────────────────────────────────────────────────────
 
 MFA_TEST_SECRET = "JBSWY3DPEHPK3PXP"
-TEST_SENHA = "senha123"
+# Passa na política de senha (SEC-011): com uma senha fraca, o login marcaria senha_expirada (SEC-029)
+TEST_SENHA = "Teste.Forte#2026"
 
 # Hash calculado uma vez com custo baixo (rounds=4) para acelerar os testes.
 # bcrypt padrão usa rounds=12, o que tornaria cada fixture lenta.

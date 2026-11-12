@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import SEED_ALLOW_DESTRUCTIVE, SEED_SECRET
 from app.data_status import get_data_status
 from app.database import get_db
-from app.deps import get_current_user, security
+from app.deps import exigir_senha_em_dia, security, usuario_autenticado
 from app.models import Usuario
 from app.schemas import fail, ok
 from app.seed_service import run_expand, run_refresh_data, run_seed
@@ -38,7 +38,8 @@ def require_seed_access(
     if db.query(Usuario.id).first() is None:
         return None
 
-    user = get_current_user(creds, db)
+    # A senha expirada também fecha o seed (SEC-029): ele pode apagar dados
+    user = exigir_senha_em_dia(usuario_autenticado(creds, db))
     if user.role != "admin":
         raise HTTPException(status_code=403, detail="Permissão negada")
     return user

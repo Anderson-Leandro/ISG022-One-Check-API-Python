@@ -1389,7 +1389,7 @@
       "_type": "request",
       "parentId": "fld_8adc175cf58cfc1b8a32ac5b",
       "name": "❌ Senha que aparece em vazamentos conhecidos → 422 (precisa de internet)",
-      "description": "Princesa@123 passa na política de senha, mas está na base do Have I Been Pwned (SEC-030). A API manda só os 5 primeiros caracteres do SHA-1 da senha. Precisa de internet: sem resposta do serviço em 2 s, ou com SENHA_VAZADA_CONSULTA=false, a senha é aceita (fail open) e este caso falha.",
+      "description": "Princesa@123 passa na política de senha, mas está na base do Have I Been Pwned (SEC-030). A API manda só os 5 primeiros caracteres do SHA-1 da senha. Precisa de internet: sem resposta do serviço em 3 s, ou com SENHA_VAZADA_CONSULTA=false, a senha é aceita (fail open) e este caso falha.",
       "method": "POST",
       "url": "{{ _.base_url }}/usuarios",
       "parameters": [],

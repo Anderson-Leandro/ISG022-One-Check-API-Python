@@ -47,6 +47,14 @@ class ErroResposta(_Modelo):
     )
 
 
+# SEC-029: o mesmo campo no perfil e no login
+_SENHA_EXPIRADA = Field(
+    False,
+    description="A senha não atende à política atual: até trocá-la (PUT /usuarios/me/senha), as outras rotas "
+    "respondem 403 (SEC-029)",
+)
+
+
 class UsuarioResposta(_Modelo):
     id: str
     nome: str
@@ -60,6 +68,7 @@ class UsuarioResposta(_Modelo):
     mfa_ativo: bool = Field(
         description="O login pede o código: MFA ligado e autenticador configurado (mfa_enabled e mfa_configurado)"
     )
+    senha_expirada: bool = _SENHA_EXPIRADA
     created_at: str | None = None
 
 
@@ -187,6 +196,7 @@ class UsuarioLoginResposta(_Modelo):
     nome: str
     email: str
     role: str = Field(description="Perfil de acesso: admin, gestor, vistoriador ou locatario")
+    senha_expirada: bool = _SENHA_EXPIRADA
 
 
 class LoginResposta(_Modelo):

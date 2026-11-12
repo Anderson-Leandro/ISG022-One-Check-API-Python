@@ -21,6 +21,9 @@ DATABASE_URL = _db_url
 # Secure by default: sem APP_ENV, vale a regra de produção
 APP_ENV = os.getenv("APP_ENV", "").strip().lower() or "production"
 IS_DEV = APP_ENV in ("development", "dev", "local", "test")
+# SEC-029: o login marca senha_expirada quando a senha não passa na política, salvo em desenvolvimento, onde
+# as contas do seed usam senhas públicas por desenho (decisão do PO em 2026-11-12). Nos testes, marca
+MARCAR_SENHA_FRACA = not IS_DEV or APP_ENV == "test"
 
 MIN_SECRET_LEN = 32
 # Valores que já estiveram no repositório (fallback antigo e exemplo do README): são públicos

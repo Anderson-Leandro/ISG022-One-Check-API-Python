@@ -47,6 +47,8 @@ def ensure_schema_updates() -> None:
                 conn.execute(text("ALTER TABLE usuarios ADD COLUMN mfa_secret_pendente VARCHAR(64)"))
             if "token_version" not in cols:
                 conn.execute(text("ALTER TABLE usuarios ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0"))
+            if "senha_expirada" not in cols:  # SEC-029
+                conn.execute(text("ALTER TABLE usuarios ADD COLUMN senha_expirada BOOLEAN NOT NULL DEFAULT FALSE"))
             # SEC-031: o CPF cifrado não cabe em VARCHAR(14). O SQLite não confere o tamanho
             tamanho = next(
                 (getattr(c["type"], "length", None) for c in insp.get_columns("usuarios") if c["name"] == "cpf"), None
