@@ -478,7 +478,7 @@ PASTAS: list[tuple[str, str, list[Caso]]] = [
                 "/auth/mfa/setup-login",
                 query={"temp_token": "{{ _.temp_token }}"},
                 status=401,
-                erro="Token MFA inválido",
+                erro="Este token é de verificação",
                 descricao="O login de quem já tem autenticador emite um token do tipo mfa, que só vale no /auth/mfa/verify. "
                 "Aceitá-lo aqui permitiria trocar o segredo só com a senha (falha N1, SEC-021). "
                 "A requisição seguinte confirma que o segredo antigo continua valendo.",

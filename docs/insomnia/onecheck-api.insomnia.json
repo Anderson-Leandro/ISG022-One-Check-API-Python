@@ -978,7 +978,7 @@
       "body": {},
       "authentication": {},
       "preRequestScript": "",
-      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test(\"mensagem contém: Token MFA inválido\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Token MFA inválido\"));",
+      "afterResponseScript": "const r = insomnia.response;\nlet b = {};\ntry { b = r.json(); } catch (e) { b = {}; }\ninsomnia.test('HTTP 401', () => insomnia.expect(r.code).to.equal(401));\ninsomnia.test(\"mensagem contém: Este token é de verificação\", () => insomnia.expect(String(b.erro || JSON.stringify(b.detail || ''))).to.include(\"Este token é de verificação\"));",
       "metaSortKey": 3007,
       "isPrivate": false,
       "settingStoreCookies": false,
