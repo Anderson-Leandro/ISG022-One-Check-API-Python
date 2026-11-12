@@ -130,6 +130,7 @@ API REST de alta performance para o ecossistema **OneCheck** — gestão complet
 Vale para senhas novas: `POST /usuarios`, `PUT /usuarios/{id}` (`senha`), `PUT /usuarios/me/senha` (`nova_senha`) e `PATCH /usuarios/me` (`senha_nova`).
 - Pelo menos 10 caracteres e no máximo 72 bytes (o limite do bcrypt; acentos ocupam 2 bytes).
 - Recusa senhas só com números e símbolos, senhas comuns mesmo com números e símbolos em volta (`Senha@2024`, `qwertyuiop`) e senhas com menos de 5 caracteres distintos.
+- Recusa também a senha que aparece em vazamentos conhecidos (Have I Been Pwned, SEC-030). Só os 5 primeiros caracteres do SHA-1 saem da API (k-anonymity), com timeout de 2 s. Se o serviço não responder, a senha é aceita e o fato vai para o log. `SENHA_VAZADA_CONSULTA=false` desliga a consulta.
 - Fora da regra → `422`, com a mensagem em `erro` e em `erros.<campo>` (por exemplo, `erros.nova_senha`). O login continua aceitando senhas cadastradas antes da política.
 
 ### Limite de tentativas
@@ -334,6 +335,8 @@ SEED_SECRET=
 # Proxies na frente da API que acrescentam o IP real ao X-Forwarded-For. 0 (padrão): o cabeçalho é
 # ignorado. No Render, 3 (render.yaml, ADR-0015)
 # PROXY_SALTOS=0
+# Consulta de senhas vazadas (Have I Been Pwned, k-anonymity); false desliga
+# SENHA_VAZADA_CONSULTA=true
 # Tamanho máximo do corpo: uploads (MB) e demais requisições, como JSON (KB)
 # MAX_UPLOAD_MB=10
 # MAX_BODY_KB=1024

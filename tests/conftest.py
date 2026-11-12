@@ -34,6 +34,8 @@ os.environ.setdefault("APP_ENV", "test")
 os.environ["UPLOAD_DIR"] = tempfile.mkdtemp(prefix="onecheck-test-uploads-")
 # Chave do CPF (SEC-031) só para os testes; os que sobem a API em modo produção num subprocesso a herdam
 os.environ.setdefault("CPF_CHAVES", "chave-do-cpf-so-para-testes-0123456789abcdef")
+# Sem rede nos testes: a consulta de senhas vazadas (SEC-030) fica desligada; os testes dela a ligam e simulam
+os.environ.setdefault("SENHA_VAZADA_CONSULTA", "false")
 
 # Importações da app somente após definir DATABASE_URL
 from app.auth import create_access_token  # noqa: E402

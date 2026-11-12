@@ -110,6 +110,10 @@ RATE_LIMIT_FALHAS_CONTA = int(os.getenv("RATE_LIMIT_FALHAS_CONTA", "5"))
 RATE_LIMIT_FALHAS_IP = int(os.getenv("RATE_LIMIT_FALHAS_IP", "20"))
 RATE_LIMIT_JANELA_MIN = int(os.getenv("RATE_LIMIT_JANELA_MIN", "15"))
 
+# Consulta de senhas vazadas no Have I Been Pwned, por k-anonymity (SEC-030). Ligada por padrão; false desliga
+_senha_vazada = os.getenv("SENHA_VAZADA_CONSULTA", "").strip().lower()
+SENHA_VAZADA_CONSULTA = _senha_vazada in ("1", "true", "yes", "on") if _senha_vazada else True
+
 # Proxies confiáveis na frente da API que acrescentam o IP de quem os chamou ao X-Forwarded-For
 # (SEC-017, ADR-0015). 0, o padrão: o cabeçalho é ignorado e vale o IP da conexão. No Render, 3 (ADR-0015)
 PROXY_SALTOS = int(os.getenv("PROXY_SALTOS", "0"))

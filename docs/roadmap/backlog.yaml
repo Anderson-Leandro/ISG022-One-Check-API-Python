@@ -2750,7 +2750,7 @@ items:
   priority: could
   rank: 230
   estimate: 3
-  status: in_sprint
+  status: in_progress
   sprint: 14
   phase: F6
   depends_on: []
@@ -2778,10 +2778,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-11'
+    status: in_progress
   sync:
     github:
-      hash: 638ac75d262e1cf0
-      remote_at: '2026-11-11T03:39:55Z'
+      hash: b1e4d98fcbad03ce
+      remote_at: '2026-11-12T02:18:31Z'
 - id: SEC-031
   type: security
   title: Cifrar o CPF em repouso
