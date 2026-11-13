@@ -108,9 +108,9 @@ def test_texto_com_commit_fora_do_git_passa(monkeypatch):
 @pytest.mark.parametrize(
     "cmd",
     [
-        "git add MUDANCAS_API_PARA_FRONT.md",
+        "git add MUDANCAS_DE_CONTRATO.md",
         "git add -f PENDENCIAS_API.md",
-        "git add docs ./MUDANCAS_API_PARA_FRONT.md",
+        "git add docs ./MUDANCAS_DE_CONTRATO.md",
     ],
 )
 def test_add_das_notas_locais_e_bloqueado(cmd, monkeypatch):

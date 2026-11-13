@@ -47,7 +47,7 @@ esac
 mkdir -p "$DESTINO/proj"
 rsync -a --delete --delete-excluded \
   --include ".env.example" --exclude ".env" --exclude ".env.*" --exclude "*.env" --exclude ".envrc" \
-  --exclude "MUDANCAS_API_PARA_FRONT.md" --exclude "PENDENCIAS_API.md" \
+  --exclude "MUDANCAS_DE_CONTRATO.md" --exclude "PENDENCIAS_API.md" \
   --exclude ".venv" --exclude ".git" --exclude "uploads" \
   --exclude "*.db" --exclude "*.db-journal" --exclude "*.sqlite" --exclude "*.sqlite3" \
   --exclude "__pycache__" --exclude ".pytest_cache" --exclude ".ruff_cache" \
