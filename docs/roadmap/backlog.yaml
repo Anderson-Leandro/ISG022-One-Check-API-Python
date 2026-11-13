@@ -5822,7 +5822,7 @@ items:
   priority: could
   rank: 1620
   estimate: 1
-  status: review
+  status: in_progress
   sprint: null
   phase: F5
   depends_on: []
@@ -5848,7 +5848,9 @@ items:
     status: in_progress
   - date: '2026-11-13'
     status: review
+  - date: '2026-11-13'
+    status: in_progress
   sync:
     github:
-      hash: 34f7778a30adbed7
-      remote_at: '2026-11-13T15:33:55Z'
+      hash: 04248eb0de04f024
+      remote_at: '2026-11-13T15:38:11Z'
