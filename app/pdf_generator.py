@@ -78,7 +78,9 @@ class SimplePdfCanvas:
         """Texto que termina em `right`. A largura é estimada (média da Helvetica: 0,5 do tamanho por caractere)."""
         self.add_text(text, font, size, right - len(text) * size * 0.5, color)
 
-    def add_wrapped(self, text: str, font: str = "Helvetica", size: float = 9, x: float = 50, width: int = 105, step: float = 12):
+    def add_wrapped(
+        self, text: str, font: str = "Helvetica", size: float = 9, x: float = 50, width: int = 105, step: float = 12
+    ):
         """Escreve o texto em quantas linhas forem precisas, sem passar da margem direita."""
         for linha in textwrap.wrap(text, width=width) or [""]:
             self.check_page_break(step)
