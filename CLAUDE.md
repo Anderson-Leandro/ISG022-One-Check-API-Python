@@ -4,8 +4,9 @@ API FastAPI da OneCheck (vistorias de imóveis). Gestão ágil em `docs/roadmap/
 nas Issues do GitHub. Convenções da API no `README.md`; decisões em `docs/adr/`.
 
 ## Modo de execução da sprint
-A execução segue `.claude/skills/sprint-executor/SKILL.md` (`/sprint-executor`). O modo vem do argumento e vale
-só para aquela execução:
+A execução segue a skill global `/sprint-executor` (`~/.claude/skills/sprint-executor/`), com os comandos do bloco
+`executor:` de `docs/roadmap/project.yaml` e as regras deste projeto em `docs/roadmap/executor.md`. O modo vem do
+argumento e vale só para aquela execução:
 - `/sprint-executor [ID]` (padrão, `confirmar cada item`): um item por vez, até o PR aberto com o CI verde.
   **O merge é do usuário.**
 - `/sprint-executor [ID] --continuo` (`contínuo`): item a item sem parar, com o merge feito depois do CI verde,
