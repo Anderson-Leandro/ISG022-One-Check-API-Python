@@ -5892,7 +5892,8 @@ items:
   links:
     trello_card: null
     gh_issue: 265
-    prs: []
+    prs:
+    - '#266'
   evidence: []
   created: '2026-11-13'
   updated: '2026-11-13'
