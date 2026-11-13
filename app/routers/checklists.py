@@ -512,6 +512,8 @@ def download_pdf(
         locatario=loc_dict,
         vistoriador=vist_dict,
         aceite=aceite_dict,
+        nomes_dos_itens={i.id: i.nome for i in db.query(ItemVistoria).all()},
+        nomes_dos_comodos={c.id: c.nome or c.descricao or c.tipo for c in get_comodos_for_checklist(db, ck)},
     )
 
     return Response(
