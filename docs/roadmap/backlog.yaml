@@ -5822,7 +5822,7 @@ items:
   priority: could
   rank: 1620
   estimate: 1
-  status: in_progress
+  status: review
   sprint: null
   phase: F5
   depends_on: []
@@ -5836,7 +5836,8 @@ items:
   links:
     trello_card: null
     gh_issue: 262
-    prs: []
+    prs:
+    - '#263'
   evidence: []
   created: '2026-11-13'
   updated: '2026-11-13'
@@ -5845,7 +5846,9 @@ items:
     status: ready
   - date: '2026-11-13'
     status: in_progress
+  - date: '2026-11-13'
+    status: review
   sync:
     github:
-      hash: 04248eb0de04f024
-      remote_at: '2026-11-13T15:33:12Z'
+      hash: 34f7778a30adbed7
+      remote_at: '2026-11-13T15:33:55Z'
