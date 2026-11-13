@@ -5361,6 +5361,7 @@ items:
   description: |-
     Achado do /code-review do DEBT-005. O requirements.lock é gerado por uv pip compile a partir de um .txt, sem cabeçalho, e o Dependabot pip não o reconhece: cada PR do pip precisa de alguém para regenerar o lock na branch, e depois de um push humano o Dependabot para de rebasear o PR. As transitivas, que só existem no lock, não ganham PR de atualização (só o pip-audit aponta as vulneráveis). A imagem base do Dockerfile segue numa tag móvel, sem o ecossistema docker no dependabot.yml (pendência do SEC-008).
     Refinado em 2026-11-11: a imagem base do Docker foi para o DEBT-021, que não tem incerteza. A solução do lock só se confirma num PR real do Dependabot.
+    Movido para a Sprint 15 em 2026-11-13, por decisão do PO: o Dependabot só lê a configuração da branch padrão (main), então os critérios 1 e 2 só se provam com um PR real depois da release dev → main (TK-015). Formato previsto: pip-compile (requirements.in → requirements.lock com hashes e cabeçalho), sem mudar o comando de build do Render e do Docker.
   acceptance_criteria:
   - Um PR do Dependabot que muda uma dependência direta já traz o lock regenerado, com hashes, sem passo manual.
   - As dependências transitivas do lock recebem PRs de atualização.
@@ -5368,8 +5369,8 @@ items:
   priority: could
   rank: 1530
   estimate: 3
-  status: in_sprint
-  sprint: 14
+  status: ready
+  sprint: null
   phase: F5
   depends_on: []
   security:
@@ -5386,7 +5387,7 @@ items:
     prs: []
   evidence: []
   created: '2026-11-08'
-  updated: '2026-11-11'
+  updated: '2026-11-13'
   history:
   - date: '2026-11-08'
     status: backlog
@@ -5394,10 +5395,12 @@ items:
     status: ready
   - date: '2026-11-11'
     status: in_sprint
+  - date: '2026-11-13'
+    status: ready
   sync:
     github:
-      hash: 302ac3b07cf1854a
-      remote_at: '2026-11-11T03:40:05Z'
+      hash: 458bd285b68c53d6
+      remote_at: '2026-11-13T14:28:52Z'
 - id: DEBT-020
   type: debt
   title: Erros de autenticação, perfil e validação no mesmo envelope {sucesso, erro, erros}

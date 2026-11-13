@@ -20,7 +20,7 @@
 | SEC-030 | Recusar senhas que aparecem em vazamentos conhecidos | 3 | low | in_sprint |
 | DEBT-013 | Mensagem de erro específica para token de verificação usado no setup-login e no activate-login | 2 | low | in_sprint |
 | BUG-002 | Foto enviada fica órfã no disco quando o pedido é recusado depois do upload | 2 | low | in_sprint |
-| DEBT-019 | Lock que o Dependabot regenera sozinho, com as transitivas | 3 | low | in_sprint |
+| DEBT-019 | Lock que o Dependabot regenera sozinho, com as transitivas | 3 | low | movido para a Sprint 15 (2026-11-13) |
 | DEBT-021 | Imagem base do Dockerfile fixada por digest e coberta pelo Dependabot | 1 | low | in_sprint |
 
 ## Ordem sugerida
@@ -46,6 +46,7 @@
 | 2026-11-11 | DEBT-021: imagem base do Dockerfile fixada por digest e coberta pelo Dependabot (PR #250) | — | — |
 | 2026-11-12 | SEC-030: senha nova que aparece em vazamentos conhecidos recebe 422 (Have I Been Pwned, k-anonymity, fail open) (PR #252) | — | — |
 | 2026-11-12 | SEC-029: senha antiga fora da política força a troca no login; prazo da consulta de senhas vazadas em 3 s (PR #254) | — | — |
+| 2026-11-13 | DEBT-019 (3 pts) sai da sprint e fica previsto para a Sprint 15 | o Dependabot só lê a configuração da main: os critérios 1 e 2 só se provam com um PR real depois da release (TK-015) | decisão do PO: fazer e provar junto da release |
 
 ## Sprint Review
 - **Incremento demonstrável:**
