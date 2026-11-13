@@ -5804,3 +5804,48 @@ items:
     github:
       hash: 9c54ce9d7d0239b6
       remote_at: '2026-11-13T15:06:59Z'
+- id: TK-024
+  type: task
+  title: Usar o sprint-executor global, com as regras do projeto em arquivo próprio
+  epic: EP-007
+  story: ''
+  description: 'Pedido do usuário em 2026-11-13: o sprint-executor passa a ser uma skill global (~/.claude/skills/sprint-executor),
+    reaproveitável em outros projetos, com os modelos do dod_check, do registro e do hook em ~/.claude/skills/_roadmap-shared/templates/executor/.
+    Neste projeto, a skill local sai, e entram o bloco executor no project.yaml e as regras próprias em docs/roadmap/executor.md.'
+  acceptance_criteria:
+  - O project.yaml tem o bloco executor com a branch base, a release, o comando de testes, o dod_check, as pastas
+    de código e de testes, as notas locais e as linhas de atribuição.
+  - docs/roadmap/executor.md guarda as regras que eram só deste projeto (serviços externos e produção, collection
+    do Insomnia, arquivo de mudanças para o outro time), e a skill local sai do repositório.
+  - O CLAUDE.md aponta para a skill global e para os arquivos do projeto.
+  - O dod_check do projeto e o modelo global dão o mesmo resultado nos itens já fechados (sem regressão).
+  priority: could
+  rank: 1620
+  estimate: 1
+  status: in_progress
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: usuario
+    ref: '2026-11-13'
+  links:
+    trello_card: null
+    gh_issue: 262
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: ready
+  - date: '2026-11-13'
+    status: in_progress
+  sync:
+    github:
+      hash: 04248eb0de04f024
+      remote_at: '2026-11-13T15:33:12Z'
