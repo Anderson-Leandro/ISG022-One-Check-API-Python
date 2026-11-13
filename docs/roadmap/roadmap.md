@@ -18,7 +18,7 @@ O projeto foi adotado com código pronto. As sprints foram reconstruídas desde 
 | 12 | 04/11 → 17/11 | fechada (08/11) | Release v0.1.0, produção segura e escopo da F4 fechado | 52 |
 | 13 | 08/11 → 11/11 (planejada para 18/11 → 01/12) | fechada (11/11), 44/47 | Produção recriada com segurança, falhas abertas corrigidas e qualidade verificada no CI | 47 |
 | **14** | 12/11 → 25/11 | **ativa** (planejada em 11/11) | Dados pessoais sob controle do titular, trilha de auditoria íntegra e erros da API num formato único | 32 |
-| 15 | 26/11 → 11/12 (16 dias) | prevista | Entrega: TK-018 e SEC-026 (fotos), TK-004, auditoria completa (TK-006), release candidata v0.9.0 (TK-015) e entrega final v1.0.0 (TK-016) | ~18 |
+| 15 | 26/11 → 11/12 (16 dias) | prevista | Entrega: TK-018 e SEC-026 (fotos), TK-004, DEBT-019 (provado depois da release, porque o Dependabot lê a main), auditoria completa (TK-006), release candidata v0.9.0 (TK-015) e entrega final v1.0.0 (TK-016) | ~21 |
 
 **Prazo final: 11/12/2026.** Todos os itens em aberto foram distribuídos nas Sprints 12 a 14 para caber nesse prazo, mesmo com carga acima do ritmo habitual; a velocity não foi usada como limite. Em 11/11, com a Sprint 13 fechada três semanas antes do previsto, o restante foi dividido em duas sprints (14 e 15), com o mesmo prazo final.
 
