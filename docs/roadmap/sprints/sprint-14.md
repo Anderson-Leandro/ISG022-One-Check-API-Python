@@ -1,6 +1,6 @@
 # Sprint 14
 
-- **Período:** 2026-11-12 → 2026-11-25
+- **Período:** 2026-11-12 → 2026-11-13. O calendário planejado ia até 25/11; ajustado no `close` para as datas da execução, por decisão do PO.
 - **Sprint Goal:** Dados pessoais sob controle do titular, trilha de auditoria íntegra e erros da API num formato único
 - **Capacidade:** 53,3 pts, a média das Sprints 11 a 13 (64, 52 e 44) · **Comprometido:** 32 pts (60%)
 - **Fora da sprint, por decisão do PO:** o TK-018 (fotos no disco do Render) fica fora, porque depende do painel do Render. Ele vai para a Sprint 15 com o SEC-026, TK-004, TK-006, TK-015 e TK-016. TK-005 (R-015 aceito) e US-016 (`could`, precisa ser quebrado) continuam no backlog.
@@ -89,5 +89,10 @@ Proposta a partir dos dados da sprint e confirmada pelo usuário, que escolheu a
 | Protocolo de testes alterados: cinco aprovações explícitas, nenhum teste enfraquecido | O prazo do SEC-030 foi fixado sem medir a primeira chamada de um processo novo e subiu de 2 s para 3 s depois de falhar | Sem item: regra nova no passo 3 do `sprint-executor`. Medir várias chamadas reais, inclusive a fria, antes de fixar um prazo |
 
 ## Métricas
-- Velocity: — pts (comprometido 32)
-- Itens que voltaram ao backlog:
+Sprint fechada em 2026-11-13.
+
+- **Velocity:** 29 pts de 32 comprometidos (91%), em 10 itens. As três últimas sprints fecharam com 52, 44 e 29 pts, o que dá uma capacidade sugerida de 41,7 pts.
+- **Itens que voltaram ao backlog:** nenhum no `close`. O DEBT-019 (3 pts) já tinha saído em 2026-11-13, por decisão do PO, e ficou previsto para a Sprint 15: ele só se prova depois da release.
+- **Escopo:** nenhum item entrou durante a sprint. Ficaram fora dela os itens descobertos (DEBT-022) e as ações da retro (DEBT-023 e TK-023).
+- **Burndown:** 32 → 3 (12/11 e 13/11). Os 3 pts restantes são do DEBT-019.
+- **Qualidade:** suíte de 1398 para 1521 testes, cobertura de branches em 97%; 22 PRs mesclados, todos com o CI verde; 5 alterações de testes existentes, todas aprovadas.

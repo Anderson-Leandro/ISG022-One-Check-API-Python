@@ -353,8 +353,8 @@ sprints:
 - number: 14
   goal: Dados pessoais sob controle do titular, trilha de auditoria íntegra e erros da API num formato único
   start: '2026-11-12'
-  end: '2026-11-25'
-  status: active
+  end: '2026-11-13'
+  status: closed
   capacity: 53.3
   committed:
   - TK-021
@@ -369,7 +369,18 @@ sprints:
   - DEBT-019
   - DEBT-021
   committed_points: 32.0
-  completed_points: null
-  completed: []
+  completed_points: 29.0
+  completed:
+  - SEC-025
+  - SEC-028
+  - SEC-029
+  - SEC-030
+  - DEBT-013
+  - DEBT-020
+  - BUG-002
+  - TK-021
+  - TK-022
+  - DEBT-021
   carried_over: []
   note: 'Sprint de 10 dias: termina no prazo final de 11/12/2026.'
+  closed_on: '2026-11-13'
