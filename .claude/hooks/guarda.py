@@ -3,7 +3,7 @@
 
 - ler o .env (segredos locais), pela ferramenta Read ou por comando de shell;
 - commit ou push direto na dev ou na main (toda mudança vai por branch própria e PR);
-- versionar MUDANCAS_API_PARA_FRONT.md ou PENDENCIAS_API.md (notas locais do time).
+- versionar MUDANCAS_DE_CONTRATO.md ou PENDENCIAS_API.md (notas locais do time).
 
 O comando é analisado como shell: o corpo dos heredocs (mensagens de commit, textos de PR) é
 ignorado, e cada comando simples é checado pelo subcomando git de fato, não por palavras soltas.
@@ -17,7 +17,7 @@ import subprocess
 import sys
 
 PROTEGIDAS = {"dev", "main"}
-LOCAIS = ("MUDANCAS_API_PARA_FRONT.md", "PENDENCIAS_API.md")
+LOCAIS = ("MUDANCAS_DE_CONTRATO.md", "PENDENCIAS_API.md")
 # .env sozinho, sem sufixo (.env.example e .envrc passam)
 ENV = re.compile(r"(?<![\w.-])\.env(?![\w.-])")
 HEREDOC = re.compile(r"<<-?\s*(['\"]?)(\w+)\1[^\n]*\n.*?\n[ \t]*\2[ \t]*(?=\n|$)", re.S)
@@ -109,7 +109,7 @@ def checar_bash(cmd: str) -> None:
         elif sub == "push":
             checar_push(args)
         elif sub == "add" and any(a.rsplit("/", 1)[-1] in LOCAIS for a in args):
-            bloquear("MUDANCAS_API_PARA_FRONT.md e PENDENCIAS_API.md são notas locais e não entram no git.")
+            bloquear("MUDANCAS_DE_CONTRATO.md e PENDENCIAS_API.md são notas locais e não entram no git.")
 
 
 def main() -> None:

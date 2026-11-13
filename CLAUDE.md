@@ -21,7 +21,7 @@ argumento e vale só para aquela execução:
 - **Segredos:** nunca ler, imprimir ou copiar o `.env`. Ao citar um segredo, só os 4 primeiros caracteres + `****`.
 - **Produção:** nada roda contra a API ou o banco do Render. Containers e volumes do docker compose do usuário
   (porta 8000) não são tocados sem confirmação.
-- **Notas locais:** `MUDANCAS_API_PARA_FRONT.md` e `PENDENCIAS_API.md` nunca entram no git.
+- **Notas locais:** `MUDANCAS_DE_CONTRATO.md` e `PENDENCIAS_API.md` nunca entram no git.
 - **Testes:** rodam numa cópia do projeto no scratchpad, sem `.env`, com
   `bash scripts/testes_na_copia.sh <scratchpad>/testes` (TK-022). Teste existente alterado ou removido exige
   relatório (arquivo, antes, depois, motivo, se quebra o comportamento atual) e aprovação do usuário antes do

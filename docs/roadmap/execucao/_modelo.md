@@ -36,4 +36,4 @@
 Aprovado por: <nome> em AAAA-MM-DD -->
 
 ## Documentação
-<!-- README, ADR, collection do Insomnia, MUDANCAS_API_PARA_FRONT.md (local), riscos. "Nada a atualizar" com o motivo. -->
+<!-- README, ADR, collection do Insomnia, MUDANCAS_DE_CONTRATO.md (local), riscos. "Nada a atualizar" com o motivo. -->

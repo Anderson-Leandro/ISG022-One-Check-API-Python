@@ -23,7 +23,7 @@ SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "testes_na_copia.sh"
 FORA_DA_COPIA = [
     ".env",
     ".env.local",
-    "MUDANCAS_API_PARA_FRONT.md",
+    "MUDANCAS_DE_CONTRATO.md",
     "PENDENCIAS_API.md",
     ".venv/bin/python",
     ".git/HEAD",

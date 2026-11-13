@@ -70,6 +70,6 @@ executor:
   dod: "python3 scripts/dod_check.py"
   pastas_codigo: [app/]
   pastas_testes: [tests/]
-  notas_locais: [MUDANCAS_API_PARA_FRONT.md, PENDENCIAS_API.md]
+  notas_locais: [MUDANCAS_DE_CONTRATO.md, PENDENCIAS_API.md]
   atribuicao_commit: "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
   atribuicao_pr: "🤖 Generated with [Claude Code](https://claude.com/claude-code)"

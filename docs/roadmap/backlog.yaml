@@ -5862,3 +5862,45 @@ items:
     github:
       hash: 2205f9d14fa2fdd9
       remote_at: '2026-11-13T15:53:31Z'
+- id: TK-025
+  type: task
+  title: Arquivo local de mudanças de contrato no lugar do de mudanças para o front
+  epic: EP-007
+  story: ''
+  description: 'Decisão do usuário em 2026-11-13: a API e o front passam a ser desenvolvidos juntos. A nota local
+    MUDANCAS_API_PARA_FRONT.md vira MUDANCAS_DE_CONTRATO.md, com as mudanças de contrato e o estado de cada uma
+    nos dois lados (marcadas como feitas e limpas a cada release). Continua local, fora do git.'
+  acceptance_criteria:
+  - O hook recusa o git add de MUDANCAS_DE_CONTRATO.md e de PENDENCIAS_API.md, e deixa de citar o nome antigo.
+  - A cópia dos testes (scripts/testes_na_copia.sh) não leva MUDANCAS_DE_CONTRATO.md.
+  - 'project.yaml (notas_locais), CLAUDE.md e docs/roadmap/executor.md usam o nome novo e descrevem o uso: o que
+    mudou no contrato, o estado nos dois lados e a limpeza das concluídas a cada release.'
+  priority: could
+  rank: 1630
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: usuario
+    ref: '2026-11-13'
+  links:
+    trello_card: null
+    gh_issue: 265
+    prs:
+    - '#266'
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: ready
+  sync:
+    github:
+      hash: ffa28b7b8f7e4274
+      remote_at: '2026-11-13T16:17:02Z'
