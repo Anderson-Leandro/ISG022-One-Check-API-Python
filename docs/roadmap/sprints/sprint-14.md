@@ -75,9 +75,18 @@ Feita em 2026-11-13.
 - **Fora da sprint:** o DEBT-019 (3 pts) foi movido para a Sprint 15 por decisão do PO, porque só se prova depois da release (o Dependabot lê a `main`). O DEBT-022 (direitos do titular de uma conta desativada) foi criado na revisão do SEC-028.
 - **Feedback do cliente/PO:** o incremento está de acordo. O goal foi atingido, e nada muda de prioridade.
 
-## Retrospectiva
+## Retrospectiva (2026-11-13)
+Proposta a partir dos dados da sprint e confirmada pelo usuário, que escolheu as ações. As ações da retro da Sprint 13 foram feitas:
+- **TK-021:** desde ele, todos os merges da sprint saíram no padrão.
+- **TK-022:** a suíte rodou na cópia por script em todos os itens.
+- **Regra de infraestrutura:** foi usada no SEC-030 (consultas reais ao serviço) e no DEBT-019 (a limitação do Dependabot apareceu antes de qualquer código).
+
 | Funcionou bem | Melhorar | Ação (vira item no backlog) |
 |---|---|---|
+| Decisões de PO tomadas antes da execução (SEC-025, SEC-028, SEC-029, SEC-030): o modo contínuo parou só nos testes alterados | A regra da auditoria do `dod_check` reprovou o BUG-002 por causa de "pendente" dentro de `foto_pendente`, e o registro precisou ser reescrito | **DEBT-023**: `dod_check` sem falso positivo em nomes de código, com testes |
+| A revisão de código pegou defeitos sérios antes do merge: o event loop travado (SEC-030), a marca antes do MFA e o seed fora da restrição (SEC-029), a liberação que vazava (SEC-025), a terceira rota com foto órfã (BUG-002) | O script de fechamento foi apagado do scratchpad várias vezes e recriado à mão | **TK-023**: script versionado que fecha um item da sprint |
+| O Postgres temporário pegou o erro do `%` no trigger, que o SQLite não mostra, antes do CI | Um teste do BUG-002 simulava a falha antes da gravação e passava sem testar a limpeza; só a cobertura revelou | Sem item: regra nova no passo 3 do `sprint-executor`. Provar, pela cobertura ou por uma asserção, que o caminho testado rodou |
+| Protocolo de testes alterados: cinco aprovações explícitas, nenhum teste enfraquecido | O prazo do SEC-030 foi fixado sem medir a primeira chamada de um processo novo e subiu de 2 s para 3 s depois de falhar | Sem item: regra nova no passo 3 do `sprint-executor`. Medir várias chamadas reais, inclusive a fria, antes de fixar um prazo |
 
 ## Métricas
 - Velocity: — pts (comprometido 32)

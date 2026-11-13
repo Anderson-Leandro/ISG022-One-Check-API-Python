@@ -74,7 +74,13 @@ Pare, explique e espere o usuário quando:
   valor no código ou no `render.yaml`, peça ao usuário um teste em produção que mostre o comportamento real e
   registre o resultado no item. Não suponha o valor. Na Sprint 13, o `PROXY_SALTOS=1` foi suposto, e a cadeia
   real tinha 3 proxies: custou três deploys.
+- **Prazo de serviço externo:** antes de fixar um timeout, meça várias chamadas reais, inclusive a primeira de um
+  processo novo (DNS e TLS frios), e registre os tempos no item. Na Sprint 14, o SEC-030 saiu com 2 s e a primeira
+  chamada caía no fail open: o prazo subiu para 3 s.
 - Escreva primeiro o teste do cenário negado ou do critério, veja-o falhar, depois implemente.
+- **Prove que o caminho testado rodou:** num teste de cenário negado ou de falha simulada, confirme pela cobertura
+  (as linhas do tratamento aparecem executadas) ou por uma asserção que a falha aconteceu onde o teste diz. Na
+  Sprint 14, um teste do BUG-002 simulava a falha antes da gravação da foto e passava sem testar a limpeza.
 - Rode `TESTES` (suíte completa). A cobertura não pode cair abaixo da anterior.
 
 ### 4. Testes existentes (protocolo obrigatório)

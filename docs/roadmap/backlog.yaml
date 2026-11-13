@@ -5716,3 +5716,83 @@ items:
   history:
   - date: '2026-11-11'
     status: backlog
+- id: DEBT-023
+  type: debt
+  title: dod_check sem falso positivo de auditoria pendente em nomes de código
+  epic: EP-007
+  story: ''
+  description: 'Ação da retrospectiva da Sprint 14. A regra auditoria_rodou do scripts/dod_check.py reprovou o registro
+    do BUG-002 porque a seção Segurança citava a função foto_pendente: a palavra pendente dentro de um identificador
+    contou como auditoria por fazer. O registro foi reescrito para contornar.'
+  acceptance_criteria:
+  - Dado um registro cuja seção Segurança cita código entre crases ou um identificador que contém pendente (foto_pendente,
+    mfa_secret_pendente), quando o dod_check roda, então a auditoria não é reprovada por isso.
+  - Dado um registro que diz que a auditoria ficou pendente ou não rodou, em texto corrido, quando o dod_check roda,
+    então a auditoria continua reprovada (cenário negado).
+  - Os casos ficam cobertos em tests/unit/test_dod_check.py.
+  priority: should
+  rank: 1600
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 14
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: ready
+- id: TK-023
+  type: task
+  title: Script versionado que fecha um item da sprint
+  epic: EP-007
+  story: ''
+  description: Ação da retrospectiva da Sprint 14. O fechamento de cada item (número do PR no registro, CI, dod_check
+    antes do merge, merge com o título do PR, backlog done com evidências, board-sync, linha no acompanhamento e
+    PR de fechamento) era feito por um script no scratchpad, que a limpeza apagou várias vezes e precisou ser recriado
+    à mão.
+  acceptance_criteria:
+  - 'Um script versionado (ex.: scripts/fechar_item.sh) faz o fechamento de um item a partir do ID, da issue, do
+    PR e da branch, e para com erro se o CI ou o dod_check falharem, sem mesclar nada nesse caso (cenário negado).'
+  - O merge só acontece com a flag que corresponde ao modo contínuo; sem ela, o script deixa o PR aberto e o item
+    em review.
+  - O board-sync roda sempre em dry-run antes do --apply, e a sprint do acompanhamento vem do backlog, não de um
+    valor fixo.
+  - Testes com gh e git simulados cobrem o caminho feliz e as falhas; o sprint-executor passa a usar o script no
+    passo 8.
+  priority: should
+  rank: 1610
+  estimate: 2
+  status: ready
+  sprint: null
+  phase: F5
+  depends_on: []
+  security:
+    impact: low
+    refs: []
+    risk_id: null
+  source:
+    kind: retro
+    ref: Sprint 14
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: ready
