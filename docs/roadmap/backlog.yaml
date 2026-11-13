@@ -5908,3 +5908,217 @@ items:
     github:
       hash: ffa28b7b8f7e4274
       remote_at: '2026-11-13T16:17:02Z'
+- id: US-021
+  type: story
+  title: Contrato só com início a partir de hoje e duração mínima de 30 dias
+  epic: EP-003
+  story: Como gestor, quero que o cadastro de contrato recuse datas retroativas e prazos menores que 30 dias, para
+    não registrar locações com datas erradas.
+  description: 'Pedido do usuário em 2026-11-13. POST /contratos: data_inicio anterior a hoje e data_fim a menos
+    de 30 dias do início passam a responder 422, com a mensagem no campo. ''Hoje'' é a data em America/Sao_Paulo
+    (função única, reutilizada no US-022). Par no front: US-019 do front.'
+  acceptance_criteria:
+  - Dado data_inicio igual a hoje e data_fim 30 dias depois, quando crio o contrato, então recebo 200.
+  - Dado data_inicio anterior a hoje, quando crio o contrato, então recebo 422 com erros.data_inicio e nada é gravado.
+  - Dado data_fim a 29 dias do início (ou anterior a ele), quando crio o contrato, então recebo 422 com erros.data_fim
+    e nada é gravado.
+  - Dado o servidor em UTC entre 21h e 0h de Brasília, quando crio um contrato com início na data de Brasília, então
+    ele é aceito.
+  priority: must
+  rank: 1
+  estimate: 2
+  status: ready
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API6:2023
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: US-022
+  type: story
+  title: Vistoria só com data a partir de hoje
+  epic: EP-004
+  story: Como gestor, quero que a criação de vistoria recuse data retroativa, para a agenda não registrar vistorias
+    no passado.
+  description: 'Pedido do usuário em 2026-11-13. POST /contratos/{id}/checklists: data_vistoria anterior a hoje
+    (America/Sao_Paulo) responde 422 com erros.data_vistoria. Sem data, continua valendo hoje. Par no front: US-020
+    do front.'
+  acceptance_criteria:
+  - Dado data_vistoria igual a hoje ou futura, quando crio a vistoria, então recebo 200.
+  - Dado data_vistoria de ontem, quando crio a vistoria, então recebo 422 com erros.data_vistoria, e nem a vistoria
+    nem o agendamento mudam.
+  - Dado a criação sem data_vistoria, quando crio a vistoria, então a data gravada é a de hoje em America/Sao_Paulo.
+  priority: must
+  rank: 2
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F6
+  depends_on:
+  - US-021
+  security:
+    impact: low
+    refs:
+    - OWASP API6:2023
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: US-023
+  type: story
+  title: Só o locatário aceita a vistoria; a gestão visualiza e pode rejeitar
+  epic: EP-004
+  story: Como locatário, quero ser o único a aceitar a vistoria do meu contrato, para que o aceite registrado seja
+    de fato meu.
+  description: 'Pedido do usuário em 2026-11-13. PATCH /checklists/{id}/aceitar passa a ser só do locatário do contrato:
+    admin e gestor recebem 403. PATCH /checklists/{id}/rejeitar continua com o locatário do contrato, o admin e
+    o gestor (para destravar uma vistoria errada ou sem resposta). Quem fez a vistoria continua sem aceitar nem
+    rejeitar a própria. Par no front: US-021 do front.'
+  acceptance_criteria:
+  - Dado o locatário do contrato e a vistoria pendente de aceite, quando aceita, então recebe 200 e o aceite fica
+    no nome dele.
+  - Dado um admin ou um gestor, quando tenta aceitar, então recebe 403 e a vistoria continua pendente de aceite.
+  - Dado um locatário de outro contrato ou um vistoriador, quando tenta aceitar ou rejeitar, então recebe 403.
+  - Dado um admin ou um gestor que não fez a vistoria, quando rejeita com motivo, então recebe 200 e a vistoria
+    fica rejeitada.
+  - Dado um admin ou gestor que é o vistoriador da vistoria, quando tenta rejeitar, então recebe 403.
+  priority: must
+  rank: 3
+  estimate: 3
+  status: ready
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: high
+    refs:
+    - OWASP API5:2023
+    - CWE-285
+    - STRIDE:R
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: TK-026
+  type: task
+  title: 'Cômodos padrão do imóvel: banheiro, cozinha e quarto'
+  epic: EP-002
+  story: ''
+  description: Pedido do usuário em 2026-11-13. Um imóvel sem cômodos recebe hoje Sala, Cozinha, Quarto 1 e Banheiro
+    (ensure_default_comodos); passa a receber Banheiro, Cozinha e Quarto. Imóveis que já têm cômodos não mudam.
+  acceptance_criteria:
+  - Dado um imóvel novo, quando listo os cômodos, então vejo exatamente Banheiro, Cozinha e Quarto.
+  - Dado um imóvel que já tem cômodos, quando listo os cômodos, então nada é acrescentado nem removido.
+  priority: must
+  rank: 4
+  estimate: 1
+  status: ready
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: none
+    refs: []
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
+- id: BUG-003
+  type: bug
+  title: Laudo em PDF com identificadores, sem acentos e com texto cortado
+  epic: EP-004
+  story: ''
+  description: Pedido do usuário em 2026-11-13. O laudo (GET /checklists/{id}/pdf) mostra UUIDs no lugar do nome
+    do item e do cômodo, rótulos sem acento, linhas longas que passam da margem, datas em ISO e status técnicos.
+    Corrigir no gerador próprio (app/pdf_generator.py), sem dependência nova; se a quebra de linha não ficar boa,
+    parar e propor uma biblioteca.
+  acceptance_criteria:
+  - Dado uma vistoria com itens, quando baixo o PDF, então cada item traz o nome do item e do cômodo, agrupado por
+    cômodo, sem UUID no corpo.
+  - Dado textos com acento e cedilha, quando baixo o PDF, então eles aparecem corretos.
+  - Dado um endereço ou uma observação maior que a largura da página, quando baixo o PDF, então o texto quebra em
+    linhas dentro da margem.
+  - Dado o laudo, quando leio, então as datas estão em dd/mm/aaaa, os status têm rótulo legível e a emissão está
+    no horário de Brasília.
+  - Dado um laudo com mais de uma página, quando baixo o PDF, então toda página tem número e rodapé.
+  - Dado um vistoriador ou um locatário de outro contrato, quando pede o PDF, então continua recebendo 403.
+  priority: must
+  rank: 5
+  estimate: 5
+  status: ready
+  sprint: null
+  phase: F6
+  depends_on: []
+  security:
+    impact: low
+    refs:
+    - OWASP API3:2023
+    risk_id: null
+  source:
+    kind: pendencias
+    ref: pedido do usuário em 2026-11-13
+  links:
+    trello_card: null
+    gh_issue: null
+    prs: []
+  evidence: []
+  created: '2026-11-13'
+  updated: '2026-11-13'
+  history:
+  - date: '2026-11-13'
+    status: backlog
+  - date: '2026-11-13'
+    status: ready
