@@ -3,7 +3,44 @@ Gerador de laudos de vistoria em formato PDF (OneCheck).
 Produz documentos PDF 1.4 válidos e leves sem dependências externas.
 """
 
+import textwrap
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+FUSO_DO_LAUDO = ZoneInfo("America/Sao_Paulo")
+
+ROTULO_DO_STATUS = {
+    "em_preenchimento": "Em preenchimento",
+    "pendente_aceite": "Pendente de aceite",
+    "aceito": "Aceito",
+    "rejeitado": "Rejeitado",
+    "ativo": "Ativo",
+    "encerrado": "Encerrado",
+    "cancelado": "Cancelado",
+}
+ROTULO_DO_ESTADO = {"otimo": "Ótimo", "bom": "Bom", "regular": "Regular", "ruim": "Ruim"}
+
+
+def data_br(valor) -> str:
+    """Data ISO (com ou sem hora) em dd/mm/aaaa; o que não for data volta como veio."""
+    if not valor:
+        return "Não informada"
+    texto = str(valor)
+    try:
+        if len(texto) <= 10:
+            return datetime.strptime(texto, "%Y-%m-%d").strftime("%d/%m/%Y")
+        return datetime.fromisoformat(texto).strftime("%d/%m/%Y %H:%M")
+    except ValueError:
+        return texto
+
+
+def codigo_curto(identificador) -> str:
+    """Código exibido no lugar do UUID: os 8 primeiros caracteres, em maiúsculas."""
+    return str(identificador or "")[:8].upper() or "N/A"
+
+
+def rotulo(tabela: dict, valor) -> str:
+    return tabela.get(str(valor or ""), str(valor or "N/A"))
 
 
 class SimplePdfCanvas:
@@ -36,6 +73,19 @@ class SimplePdfCanvas:
         )
         stream.append(f"{r:.2f} {g:.2f} {b:.2f} rg")
         stream.append(f"BT /{font} {size} Tf {x:.2f} {self.y:.2f} Td ({escaped}) Tj ET")
+
+    def add_text_right(self, text: str, font: str = "Helvetica", size: float = 10, right: float = 545, color=(0, 0, 0)):
+        """Texto que termina em `right`. A largura é estimada (média da Helvetica: 0,5 do tamanho por caractere)."""
+        self.add_text(text, font, size, right - len(text) * size * 0.5, color)
+
+    def add_wrapped(
+        self, text: str, font: str = "Helvetica", size: float = 9, x: float = 50, width: int = 105, step: float = 12
+    ):
+        """Escreve o texto em quantas linhas forem precisas, sem passar da margem direita."""
+        for linha in textwrap.wrap(text, width=width) or [""]:
+            self.check_page_break(step)
+            self.add_text(linha, font, size, x)
+            self.y -= step
 
     def draw_line(self, x1: float, y1: float, x2: float, y2: float, width: float = 1, color=(0.7, 0.7, 0.7)):
         r, g, b = color
@@ -113,25 +163,29 @@ def gerar_pdf_checklist(
     locatario: dict,
     vistoriador: dict,
     aceite: dict | None,
+    nomes_dos_itens: dict | None = None,
+    nomes_dos_comodos: dict | None = None,
 ) -> bytes:
+    nomes_dos_itens = nomes_dos_itens or {}
+    nomes_dos_comodos = nomes_dos_comodos or {}
     canvas = SimplePdfCanvas()
 
     # Header
     canvas.draw_rect(40, canvas.y - 10, 515, 35, fill_color=(0.1, 0.15, 0.3))
     canvas.y -= 2
-    canvas.add_text("ONECHECK - LAUDO DE VISTORIA IMOBILIARIA", "Helvetica-Bold", 14, 50, color=(1, 1, 1))
-    canvas.y -= 14
-    canvas.add_text(
-        f"Emissao: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", "Helvetica", 9, 50, color=(0.85, 0.85, 0.85)
+    canvas.add_text("ONECHECK - LAUDO DE VISTORIA IMOBILIÁRIA", "Helvetica-Bold", 14, 50, color=(1, 1, 1))
+    # a emissão fica na linha do título, à direita e menor
+    canvas.add_text_right(
+        f"Emissão: {datetime.now(FUSO_DO_LAUDO).strftime('%d/%m/%Y %H:%M')}", "Helvetica", 8, 545, color=(1, 1, 1)
     )
-    canvas.y -= 30
+    canvas.y -= 40
 
     # Imóvel
     canvas.draw_rect(40, canvas.y - 2, 515, 18, fill_color=(0.93, 0.94, 0.96))
-    canvas.add_text("1. DADOS DO IMOVEL", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
+    canvas.add_text("1. DADOS DO IMÓVEL", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
     canvas.y -= 16
 
-    end_str = "Nao informado"
+    end_str = "Não informado"
     if endereco:
         end_str = f"{endereco.get('rua', '')}, {endereco.get('numero', '') or 'S/N'} - {endereco.get('bairro', '')} - {endereco.get('cidade', '')}/{endereco.get('estado', '')} (CEP: {endereco.get('cep', '')})"
 
@@ -142,22 +196,25 @@ def gerar_pdf_checklist(
         50,
     )
     canvas.y -= 12
-    canvas.add_text(f"Endereco: {end_str}", "Helvetica", 9, 50)
-    canvas.y -= 20
+    canvas.add_wrapped(f"Endereço: {end_str}")
+    canvas.y -= 8
 
     # Contrato e Partes
     canvas.draw_rect(40, canvas.y - 2, 515, 18, fill_color=(0.93, 0.94, 0.96))
     canvas.add_text("2. DADOS DO CONTRATO E PARTES", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
     canvas.y -= 16
     canvas.add_text(
-        f"Contrato ID: {contrato.get('id', 'N/A')}  |  Status: {contrato.get('status', 'N/A')}", "Helvetica", 9, 50
+        f"Contrato: {codigo_curto(contrato.get('id'))}  |  Status: {rotulo(ROTULO_DO_STATUS, contrato.get('status'))}",
+        "Helvetica",
+        9,
+        50,
     )
     canvas.y -= 12
     canvas.add_text(
-        f"Periodo: {contrato.get('data_inicio', '')} ate {contrato.get('data_fim', '')}", "Helvetica", 9, 50
+        f"Período: {data_br(contrato.get('data_inicio'))} até {data_br(contrato.get('data_fim'))}", "Helvetica", 9, 50
     )
     canvas.y -= 12
-    canvas.add_text(f"Locatario: {locatario.get('nome', 'N/A')} ({locatario.get('email', 'N/A')})", "Helvetica", 9, 50)
+    canvas.add_text(f"Locatário: {locatario.get('nome', 'N/A')} ({locatario.get('email', 'N/A')})", "Helvetica", 9, 50)
     canvas.y -= 12
     canvas.add_text(
         f"Vistoriador: {vistoriador.get('nome', 'N/A')} ({vistoriador.get('email', 'N/A')})", "Helvetica", 9, 50
@@ -170,7 +227,7 @@ def gerar_pdf_checklist(
     canvas.add_text(f"3. DADOS DA VISTORIA ({tipo_str.upper()})", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
     canvas.y -= 16
     canvas.add_text(
-        f"Checklist ID: {checklist.get('id', 'N/A')}  |  Status: {checklist.get('status', 'N/A')}  |  Data: {checklist.get('data_vistoria', 'N/A')}",
+        f"Vistoria: {codigo_curto(checklist.get('id'))}  |  Status: {rotulo(ROTULO_DO_STATUS, checklist.get('status'))}  |  Data: {data_br(checklist.get('data_vistoria'))}",
         "Helvetica",
         9,
         50,
@@ -179,7 +236,7 @@ def gerar_pdf_checklist(
 
     # Itens
     canvas.draw_rect(40, canvas.y - 2, 515, 18, fill_color=(0.93, 0.94, 0.96))
-    canvas.add_text("4. ITENS VISTORIADOS E ESTADO DE CONSERVACAO", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
+    canvas.add_text("4. ITENS VISTORIADOS E ESTADO DE CONSERVAÇÃO", "Helvetica-Bold", 10, 50, color=(0.1, 0.15, 0.3))
     canvas.y -= 16
 
     itens = checklist.get("itens", [])
@@ -189,17 +246,14 @@ def gerar_pdf_checklist(
     else:
         for idx, item in enumerate(itens, 1):
             canvas.check_page_break(35)
-            estado = (item.get("estado") or "N/A").upper()
-            obs = item.get("observacao") or "Sem observacoes"
-            canvas.add_text(
-                f"{idx}. Item ID: {item.get('item_vistoria_id', 'N/A')}  |  Comodo: {item.get('comodo_id', 'N/A')}",
-                "Helvetica-Bold",
-                9,
-                50,
-            )
+            estado = rotulo(ROTULO_DO_ESTADO, item.get("estado")) if item.get("estado") else "Não avaliado"
+            obs = item.get("observacao") or "Sem observações"
+            nome_do_item = nomes_dos_itens.get(item.get("item_vistoria_id")) or "Item sem nome"
+            nome_do_comodo = nomes_dos_comodos.get(item.get("comodo_id")) or "Cômodo não informado"
+            canvas.add_text(f"{idx}. {nome_do_item}  |  Cômodo: {nome_do_comodo}", "Helvetica-Bold", 9, 50)
             canvas.y -= 11
-            canvas.add_text(f"   Estado: {estado}  |  Observacao: {obs}", "Helvetica", 9, 50)
-            canvas.y -= 14
+            canvas.add_wrapped(f"Estado: {estado}  |  Observação: {obs}", x=62, width=100, step=11)
+            canvas.y -= 3
 
     canvas.y -= 10
     canvas.check_page_break(50)
@@ -210,17 +264,17 @@ def gerar_pdf_checklist(
     canvas.y -= 16
 
     if aceite:
-        status_ac = (aceite.get("status") or "N/A").upper()
-        dt_ac = aceite.get("created_at") or "N/A"
+        status_ac = rotulo(ROTULO_DO_STATUS, aceite.get("status")).upper()
+        dt_ac = data_br(aceite.get("created_at"))
         motivo = f" | Motivo: {aceite.get('motivo_rejeicao')}" if aceite.get("motivo_rejeicao") else ""
         canvas.add_text(f"Status do Aceite: {status_ac} em {dt_ac}{motivo}", "Helvetica-Bold", 9, 50)
         canvas.y -= 12
         canvas.add_text(
-            f"Assinado digitalmente por: {locatario.get('nome', 'N/A')} (Locatario Titular)", "Helvetica", 9, 50
+            f"Assinado digitalmente por: {locatario.get('nome', 'N/A')} (Locatário Titular)", "Helvetica", 9, 50
         )
     else:
         canvas.add_text(
-            "Status do Aceite: PENDENTE DE ASSINATURA PELO LOCATARIO", "Helvetica", 9, 50, color=(0.6, 0.3, 0.1)
+            "Status do Aceite: PENDENTE DE ASSINATURA PELO LOCATÁRIO", "Helvetica", 9, 50, color=(0.6, 0.3, 0.1)
         )
 
     canvas.y -= 25
