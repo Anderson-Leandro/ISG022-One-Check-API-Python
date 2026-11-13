@@ -49,11 +49,31 @@
 | 2026-11-13 | DEBT-019 (3 pts) sai da sprint e fica previsto para a Sprint 15 | o Dependabot só lê a configuração da main: os critérios 1 e 2 só se provam com um PR real depois da release (TK-015) | decisão do PO: fazer e provar junto da release |
 
 ## Sprint Review
+Feita em 2026-11-13.
+
 - **Incremento demonstrável:**
-- **Goal atingido?** sim / parcial / não — por quê:
-- **Evidências** (PRs, testes, prints, relatórios):
-- **Checagem de segurança** (`/security-audit diff`, segredos, riscos novos):
-- **Feedback do cliente/PO:**
+  - **Dados do titular (LGPD):** exportação (`GET /usuarios/me/dados`) e anonimização da própria conta (`POST /usuarios/me/anonimizar`), com ADR-0017 (SEC-028). O login, a criação e a desativação de usuário deixam de gravar o e-mail no log.
+  - **Trilha íntegra:** um trigger no banco recusa UPDATE e DELETE em `log_operacao`, salvo a retenção (SEC-025, ADR-0016). Testado também no PostgreSQL.
+  - **Erros num formato único:** todo erro, inclusive 401, 403, 422 de schema e 500, vem em `{sucesso, erro, erros}`, e o OpenAPI só declara esse formato (DEBT-020).
+  - **Senhas:** a senha antiga fraca obriga a troca no login (SEC-029). Senhas novas vazadas são recusadas pelo Have I Been Pwned, com k-anonymity, prazo de 3 s e fail open (SEC-030).
+  - **Correções:** foto órfã no disco, inclusive na foto do checklist (BUG-002), e mensagem própria para o token de verificação no MFA (DEBT-013).
+  - **Processo:**
+    - merges pela interface do GitHub no padrão (TK-021): dos 22 merges da sprint, só o anterior a ele saiu fora do padrão;
+    - suíte numa cópia do projeto por script (TK-022);
+    - imagem do Docker fixada por digest (DEBT-021).
+- **Goal atingido? Sim.** Os três resultados do goal estão entregues, cada um com os testes do critério e do cenário negado.
+- **Evidências:**
+  - `python3 scripts/dod_check.py` verde nos 10 itens `done`;
+  - 55 commits e 22 PRs mesclados desde o planejamento (#236 a #256);
+  - suíte de 1398 para 1521 testes, cobertura de branches em 97%;
+  - collection do Insomnia com 169/169;
+  - ADRs 0016 e 0017.
+- **Checagem de segurança:**
+  - **Scanners:** rodados no diff completo da sprint (`9f1c7e0..dev`), os 7 com status `ok`. **Nenhum achado novo** e nenhuma dependência vulnerável.
+  - **Apontamentos conferidos no código:** o SQL dos triggers é montado só com nomes fixos; o `try/except` da liberação é proposital; o SHA-1 e a URL da consulta de senhas vazadas são o formato do serviço, com o prefixo conferido antes; as constantes de mensagem e a chave do teste de assinatura não são segredos.
+  - **Riscos:** R-005 (não-repúdio) e R-016 (LGPD) mitigados.
+- **Fora da sprint:** o DEBT-019 (3 pts) foi movido para a Sprint 15 por decisão do PO, porque só se prova depois da release (o Dependabot lê a `main`). O DEBT-022 (direitos do titular de uma conta desativada) foi criado na revisão do SEC-028.
+- **Feedback do cliente/PO:** o incremento está de acordo. O goal foi atingido, e nada muda de prioridade.
 
 ## Retrospectiva
 | Funcionou bem | Melhorar | Ação (vira item no backlog) |
